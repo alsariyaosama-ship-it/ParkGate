@@ -32,7 +32,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T2.4 `UnitOfWorkFactory`, `UnitOfWork` (transaction, `GetDbUtcNowAsync`), repositories incl. `GetForUpdateAsync` with `UPDLOCK, ROWLOCK`.
 - [x] T2.5 `Pbkdf2PasswordHasher`, `AppSettingsStore`, `AuditWriter`, DPAPI `ConnectionSettingsStore`.
 - [x] T2.6 Integration tests (LocalDB): mapping round-trip, unique indexes, **parallel check-in → exactly one granted**, void recalculation.
-- [ ] T2.7 `scripts/build-migration-bundle.ps1` producing `efbundle.exe` for deployment.
+- [x] T2.7 `scripts/build-migration-bundle.ps1` producing `efbundle.exe` for deployment.
 
 **Done when:** DB created from migrations on LocalDB; integration tests pass locally; concurrency test passes 20 consecutive runs.
 
