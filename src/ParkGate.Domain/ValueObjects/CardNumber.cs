@@ -57,12 +57,6 @@ public sealed record CardNumber
 
         var normalizedString = sb.ToString();
 
-        if (normalizedString.Length == 0)
-        {
-            error = "Card number cannot be empty.";
-            return false;
-        }
-
         if (normalizedString.Length > MaxLength)
         {
             error = $"Card number exceeds maximum length of {MaxLength} characters.";
