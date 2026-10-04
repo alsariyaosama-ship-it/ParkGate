@@ -24,6 +24,7 @@ public class ParkGateDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ParkGateDbContext).Assembly);
+        modelBuilder.SeedInitialData();
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
