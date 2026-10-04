@@ -12,7 +12,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T0.3 `ParkGate.ArchitectureTests`: reflection tests enforcing AGENTS.md §3 (referenced assemblies per layer).
 - [x] T0.4 WinForms composition root: Generic Host, `appsettings.json` (LocalDB dev default), Serilog file sink to `%ProgramData%\ParkGate\logs`, global exception handlers, `IFormFactory`, `PerMonitorV2` DPI.
 - [x] T0.5 `RtlFormBase`, `Notify` helper, `Strings.resx` (ar), empty `MainForm` titled from resources. App starts and shows an RTL window.
-- [ ] T0.6 CI green on GitHub Actions (`.github/workflows/build.yml`).
+- [x] T0.6 CI green on GitHub Actions (`.github/workflows/build.yml`).
 
 **Done when:** solution builds with zero warnings, architecture tests pass, CI green, app opens an Arabic RTL window.
 
