@@ -87,7 +87,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public async Task<DateTime> GetDbUtcNowAsync(CancellationToken cancellationToken = default)
     {
         var dbTime = await _context.Database
-            .SqlQueryRaw<DateTime>("SELECT SYSUTCDATETIME()")
+            .SqlQueryRaw<DateTime>("SELECT SYSUTCDATETIME() AS [Value]")
             .SingleAsync(cancellationToken);
 
         return DateTime.SpecifyKind(dbTime, DateTimeKind.Utc);
