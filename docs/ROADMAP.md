@@ -10,7 +10,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T0.1 Create `ParkGate.sln` (`dotnet new sln -n ParkGate --format sln`) and the 4 src + 4 test projects from AGENTS.md §3 with correct target frameworks.
 - [x] T0.2 Project references per the dependency rule. Add `Directory.Packages.props` (Central Package Management, latest stable versions of approved packages). Confirm `Directory.Build.props` applies.
 - [x] T0.3 `ParkGate.ArchitectureTests`: reflection tests enforcing AGENTS.md §3 (referenced assemblies per layer).
-- [ ] T0.4 WinForms composition root: Generic Host, `appsettings.json` (LocalDB dev default), Serilog file sink to `%ProgramData%\ParkGate\logs`, global exception handlers, `IFormFactory`, `PerMonitorV2` DPI.
+- [x] T0.4 WinForms composition root: Generic Host, `appsettings.json` (LocalDB dev default), Serilog file sink to `%ProgramData%\ParkGate\logs`, global exception handlers, `IFormFactory`, `PerMonitorV2` DPI.
 - [ ] T0.5 `RtlFormBase`, `Notify` helper, `Strings.resx` (ar), empty `MainForm` titled from resources. App starts and shows an RTL window.
 - [ ] T0.6 CI green on GitHub Actions (`.github/workflows/build.yml`).
 
