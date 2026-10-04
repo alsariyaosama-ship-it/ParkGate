@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ParkGate.Domain\ParkGate.Domain.csproj" />
+    <ProjectReference Include="..\..\src\ParkGate.Application\ParkGate.Application.csproj" />
+    <ProjectReference Include="..\..\src\ParkGate.Infrastructure\ParkGate.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\ParkGate.WinForms\ParkGate.WinForms.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Shouldly" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Shouldly" />
+  </ItemGroup>
+
+</Project>
