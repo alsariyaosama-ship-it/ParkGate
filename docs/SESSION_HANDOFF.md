@@ -16,8 +16,8 @@
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
 | Unit tests | 163 passed (151 domain + 10 architecture + 1 app + 1 infra) |
 | Integration tests | n/a (Phase 2) |
-| CI | Pending PR run |
-| Last commit | `test(domain): add table-driven boundary tests for eligibility policy and decisions [T1.5]` |
+| CI | Green on GitHub Actions (`build` passed in 1m38s) |
+| Last commit | `docs: update session handoff` |
 
 ## State of the work
 
