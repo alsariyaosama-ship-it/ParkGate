@@ -26,7 +26,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 **Done when:** all Domain BRs covered by passing tests; Domain has zero references.
 
 ## Phase 2 — Persistence · branch `phase/02-persistence`
-- [ ] T2.1 `ParkGateDbContext` + one configuration per entity matching DATABASE.md (lengths, indexes, filtered indexes, check constraints, rowversion).
+- [x] T2.1 `ParkGateDbContext` + one configuration per entity matching DATABASE.md (lengths, indexes, filtered indexes, check constraints, rowversion).
 - [ ] T2.2 Audit-columns `SaveChangesInterceptor`.
 - [ ] T2.3 Migration `InitialCreate` with seed (DATABASE.md §6, no users).
 - [ ] T2.4 `UnitOfWorkFactory`, `UnitOfWork` (transaction, `GetDbUtcNowAsync`), repositories incl. `GetForUpdateAsync` with `UPDLOCK, ROWLOCK`.
