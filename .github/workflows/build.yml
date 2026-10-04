@@ -1,0 +1,60 @@
+name: build
+
+on:
+  push:
+    branches: [ main, 'phase/**', 'fix/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect solution
+        id: sln
+        shell: pwsh
+        run: |
+          if (Test-Path 'ParkGate.sln') {
+            "exists=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "exists=false" >> $env:GITHUB_OUTPUT
+            Write-Host 'ParkGate.sln not found yet (Phase 0 not done) - skipping build.'
+          }
+
+      - name: Setup .NET
+        if: steps.sln.outputs.exists == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        if: steps.sln.outputs.exists == 'true'
+        run: dotnet restore ParkGate.sln
+
+      - name: Build
+        if: steps.sln.outputs.exists == 'true'
+        run: dotnet build ParkGate.sln -c Release --no-restore
+
+      - name: Test (unit + architecture)
+        if: steps.sln.outputs.exists == 'true'
+        run: dotnet test ParkGate.sln -c Release --no-build --filter "Category!=Integration" --logger trx --results-directory TestResults
+
+      - name: Upload test results
+        if: always() && steps.sln.outputs.exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+          if-no-files-found: ignore

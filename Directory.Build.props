@@ -1,0 +1,18 @@
+<Project>
+  <!-- Applies to every project under this folder. Package versions live in Directory.Packages.props (created in T0.2). -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Company>شركة الركاز المتين لتقنية المعلومات</Company>
+    <Product>ParkGate</Product>
+    <NeutralLanguage>ar-LY</NeutralLanguage>
+  </PropertyGroup>
+
+  <!-- Warnings are errors everywhere except the WinForms project (designer noise). Keep WinForms warning-free anyway. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'ParkGate.WinForms'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

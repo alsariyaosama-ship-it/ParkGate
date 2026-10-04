@@ -1,0 +1,63 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rtifacts/
+publish/
+*.efbundle
+efbundle.exe
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Tests and coverage
+[Tt]est[Rr]esults/
+coverage*/
+*.coverage
+*.coveragexml
+*.trx
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!**/packages/build/
+
+# Local configuration and secrets — never commit
+appsettings.Local.json
+appsettings.*.Local.json
+*.pfx
+*.snk
+connection.dat
+.env
+
+# Databases, backups, logs
+*.mdf
+*.ldf
+*.ndf
+*.bak
+logs/
+*.log
+
+# Installer output
+installer/Output/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json
