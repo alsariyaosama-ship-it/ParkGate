@@ -17,11 +17,11 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 **Done when:** solution builds with zero warnings, architecture tests pass, CI green, app opens an Arabic RTL window.
 
 ## Phase 1 — Domain · branch `phase/01-domain`
-- [ ] T1.1 Enums from DATABASE.md §2 with explicit numeric values.
-- [ ] T1.2 Value objects `CardNumber`, `PhoneNumber`, `NationalId` with normalization (BR-01, BR-15, BR-16) incl. Arabic-Indic/Persian digits.
-- [ ] T1.3 Entities `Organization`, `Beneficiary`, `AgeCategory`, `EntryAttempt` (+ companions), `User`, `Workstation`, `AppSetting`, `AuditLog` with invariants and behavior methods.
-- [ ] T1.4 `IEntryEligibilityPolicy`, `EligibilityContext`, `EligibilityDecision`, `RollingWindowEligibilityPolicy` (BR-02..BR-06) + override eligibility rules (BR-11).
-- [ ] T1.5 Domain tests per AGENTS.md §8 (table-driven boundaries).
+- [x] T1.1 Enums from DATABASE.md §2 with explicit numeric values.
+- [x] T1.2 Value objects `CardNumber`, `PhoneNumber`, `NationalId` with normalization (BR-01, BR-15, BR-16) incl. Arabic-Indic/Persian digits.
+- [x] T1.3 Entities `Organization`, `Beneficiary`, `AgeCategory`, `EntryAttempt` (+ companions), `User`, `Workstation`, `AppSetting`, `AuditLog` with invariants and behavior methods.
+- [x] T1.4 `IEntryEligibilityPolicy`, `EligibilityContext`, `EligibilityDecision`, `RollingWindowEligibilityPolicy` (BR-02..BR-06) + override eligibility rules (BR-11).
+- [x] T1.5 Domain tests per AGENTS.md §8 (table-driven boundaries).
 
 **Done when:** all Domain BRs covered by passing tests; Domain has zero references.
 
