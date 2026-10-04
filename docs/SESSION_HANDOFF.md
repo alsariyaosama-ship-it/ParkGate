@@ -10,42 +10,44 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-05 |
-| Last session | S02 — Phase 1 Domain |
-| Current phase | Phase 1 — Domain (completed, pending merge) |
-| Working branch | `phase/01-domain` |
+| Last session | S03 — Phase 2 Persistence |
+| Current phase | Phase 2 — Persistence (completed, pending merge) |
+| Working branch | `phase/02-persistence` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 163 passed (151 domain + 10 architecture + 1 app + 1 infra) |
-| Integration tests | n/a (Phase 2) |
-| CI | Green on GitHub Actions (`build` passed in 1m38s) |
-| Last commit | `docs: update session handoff` |
+| Unit tests | 195 passed (151 domain + 10 architecture + 1 app + 33 infra) |
+| Integration tests | 14 passed on LocalDB (concurrency 20 runs, round-trip, indexes, void) |
+| CI | Ready for Phase 2 PR |
+| Last commit | `build(infra): add script to generate efbundle.exe migration bundle [T2.7]` |
 
 ## State of the work
 
 **Done**
-- Merged Phase 0 (Foundation) PR #1 into `main`.
-- T1.1 Enums with explicit byte numeric values matching DATABASE.md §2 (`BeneficiaryStatus`, `EntryResult`, `DenialReason`, `EntryChannel`, `UserRole`, `WorkstationType`).
-- T1.2 Value objects `CardNumber`, `PhoneNumber`, `NationalId` with complete normalization and Arabic-Indic/Persian digit handling (BR-01, BR-15, BR-16).
-- T1.3 Domain entities `Organization`, `Beneficiary`, `AgeCategory`, `EntryAttempt` (+ companions), `User`, `Workstation`, `AppSetting`, `AuditLog` with invariants and behavior methods.
-- T1.4 `IEntryEligibilityPolicy`, `EligibilityContext`, `EligibilityDecision`, `RollingWindowEligibilityPolicy` implementing BR-02..BR-06 check order, rolling window boundary conditions, and BR-11 supervisor override rules.
-- T1.5 151 unit tests in `ParkGate.Domain.Tests` covering all business rules and boundaries with 100% line & branch coverage on value objects and eligibility policy. Zero package/project references in Domain.
+- Merged Phase 1 (Domain) PR #2 into `main`.
+- T2.1 `ParkGateDbContext` + 9 entity configurations matching DATABASE.md (lengths, indexes, filtered indexes, check constraints, rowversion).
+- T2.2 Audit-columns `SaveChangesInterceptor` with `DateTimeUtcConverter`.
+- T2.3 Migration `InitialCreate` with seed (DATABASE.md §5 & §6, no users) applied on LocalDB.
+- T2.4 `UnitOfWorkFactory`, `UnitOfWork` (transaction, `GetDbUtcNowAsync`), repositories incl. `GetForUpdateAsync` with `UPDLOCK, ROWLOCK`.
+- T2.5 `Pbkdf2PasswordHasher`, `AppSettingsStore`, `AuditWriter`, DPAPI `ConnectionSettingsStore`.
+- T2.6 Integration tests (LocalDB): mapping round-trip, unique indexes, **parallel check-in → exactly one granted (20 consecutive runs)**, void recalculation.
+- T2.7 `scripts/build-migration-bundle.ps1` producing `efbundle.exe` for deployment.
 
 **In progress**
-- Phase 1 PR to `main`.
+- Phase 2 PR to `main`.
 
 **Not started**
-- Phase 2: Persistence (T2.1 .. T2.7).
+- Phase 3: Application (T3.1 .. T3.8).
 
 ## Next session — start here
 
-1. User reviews and merges Phase 1 PR (`phase/01-domain`) into `main`.
+1. User reviews and merges Phase 2 PR (`phase/02-persistence`) into `main`.
 2. Checkout `main` and pull (`git checkout main; git pull --ff-only`).
-3. Create branch `phase/02-persistence` from `main`.
-4. Start T2.1: `ParkGateDbContext` + entity configurations matching DATABASE.md (lengths, indexes, filtered indexes, check constraints, rowversion).
-5. Continue with T2.2 audit interceptor and T2.3 migrations.
+3. Create branch `phase/03-application` from `main`.
+4. Start T3.1: `Result`, `Result<T>`, `Error`, error code catalog.
+5. Continue with T3.2 `ICurrentUser`, `ICurrentWorkstation`, `Permission` enum and role matrix.
 
 ## Blockers / waiting on the user
 
-- User review and merge of Phase 1 Pull Request into `main`.
+- User review and merge of Phase 2 Pull Request into `main`.
 
 ## Known issues / tech debt
 
@@ -54,15 +56,21 @@
 ## Environment notes
 
 - Dev DB: LocalDB `(localdb)\MSSQLLocalDB`, database `ParkGate_Dev` (default in `appsettings.json`).
-- Integration tests will create and drop `ParkGate_Test_<guid>` databases on LocalDB.
+- Integration tests create and drop `ParkGate_Test_<guid>` databases on LocalDB.
 
 ---
 
 ## Session log (newest first, max 10)
 
+### S03 — 2026-10-05 — Phase 2 Persistence
+- Tasks: T2.1, T2.2, T2.3, T2.4, T2.5, T2.6, T2.7 completed (all Phase 2 tasks).
+- Commits: see branch `phase/02-persistence`.
+- Decisions: Global DateTime UTC convention configured in DbContext; parallel check-in concurrency verified with UPDLOCK/ROWLOCK across 20 consecutive runs; efbundle.exe script verified.
+- Test count: 209 total passed (195 unit/architecture + 14 LocalDB integration tests).
+
 ### S02 — 2026-10-04 — Phase 1 Domain
 - Tasks: T1.1, T1.2, T1.3, T1.4, T1.5 completed (all Phase 1 tasks).
-- Commits: see branch `phase/01-domain`.
+- Commits: see branch `phase/01-domain`, merged into `main` via PR #2.
 - Decisions: Value objects implemented with 100% branch coverage; eligibility policy verified against boundary conditions and check orders; Domain project maintained with zero package/project references.
 - Test count: 163 total passed (151 Domain + 10 Architecture + 1 Application + 1 Infrastructure).
 
@@ -77,13 +85,3 @@
 - Decisions: ADR-001 … ADR-016 — **approved by the user**.
 - User answers: Q2 holder counted separately · Q3 rolling window in hours · Q8 no financial claims, per-organization statistics important · Q11 gate deferred.
 - No code yet.
-
-<!--
-Template for a new log entry (copy above the previous entry):
-
-### S<NN> — YYYY-MM-DD — <short title>
-- Tasks: T<x.y> done, T<x.z> partial (what's left)
-- Commits: <short hashes or "see branch">
-- Decisions: ADR-0XX (if any)
-- Notes for next session: <one or two lines>
--->
