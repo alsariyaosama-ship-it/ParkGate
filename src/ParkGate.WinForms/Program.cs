@@ -66,7 +66,7 @@ internal static class Program
             _host.Start();
 
             var formFactory = _host.Services.GetRequiredService<IFormFactory>();
-            var mainForm = formFactory.Create<Form1>();
+            var mainForm = formFactory.Create<Forms.MainForm>();
 
             WinFormsApp.Run(mainForm);
         }
@@ -89,7 +89,7 @@ internal static class Program
         services.AddSingleton<IFormFactory, FormFactory>();
 
         // Forms (Transient per AGENTS.md §4.5)
-        services.AddTransient<Form1>();
+        services.AddTransient<Forms.MainForm>();
     }
 
     private static void HandleException(string source, Exception? exception)
