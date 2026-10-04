@@ -30,7 +30,15 @@ public class ParkGateDbContext : DbContext
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);
-        configurationBuilder.Properties<DateTime>().HavePrecision(3);
-        configurationBuilder.Properties<DateOnly>().HaveColumnType("date");
+        configurationBuilder.Properties<DateTime>()
+            .HavePrecision(3)
+            .HaveConversion<DateTimeUtcConverter>();
+
+        configurationBuilder.Properties<DateTime?>()
+            .HavePrecision(3)
+            .HaveConversion<NullableDateTimeUtcConverter>();
+
+        configurationBuilder.Properties<DateOnly>()
+            .HaveColumnType("date");
     }
 }
