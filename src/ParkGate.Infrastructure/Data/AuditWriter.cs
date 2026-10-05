@@ -27,7 +27,18 @@ public sealed class AuditWriter : IAuditWriter
         CancellationToken cancellationToken = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
-        var nowUtc = _timeProvider.GetUtcNow().UtcDateTime;
+        DateTime nowUtc;
+        try
+        {
+            var dbTime = await context.Database
+                .SqlQueryRaw<DateTime>("SELECT SYSUTCDATETIME() AS [Value]")
+                .SingleAsync(cancellationToken);
+            nowUtc = DateTime.SpecifyKind(dbTime, DateTimeKind.Utc);
+        }
+        catch
+        {
+            nowUtc = _timeProvider.GetUtcNow().UtcDateTime;
+        }
 
         var log = new AuditLog(nowUtc, action, userId, workstationId, entityName, entityId, detailsJson);
         context.AuditLogs.Add(log);

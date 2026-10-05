@@ -19,6 +19,9 @@ public sealed record NationalId
         Value = value;
     }
 
+    public static bool TryCreate(string? raw, [NotNullWhen(true)] out NationalId? nationalId) =>
+        TryCreate(raw, out nationalId, out _);
+
     public static bool TryCreate(string? raw, [NotNullWhen(true)] out NationalId? nationalId, [NotNullWhen(false)] out string? error)
     {
         nationalId = null;

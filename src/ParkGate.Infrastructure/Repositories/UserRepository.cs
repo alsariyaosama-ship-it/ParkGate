@@ -27,6 +27,11 @@ public sealed class UserRepository : IUserRepository
             .SingleOrDefaultAsync(u => u.UserName == normalized, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Users.OrderBy(u => u.UserName).ToListAsync(cancellationToken);
+    }
+
     public async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Users.CountAsync(cancellationToken);

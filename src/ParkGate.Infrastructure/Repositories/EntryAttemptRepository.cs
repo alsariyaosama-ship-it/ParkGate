@@ -40,6 +40,26 @@ public sealed class EntryAttemptRepository : IEntryAttemptRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<EntryAttempt>> GetHistoryByBeneficiaryIdAsync(Guid beneficiaryId, int maxResults = 100, CancellationToken cancellationToken = default)
+    {
+        return await _context.EntryAttempts
+            .Include(e => e.Companions)
+            .Where(e => e.BeneficiaryId == beneficiaryId)
+            .OrderByDescending(e => e.AttemptedAtUtc)
+            .Take(maxResults)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<EntryAttempt>> GetTodayByWorkstationIdAsync(int workstationId, DateOnly businessDate, int maxResults = 20, CancellationToken cancellationToken = default)
+    {
+        return await _context.EntryAttempts
+            .Include(e => e.Companions)
+            .Where(e => e.WorkstationId == workstationId && e.BusinessDate == businessDate)
+            .OrderByDescending(e => e.AttemptedAtUtc)
+            .Take(maxResults)
+            .ToListAsync(cancellationToken);
+    }
+
     public void Add(EntryAttempt attempt)
     {
         _context.EntryAttempts.Add(attempt);

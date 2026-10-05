@@ -59,6 +59,28 @@ public sealed class BeneficiaryRepository : IBeneficiaryRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Beneficiary>> SearchAsync(string searchTerm, int maxResults = 50, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            return Array.Empty<Beneficiary>();
+        }
+
+        var trimmed = searchTerm.Trim();
+        var hasCard = CardNumber.TryCreate(trimmed, out var card);
+        var hasPhone = PhoneNumber.TryCreate(trimmed, out var phone);
+        var hasNationalId = NationalId.TryCreate(trimmed, out var nationalId);
+
+        return await _context.Beneficiaries
+            .Where(b => EF.Functions.Like(b.FullName, $"%{trimmed}%") ||
+                        (hasCard && b.CardNumber == card) ||
+                        (hasPhone && b.Phone == phone) ||
+                        (hasNationalId && b.NationalId == nationalId))
+            .OrderBy(b => b.FullName)
+            .Take(maxResults)
+            .ToListAsync(cancellationToken);
+    }
+
     public void Add(Beneficiary beneficiary)
     {
         _context.Beneficiaries.Add(beneficiary);
