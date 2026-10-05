@@ -43,7 +43,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T3.4 `BeneficiaryService`: lookup by card (multi-org), eligibility preview, register, update, suspend/reactivate/block, search, history.
 - [x] T3.5 `CheckInService`: record entry (atomic, BR-07..BR-12), log denial with dedupe (BR-10), override (BR-11), void (BR-13).
 - [x] T3.6 `SettingsService` (typed, cached), organizations, age categories, users, workstations services + validators.
-- [ ] T3.7 Audit calls for every BR-17 action.
+- [x] T3.7 Audit calls for every BR-17 action.
 - [ ] T3.8 Application tests per AGENTS.md §8.
 
 **Done when:** every FR-CHK/FR-BEN/FR-AUTH use case exists and is tested without a UI.

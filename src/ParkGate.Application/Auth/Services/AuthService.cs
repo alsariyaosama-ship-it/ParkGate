@@ -124,16 +124,43 @@ public sealed class AuthService : IAuthService
         var user = await uow.Users.GetByUserNameAsync(normalizedUserName, cancellationToken);
         if (user is null)
         {
+            await _auditWriter.WriteAsync(
+                action: "UserLoginFailed",
+                userId: null,
+                workstationId: _workstationSession.WorkstationId,
+                entityName: nameof(User),
+                entityId: normalizedUserName,
+                detailsJson: "{\"Reason\":\"UserNotFound\"}",
+                cancellationToken: cancellationToken);
+
             return Errors.Auth.InvalidCredentials;
         }
 
         if (!user.IsActive)
         {
+            await _auditWriter.WriteAsync(
+                action: "UserLoginFailed",
+                userId: user.Id,
+                workstationId: _workstationSession.WorkstationId,
+                entityName: nameof(User),
+                entityId: user.Id.ToString(),
+                detailsJson: "{\"Reason\":\"AccountInactive\"}",
+                cancellationToken: cancellationToken);
+
             return Errors.Auth.AccountInactive;
         }
 
         if (user.IsLockedOut(nowUtc))
         {
+            await _auditWriter.WriteAsync(
+                action: "UserLoginFailed",
+                userId: user.Id,
+                workstationId: _workstationSession.WorkstationId,
+                entityName: nameof(User),
+                entityId: user.Id.ToString(),
+                detailsJson: "{\"Reason\":\"AccountLocked\"}",
+                cancellationToken: cancellationToken);
+
             return Errors.Auth.AccountLocked;
         }
 
@@ -155,6 +182,15 @@ public sealed class AuthService : IAuthService
 
                 return Errors.Auth.AccountLocked;
             }
+
+            await _auditWriter.WriteAsync(
+                action: "UserLoginFailed",
+                userId: user.Id,
+                workstationId: _workstationSession.WorkstationId,
+                entityName: nameof(User),
+                entityId: user.Id.ToString(),
+                detailsJson: "{\"Reason\":\"InvalidPassword\"}",
+                cancellationToken: cancellationToken);
 
             return Errors.Auth.InvalidCredentials;
         }
@@ -299,13 +335,21 @@ public sealed class AuthService : IAuthService
             workstation = new Workstation(targetMachine, targetMachine, WorkstationType.Desk, isActive: true);
             workstation.RecordHeartbeat(nowUtc);
             uow.Workstations.Add(workstation);
+            await uow.SaveChangesAsync(cancellationToken);
+
+            await _auditWriter.WriteAsync(
+                action: "WorkstationAutoRegistered",
+                userId: _currentUserSession.UserId,
+                workstationId: workstation.Id,
+                entityName: nameof(Workstation),
+                entityId: workstation.Id.ToString(),
+                cancellationToken: cancellationToken);
         }
         else
         {
             workstation.RecordHeartbeat(nowUtc);
+            await uow.SaveChangesAsync(cancellationToken);
         }
-
-        await uow.SaveChangesAsync(cancellationToken);
         _workstationSession.SetWorkstation(workstation);
 
         return workstation.ToDto();
