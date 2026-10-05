@@ -92,6 +92,7 @@ public static class DependencyInjection
         services.AddTransient<FirstRunAdminForm>();
         services.AddTransient<LoginForm>();
         services.AddTransient<ChangePasswordForm>();
+        services.AddTransient<SupervisorAuthDialog>();
 
         return services;
     }

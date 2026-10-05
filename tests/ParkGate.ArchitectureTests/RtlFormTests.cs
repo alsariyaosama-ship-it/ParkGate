@@ -37,6 +37,7 @@ public sealed class RtlFormTests
     [InlineData(typeof(FirstRunAdminForm))]
     [InlineData(typeof(LoginForm))]
     [InlineData(typeof(ChangePasswordForm))]
+    [InlineData(typeof(SupervisorAuthDialog))]
     public void AllForms_ShouldInheritRtlFormBase(Type formType)
     {
         typeof(RtlFormBase).IsAssignableFrom(formType).ShouldBeTrue($"Form '{formType.Name}' must inherit from RtlFormBase.");
