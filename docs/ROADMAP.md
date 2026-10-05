@@ -50,9 +50,9 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 ## Phase 4 — UI shell · branch `phase/04-ui-shell`
 - [x] T4.1 Startup sequence: DB connectivity → connection dialog (DPAPI) → pending-migrations block → first-run wizard → login → shell.
-- [ ] T4.2 Main shell: menu by permission, status bar (user, workstation, server time, connection state).
-- [ ] T4.3 Shared UI kit: `StatusBanner`, `CounterInput` (− value +), busy indicator, `ErrorMessages` mapping, keyboard shortcut handling.
-- [ ] T4.4 Change-password and re-authentication (supervisor) dialogs.
+- [x] T4.2 Main shell: menu by permission, status bar (user, workstation, server time, connection state).
+- [x] T4.3 Shared UI kit: `StatusBanner`, `CounterInput` (− value +), busy indicator, `ErrorMessages` mapping, keyboard shortcut handling.
+- [x] T4.4 Change-password and re-authentication (supervisor) dialogs.
 
 **Done when:** a user can install on LocalDB, create the admin, log in, and see the shell in RTL at 100 % and 150 % DPI.
 

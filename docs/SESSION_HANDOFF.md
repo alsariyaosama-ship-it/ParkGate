@@ -10,47 +10,43 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-05 |
-| Last session | S05 — Phase 4 UI Shell (T4.1) |
-| Current phase | Phase 4 — UI Shell |
+| Last session | S06 — Phase 4 UI Shell (T4.2, T4.3, T4.4) |
+| Current phase | Phase 4 — UI Shell (Complete, ready for PR) |
 | Working branch | `phase/04-ui-shell` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 259 passed (151 domain + 76 application + 32 architecture/ui) |
+| Unit tests | 286 passed (151 domain + 76 application + 59 architecture/ui) |
 | Integration tests | 47 passed on LocalDB (33 infra unit + 14 LocalDB integration) |
-| Total tests | 292 passed |
-| Last commit | `feat(ui): implement startup sequence and auth dialogs [T4.1]` |
+| Total tests | 333 passed |
+| Last commit | `feat(ui): implement supervisor re-authentication dialog [T4.4]` |
 
 ## State of the work
 
 **Done**
 - Merged Phase 3 PR #4 into `main`, branched `phase/04-ui-shell`.
 - T4.1: Startup sequence: DB connectivity check -> Connection settings dialog (DPAPI machine-scope encryption) -> Pending migrations block (ADR-011) -> First-run wizard (ADR-012) -> Workstation auto-registration -> User login with lockout (BR-18) -> Shell.
-- Added Application ports `IDatabaseStartupService` and `IAppConnectionStringProvider`.
-- Added Infrastructure implementations `AppConnectionStringProvider` and `DatabaseStartupService`.
-- Added UI forms and dialogs: `ConnectionSettingsForm`, `FirstRunAdminForm`, `LoginForm`, `ChangePasswordForm`.
-- Added `ErrorMessages` mapper and `INotifyService` / `NotifyService` abstraction for testable notifications.
-- Comprehensive unit and architecture tests for ErrorMessages, RTL conformance, and StartupCoordinator (292 tests green).
+- T4.2: Main shell (`MainForm`): Full RTL, menu dynamically filtered by user permissions per SPEC §4 (File, Operations, Management, Reports, Help), status bar showing authenticated user with Arabic role name, workstation name, live server clock ticking every second in park local time (with automatic server-UTC offset sync), and live connection state.
+- T4.3: Shared UI kit: `StatusBanner` with standard states and colors (#1B873F, #C62828, #B26A00, #455A64) and large font >= 20 pt per SPEC §5.3/AGENTS.md §5.10; `CounterInput` with decrement/increment buttons, direct typing, range clamping, and automatic normalization of Arabic-Indic / Persian digits; `BusyScope` scoped control disablement and wait cursor.
+- T4.4: `SupervisorAuthDialog` re-authentication dialog with supervisor credential validation via `IAuthService` and mandatory reason (>= 5 chars) per BR-11/FR-CHK-06 (`ChangePasswordForm` completed in T4.1).
+- Added `DateTimeDisplayHelper` formatting dates and times per AGENTS.md §5.8 with Western digits 0-9 and ص/م.
+- Added comprehensive unit and architecture tests for all new forms, controls, and helpers (333 tests green).
 
 **In progress**
-- Phase 4: UI shell · branch `phase/04-ui-shell` (T4.2, T4.3, T4.4).
+- Phase 4 complete, pending review and merge into `main`.
 
 **Not started**
 - Phase 5: Check-in desk (core) · branch `phase/05-checkin` (T5.1 .. T5.5).
 
 ## Next session — start here
 
-1. Continue on branch `phase/04-ui-shell`.
-2. Start T4.2: Main shell (`MainForm`):
-   - Menu by permission: File (Change Password, Logout, Exit), Operations (Check-in desk F1), Management (Holders, Organizations, Age Categories, Users, Workstations, Settings), Reports (Daily Summary, Org Statistics), Help (About).
-   - Status bar: Logged-in user (name + role), workstation name, server local time (live clock timer), connection state.
-3. Start T4.3: Shared UI kit:
-   - `StatusBanner` (granted/denied/warning/neutral with text and colors per AGENTS.md §5.10).
-   - `CounterInput` (− value + with direct typing and Arabic-Indic normalization).
-   - Busy indicator / keyboard shortcut handling.
-4. Start T4.4: Supervisor re-authentication dialog (`SupervisorAuthDialog`). (`ChangePasswordForm` already completed in T4.1).
+1. User reviews and merges Phase 4 PR into `main`.
+2. Branch `phase/05-checkin` from updated `main`.
+3. Start T5.1: Check-in screen layout per SPEC §5.3:
+   - Zones from top to bottom: Top bar, search zone (card number box, org filter), status banner, holder panel, companions panel, action bar (F5, F9, F2, Esc), today grid + totals.
+4. Start T5.2: Flows 5.1 and A1-A7 wired to `CheckInService` / `BeneficiaryService`.
 
 ## Blockers / waiting on the user
 
-- None.
+- User review and merge of Phase 4 Pull Request.
 
 ## Known issues / tech debt
 
@@ -65,6 +61,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S06 — 2026-10-05 — Phase 4 UI Shell (T4.2, T4.3, T4.4)
+- Tasks: T4.2, T4.3, T4.4 completed on `phase/04-ui-shell` (Phase 4 complete).
+- Commits: `feat(ui): implement main shell with menu by permission and status bar [T4.2]`, `feat(ui): implement shared UI kit controls and helpers [T4.3]`, `feat(ui): implement supervisor re-authentication dialog [T4.4]`.
+- Decisions: Main shell menu dynamically adapts to `ICurrentUser` permissions; status bar displays live server time converted to park time zone with automatic DB sync and connection status monitoring; `StatusBanner` and `CounterInput` built with full RTL and Arabic-Indic digit normalization; `SupervisorAuthDialog` wired with `IAuthService.ValidateSupervisorCredentialsAsync`.
+- Test count: 333 total passed (286 unit/architecture + 47 LocalDB infrastructure tests).
 
 ### S05 — 2026-10-05 — Phase 4 UI Shell (T4.1)
 - Tasks: PR #4 merged into `main`; T4.1 completed on `phase/04-ui-shell`.
