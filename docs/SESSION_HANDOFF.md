@@ -10,47 +10,43 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-05 |
-| Last session | S04 — Phase 3 Application |
-| Current phase | Phase 3 — Application (completed, ready for PR) |
-| Working branch | `phase/03-application` |
+| Last session | S06 — Phase 4 UI Shell (T4.2, T4.3, T4.4) |
+| Current phase | Phase 4 — UI Shell (Complete, ready for PR) |
+| Working branch | `phase/04-ui-shell` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 237 passed (151 domain + 76 application + 10 architecture) |
-| Integration tests | 47 passed on LocalDB |
-| Total tests | 284 passed |
-| Last commit | `fix(infra): specify DateTimeKind.Utc on raw SQL SYSUTCDATETIME in AuditWriter` |
+| Unit tests | 286 passed (151 domain + 76 application + 59 architecture/ui) |
+| Integration tests | 47 passed on LocalDB (33 infra unit + 14 LocalDB integration) |
+| Total tests | 333 passed |
+| Last commit | `feat(ui): implement supervisor re-authentication dialog [T4.4]` |
 
 ## State of the work
 
 **Done**
-- T3.1: Result, Result<T>, Error, and error code catalog (General, Auth, Beneficiary, CheckIn, Organization, AgeCategory, User, Workstation, Settings).
-- T3.2: ICurrentUser, ICurrentWorkstation, Permission enum and role permission matrix (Admin, Supervisor, Operator).
-- T3.3: AuthService (first-run admin setup, login with BR-18 lockout, password changes, supervisor credentials validation, workstation auto-registration).
-- T3.4: BeneficiaryService (lookup by card number across organizations, eligibility preview, registration, update, status change, search, history).
-- T3.5: CheckInService (atomic check-in with UPDLOCK/ROWLOCK, group limits, denial deduplication within dedup window, supervisor override, void entry with timestamp recalculation).
-- T3.6: Management services (SettingsService typed and cached, OrganizationService, AgeCategoryService, UserService, WorkstationService) with FluentValidation validators.
-- T3.7: Audit logging for every BR-17 action (FirstRunAdminCreated, UserLogin, UserLoginFailed, UserLockedOut, PasswordChanged, WorkstationAutoRegistered, BeneficiaryRegistered, BeneficiaryUpdated, BeneficiaryStatusChanged, EntryGranted, EntryOverridden, EntryVoided, SettingsUpdated, OrganizationCreated/Updated/Deactivated/Reactivated, AgeCategoryCreated/Updated/Deactivated/Reactivated, UserCreated/RoleChanged/PasswordReset/Deactivated/Reactivated, WorkstationUpdated/Deactivated/Reactivated).
-- T3.8: Comprehensive application tests covering use cases, edge cases, permission enforcement, and validation failures per AGENTS.md §8.
+- Merged Phase 3 PR #4 into `main`, branched `phase/04-ui-shell`.
+- T4.1: Startup sequence: DB connectivity check -> Connection settings dialog (DPAPI machine-scope encryption) -> Pending migrations block (ADR-011) -> First-run wizard (ADR-012) -> Workstation auto-registration -> User login with lockout (BR-18) -> Shell.
+- T4.2: Main shell (`MainForm`): Full RTL, menu dynamically filtered by user permissions per SPEC §4 (File, Operations, Management, Reports, Help), status bar showing authenticated user with Arabic role name, workstation name, live server clock ticking every second in park local time (with automatic server-UTC offset sync), and live connection state.
+- T4.3: Shared UI kit: `StatusBanner` with standard states and colors (#1B873F, #C62828, #B26A00, #455A64) and large font >= 20 pt per SPEC §5.3/AGENTS.md §5.10; `CounterInput` with decrement/increment buttons, direct typing, range clamping, and automatic normalization of Arabic-Indic / Persian digits; `BusyScope` scoped control disablement and wait cursor.
+- T4.4: `SupervisorAuthDialog` re-authentication dialog with supervisor credential validation via `IAuthService` and mandatory reason (>= 5 chars) per BR-11/FR-CHK-06 (`ChangePasswordForm` completed in T4.1).
+- Added `DateTimeDisplayHelper` formatting dates and times per AGENTS.md §5.8 with Western digits 0-9 and ص/م.
+- Added comprehensive unit and architecture tests for all new forms, controls, and helpers (333 tests green).
 
 **In progress**
-- Phase 3 PR to `main`.
+- Phase 4 complete, pending review and merge into `main`.
 
 **Not started**
-- Phase 4: UI shell · branch `phase/04-ui-shell` (T4.1 .. T4.4).
+- Phase 5: Check-in desk (core) · branch `phase/05-checkin` (T5.1 .. T5.5).
 
 ## Next session — start here
 
-1. User reviews and merges Phase 3 PR (`phase/03-application`) into `main`.
-2. Checkout `main` and pull (`git checkout main; git pull --ff-only`).
-3. Create branch `phase/04-ui-shell` from `main`.
-4. Start Phase 4 UI shell tasks:
-   - T4.1 Startup sequence: DB connectivity → connection dialog (DPAPI) → pending-migrations block → first-run wizard → login → shell.
-   - T4.2 Main shell: menu by permission, status bar (user, workstation, server time, connection state).
-   - T4.3 Shared UI kit: `StatusBanner`, `CounterInput` (− value +), busy indicator, `ErrorMessages` mapping, keyboard shortcut handling.
-   - T4.4 Change-password and re-authentication (supervisor) dialogs.
+1. User reviews and merges Phase 4 PR into `main`.
+2. Branch `phase/05-checkin` from updated `main`.
+3. Start T5.1: Check-in screen layout per SPEC §5.3:
+   - Zones from top to bottom: Top bar, search zone (card number box, org filter), status banner, holder panel, companions panel, action bar (F5, F9, F2, Esc), today grid + totals.
+4. Start T5.2: Flows 5.1 and A1-A7 wired to `CheckInService` / `BeneficiaryService`.
 
 ## Blockers / waiting on the user
 
-- User review and merge of Phase 3 Pull Request into `main`.
+- User review and merge of Phase 4 Pull Request.
 
 ## Known issues / tech debt
 
@@ -59,15 +55,28 @@
 ## Environment notes
 
 - Dev DB: LocalDB `(localdb)\MSSQLLocalDB`, database `ParkGate_Dev` (default in `appsettings.json`).
+- Connection string securely overrideable via `%ProgramData%\ParkGate\connection.dat` (DPAPI LocalMachine scope).
 - Integration tests create and drop `ParkGate_Test_<guid>` databases on LocalDB.
 
 ---
 
 ## Session log (newest first, max 10)
 
+### S06 — 2026-10-05 — Phase 4 UI Shell (T4.2, T4.3, T4.4)
+- Tasks: T4.2, T4.3, T4.4 completed on `phase/04-ui-shell` (Phase 4 complete).
+- Commits: `feat(ui): implement main shell with menu by permission and status bar [T4.2]`, `feat(ui): implement shared UI kit controls and helpers [T4.3]`, `feat(ui): implement supervisor re-authentication dialog [T4.4]`.
+- Decisions: Main shell menu dynamically adapts to `ICurrentUser` permissions; status bar displays live server time converted to park time zone with automatic DB sync and connection status monitoring; `StatusBanner` and `CounterInput` built with full RTL and Arabic-Indic digit normalization; `SupervisorAuthDialog` wired with `IAuthService.ValidateSupervisorCredentialsAsync`.
+- Test count: 333 total passed (286 unit/architecture + 47 LocalDB infrastructure tests).
+
+### S05 — 2026-10-05 — Phase 4 UI Shell (T4.1)
+- Tasks: PR #4 merged into `main`; T4.1 completed on `phase/04-ui-shell`.
+- Commits: `feat(ui): implement startup sequence and auth dialogs [T4.1]`.
+- Decisions: Added `IDatabaseStartupService` and `IAppConnectionStringProvider` ports in Application layer to maintain strict dependency isolation; dynamic DbContextFactory wired with DPAPI store; `INotifyService` introduced for testable WinForms dialog interactions without modal hangs; full Arabic resources and RTL compliance verified for all forms.
+- Test count: 292 total passed (259 unit/architecture + 47 Infrastructure tests).
+
 ### S04 — 2026-10-05 — Phase 3 Application
 - Tasks: T3.1, T3.2, T3.3, T3.4, T3.5, T3.6, T3.7, T3.8 completed (all Phase 3 tasks).
-- Commits: see branch `phase/03-application`.
+- Commits: see branch `phase/03-application`, merged into `main` via PR #4.
 - Decisions: Clean Architecture strictly maintained (ParkGate.Application references Domain only); typed Result/Error catalog without UI/Infra references; all BR-17 audit actions audited with DB time; full permission enforcement and FluentValidation test coverage.
 - Test count: 284 total passed (237 unit/architecture + 47 LocalDB integration tests).
 

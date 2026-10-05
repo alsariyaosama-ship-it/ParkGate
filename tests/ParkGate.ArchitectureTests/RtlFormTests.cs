@@ -31,6 +31,18 @@ public sealed class RtlFormTests
         form.Text.ShouldContain("ParkGate");
     }
 
+    [Theory]
+    [InlineData(typeof(MainForm))]
+    [InlineData(typeof(ConnectionSettingsForm))]
+    [InlineData(typeof(FirstRunAdminForm))]
+    [InlineData(typeof(LoginForm))]
+    [InlineData(typeof(ChangePasswordForm))]
+    [InlineData(typeof(SupervisorAuthDialog))]
+    public void AllForms_ShouldInheritRtlFormBase(Type formType)
+    {
+        typeof(RtlFormBase).IsAssignableFrom(formType).ShouldBeTrue($"Form '{formType.Name}' must inherit from RtlFormBase.");
+    }
+
     [Fact]
     public void Strings_ShouldContainCoreArabicResources()
     {
@@ -39,5 +51,9 @@ public sealed class RtlFormTests
         Strings.Title_Warning.ShouldNotBeNullOrWhiteSpace();
         Strings.Title_Error.ShouldNotBeNullOrWhiteSpace();
         Strings.Title_Confirm.ShouldNotBeNullOrWhiteSpace();
+        Strings.Title_ConnectionSettings.ShouldNotBeNullOrWhiteSpace();
+        Strings.Title_FirstRunAdmin.ShouldNotBeNullOrWhiteSpace();
+        Strings.Title_Login.ShouldNotBeNullOrWhiteSpace();
+        Strings.Title_ChangePassword.ShouldNotBeNullOrWhiteSpace();
     }
 }

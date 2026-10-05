@@ -140,11 +140,140 @@ internal class Strings
     /// <summary>
     ///   Looks up a localized string similar to تعذر بدء تشغيل البرنامج..
     /// </summary>
-    internal static string Msg_StartupFailed
+    internal static string Msg_StartupFailed => GetString(nameof(Msg_StartupFailed));
+
+    internal static string Title_ConnectionSettings => GetString(nameof(Title_ConnectionSettings));
+    internal static string Label_Server => GetString(nameof(Label_Server));
+    internal static string Label_Database => GetString(nameof(Label_Database));
+    internal static string Label_AuthType => GetString(nameof(Label_AuthType));
+    internal static string Auth_Windows => GetString(nameof(Auth_Windows));
+    internal static string Auth_SqlServer => GetString(nameof(Auth_SqlServer));
+    internal static string Label_Username => GetString(nameof(Label_Username));
+    internal static string Label_Password => GetString(nameof(Label_Password));
+    internal static string Btn_TestConnection => GetString(nameof(Btn_TestConnection));
+    internal static string Btn_SaveAndConnect => GetString(nameof(Btn_SaveAndConnect));
+    internal static string Btn_Cancel => GetString(nameof(Btn_Cancel));
+    internal static string Btn_Exit => GetString(nameof(Btn_Exit));
+    internal static string Msg_ConnectionSuccess => GetString(nameof(Msg_ConnectionSuccess));
+    internal static string Msg_ConnectionFailed => GetString(nameof(Msg_ConnectionFailed));
+    internal static string Msg_PendingMigrationsBlock => GetString(nameof(Msg_PendingMigrationsBlock));
+    internal static string Title_PendingMigrations => GetString(nameof(Title_PendingMigrations));
+    internal static string Msg_ServerRequired => GetString(nameof(Msg_ServerRequired));
+    internal static string Msg_DatabaseRequired => GetString(nameof(Msg_DatabaseRequired));
+    internal static string Msg_SqlUserRequired => GetString(nameof(Msg_SqlUserRequired));
+
+    internal static string Title_FirstRunAdmin => GetString(nameof(Title_FirstRunAdmin));
+    internal static string Header_FirstRunAdmin => GetString(nameof(Header_FirstRunAdmin));
+    internal static string Label_AdminFullName => GetString(nameof(Label_AdminFullName));
+    internal static string Label_AdminUsername => GetString(nameof(Label_AdminUsername));
+    internal static string Label_AdminPassword => GetString(nameof(Label_AdminPassword));
+    internal static string Label_AdminConfirmPassword => GetString(nameof(Label_AdminConfirmPassword));
+    internal static string Btn_CreateAdmin => GetString(nameof(Btn_CreateAdmin));
+    internal static string Msg_FirstRunAdminSuccess => GetString(nameof(Msg_FirstRunAdminSuccess));
+
+    internal static string Title_Login => GetString(nameof(Title_Login));
+    internal static string Header_Login => GetString(nameof(Header_Login));
+    internal static string Label_LoginUsername => GetString(nameof(Label_LoginUsername));
+    internal static string Label_LoginPassword => GetString(nameof(Label_LoginPassword));
+    internal static string Label_Workstation => GetString(nameof(Label_Workstation));
+    internal static string Btn_Login => GetString(nameof(Btn_Login));
+
+    internal static string Title_ChangePassword => GetString(nameof(Title_ChangePassword));
+    internal static string Header_MustChangePassword => GetString(nameof(Header_MustChangePassword));
+    internal static string Label_CurrentPassword => GetString(nameof(Label_CurrentPassword));
+    internal static string Label_NewPassword => GetString(nameof(Label_NewPassword));
+    internal static string Label_ConfirmNewPassword => GetString(nameof(Label_ConfirmNewPassword));
+    internal static string Btn_ChangePassword => GetString(nameof(Btn_ChangePassword));
+    internal static string Msg_PasswordChangedSuccess => GetString(nameof(Msg_PasswordChangedSuccess));
+
+    internal static string Menu_File => GetString(nameof(Menu_File));
+    internal static string Menu_Exit => GetString(nameof(Menu_Exit));
+    internal static string Menu_ChangePassword => GetString(nameof(Menu_ChangePassword));
+    internal static string Menu_Logout => GetString(nameof(Menu_Logout));
+    internal static string Menu_Operations => GetString(nameof(Menu_Operations));
+    internal static string Menu_CheckIn => GetString(nameof(Menu_CheckIn));
+    internal static string Menu_Management => GetString(nameof(Menu_Management));
+    internal static string Menu_Beneficiaries => GetString(nameof(Menu_Beneficiaries));
+    internal static string Menu_Organizations => GetString(nameof(Menu_Organizations));
+    internal static string Menu_AgeCategories => GetString(nameof(Menu_AgeCategories));
+    internal static string Menu_Users => GetString(nameof(Menu_Users));
+    internal static string Menu_Workstations => GetString(nameof(Menu_Workstations));
+    internal static string Menu_Settings => GetString(nameof(Menu_Settings));
+    internal static string Menu_Reports => GetString(nameof(Menu_Reports));
+    internal static string Menu_DailyReport => GetString(nameof(Menu_DailyReport));
+    internal static string Menu_OrgStatistics => GetString(nameof(Menu_OrgStatistics));
+    internal static string Menu_Help => GetString(nameof(Menu_Help));
+    internal static string Menu_About => GetString(nameof(Menu_About));
+
+    internal static string Status_User => GetString(nameof(Status_User));
+    internal static string Status_Workstation => GetString(nameof(Status_Workstation));
+    internal static string Status_ServerTime => GetString(nameof(Status_ServerTime));
+    internal static string Status_Connected => GetString(nameof(Status_Connected));
+    internal static string Status_Disconnected => GetString(nameof(Status_Disconnected));
+
+    internal static string Error_General_NotFound => GetString(nameof(Error_General_NotFound));
+    internal static string Error_General_Unauthorized => GetString(nameof(Error_General_Unauthorized));
+    internal static string Error_General_Forbidden => GetString(nameof(Error_General_Forbidden));
+    internal static string Error_General_ConcurrencyConflict => GetString(nameof(Error_General_ConcurrencyConflict));
+    internal static string Error_Auth_InvalidCredentials => GetString(nameof(Error_Auth_InvalidCredentials));
+    internal static string Error_Auth_AccountLocked => GetString(nameof(Error_Auth_AccountLocked));
+    internal static string Error_Auth_AccountInactive => GetString(nameof(Error_Auth_AccountInactive));
+    internal static string Error_Auth_MustChangePassword => GetString(nameof(Error_Auth_MustChangePassword));
+    internal static string Error_Auth_PasswordMismatch => GetString(nameof(Error_Auth_PasswordMismatch));
+    internal static string Error_Auth_FirstRunAlreadyCompleted => GetString(nameof(Error_Auth_FirstRunAlreadyCompleted));
+    internal static string Error_Auth_WorkstationNotFound => GetString(nameof(Error_Auth_WorkstationNotFound));
+    internal static string Error_Auth_WorkstationInactive => GetString(nameof(Error_Auth_WorkstationInactive));
+    internal static string Error_Auth_SupervisorRequired => GetString(nameof(Error_Auth_SupervisorRequired));
+
+    internal static string Val_UserNameRequired => GetString(nameof(Val_UserNameRequired));
+    internal static string Val_UserNameTooLong => GetString(nameof(Val_UserNameTooLong));
+    internal static string Val_FullNameRequired => GetString(nameof(Val_FullNameRequired));
+    internal static string Val_FullNameTooLong => GetString(nameof(Val_FullNameTooLong));
+    internal static string Val_PasswordRequired => GetString(nameof(Val_PasswordRequired));
+    internal static string Val_PasswordTooShort => GetString(nameof(Val_PasswordTooShort));
+    internal static string Val_PasswordsDoNotMatch => GetString(nameof(Val_PasswordsDoNotMatch));
+    internal static string Val_CurrentPasswordRequired => GetString(nameof(Val_CurrentPasswordRequired));
+    internal static string Val_NewPasswordRequired => GetString(nameof(Val_NewPasswordRequired));
+
+    internal static string Role_Operator => GetString(nameof(Role_Operator));
+    internal static string Role_Supervisor => GetString(nameof(Role_Supervisor));
+    internal static string Role_Admin => GetString(nameof(Role_Admin));
+    internal static string Role_Unknown => GetString(nameof(Role_Unknown));
+
+    internal static string Msg_ConfirmLogout => GetString(nameof(Msg_ConfirmLogout));
+    internal static string Title_Logout => GetString(nameof(Title_Logout));
+    internal static string Msg_ConfirmExit => GetString(nameof(Msg_ConfirmExit));
+    internal static string Title_Exit => GetString(nameof(Title_Exit));
+    internal static string Msg_FeatureInNextPhase => GetString(nameof(Msg_FeatureInNextPhase));
+
+    internal static string About_Title => GetString(nameof(About_Title));
+    internal static string About_AppName => GetString(nameof(About_AppName));
+    internal static string About_Park => GetString(nameof(About_Park));
+    internal static string About_Description => GetString(nameof(About_Description));
+    internal static string About_Vendor => GetString(nameof(About_Vendor));
+    internal static string About_Version => GetString(nameof(About_Version));
+
+    internal static string Banner_Granted => GetString(nameof(Banner_Granted));
+    internal static string Banner_Denied => GetString(nameof(Banner_Denied));
+    internal static string Banner_Warning => GetString(nameof(Banner_Warning));
+    internal static string Banner_Neutral => GetString(nameof(Banner_Neutral));
+
+    internal static string Title_SupervisorAuth => GetString(nameof(Title_SupervisorAuth));
+    internal static string Header_SupervisorAuth => GetString(nameof(Header_SupervisorAuth));
+    internal static string Label_SupervisorUsername => GetString(nameof(Label_SupervisorUsername));
+    internal static string Label_SupervisorPassword => GetString(nameof(Label_SupervisorPassword));
+    internal static string Label_SupervisorReason => GetString(nameof(Label_SupervisorReason));
+    internal static string Btn_Approve => GetString(nameof(Btn_Approve));
+    internal static string Val_SupervisorReasonRequired => GetString(nameof(Val_SupervisorReasonRequired));
+    internal static string Val_SupervisorReasonTooShort => GetString(nameof(Val_SupervisorReasonTooShort));
+
+    internal static string GetString(string name)
     {
-        get
-        {
-            return ResourceManager.GetString("Msg_StartupFailed", resourceCulture) ?? "تعذر بدء تشغيل البرنامج.";
-        }
+        return ResourceManager.GetString(name, resourceCulture) ?? name;
+    }
+
+    internal static string? GetOptionalString(string name)
+    {
+        return ResourceManager.GetString(name, resourceCulture);
     }
 }
