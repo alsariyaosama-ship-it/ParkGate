@@ -17,6 +17,9 @@ public sealed record CardNumber
         Value = value;
     }
 
+    public static bool TryCreate(string? raw, [NotNullWhen(true)] out CardNumber? cardNumber) =>
+        TryCreate(raw, out cardNumber, out _);
+
     public static bool TryCreate(string? raw, [NotNullWhen(true)] out CardNumber? cardNumber, [NotNullWhen(false)] out string? error)
     {
         cardNumber = null;

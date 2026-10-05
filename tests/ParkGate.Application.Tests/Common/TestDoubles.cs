@@ -2,6 +2,8 @@ using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Domain.Entities;
+using ParkGate.Domain.Enums;
+using ParkGate.Domain.ValueObjects;
 
 namespace ParkGate.Application.Tests.Common;
 
@@ -124,17 +126,213 @@ public sealed class FakeAppSettingRepository : IAppSettingRepository
     public void Update(AppSetting setting) => _settings[setting.Key] = setting;
 }
 
+public sealed class FakeOrganizationRepository : IOrganizationRepository
+{
+    private readonly List<Organization> _organizations;
+    private int _nextId = 1;
+
+    public FakeOrganizationRepository(List<Organization> organizations)
+    {
+        _organizations = organizations;
+    }
+
+    public Task<Organization?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_organizations.FirstOrDefault(o => o.Id == id));
+
+    public Task<Organization?> GetByCodeAsync(string code, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_organizations.FirstOrDefault(o => o.Code.Equals(code, StringComparison.OrdinalIgnoreCase)));
+
+    public Task<Organization?> GetDefaultAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(_organizations.FirstOrDefault(o => o.IsDefault));
+
+    public Task<IReadOnlyList<Organization>> GetAllAsync(bool activeOnly = false, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<Organization>>(activeOnly ? _organizations.Where(o => o.IsActive).ToList() : _organizations);
+
+    public void Add(Organization organization)
+    {
+        if (organization.Id == 0)
+        {
+            typeof(Organization).GetProperty(nameof(Organization.Id))!.SetValue(organization, _nextId++);
+        }
+        _organizations.Add(organization);
+    }
+
+    public void Update(Organization organization) { }
+}
+
+public sealed class FakeBeneficiaryRepository : IBeneficiaryRepository
+{
+    private readonly List<Beneficiary> _beneficiaries;
+    private readonly List<EntryAttempt> _attempts;
+
+    public FakeBeneficiaryRepository(List<Beneficiary> beneficiaries, List<EntryAttempt> attempts)
+    {
+        _beneficiaries = beneficiaries;
+        _attempts = attempts;
+    }
+
+    public Task<Beneficiary?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_beneficiaries.FirstOrDefault(b => b.Id == id));
+
+    public Task<Beneficiary?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_beneficiaries.FirstOrDefault(b => b.Id == id));
+
+    public Task<IReadOnlyList<Beneficiary>> GetByCardNumberAsync(CardNumber cardNumber, CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<Beneficiary> matches = _beneficiaries.Where(b => b.CardNumber == cardNumber).ToList();
+        return Task.FromResult(matches);
+    }
+
+    public Task<Beneficiary?> GetByOrgAndCardAsync(int organizationId, CardNumber cardNumber, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_beneficiaries.FirstOrDefault(b => b.OrganizationId == organizationId && b.CardNumber == cardNumber));
+
+    public Task<bool> ExistsNationalIdAsync(NationalId nationalId, Guid? excludeId = null, CancellationToken cancellationToken = default)
+    {
+        var exists = _beneficiaries.Any(b => b.NationalId == nationalId && (!excludeId.HasValue || b.Id != excludeId.Value));
+        return Task.FromResult(exists);
+    }
+
+    public Task<DateTime?> GetLatestGrantedEntryUtcAsync(Guid beneficiaryId, CancellationToken cancellationToken = default)
+    {
+        var latest = _attempts
+            .Where(a => a.BeneficiaryId == beneficiaryId && !a.IsVoided && (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden))
+            .OrderByDescending(a => a.AttemptedAtUtc)
+            .FirstOrDefault();
+
+        return Task.FromResult(latest?.AttemptedAtUtc);
+    }
+
+    public Task<IReadOnlyList<Beneficiary>> SearchAsync(string searchTerm, int maxResults = 50, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            return Task.FromResult<IReadOnlyList<Beneficiary>>([]);
+        }
+
+        var trimmed = searchTerm.Trim();
+        var hasCard = CardNumber.TryCreate(trimmed, out var card);
+        var hasPhone = PhoneNumber.TryCreate(trimmed, out var phone);
+        var hasNatId = NationalId.TryCreate(trimmed, out var natId);
+
+        IReadOnlyList<Beneficiary> matches = _beneficiaries
+            .Where(b => b.FullName.Contains(trimmed, StringComparison.OrdinalIgnoreCase) ||
+                        (hasCard && b.CardNumber == card) ||
+                        (hasPhone && b.Phone == phone) ||
+                        (hasNatId && b.NationalId == natId))
+            .Take(maxResults)
+            .ToList();
+
+        return Task.FromResult(matches);
+    }
+
+    public void Add(Beneficiary beneficiary) => _beneficiaries.Add(beneficiary);
+
+    public void Update(Beneficiary beneficiary) { }
+}
+
+public sealed class FakeEntryAttemptRepository : IEntryAttemptRepository
+{
+    private readonly List<EntryAttempt> _attempts;
+
+    public FakeEntryAttemptRepository(List<EntryAttempt> attempts)
+    {
+        _attempts = attempts;
+    }
+
+    public Task<EntryAttempt?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_attempts.FirstOrDefault(a => a.Id == id));
+
+    public Task<EntryAttempt?> GetLatestAttemptForBeneficiaryAsync(Guid beneficiaryId, CancellationToken cancellationToken = default)
+    {
+        var latest = _attempts
+            .Where(a => a.BeneficiaryId == beneficiaryId)
+            .OrderByDescending(a => a.AttemptedAtUtc)
+            .FirstOrDefault();
+        return Task.FromResult(latest);
+    }
+
+    public Task<EntryAttempt?> GetLatestDenialAsync(Guid beneficiaryId, int workstationId, CancellationToken cancellationToken = default)
+    {
+        var latest = _attempts
+            .Where(a => a.BeneficiaryId == beneficiaryId && a.WorkstationId == workstationId && a.Result == EntryResult.Denied)
+            .OrderByDescending(a => a.AttemptedAtUtc)
+            .FirstOrDefault();
+        return Task.FromResult(latest);
+    }
+
+    public Task<IReadOnlyList<EntryAttempt>> GetHistoryByBeneficiaryIdAsync(Guid beneficiaryId, int maxResults = 100, CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<EntryAttempt> list = _attempts
+            .Where(a => a.BeneficiaryId == beneficiaryId)
+            .OrderByDescending(a => a.AttemptedAtUtc)
+            .Take(maxResults)
+            .ToList();
+        return Task.FromResult(list);
+    }
+
+    public Task<IReadOnlyList<EntryAttempt>> GetTodayByWorkstationIdAsync(int workstationId, DateOnly businessDate, int maxResults = 20, CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<EntryAttempt> list = _attempts
+            .Where(a => a.WorkstationId == workstationId && a.BusinessDate == businessDate)
+            .OrderByDescending(a => a.AttemptedAtUtc)
+            .Take(maxResults)
+            .ToList();
+        return Task.FromResult(list);
+    }
+
+    public void Add(EntryAttempt attempt) => _attempts.Add(attempt);
+
+    public void Update(EntryAttempt attempt) { }
+}
+
+public sealed class FakeAgeCategoryRepository : IAgeCategoryRepository
+{
+    private readonly List<AgeCategory> _categories;
+    private int _nextId = 1;
+
+    public FakeAgeCategoryRepository(List<AgeCategory> categories)
+    {
+        _categories = categories;
+    }
+
+    public Task<AgeCategory?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_categories.FirstOrDefault(c => c.Id == id));
+
+    public Task<IReadOnlyList<AgeCategory>> GetAllActiveAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<AgeCategory>>(_categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder).ToList());
+
+    public void Add(AgeCategory category)
+    {
+        if (category.Id == 0)
+        {
+            typeof(AgeCategory).GetProperty(nameof(AgeCategory.Id))!.SetValue(category, _nextId++);
+        }
+        _categories.Add(category);
+    }
+
+    public void Update(AgeCategory category) { }
+}
+
+public sealed class FakeAuditLogRepository : IAuditLogRepository
+{
+    private readonly List<AuditLog> _logs = [];
+
+    public void Add(AuditLog log) => _logs.Add(log);
+
+    public Task<IReadOnlyList<AuditLog>> GetRecentAsync(int count, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<AuditLog>>(_logs.OrderByDescending(l => l.AtUtc).Take(count).ToList());
+}
+
 public sealed class FakeUnitOfWork : IUnitOfWork
 {
     public IUserRepository Users { get; }
     public IWorkstationRepository Workstations { get; }
     public IAppSettingRepository AppSettings { get; }
-
-    public IBeneficiaryRepository Beneficiaries => throw new NotImplementedException();
-    public IOrganizationRepository Organizations => throw new NotImplementedException();
-    public IEntryAttemptRepository EntryAttempts => throw new NotImplementedException();
-    public IAgeCategoryRepository AgeCategories => throw new NotImplementedException();
-    public IAuditLogRepository AuditLogs => throw new NotImplementedException();
+    public IBeneficiaryRepository Beneficiaries { get; }
+    public IOrganizationRepository Organizations { get; }
+    public IEntryAttemptRepository EntryAttempts { get; }
+    public IAgeCategoryRepository AgeCategories { get; }
+    public IAuditLogRepository AuditLogs { get; }
 
     public DateTime CurrentDbTime { get; set; } = new(2026, 10, 5, 10, 0, 0, DateTimeKind.Utc);
     public int SaveChangesCalls { get; private set; }
@@ -142,11 +340,20 @@ public sealed class FakeUnitOfWork : IUnitOfWork
     public FakeUnitOfWork(
         List<User> users,
         List<Workstation> workstations,
-        FakeAppSettingRepository appSettings)
+        FakeAppSettingRepository appSettings,
+        List<Organization> organizations,
+        List<Beneficiary> beneficiaries,
+        List<EntryAttempt> attempts,
+        List<AgeCategory> categories)
     {
         Users = new FakeUserRepository(users);
         Workstations = new FakeWorkstationRepository(workstations);
         AppSettings = appSettings;
+        Organizations = new FakeOrganizationRepository(organizations);
+        Beneficiaries = new FakeBeneficiaryRepository(beneficiaries, attempts);
+        EntryAttempts = new FakeEntryAttemptRepository(attempts);
+        AgeCategories = new FakeAgeCategoryRepository(categories);
+        AuditLogs = new FakeAuditLogRepository();
     }
 
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
@@ -171,18 +378,38 @@ public sealed class FakeUnitOfWorkFactory : IUnitOfWorkFactory
     private readonly List<User> _users;
     private readonly List<Workstation> _workstations;
     private readonly FakeAppSettingRepository _appSettings;
+    private readonly List<Organization> _organizations;
+    private readonly List<Beneficiary> _beneficiaries;
+    private readonly List<EntryAttempt> _attempts;
+    private readonly List<AgeCategory> _categories;
 
     public FakeUnitOfWork CurrentUow { get; }
 
     public FakeUnitOfWorkFactory(
         List<User>? users = null,
         List<Workstation>? workstations = null,
-        FakeAppSettingRepository? appSettings = null)
+        FakeAppSettingRepository? appSettings = null,
+        List<Organization>? organizations = null,
+        List<Beneficiary>? beneficiaries = null,
+        List<EntryAttempt>? attempts = null,
+        List<AgeCategory>? categories = null)
     {
         _users = users ?? [];
         _workstations = workstations ?? [];
         _appSettings = appSettings ?? new FakeAppSettingRepository();
-        CurrentUow = new FakeUnitOfWork(_users, _workstations, _appSettings);
+        _organizations = organizations ?? [];
+        _beneficiaries = beneficiaries ?? [];
+        _attempts = attempts ?? [];
+        _categories = categories ?? [];
+
+        CurrentUow = new FakeUnitOfWork(
+            _users,
+            _workstations,
+            _appSettings,
+            _organizations,
+            _beneficiaries,
+            _attempts,
+            _categories);
     }
 
     public IUnitOfWork Create() => CurrentUow;

@@ -20,6 +20,9 @@ public sealed record PhoneNumber
         Value = value;
     }
 
+    public static bool TryCreate(string? raw, [NotNullWhen(true)] out PhoneNumber? phoneNumber) =>
+        TryCreate(raw, out phoneNumber, out _);
+
     public static bool TryCreate(string? raw, [NotNullWhen(true)] out PhoneNumber? phoneNumber, [NotNullWhen(false)] out string? error)
     {
         phoneNumber = null;
