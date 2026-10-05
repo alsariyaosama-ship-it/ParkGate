@@ -16,4 +16,9 @@ public sealed class FormFactory : IFormFactory
     {
         return _serviceProvider.GetRequiredService<TForm>();
     }
+
+    public TControl CreateControl<TControl>() where TControl : Control
+    {
+        return _serviceProvider.GetRequiredService<TControl>();
+    }
 }

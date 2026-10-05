@@ -421,4 +421,142 @@
   <data name="Val_SupervisorReasonTooShort" xml:space="preserve">
     <value>سبب الإجراء يجب أن يتكون من 5 أحرف على الأقل.</value>
   </data>
+  <data name="Label_CardNumber" xml:space="preserve">
+    <value>رقم البطاقة:</value>
+  </data>
+  <data name="Label_OrganizationFilter" xml:space="preserve">
+    <value>الجهة:</value>
+  </data>
+  <data name="Filter_AllOrganizations" xml:space="preserve">
+    <value>الكل (جميع الجهات)</value>
+  </data>
+  <data name="Btn_Search" xml:space="preserve">
+    <value>بحث (Enter)</value>
+  </data>
+  <data name="Title_HolderInfo" xml:space="preserve">
+    <value>بيانات حامل البطاقة</value>
+  </data>
+  <data name="Label_HolderName" xml:space="preserve">
+    <value>الاسم الكامل:</value>
+  </data>
+  <data name="Label_HolderPhone" xml:space="preserve">
+    <value>رقم الهاتف:</value>
+  </data>
+  <data name="Label_HolderOrg" xml:space="preserve">
+    <value>الجهة الراعية:</value>
+  </data>
+  <data name="Label_HolderNationalId" xml:space="preserve">
+    <value>الرقم الوطني:</value>
+  </data>
+  <data name="Label_HolderExpiry" xml:space="preserve">
+    <value>صلاحية البطاقة:</value>
+  </data>
+  <data name="Label_HolderLastEntry" xml:space="preserve">
+    <value>آخر دخول مسجل:</value>
+  </data>
+  <data name="Label_HolderStatus" xml:space="preserve">
+    <value>حالة البطاقة:</value>
+  </data>
+  <data name="Status_Active" xml:space="preserve">
+    <value>نشط (مسموح)</value>
+  </data>
+  <data name="Status_Suspended" xml:space="preserve">
+    <value>معلّق</value>
+  </data>
+  <data name="Status_Blocked" xml:space="preserve">
+    <value>محظور</value>
+  </data>
+  <data name="Value_None" xml:space="preserve">
+    <value>لا يوجد</value>
+  </data>
+  <data name="Title_InlineRegistration" xml:space="preserve">
+    <value>تسجيل حامل بطاقة جديد (فوري)</value>
+  </data>
+  <data name="Label_RegFullName" xml:space="preserve">
+    <value>الاسم الرباعي:</value>
+  </data>
+  <data name="Label_RegPhone" xml:space="preserve">
+    <value>الهاتف (09xxxxxxxx):</value>
+  </data>
+  <data name="Label_RegNationalId" xml:space="preserve">
+    <value>الرقم الوطني (12 رقماً):</value>
+  </data>
+  <data name="Label_RegExpiry" xml:space="preserve">
+    <value>تاريخ الانتهاء:</value>
+  </data>
+  <data name="Label_RegNotes" xml:space="preserve">
+    <value>ملاحظات:</value>
+  </data>
+  <data name="Btn_SaveAndContinue" xml:space="preserve">
+    <value>حفظ ومتابعة الدخول</value>
+  </data>
+  <data name="Btn_CancelReg" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="Title_Companions" xml:space="preserve">
+    <value>المرافقون مع حامل البطاقة</value>
+  </data>
+  <data name="Label_TotalPersons" xml:space="preserve">
+    <value>الإجمالي مع حامل البطاقة: {0} فرد</value>
+  </data>
+  <data name="Notice_HolderCounted" xml:space="preserve">
+    <value>(حامل البطاقة محتسب تلقائياً +1)</value>
+  </data>
+  <data name="Btn_RecordEntry" xml:space="preserve">
+    <value>تسجيل الدخول (F5)</value>
+  </data>
+  <data name="Btn_Override" xml:space="preserve">
+    <value>تجاوز المشرف (F9)</value>
+  </data>
+  <data name="Btn_NewHolder" xml:space="preserve">
+    <value>حامل جديد (F2)</value>
+  </data>
+  <data name="Btn_Clear" xml:space="preserve">
+    <value>مسح الشاشة (Esc)</value>
+  </data>
+  <data name="Title_TodayDesk" xml:space="preserve">
+    <value>سجل الدخول لهذا اليوم بالمحطة (آخر 20 محاولة)</value>
+  </data>
+  <data name="Col_Time" xml:space="preserve">
+    <value>الوقت</value>
+  </data>
+  <data name="Col_CardNumber" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="Col_HolderName" xml:space="preserve">
+    <value>حامل البطاقة</value>
+  </data>
+  <data name="Col_Org" xml:space="preserve">
+    <value>الجهة</value>
+  </data>
+  <data name="Col_Persons" xml:space="preserve">
+    <value>الأفراد</value>
+  </data>
+  <data name="Col_Result" xml:space="preserve">
+    <value>النتيجة</value>
+  </data>
+  <data name="Summary_TodayStats" xml:space="preserve">
+    <value>المقبول: {0} | التجاوز: {1} | المرفوض: {2} | إجمالي الأفراد: {3}</value>
+  </data>
+  <data name="Result_Allowed" xml:space="preserve">
+    <value>مسموح</value>
+  </data>
+  <data name="Result_Denied" xml:space="preserve">
+    <value>مرفوض</value>
+  </data>
+  <data name="Result_Overridden" xml:space="preserve">
+    <value>تجاوز</value>
+  </data>
+  <data name="Result_Voided" xml:space="preserve">
+    <value>ملغى</value>
+  </data>
+  <data name="Title_SelectOrganization" xml:space="preserve">
+    <value>تحديد الجهة للبطاقة</value>
+  </data>
+  <data name="Header_SelectOrganization" xml:space="preserve">
+    <value>رقم البطاقة مسجل لدى أكثر من جهة، يرجى اختيار الجهة المطلوبة للمتابعة:</value>
+  </data>
+  <data name="Btn_SelectOrg" xml:space="preserve">
+    <value>اختيار ومتابعة</value>
+  </data>
 </root>

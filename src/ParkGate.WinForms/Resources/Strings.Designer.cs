@@ -267,6 +267,60 @@ internal class Strings
     internal static string Val_SupervisorReasonRequired => GetString(nameof(Val_SupervisorReasonRequired));
     internal static string Val_SupervisorReasonTooShort => GetString(nameof(Val_SupervisorReasonTooShort));
 
+    internal static string Label_CardNumber => GetString(nameof(Label_CardNumber));
+    internal static string Label_OrganizationFilter => GetString(nameof(Label_OrganizationFilter));
+    internal static string Filter_AllOrganizations => GetString(nameof(Filter_AllOrganizations));
+    internal static string Btn_Search => GetString(nameof(Btn_Search));
+
+    internal static string Title_HolderInfo => GetString(nameof(Title_HolderInfo));
+    internal static string Label_HolderName => GetString(nameof(Label_HolderName));
+    internal static string Label_HolderPhone => GetString(nameof(Label_HolderPhone));
+    internal static string Label_HolderOrg => GetString(nameof(Label_HolderOrg));
+    internal static string Label_HolderNationalId => GetString(nameof(Label_HolderNationalId));
+    internal static string Label_HolderExpiry => GetString(nameof(Label_HolderExpiry));
+    internal static string Label_HolderLastEntry => GetString(nameof(Label_HolderLastEntry));
+    internal static string Label_HolderStatus => GetString(nameof(Label_HolderStatus));
+    internal static string Status_Active => GetString(nameof(Status_Active));
+    internal static string Status_Suspended => GetString(nameof(Status_Suspended));
+    internal static string Status_Blocked => GetString(nameof(Status_Blocked));
+    internal static string Value_None => GetString(nameof(Value_None));
+
+    internal static string Title_InlineRegistration => GetString(nameof(Title_InlineRegistration));
+    internal static string Label_RegFullName => GetString(nameof(Label_RegFullName));
+    internal static string Label_RegPhone => GetString(nameof(Label_RegPhone));
+    internal static string Label_RegNationalId => GetString(nameof(Label_RegNationalId));
+    internal static string Label_RegExpiry => GetString(nameof(Label_RegExpiry));
+    internal static string Label_RegNotes => GetString(nameof(Label_RegNotes));
+    internal static string Btn_SaveAndContinue => GetString(nameof(Btn_SaveAndContinue));
+    internal static string Btn_CancelReg => GetString(nameof(Btn_CancelReg));
+
+    internal static string Title_Companions => GetString(nameof(Title_Companions));
+    internal static string Label_TotalPersons => GetString(nameof(Label_TotalPersons));
+    internal static string Notice_HolderCounted => GetString(nameof(Notice_HolderCounted));
+
+    internal static string Btn_RecordEntry => GetString(nameof(Btn_RecordEntry));
+    internal static string Btn_Override => GetString(nameof(Btn_Override));
+    internal static string Btn_NewHolder => GetString(nameof(Btn_NewHolder));
+    internal static string Btn_Clear => GetString(nameof(Btn_Clear));
+
+    internal static string Title_TodayDesk => GetString(nameof(Title_TodayDesk));
+    internal static string Col_Time => GetString(nameof(Col_Time));
+    internal static string Col_CardNumber => GetString(nameof(Col_CardNumber));
+    internal static string Col_HolderName => GetString(nameof(Col_HolderName));
+    internal static string Col_Org => GetString(nameof(Col_Org));
+    internal static string Col_Persons => GetString(nameof(Col_Persons));
+    internal static string Col_Result => GetString(nameof(Col_Result));
+    internal static string Summary_TodayStats => GetString(nameof(Summary_TodayStats));
+
+    internal static string Result_Allowed => GetString(nameof(Result_Allowed));
+    internal static string Result_Denied => GetString(nameof(Result_Denied));
+    internal static string Result_Overridden => GetString(nameof(Result_Overridden));
+    internal static string Result_Voided => GetString(nameof(Result_Voided));
+
+    internal static string Title_SelectOrganization => GetString(nameof(Title_SelectOrganization));
+    internal static string Header_SelectOrganization => GetString(nameof(Header_SelectOrganization));
+    internal static string Btn_SelectOrg => GetString(nameof(Btn_SelectOrg));
+
     internal static string GetString(string name)
     {
         return ResourceManager.GetString(name, resourceCulture) ?? name;

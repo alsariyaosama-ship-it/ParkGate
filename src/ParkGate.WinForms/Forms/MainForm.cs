@@ -167,7 +167,7 @@ public partial class MainForm : RtlFormBase
         _menuLogout.Click += async (_, _) => await OnLogoutClickedAsync();
         _menuExit.Click += (_, _) => Close();
 
-        _menuCheckIn.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_CheckIn);
+        _menuCheckIn.Click += (_, _) => ShowCheckInDesk();
         _menuBeneficiaries.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Beneficiaries);
         _menuOrganizations.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Organizations);
         _menuAgeCategories.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_AgeCategories);
@@ -178,6 +178,37 @@ public partial class MainForm : RtlFormBase
         _menuOrgStatistics.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_OrgStatistics);
 
         _menuAbout.Click += OnAboutClicked;
+    }
+
+    private Controls.CheckInDeskControl? _checkInDeskControl;
+
+    public void ShowCheckInDesk()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.CheckIn))
+        {
+            return;
+        }
+
+        if (_checkInDeskControl == null)
+        {
+            _checkInDeskControl = _formFactory?.CreateControl<Controls.CheckInDeskControl>() ??
+                                  new Controls.CheckInDeskControl(
+                                      null, null, null, null,
+                                      _settingsService,
+                                      _currentUser,
+                                      _currentWorkstation,
+                                      _formFactory,
+                                      _notifyService,
+                                      null);
+
+            _checkInDeskControl.Dock = DockStyle.Fill;
+            _mainContainer.Controls.Add(_checkInDeskControl);
+        }
+
+        _welcomeCard.Visible = false;
+        _checkInDeskControl.Visible = true;
+        _checkInDeskControl.BringToFront();
+        _checkInDeskControl.FocusCardNumberBox();
     }
 
     private async Task OnMainFormLoadedAsync()
@@ -204,6 +235,11 @@ public partial class MainForm : RtlFormBase
 
         _clockTimer.Start();
         _syncTimer.Start();
+
+        if (_currentUser?.Has(Permission.CheckIn) ?? true)
+        {
+            ShowCheckInDesk();
+        }
     }
 
     private async Task SyncServerTimeAsync()
