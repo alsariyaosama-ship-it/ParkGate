@@ -82,4 +82,262 @@
   <data name="Msg_StartupFailed" xml:space="preserve">
     <value>تعذر بدء تشغيل البرنامج.</value>
   </data>
+  <data name="Title_ConnectionSettings" xml:space="preserve">
+    <value>إعدادات الاتصال بقاعدة البيانات</value>
+  </data>
+  <data name="Label_Server" xml:space="preserve">
+    <value>اسم الخادم أو المثيل (Server):</value>
+  </data>
+  <data name="Label_Database" xml:space="preserve">
+    <value>اسم قاعدة البيانات (Database):</value>
+  </data>
+  <data name="Label_AuthType" xml:space="preserve">
+    <value>نوع المصادقة:</value>
+  </data>
+  <data name="Auth_Windows" xml:space="preserve">
+    <value>مصادقة Windows (Windows Authentication)</value>
+  </data>
+  <data name="Auth_SqlServer" xml:space="preserve">
+    <value>مصادقة SQL Server</value>
+  </data>
+  <data name="Label_Username" xml:space="preserve">
+    <value>اسم المستخدم (User ID):</value>
+  </data>
+  <data name="Label_Password" xml:space="preserve">
+    <value>كلمة المرور (Password):</value>
+  </data>
+  <data name="Btn_TestConnection" xml:space="preserve">
+    <value>اختبار الاتصال</value>
+  </data>
+  <data name="Btn_SaveAndConnect" xml:space="preserve">
+    <value>حفظ ومتابعة</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="Btn_Exit" xml:space="preserve">
+    <value>خروج</value>
+  </data>
+  <data name="Msg_ConnectionSuccess" xml:space="preserve">
+    <value>تم الاتصال بقاعدة البيانات بنجاح.</value>
+  </data>
+  <data name="Msg_ConnectionFailed" xml:space="preserve">
+    <value>فشل الاتصال بقاعدة البيانات. يرجى التحقق من صحة البيانات وحالة الخادم.</value>
+  </data>
+  <data name="Msg_PendingMigrationsBlock" xml:space="preserve">
+    <value>قاعدة البيانات بحاجة إلى ترقية.
+توجد ترقيات معلقة ({0}) لم يتم تطبيقها بعد.
+يرجى تشغيل حزمة الترقية (efbundle.exe) على خادم قاعدة البيانات قبل تشغيل المنظومة.</value>
+  </data>
+  <data name="Title_PendingMigrations" xml:space="preserve">
+    <value>ترقية قاعدة البيانات مطلوبة</value>
+  </data>
+  <data name="Msg_ServerRequired" xml:space="preserve">
+    <value>يرجى إدخال اسم الخادم.</value>
+  </data>
+  <data name="Msg_DatabaseRequired" xml:space="preserve">
+    <value>يرجى إدخال اسم قاعدة البيانات.</value>
+  </data>
+  <data name="Msg_SqlUserRequired" xml:space="preserve">
+    <value>يرجى إدخال اسم مستخدم قاعدة البيانات.</value>
+  </data>
+  <data name="Title_FirstRunAdmin" xml:space="preserve">
+    <value>المعالج الأولي — إنشاء حساب مدير النظام</value>
+  </data>
+  <data name="Header_FirstRunAdmin" xml:space="preserve">
+    <value>مرحباً بك في منظومة بوابة الحديقة (ParkGate)
+يرجى إنشاء حساب المدير الرئيسي الأول للمنظومة للمتابعة.</value>
+  </data>
+  <data name="Label_AdminFullName" xml:space="preserve">
+    <value>الاسم الكامل للمدير:</value>
+  </data>
+  <data name="Label_AdminUsername" xml:space="preserve">
+    <value>اسم المستخدم:</value>
+  </data>
+  <data name="Label_AdminPassword" xml:space="preserve">
+    <value>كلمة المرور:</value>
+  </data>
+  <data name="Label_AdminConfirmPassword" xml:space="preserve">
+    <value>تأكيد كلمة المرور:</value>
+  </data>
+  <data name="Btn_CreateAdmin" xml:space="preserve">
+    <value>إنشاء الحساب والمتابعة</value>
+  </data>
+  <data name="Msg_FirstRunAdminSuccess" xml:space="preserve">
+    <value>تم إنشاء حساب المدير بنجاح. يمكنك الآن تسجيل الدخول.</value>
+  </data>
+  <data name="Title_Login" xml:space="preserve">
+    <value>تسجيل الدخول — ParkGate</value>
+  </data>
+  <data name="Header_Login" xml:space="preserve">
+    <value>تسجيل الدخول إلى المنظومة</value>
+  </data>
+  <data name="Label_LoginUsername" xml:space="preserve">
+    <value>اسم المستخدم:</value>
+  </data>
+  <data name="Label_LoginPassword" xml:space="preserve">
+    <value>كلمة المرور:</value>
+  </data>
+  <data name="Label_Workstation" xml:space="preserve">
+    <value>محطة العمل:</value>
+  </data>
+  <data name="Btn_Login" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="Title_ChangePassword" xml:space="preserve">
+    <value>تغيير كلمة المرور</value>
+  </data>
+  <data name="Header_MustChangePassword" xml:space="preserve">
+    <value>يجب عليك تغيير كلمة المرور للمتابعة لأول مرة.</value>
+  </data>
+  <data name="Label_CurrentPassword" xml:space="preserve">
+    <value>كلمة المرور الحالية:</value>
+  </data>
+  <data name="Label_NewPassword" xml:space="preserve">
+    <value>كلمة المرور الجديدة:</value>
+  </data>
+  <data name="Label_ConfirmNewPassword" xml:space="preserve">
+    <value>تأكيد كلمة المرور الجديدة:</value>
+  </data>
+  <data name="Btn_ChangePassword" xml:space="preserve">
+    <value>تغيير كلمة المرور</value>
+  </data>
+  <data name="Msg_PasswordChangedSuccess" xml:space="preserve">
+    <value>تم تغيير كلمة المرور بنجاح.</value>
+  </data>
+  <data name="Menu_File" xml:space="preserve">
+    <value>ملف</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>خروج</value>
+  </data>
+  <data name="Menu_ChangePassword" xml:space="preserve">
+    <value>تغيير كلمة المرور...</value>
+  </data>
+  <data name="Menu_Logout" xml:space="preserve">
+    <value>تسجيل الخروج</value>
+  </data>
+  <data name="Menu_Operations" xml:space="preserve">
+    <value>العمليات</value>
+  </data>
+  <data name="Menu_CheckIn" xml:space="preserve">
+    <value>بوابة الدخول</value>
+  </data>
+  <data name="Menu_Management" xml:space="preserve">
+    <value>الإدارة</value>
+  </data>
+  <data name="Menu_Beneficiaries" xml:space="preserve">
+    <value>حاملو البطاقات</value>
+  </data>
+  <data name="Menu_Organizations" xml:space="preserve">
+    <value>الجهات والمنظمات</value>
+  </data>
+  <data name="Menu_AgeCategories" xml:space="preserve">
+    <value>الفئات العمرية</value>
+  </data>
+  <data name="Menu_Users" xml:space="preserve">
+    <value>المستخدمون</value>
+  </data>
+  <data name="Menu_Workstations" xml:space="preserve">
+    <value>محطات العمل</value>
+  </data>
+  <data name="Menu_Settings" xml:space="preserve">
+    <value>إعدادات النظام</value>
+  </data>
+  <data name="Menu_Reports" xml:space="preserve">
+    <value>التقارير والإحصائيات</value>
+  </data>
+  <data name="Menu_DailyReport" xml:space="preserve">
+    <value>التقرير اليومي</value>
+  </data>
+  <data name="Menu_OrgStatistics" xml:space="preserve">
+    <value>إحصائيات الجهات</value>
+  </data>
+  <data name="Menu_Help" xml:space="preserve">
+    <value>مساعدة</value>
+  </data>
+  <data name="Menu_About" xml:space="preserve">
+    <value>حول المنظومة...</value>
+  </data>
+  <data name="Status_User" xml:space="preserve">
+    <value>المستخدم: {0} ({1})</value>
+  </data>
+  <data name="Status_Workstation" xml:space="preserve">
+    <value>المحطة: {0}</value>
+  </data>
+  <data name="Status_ServerTime" xml:space="preserve">
+    <value>وقت الخادم: {0}</value>
+  </data>
+  <data name="Status_Connected" xml:space="preserve">
+    <value>متصل بالخادم</value>
+  </data>
+  <data name="Status_Disconnected" xml:space="preserve">
+    <value>غير متصل</value>
+  </data>
+  <data name="Error_General_NotFound" xml:space="preserve">
+    <value>السجل المطلوب غير موجود.</value>
+  </data>
+  <data name="Error_General_Unauthorized" xml:space="preserve">
+    <value>المستخدم غير مسجل الدخول.</value>
+  </data>
+  <data name="Error_General_Forbidden" xml:space="preserve">
+    <value>ليس لديك الصلاحية لتنفيذ هذا الإجراء.</value>
+  </data>
+  <data name="Error_General_ConcurrencyConflict" xml:space="preserve">
+    <value>تم تعديل السجل من قبل عملية أخرى بالتزامن. يرجى إعادة المحاولة.</value>
+  </data>
+  <data name="Error_Auth_InvalidCredentials" xml:space="preserve">
+    <value>اسم المستخدم أو كلمة المرور غير صحيحة.</value>
+  </data>
+  <data name="Error_Auth_AccountLocked" xml:space="preserve">
+    <value>تم قفل الحساب مؤقتاً بسبب تكرار محاولات الدخول الخاطئة. يرجى المحاولة لاحقاً.</value>
+  </data>
+  <data name="Error_Auth_AccountInactive" xml:space="preserve">
+    <value>هذا الحساب معطّل. يرجى مراجعة مدير النظام.</value>
+  </data>
+  <data name="Error_Auth_MustChangePassword" xml:space="preserve">
+    <value>يجب تغيير كلمة المرور قبل المتابعة.</value>
+  </data>
+  <data name="Error_Auth_PasswordMismatch" xml:space="preserve">
+    <value>كلمة المرور الحالية غير صحيحة.</value>
+  </data>
+  <data name="Error_Auth_FirstRunAlreadyCompleted" xml:space="preserve">
+    <value>تم إعداد الحساب الرئيسي للمنظومة مسبقاً.</value>
+  </data>
+  <data name="Error_Auth_WorkstationNotFound" xml:space="preserve">
+    <value>محطة العمل غير مسجلة.</value>
+  </data>
+  <data name="Error_Auth_WorkstationInactive" xml:space="preserve">
+    <value>محطة العمل هذه معطّلة. يرجى مراجعة المشرف.</value>
+  </data>
+  <data name="Error_Auth_SupervisorRequired" xml:space="preserve">
+    <value>هذا الإجراء يتطلب صلاحية مشرف أو مدير.</value>
+  </data>
+  <data name="Val_UserNameRequired" xml:space="preserve">
+    <value>اسم المستخدم مطلوب.</value>
+  </data>
+  <data name="Val_UserNameTooLong" xml:space="preserve">
+    <value>اسم المستخدم أطول من الحد المسموح به.</value>
+  </data>
+  <data name="Val_FullNameRequired" xml:space="preserve">
+    <value>الاسم الكامل مطلوب.</value>
+  </data>
+  <data name="Val_FullNameTooLong" xml:space="preserve">
+    <value>الاسم الكامل أطول من الحد المسموح به.</value>
+  </data>
+  <data name="Val_PasswordRequired" xml:space="preserve">
+    <value>كلمة المرور مطلوبة.</value>
+  </data>
+  <data name="Val_PasswordTooShort" xml:space="preserve">
+    <value>كلمة المرور يجب أن تتكون من 8 أحرف على الأقل.</value>
+  </data>
+  <data name="Val_PasswordsDoNotMatch" xml:space="preserve">
+    <value>كلمتا المرور غير متطابقتين.</value>
+  </data>
+  <data name="Val_CurrentPasswordRequired" xml:space="preserve">
+    <value>كلمة المرور الحالية مطلوبة.</value>
+  </data>
+  <data name="Val_NewPasswordRequired" xml:space="preserve">
+    <value>كلمة المرور الجديدة مطلوبة.</value>
+  </data>
 </root>

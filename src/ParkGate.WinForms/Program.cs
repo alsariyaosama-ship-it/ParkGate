@@ -12,7 +12,7 @@ internal static class Program
     private static IHost? _host;
 
     [STAThread]
-    private static void Main()
+    private static async Task Main()
     {
         // 1. High DPI initialization
         ApplicationConfiguration.Initialize();
@@ -59,16 +59,27 @@ internal static class Program
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    ConfigureServices(services, context.Configuration);
+                    services.AddParkGateServices(context.Configuration);
                 })
                 .Build();
 
-            _host.Start();
+            await _host.StartAsync();
 
-            var formFactory = _host.Services.GetRequiredService<IFormFactory>();
-            var mainForm = formFactory.Create<Forms.MainForm>();
+            // 5. Run startup coordinator (T4.1)
+            var coordinator = _host.Services.GetRequiredService<IStartupCoordinator>();
+            var status = await coordinator.RunStartupSequenceAsync();
 
-            WinFormsApp.Run(mainForm);
+            if (status == StartupStatus.Success)
+            {
+                var formFactory = _host.Services.GetRequiredService<IFormFactory>();
+                var mainForm = formFactory.Create<Forms.MainForm>();
+
+                WinFormsApp.Run(mainForm);
+            }
+            else
+            {
+                Log.Information("ParkGate startup finished with status {Status}. Exiting application.", status);
+            }
         }
         catch (Exception ex)
         {
@@ -77,19 +88,15 @@ internal static class Program
         }
         finally
         {
-            _host?.Dispose();
+            if (_host != null)
+            {
+                await _host.StopAsync();
+                _host.Dispose();
+            }
+
             Log.Information("ParkGate shutdown complete.");
             Log.CloseAndFlush();
         }
-    }
-
-    private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-    {
-        // Core services
-        services.AddSingleton<IFormFactory, FormFactory>();
-
-        // Forms (Transient per AGENTS.md §4.5)
-        services.AddTransient<Forms.MainForm>();
     }
 
     private static void HandleException(string source, Exception? exception)
