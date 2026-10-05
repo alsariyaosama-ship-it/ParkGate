@@ -340,4 +340,85 @@
   <data name="Val_NewPasswordRequired" xml:space="preserve">
     <value>كلمة المرور الجديدة مطلوبة.</value>
   </data>
+  <data name="Role_Operator" xml:space="preserve">
+    <value>موظف الشباك</value>
+  </data>
+  <data name="Role_Supervisor" xml:space="preserve">
+    <value>مشرف</value>
+  </data>
+  <data name="Role_Admin" xml:space="preserve">
+    <value>مدير النظام</value>
+  </data>
+  <data name="Role_Unknown" xml:space="preserve">
+    <value>مجهول</value>
+  </data>
+  <data name="Msg_ConfirmLogout" xml:space="preserve">
+    <value>هل أنت متأكد من رغبتك في تسجيل الخروج من المنظومة؟</value>
+  </data>
+  <data name="Title_Logout" xml:space="preserve">
+    <value>تأكيد تسجيل الخروج</value>
+  </data>
+  <data name="Msg_ConfirmExit" xml:space="preserve">
+    <value>هل أنت متأكد من رغبتك في إغلاق المنظومة؟</value>
+  </data>
+  <data name="Title_Exit" xml:space="preserve">
+    <value>تأكيد إغلاق المنظومة</value>
+  </data>
+  <data name="Msg_FeatureInNextPhase" xml:space="preserve">
+    <value>هذه الشاشة سيتم تفعيلها في المرحلة القادمة من خطة التطوير.</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>حول المنظومة</value>
+  </data>
+  <data name="About_AppName" xml:space="preserve">
+    <value>منظومة بوابة الحديقة (ParkGate)</value>
+  </data>
+  <data name="About_Park" xml:space="preserve">
+    <value>منتزه المرح العائلي</value>
+  </data>
+  <data name="About_Description" xml:space="preserve">
+    <value>نظام إدارة والتحكم في الدخول المجاني لحاملي بطاقات صندوق التضامن الاجتماعي والجهات الراعية.</value>
+  </data>
+  <data name="About_Vendor" xml:space="preserve">
+    <value>شركة الركاز المتين لتقنية المعلومات</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>الإصدار 1.0.0</value>
+  </data>
+  <data name="Banner_Granted" xml:space="preserve">
+    <value>مسموح بالدخول</value>
+  </data>
+  <data name="Banner_Denied" xml:space="preserve">
+    <value>مرفوض</value>
+  </data>
+  <data name="Banner_Warning" xml:space="preserve">
+    <value>تنبيه</value>
+  </data>
+  <data name="Banner_Neutral" xml:space="preserve">
+    <value>جاهز للاستخدام</value>
+  </data>
+  <data name="Title_SupervisorAuth" xml:space="preserve">
+    <value>موافقة المشرف (إعادة المصادقة)</value>
+  </data>
+  <data name="Header_SupervisorAuth" xml:space="preserve">
+    <value>هذا الإجراء يتطلب مصادقة مشرف الوردية أو مدير النظام.</value>
+  </data>
+  <data name="Label_SupervisorUsername" xml:space="preserve">
+    <value>اسم المستخدم للمشرف:</value>
+  </data>
+  <data name="Label_SupervisorPassword" xml:space="preserve">
+    <value>كلمة المرور:</value>
+  </data>
+  <data name="Label_SupervisorReason" xml:space="preserve">
+    <value>سبب الإجراء (5 أحرف على الأقل):</value>
+  </data>
+  <data name="Btn_Approve" xml:space="preserve">
+    <value>موافقة واعتماد</value>
+  </data>
+  <data name="Val_SupervisorReasonRequired" xml:space="preserve">
+    <value>سبب الإجراء مطلوب ويجب ألا يقل عن 5 أحرف.</value>
+  </data>
+  <data name="Val_SupervisorReasonTooShort" xml:space="preserve">
+    <value>سبب الإجراء يجب أن يتكون من 5 أحرف على الأقل.</value>
+  </data>
 </root>

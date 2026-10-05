@@ -235,6 +235,38 @@ internal class Strings
     internal static string Val_CurrentPasswordRequired => GetString(nameof(Val_CurrentPasswordRequired));
     internal static string Val_NewPasswordRequired => GetString(nameof(Val_NewPasswordRequired));
 
+    internal static string Role_Operator => GetString(nameof(Role_Operator));
+    internal static string Role_Supervisor => GetString(nameof(Role_Supervisor));
+    internal static string Role_Admin => GetString(nameof(Role_Admin));
+    internal static string Role_Unknown => GetString(nameof(Role_Unknown));
+
+    internal static string Msg_ConfirmLogout => GetString(nameof(Msg_ConfirmLogout));
+    internal static string Title_Logout => GetString(nameof(Title_Logout));
+    internal static string Msg_ConfirmExit => GetString(nameof(Msg_ConfirmExit));
+    internal static string Title_Exit => GetString(nameof(Title_Exit));
+    internal static string Msg_FeatureInNextPhase => GetString(nameof(Msg_FeatureInNextPhase));
+
+    internal static string About_Title => GetString(nameof(About_Title));
+    internal static string About_AppName => GetString(nameof(About_AppName));
+    internal static string About_Park => GetString(nameof(About_Park));
+    internal static string About_Description => GetString(nameof(About_Description));
+    internal static string About_Vendor => GetString(nameof(About_Vendor));
+    internal static string About_Version => GetString(nameof(About_Version));
+
+    internal static string Banner_Granted => GetString(nameof(Banner_Granted));
+    internal static string Banner_Denied => GetString(nameof(Banner_Denied));
+    internal static string Banner_Warning => GetString(nameof(Banner_Warning));
+    internal static string Banner_Neutral => GetString(nameof(Banner_Neutral));
+
+    internal static string Title_SupervisorAuth => GetString(nameof(Title_SupervisorAuth));
+    internal static string Header_SupervisorAuth => GetString(nameof(Header_SupervisorAuth));
+    internal static string Label_SupervisorUsername => GetString(nameof(Label_SupervisorUsername));
+    internal static string Label_SupervisorPassword => GetString(nameof(Label_SupervisorPassword));
+    internal static string Label_SupervisorReason => GetString(nameof(Label_SupervisorReason));
+    internal static string Btn_Approve => GetString(nameof(Btn_Approve));
+    internal static string Val_SupervisorReasonRequired => GetString(nameof(Val_SupervisorReasonRequired));
+    internal static string Val_SupervisorReasonTooShort => GetString(nameof(Val_SupervisorReasonTooShort));
+
     internal static string GetString(string name)
     {
         return ResourceManager.GetString(name, resourceCulture) ?? name;
