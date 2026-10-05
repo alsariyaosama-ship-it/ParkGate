@@ -6,7 +6,7 @@ namespace ParkGate.Application.Security;
 /// <summary>
 /// In-memory context identifying the workstation on which the application is executing.
 /// </summary>
-public sealed class CurrentWorkstationContext : ICurrentWorkstation
+public sealed class CurrentWorkstationContext : ICurrentWorkstationSession
 {
     private readonly object _lock = new();
 

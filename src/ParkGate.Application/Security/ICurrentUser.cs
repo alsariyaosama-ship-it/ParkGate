@@ -17,3 +17,13 @@ public interface ICurrentUser
     bool HasAny(params Permission[] permissions);
     bool IsInRole(UserRole role);
 }
+
+/// <summary>
+/// Session-management interface for mutating the current user session on login/logout.
+/// </summary>
+public interface ICurrentUserSession : ICurrentUser
+{
+    void SetUser(ParkGate.Domain.Entities.User user);
+    void SetUser(int userId, string userName, string fullName, UserRole role);
+    void Clear();
+}

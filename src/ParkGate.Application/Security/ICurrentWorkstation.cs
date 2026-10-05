@@ -13,3 +13,13 @@ public interface ICurrentWorkstation
     WorkstationType? Type { get; }
     bool IsRegistered { get; }
 }
+
+/// <summary>
+/// Session-management interface for mutating the current workstation state on initialization/registration.
+/// </summary>
+public interface ICurrentWorkstationSession : ICurrentWorkstation
+{
+    void SetWorkstation(ParkGate.Domain.Entities.Workstation workstation);
+    void SetWorkstation(int workstationId, string machineName, string displayName, WorkstationType type);
+    void Clear();
+}

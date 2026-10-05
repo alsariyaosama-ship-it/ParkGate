@@ -6,7 +6,7 @@ namespace ParkGate.Application.Security;
 /// <summary>
 /// In-memory singleton context managing the active user session.
 /// </summary>
-public sealed class CurrentUserContext : ICurrentUser
+public sealed class CurrentUserContext : ICurrentUserSession
 {
     private readonly object _lock = new();
 

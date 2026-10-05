@@ -39,7 +39,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 ## Phase 3 — Application · branch `phase/03-application`
 - [x] T3.1 `Result`, `Result<T>`, `Error`, error code catalog.
 - [x] T3.2 `ICurrentUser`, `ICurrentWorkstation`, `Permission` enum and role matrix (SPEC §4).
-- [ ] T3.3 `AuthService`: first-run admin creation, login with lockout (BR-18), change password, must-change flow; workstation auto-registration.
+- [x] T3.3 `AuthService`: first-run admin creation, login with lockout (BR-18), change password, must-change flow; workstation auto-registration.
 - [ ] T3.4 `BeneficiaryService`: lookup by card (multi-org), eligibility preview, register, update, suspend/reactivate/block, search, history.
 - [ ] T3.5 `CheckInService`: record entry (atomic, BR-07..BR-12), log denial with dedupe (BR-10), override (BR-11), void (BR-13).
 - [ ] T3.6 `SettingsService` (typed, cached), organizations, age categories, users, workstations services + validators.

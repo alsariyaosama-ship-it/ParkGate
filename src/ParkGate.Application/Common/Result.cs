@@ -32,6 +32,8 @@ public class Result
     public static Result<T> Success<T>(T value) => Result<T>.Success(value);
     public static Result<T> Failure<T>(Error error) => Result<T>.Failure(error);
     public static Result<T> Failure<T>(string code, string message = "") => Result<T>.Failure(new Error(code, message));
+
+    public static implicit operator Result(Error error) => Failure(error);
 }
 
 /// <summary>
