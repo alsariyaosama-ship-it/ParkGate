@@ -26,13 +26,13 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 **Done when:** all Domain BRs covered by passing tests; Domain has zero references.
 
 ## Phase 2 — Persistence · branch `phase/02-persistence`
-- [ ] T2.1 `ParkGateDbContext` + one configuration per entity matching DATABASE.md (lengths, indexes, filtered indexes, check constraints, rowversion).
-- [ ] T2.2 Audit-columns `SaveChangesInterceptor`.
-- [ ] T2.3 Migration `InitialCreate` with seed (DATABASE.md §6, no users).
-- [ ] T2.4 `UnitOfWorkFactory`, `UnitOfWork` (transaction, `GetDbUtcNowAsync`), repositories incl. `GetForUpdateAsync` with `UPDLOCK, ROWLOCK`.
-- [ ] T2.5 `Pbkdf2PasswordHasher`, `AppSettingsStore`, `AuditWriter`, DPAPI `ConnectionSettingsStore`.
-- [ ] T2.6 Integration tests (LocalDB): mapping round-trip, unique indexes, **parallel check-in → exactly one granted**, void recalculation.
-- [ ] T2.7 `scripts/build-migration-bundle.ps1` producing `efbundle.exe` for deployment.
+- [x] T2.1 `ParkGateDbContext` + one configuration per entity matching DATABASE.md (lengths, indexes, filtered indexes, check constraints, rowversion).
+- [x] T2.2 Audit-columns `SaveChangesInterceptor`.
+- [x] T2.3 Migration `InitialCreate` with seed (DATABASE.md §6, no users).
+- [x] T2.4 `UnitOfWorkFactory`, `UnitOfWork` (transaction, `GetDbUtcNowAsync`), repositories incl. `GetForUpdateAsync` with `UPDLOCK, ROWLOCK`.
+- [x] T2.5 `Pbkdf2PasswordHasher`, `AppSettingsStore`, `AuditWriter`, DPAPI `ConnectionSettingsStore`.
+- [x] T2.6 Integration tests (LocalDB): mapping round-trip, unique indexes, **parallel check-in → exactly one granted**, void recalculation.
+- [x] T2.7 `scripts/build-migration-bundle.ps1` producing `efbundle.exe` for deployment.
 
 **Done when:** DB created from migrations on LocalDB; integration tests pass locally; concurrency test passes 20 consecutive runs.
 
