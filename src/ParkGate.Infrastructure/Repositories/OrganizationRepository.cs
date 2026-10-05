@@ -20,6 +20,20 @@ public sealed class OrganizationRepository : IOrganizationRepository
             .SingleOrDefaultAsync(o => o.Id == id, cancellationToken);
     }
 
+    public async Task<Organization?> GetByCodeAsync(string code, CancellationToken cancellationToken = default)
+    {
+        var normalized = code.Trim().ToUpperInvariant();
+        return await _context.Organizations
+            .SingleOrDefaultAsync(o => o.Code == normalized, cancellationToken);
+    }
+
+    public async Task<Organization?> GetByNameAsync(string nameAr, CancellationToken cancellationToken = default)
+    {
+        var normalized = nameAr.Trim();
+        return await _context.Organizations
+            .SingleOrDefaultAsync(o => o.NameAr == normalized, cancellationToken);
+    }
+
     public async Task<Organization?> GetDefaultAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Organizations

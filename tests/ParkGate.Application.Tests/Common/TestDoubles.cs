@@ -1,6 +1,7 @@
 using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
+using ParkGate.Application.Ports.Settings;
 using ParkGate.Domain.Entities;
 using ParkGate.Domain.Enums;
 using ParkGate.Domain.ValueObjects;
@@ -44,6 +45,7 @@ public sealed class FakeUserRepository : IUserRepository
     public FakeUserRepository(List<User> users)
     {
         _users = users;
+        _nextId = users.Count > 0 ? users.Max(u => u.Id) + 1 : 1;
     }
 
     public Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -60,6 +62,9 @@ public sealed class FakeUserRepository : IUserRepository
     {
         return Task.FromResult(_users.Count);
     }
+
+    public Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<User>>(_users);
 
     public void Add(User user)
     {
@@ -81,6 +86,7 @@ public sealed class FakeWorkstationRepository : IWorkstationRepository
     public FakeWorkstationRepository(List<Workstation> workstations)
     {
         _workstations = workstations;
+        _nextId = workstations.Count > 0 ? workstations.Max(w => w.Id) + 1 : 1;
     }
 
     public Task<Workstation?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -92,6 +98,9 @@ public sealed class FakeWorkstationRepository : IWorkstationRepository
     {
         return Task.FromResult(_workstations.FirstOrDefault(w => w.MachineName.Equals(machineName, StringComparison.OrdinalIgnoreCase)));
     }
+
+    public Task<IReadOnlyList<Workstation>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<Workstation>>(_workstations);
 
     public void Add(Workstation workstation)
     {
@@ -105,7 +114,7 @@ public sealed class FakeWorkstationRepository : IWorkstationRepository
     public void Update(Workstation workstation) { }
 }
 
-public sealed class FakeAppSettingRepository : IAppSettingRepository
+public sealed class FakeAppSettingRepository : IAppSettingRepository, IAppSettingsStore
 {
     private readonly Dictionary<string, AppSetting> _settings = new(StringComparer.OrdinalIgnoreCase);
 
@@ -121,6 +130,27 @@ public sealed class FakeAppSettingRepository : IAppSettingRepository
         return Task.FromResult(dict);
     }
 
+    public Task<string?> GetValueAsync(string key, CancellationToken cancellationToken = default)
+    {
+        _settings.TryGetValue(key, out var setting);
+        return Task.FromResult(setting?.Value);
+    }
+
+    public Task SetValueAsync(string key, string value, int? updatedByUserId = null, CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        if (_settings.TryGetValue(key, out var existing))
+        {
+            existing.Update(value, now, updatedByUserId);
+        }
+        else
+        {
+            _settings[key] = new AppSetting(key, value, now, updatedByUserId);
+        }
+
+        return Task.CompletedTask;
+    }
+
     public void Add(AppSetting setting) => _settings[setting.Key] = setting;
 
     public void Update(AppSetting setting) => _settings[setting.Key] = setting;
@@ -134,6 +164,7 @@ public sealed class FakeOrganizationRepository : IOrganizationRepository
     public FakeOrganizationRepository(List<Organization> organizations)
     {
         _organizations = organizations;
+        _nextId = organizations.Count > 0 ? organizations.Max(o => o.Id) + 1 : 1;
     }
 
     public Task<Organization?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
@@ -141,6 +172,9 @@ public sealed class FakeOrganizationRepository : IOrganizationRepository
 
     public Task<Organization?> GetByCodeAsync(string code, CancellationToken cancellationToken = default) =>
         Task.FromResult(_organizations.FirstOrDefault(o => o.Code.Equals(code, StringComparison.OrdinalIgnoreCase)));
+
+    public Task<Organization?> GetByNameAsync(string nameAr, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_organizations.FirstOrDefault(o => o.NameAr.Equals(nameAr, StringComparison.OrdinalIgnoreCase)));
 
     public Task<Organization?> GetDefaultAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(_organizations.FirstOrDefault(o => o.IsDefault));
@@ -293,6 +327,7 @@ public sealed class FakeAgeCategoryRepository : IAgeCategoryRepository
     public FakeAgeCategoryRepository(List<AgeCategory> categories)
     {
         _categories = categories;
+        _nextId = categories.Count > 0 ? categories.Max(c => c.Id) + 1 : 1;
     }
 
     public Task<AgeCategory?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
@@ -300,6 +335,12 @@ public sealed class FakeAgeCategoryRepository : IAgeCategoryRepository
 
     public Task<IReadOnlyList<AgeCategory>> GetAllActiveAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<AgeCategory>>(_categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder).ToList());
+
+    public Task<IReadOnlyList<AgeCategory>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<AgeCategory>>(_categories.OrderBy(c => c.SortOrder).ToList());
+
+    public Task<AgeCategory?> GetByNameAsync(string nameAr, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_categories.FirstOrDefault(c => c.NameAr.Equals(nameAr, StringComparison.OrdinalIgnoreCase)));
 
     public void Add(AgeCategory category)
     {

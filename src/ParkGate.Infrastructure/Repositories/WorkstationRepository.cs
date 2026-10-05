@@ -27,6 +27,11 @@ public sealed class WorkstationRepository : IWorkstationRepository
             .SingleOrDefaultAsync(w => w.MachineName == normalized, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Workstation>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Workstations.OrderBy(w => w.MachineName).ToListAsync(cancellationToken);
+    }
+
     public void Add(Workstation workstation)
     {
         _context.Workstations.Add(workstation);

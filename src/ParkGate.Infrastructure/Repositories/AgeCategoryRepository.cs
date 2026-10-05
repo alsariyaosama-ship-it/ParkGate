@@ -22,9 +22,33 @@ public sealed class AgeCategoryRepository : IAgeCategoryRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<AgeCategory>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.AgeCategories
+            .OrderBy(a => a.SortOrder)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<AgeCategory?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.AgeCategories
             .SingleOrDefaultAsync(a => a.Id == id, cancellationToken);
+    }
+
+    public async Task<AgeCategory?> GetByNameAsync(string nameAr, CancellationToken cancellationToken = default)
+    {
+        var normalized = nameAr.Trim();
+        return await _context.AgeCategories
+            .SingleOrDefaultAsync(a => a.NameAr == normalized, cancellationToken);
+    }
+
+    public void Add(AgeCategory category)
+    {
+        _context.AgeCategories.Add(category);
+    }
+
+    public void Update(AgeCategory category)
+    {
+        _context.AgeCategories.Update(category);
     }
 }
