@@ -599,7 +599,7 @@ public sealed class CheckInDeskControlTests
         public Task<ParkGate.Application.Common.Result<CheckInResultDto>> OverrideEntryAsync(OverrideEntryRequest request, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
-        public Task<ParkGate.Application.Common.Result> VoidEntryAsync(VoidEntryRequest request, CancellationToken cancellationToken = default)
+        public Task<ParkGate.Application.Common.Result> VoidEntryAsync(VoidEntryRequest request, int? supervisorUserId = null, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         public Task<ParkGate.Application.Common.Result<TodayDeskSummaryDto>> GetTodayDeskEntriesAsync(int? workstationId = null, CancellationToken cancellationToken = default)

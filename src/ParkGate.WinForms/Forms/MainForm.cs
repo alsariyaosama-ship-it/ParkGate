@@ -168,12 +168,12 @@ public partial class MainForm : RtlFormBase
         _menuExit.Click += (_, _) => Close();
 
         _menuCheckIn.Click += (_, _) => ShowCheckInDesk();
-        _menuBeneficiaries.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Beneficiaries);
-        _menuOrganizations.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Organizations);
-        _menuAgeCategories.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_AgeCategories);
-        _menuUsers.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Users);
-        _menuWorkstations.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Workstations);
-        _menuSettings.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Settings);
+        _menuBeneficiaries.Click += (_, _) => ShowBeneficiaries();
+        _menuOrganizations.Click += (_, _) => ShowOrganizations();
+        _menuAgeCategories.Click += (_, _) => ShowAgeCategories();
+        _menuUsers.Click += (_, _) => ShowUsers();
+        _menuWorkstations.Click += (_, _) => ShowWorkstations();
+        _menuSettings.Click += (_, _) => ShowSettings();
         _menuDailyReport.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_DailyReport);
         _menuOrgStatistics.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_OrgStatistics);
 
@@ -181,6 +181,7 @@ public partial class MainForm : RtlFormBase
     }
 
     private Controls.CheckInDeskControl? _checkInDeskControl;
+    private Controls.BeneficiariesControl? _beneficiariesControl;
 
     public void ShowCheckInDesk()
     {
@@ -206,9 +207,59 @@ public partial class MainForm : RtlFormBase
         }
 
         _welcomeCard.Visible = false;
+        if (_beneficiariesControl != null)
+        {
+            _beneficiariesControl.Visible = false;
+        }
+
         _checkInDeskControl.Visible = true;
         _checkInDeskControl.BringToFront();
         _checkInDeskControl.FocusCardNumberBox();
+    }
+
+    public void ShowCheckInDeskWithCard(string cardNumber)
+    {
+        ShowCheckInDesk();
+        if (_checkInDeskControl != null && !string.IsNullOrWhiteSpace(cardNumber))
+        {
+            _checkInDeskControl.SetCardNumber(cardNumber);
+            _ = _checkInDeskControl.SearchCardAsync();
+        }
+    }
+
+    public void ShowBeneficiaries(string? initialSearchTerm = null)
+    {
+        if (_beneficiariesControl == null)
+        {
+            _beneficiariesControl = _formFactory?.CreateControl<Controls.BeneficiariesControl>() ??
+                                    new Controls.BeneficiariesControl(
+                                        null, null, _settingsService,
+                                        _currentUser, _currentWorkstation,
+                                        _formFactory, _notifyService, null);
+
+            _beneficiariesControl.Dock = DockStyle.Fill;
+            _beneficiariesControl.RequestCheckIn += (_, card) => ShowCheckInDeskWithCard(card);
+            _mainContainer.Controls.Add(_beneficiariesControl);
+        }
+
+        _welcomeCard.Visible = false;
+        if (_checkInDeskControl != null)
+        {
+            _checkInDeskControl.Visible = false;
+        }
+
+        _beneficiariesControl.Visible = true;
+        _beneficiariesControl.BringToFront();
+
+        if (!string.IsNullOrWhiteSpace(initialSearchTerm))
+        {
+            _beneficiariesControl.SetSearchQuery(initialSearchTerm);
+            _ = _beneficiariesControl.PerformSearchAsync();
+        }
+        else
+        {
+            _beneficiariesControl.FocusSearchBox();
+        }
     }
 
     private async Task OnMainFormLoadedAsync()
@@ -360,6 +411,76 @@ public partial class MainForm : RtlFormBase
                 MessageBoxIcon.Information,
                 MessageBoxDefaultButton.Button1,
                 MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        }
+    }
+
+    public void ShowOrganizations()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ManageOrganizations))
+        {
+            return;
+        }
+
+        var form = _formFactory?.Create<OrganizationsForm>() ?? new OrganizationsForm(null, _formFactory, _notifyService, null);
+        using (form)
+        {
+            form.ShowDialog(this);
+        }
+    }
+
+    public void ShowAgeCategories()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ManageAgeCategories))
+        {
+            return;
+        }
+
+        var form = _formFactory?.Create<AgeCategoriesForm>() ?? new AgeCategoriesForm(null, _formFactory, _notifyService, null);
+        using (form)
+        {
+            form.ShowDialog(this);
+        }
+    }
+
+    public void ShowUsers()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ManageUsers))
+        {
+            return;
+        }
+
+        var form = _formFactory?.Create<UsersForm>() ?? new UsersForm(null, _currentUser, _settingsService, _formFactory, _notifyService, null);
+        using (form)
+        {
+            form.ShowDialog(this);
+        }
+    }
+
+    public void ShowWorkstations()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ManageWorkstations))
+        {
+            return;
+        }
+
+        var form = _formFactory?.Create<WorkstationsForm>() ?? new WorkstationsForm(null, _settingsService, _formFactory, _notifyService, null);
+        using (form)
+        {
+            form.ShowDialog(this);
+        }
+    }
+
+    public void ShowSettings()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ManageSettings))
+        {
+            return;
+        }
+
+        var form = _formFactory?.Create<SettingsForm>() ?? new SettingsForm(_settingsService, _notifyService, null);
+        using (form)
+        {
+            form.ShowDialog(this);
         }
     }
 

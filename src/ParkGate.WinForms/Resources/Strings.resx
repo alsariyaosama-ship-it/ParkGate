@@ -490,6 +490,9 @@
   <data name="Btn_SaveAndContinue" xml:space="preserve">
     <value>حفظ ومتابعة الدخول</value>
   </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
   <data name="Btn_CancelReg" xml:space="preserve">
     <value>إلغاء</value>
   </data>
@@ -558,5 +561,428 @@
   </data>
   <data name="Btn_SelectOrg" xml:space="preserve">
     <value>اختيار ومتابعة</value>
+  </data>
+  <data name="Title_Beneficiaries" xml:space="preserve">
+    <value>إدارة حاملي البطاقات والمستفيدين</value>
+  </data>
+  <data name="Header_BeneficiariesSearch" xml:space="preserve">
+    <value>البحث في حاملي البطاقات</value>
+  </data>
+  <data name="Label_SearchTerm" xml:space="preserve">
+    <value>البحث (رقم البطاقة / الاسم / الهاتف / الرقم الوطني):</value>
+  </data>
+  <data name="Placeholder_SearchBeneficiary" xml:space="preserve">
+    <value>اكتب للبحث واضغط Enter...</value>
+  </data>
+  <data name="Btn_ClearSearch" xml:space="preserve">
+    <value>مسح</value>
+  </data>
+  <data name="Summary_SearchResults" xml:space="preserve">
+    <value>عدد النتائج: {0}</value>
+  </data>
+  <data name="Col_Ben_CardNumber" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="Col_Ben_Organization" xml:space="preserve">
+    <value>الجهة</value>
+  </data>
+  <data name="Col_Ben_FullName" xml:space="preserve">
+    <value>الاسم الكامل</value>
+  </data>
+  <data name="Col_Ben_Phone" xml:space="preserve">
+    <value>رقم الهاتف</value>
+  </data>
+  <data name="Col_Ben_NationalId" xml:space="preserve">
+    <value>الرقم الوطني</value>
+  </data>
+  <data name="Col_Ben_ExpiryDate" xml:space="preserve">
+    <value>تاريخ الانتهاء</value>
+  </data>
+  <data name="Col_Ben_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_Ben_LastEntry" xml:space="preserve">
+    <value>آخر دخول</value>
+  </data>
+  <data name="Group_Ben_Details" xml:space="preserve">
+    <value>تفاصيل حامل البطاقة</value>
+  </data>
+  <data name="Group_Ben_History" xml:space="preserve">
+    <value>سجل محاولات وحركات الدخول</value>
+  </data>
+  <data name="Btn_EditBeneficiary" xml:space="preserve">
+    <value>تعديل البيانات...</value>
+  </data>
+  <data name="Btn_ChangeStatus" xml:space="preserve">
+    <value>تغيير الحالة...</value>
+  </data>
+  <data name="Btn_CheckInDirect" xml:space="preserve">
+    <value>فتح بشباك الدخول</value>
+  </data>
+  <data name="Title_EditBeneficiary" xml:space="preserve">
+    <value>تعديل بيانات حامل البطاقة</value>
+  </data>
+  <data name="Header_EditBeneficiary" xml:space="preserve">
+    <value>تعديل بيانات المستفيد المسجل</value>
+  </data>
+  <data name="Title_ChangeStatus" xml:space="preserve">
+    <value>تغيير حالة المستفيد</value>
+  </data>
+  <data name="Header_ChangeStatus" xml:space="preserve">
+    <value>تحديث حالة المستفيد في النظام</value>
+  </data>
+  <data name="Label_CurrentStatus" xml:space="preserve">
+    <value>الحالة الحالية: {0}</value>
+  </data>
+  <data name="Label_TargetStatus" xml:space="preserve">
+    <value>الحالة الجديدة المطلوبة:</value>
+  </data>
+  <data name="Label_StatusReasonPrompt" xml:space="preserve">
+    <value>سبب تغيير الحالة (مطلوب عند الإيقاف أو الحظر - 5 أحرف على الأقل):</value>
+  </data>
+  <data name="Msg_StatusChangeSuccess" xml:space="preserve">
+    <value>تم تحديث حالة المستفيد بنجاح.</value>
+  </data>
+  <data name="Msg_EditBeneficiarySuccess" xml:space="preserve">
+    <value>تم حفظ تعديلات بيانات المستفيد بنجاح.</value>
+  </data>
+  <data name="Msg_SelectBeneficiaryFirst" xml:space="preserve">
+    <value>يرجى تحديد مستفيد من القائمة أولاً.</value>
+  </data>
+  <data name="Msg_NoHistoryFound" xml:space="preserve">
+    <value>لا توجد حركات دخول سابقة لهذا المستفيد.</value>
+  </data>
+  <data name="Col_Hist_Time" xml:space="preserve">
+    <value>الوقت والتاريخ</value>
+  </data>
+  <data name="Col_Hist_BusinessDate" xml:space="preserve">
+    <value>تاريخ العمل</value>
+  </data>
+  <data name="Col_Hist_Workstation" xml:space="preserve">
+    <value>الشباك</value>
+  </data>
+  <data name="Col_Hist_Result" xml:space="preserve">
+    <value>النتيجة</value>
+  </data>
+  <data name="Col_Hist_Persons" xml:space="preserve">
+    <value>الأفراد</value>
+  </data>
+  <data name="Col_Hist_Details" xml:space="preserve">
+    <value>التفاصيل / المرافقون</value>
+  </data>
+  <data name="Col_Hist_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_Hist_VoidReason" xml:space="preserve">
+    <value>سبب الإلغاء</value>
+  </data>
+  <data name="Status_Attempt_Active" xml:space="preserve">
+    <value>سارية</value>
+  </data>
+  <data name="Status_Attempt_Voided" xml:space="preserve">
+    <value>ملغاة</value>
+  </data>
+  <data name="Title_VoidEntry" xml:space="preserve">
+    <value>إلغاء عملية دخول</value>
+  </data>
+  <data name="Header_VoidEntry" xml:space="preserve">
+    <value>إلغاء حركة دخول مسجلة (إعادة احتساب فترة السماح)</value>
+  </data>
+  <data name="Label_VoidReasonPrompt" xml:space="preserve">
+    <value>سبب الإلغاء (إلزامي - 5 أحرف على الأقل):</value>
+  </data>
+  <data name="Btn_ConfirmVoid" xml:space="preserve">
+    <value>تأكيد الإلغاء</value>
+  </data>
+  <data name="Msg_ConfirmVoid" xml:space="preserve">
+    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيؤدي ذلك لإعادة احتساب موعد آخر دخول للمستفيد تلقائياً.</value>
+  </data>
+  <data name="Msg_VoidSuccess" xml:space="preserve">
+    <value>تم إلغاء عملية الدخول بنجاح.</value>
+  </data>
+  <data name="Menu_VoidTodayEntry" xml:space="preserve">
+    <value>إلغاء هذه العملية (Void)...</value>
+  </data>
+  <data name="Label_CreatedAt" xml:space="preserve">
+    <value>تاريخ التسجيل: {0}</value>
+  </data>
+  <data name="Label_Notes" xml:space="preserve">
+    <value>ملاحظات:</value>
+  </data>
+  <data name="Label_StatusReason" xml:space="preserve">
+    <value>سبب الإيقاف/الحظر: {0}</value>
+  </data>
+  <data name="Btn_Add" xml:space="preserve">
+    <value>إضافة جديدة</value>
+  </data>
+  <data name="Btn_Edit" xml:space="preserve">
+    <value>تعديل</value>
+  </data>
+  <data name="Btn_Deactivate" xml:space="preserve">
+    <value>تعطيل</value>
+  </data>
+  <data name="Btn_Reactivate" xml:space="preserve">
+    <value>إعادة تفعيل</value>
+  </data>
+  <data name="Btn_Refresh" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>إغلاق</value>
+  </data>
+  <data name="Status_Inactive" xml:space="preserve">
+    <value>غير نشط</value>
+  </data>
+  <data name="Title_Organizations" xml:space="preserve">
+    <value>إدارة الجهات والمنظمات</value>
+  </data>
+  <data name="Title_AddOrganization" xml:space="preserve">
+    <value>إضافة جهة جديدة</value>
+  </data>
+  <data name="Title_EditOrganization" xml:space="preserve">
+    <value>تعديل بيانات الجهة</value>
+  </data>
+  <data name="Col_Org_Code" xml:space="preserve">
+    <value>رمز الجهة</value>
+  </data>
+  <data name="Col_Org_Name" xml:space="preserve">
+    <value>اسم الجهة</value>
+  </data>
+  <data name="Col_Org_Cooldown" xml:space="preserve">
+    <value>فترة السماح</value>
+  </data>
+  <data name="Col_Org_Default" xml:space="preserve">
+    <value>افتراضية</value>
+  </data>
+  <data name="Col_Org_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Label_Org_Code" xml:space="preserve">
+    <value>رمز الجهة (إنجليزي):</value>
+  </data>
+  <data name="Label_Org_Name" xml:space="preserve">
+    <value>اسم الجهة بالعربية:</value>
+  </data>
+  <data name="Label_Org_CustomCooldown" xml:space="preserve">
+    <value>تحديد فترة سماح خاصة بهذه الجهة</value>
+  </data>
+  <data name="Label_Org_CooldownHours" xml:space="preserve">
+    <value>فترة السماح (بالساعات):</value>
+  </data>
+  <data name="Label_Org_IsDefault" xml:space="preserve">
+    <value>الجهة الافتراضية للنظام</value>
+  </data>
+  <data name="Msg_ConfirmDeactivateOrg" xml:space="preserve">
+    <value>هل أنت متأكد من تعطيل هذه الجهة؟ لن يتمكن حاملو بطاقاتها من الدخول حتى إعادة تفعيلها.</value>
+  </data>
+  <data name="Msg_ConfirmReactivateOrg" xml:space="preserve">
+    <value>هل أنت متأكد من إعادة تفعيل هذه الجهة؟</value>
+  </data>
+  <data name="Msg_SaveOrgSuccess" xml:space="preserve">
+    <value>تم حفظ بيانات الجهة بنجاح.</value>
+  </data>
+  <data name="Title_AgeCategories" xml:space="preserve">
+    <value>إدارة الفئات العمرية للمرافقين</value>
+  </data>
+  <data name="Title_AddAgeCategory" xml:space="preserve">
+    <value>إضافة فئة عمرية جديدة</value>
+  </data>
+  <data name="Title_EditAgeCategory" xml:space="preserve">
+    <value>تعديل فئة عمرية</value>
+  </data>
+  <data name="Col_Age_Name" xml:space="preserve">
+    <value>اسم الفئة</value>
+  </data>
+  <data name="Col_Age_Description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="Col_Age_SortOrder" xml:space="preserve">
+    <value>الترتيب</value>
+  </data>
+  <data name="Col_Age_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Label_Age_Name" xml:space="preserve">
+    <value>اسم الفئة:</value>
+  </data>
+  <data name="Label_Age_Description" xml:space="preserve">
+    <value>الوصف (مثال: من 3 إلى 12 سنة):</value>
+  </data>
+  <data name="Label_Age_SortOrder" xml:space="preserve">
+    <value>الترتيب:</value>
+  </data>
+  <data name="Msg_ConfirmDeactivateAge" xml:space="preserve">
+    <value>هل أنت متأكد من تعطيل هذه الفئة العمرية؟</value>
+  </data>
+  <data name="Msg_ConfirmReactivateAge" xml:space="preserve">
+    <value>هل أنت متأكد من إعادة تفعيل هذه الفئة العمرية؟</value>
+  </data>
+  <data name="Msg_SaveAgeSuccess" xml:space="preserve">
+    <value>تم حفظ الفئة العمرية بنجاح.</value>
+  </data>
+  <data name="Title_Workstations" xml:space="preserve">
+    <value>إدارة محطات العمل ونقاط الدخول</value>
+  </data>
+  <data name="Title_EditWorkstation" xml:space="preserve">
+    <value>تعديل محطة العمل</value>
+  </data>
+  <data name="Col_Ws_MachineName" xml:space="preserve">
+    <value>اسم الجهاز</value>
+  </data>
+  <data name="Col_Ws_DisplayName" xml:space="preserve">
+    <value>اسم المحطة</value>
+  </data>
+  <data name="Col_Ws_Type" xml:space="preserve">
+    <value>النوع</value>
+  </data>
+  <data name="Col_Ws_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_Ws_LastSeen" xml:space="preserve">
+    <value>آخر ظهور</value>
+  </data>
+  <data name="Label_Ws_MachineName" xml:space="preserve">
+    <value>اسم الجهاز في الشبكة:</value>
+  </data>
+  <data name="Label_Ws_DisplayName" xml:space="preserve">
+    <value>الاسم التعريفي للمحطة:</value>
+  </data>
+  <data name="Label_Ws_Type" xml:space="preserve">
+    <value>نوع المحطة:</value>
+  </data>
+  <data name="Ws_Type_Desk" xml:space="preserve">
+    <value>شباك موظف (Desk)</value>
+  </data>
+  <data name="Ws_Type_Gate" xml:space="preserve">
+    <value>بوابة إلكترونية (Gate)</value>
+  </data>
+  <data name="Msg_ConfirmDeactivateWs" xml:space="preserve">
+    <value>هل أنت متأكد من تعطيل محطة العمل هذه؟</value>
+  </data>
+  <data name="Msg_ConfirmReactivateWs" xml:space="preserve">
+    <value>هل أنت متأكد من إعادة تفعيل محطة العمل هذه؟</value>
+  </data>
+  <data name="Msg_SaveWsSuccess" xml:space="preserve">
+    <value>تم حفظ بيانات محطة العمل بنجاح.</value>
+  </data>
+  <data name="Title_Users" xml:space="preserve">
+    <value>إدارة المستخدمين</value>
+  </data>
+  <data name="Title_CreateUser" xml:space="preserve">
+    <value>إضافة مستخدم جديد</value>
+  </data>
+  <data name="Title_ChangeUserRole" xml:space="preserve">
+    <value>تعديل صلاحية المستخدم</value>
+  </data>
+  <data name="Title_ResetUserPassword" xml:space="preserve">
+    <value>إعادة تعيين كلمة المرور</value>
+  </data>
+  <data name="Col_User_Username" xml:space="preserve">
+    <value>اسم المستخدم</value>
+  </data>
+  <data name="Col_User_FullName" xml:space="preserve">
+    <value>الاسم الكامل</value>
+  </data>
+  <data name="Col_User_Role" xml:space="preserve">
+    <value>الدور / الصلاحية</value>
+  </data>
+  <data name="Col_User_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_User_MustChangePass" xml:space="preserve">
+    <value>تغيير إلزامي لكلمة المرور</value>
+  </data>
+  <data name="Col_User_LastLogin" xml:space="preserve">
+    <value>آخر تسجيل دخول</value>
+  </data>
+  <data name="Label_User_Username" xml:space="preserve">
+    <value>اسم المستخدم:</value>
+  </data>
+  <data name="Label_User_FullName" xml:space="preserve">
+    <value>الاسم الكامل:</value>
+  </data>
+  <data name="Label_User_Password" xml:space="preserve">
+    <value>كلمة المرور:</value>
+  </data>
+  <data name="Label_User_ConfirmPassword" xml:space="preserve">
+    <value>تأكيد كلمة المرور:</value>
+  </data>
+  <data name="Label_User_Role" xml:space="preserve">
+    <value>الدور / الصلاحية:</value>
+  </data>
+  <data name="Label_User_NewTempPassword" xml:space="preserve">
+    <value>كلمة المرور المؤقتة الجديدة:</value>
+  </data>
+  <data name="Btn_ChangeRole" xml:space="preserve">
+    <value>تعديل الصلاحية...</value>
+  </data>
+  <data name="Btn_ResetPassword" xml:space="preserve">
+    <value>إعادة تعيين كلمة المرور...</value>
+  </data>
+  <data name="Msg_ConfirmDeactivateUser" xml:space="preserve">
+    <value>هل أنت متأكد من تعطيل هذا المستخدم؟ لن يتمكن من تسجيل الدخول للنظام.</value>
+  </data>
+  <data name="Msg_ConfirmReactivateUser" xml:space="preserve">
+    <value>هل أنت متأكد من إعادة تفعيل هذا المستخدم؟</value>
+  </data>
+  <data name="Msg_CannotDeactivateSelf" xml:space="preserve">
+    <value>لا يمكنك تعطيل حسابك الحالي المسجل به الدخول.</value>
+  </data>
+  <data name="Msg_CannotChangeSelfRole" xml:space="preserve">
+    <value>لا يمكنك تغيير صلاحية حسابك الحالي المسجل به الدخول.</value>
+  </data>
+  <data name="Msg_CreateUserSuccess" xml:space="preserve">
+    <value>تم إنشاء المستخدم بنجاح.</value>
+  </data>
+  <data name="Msg_RoleChangeSuccess" xml:space="preserve">
+    <value>تم تحديث صلاحية المستخدم بنجاح.</value>
+  </data>
+  <data name="Msg_PasswordResetSuccess" xml:space="preserve">
+    <value>تم إعادة تعيين كلمة المرور بنجاح. سيُطلب من المستخدم تغييرها عند أول تسجيل دخول.</value>
+  </data>
+  <data name="Title_Settings" xml:space="preserve">
+    <value>إعدادات النظام</value>
+  </data>
+  <data name="Tab_GeneralSettings" xml:space="preserve">
+    <value>إعدادات عامة</value>
+  </data>
+  <data name="Tab_EntrySettings" xml:space="preserve">
+    <value>إعدادات الدخول وفترة السماح</value>
+  </data>
+  <data name="Tab_SecuritySettings" xml:space="preserve">
+    <value>إعدادات الأمان والقفل</value>
+  </data>
+  <data name="Label_ParkName" xml:space="preserve">
+    <value>اسم المنتزه / المرفق:</value>
+  </data>
+  <data name="Label_TimeZone" xml:space="preserve">
+    <value>المنطقة الزمنية (TimeZone):</value>
+  </data>
+  <data name="Label_DefaultCooldownHours" xml:space="preserve">
+    <value>فترة السماح الافتراضية بين الزيارات (بالساعات):</value>
+  </data>
+  <data name="Label_MaxGroupSize" xml:space="preserve">
+    <value>الحد الأقصى لعدد الأفراد في المجموعة (شامل حامل البطاقة):</value>
+  </data>
+  <data name="Label_DenialDedupMinutes" xml:space="preserve">
+    <value>مدة عدم تكرار تسجيل المحاولات المرفوضة المتتالية (بالدقائق):</value>
+  </data>
+  <data name="Label_PrefillCompanions" xml:space="preserve">
+    <value>تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للمستفيد</value>
+  </data>
+  <data name="Label_DenialSound" xml:space="preserve">
+    <value>تشغيل تنبيه صوتي عند رفض الدخول</value>
+  </data>
+  <data name="Label_MaxFailedLogins" xml:space="preserve">
+    <value>أقصى عدد لمحاولات الدخول الخاطئة قبل القفل:</value>
+  </data>
+  <data name="Label_LockoutMinutes" xml:space="preserve">
+    <value>مدة القفل بعد استنفاد المحاولات (بالدقائق):</value>
+  </data>
+  <data name="Label_AutoLockMinutes" xml:space="preserve">
+    <value>مدة قفل الشاشة التلقائي عند الخمول (بالدقائق - 0 للتعطيل):</value>
+  </data>
+  <data name="Msg_SaveSettingsSuccess" xml:space="preserve">
+    <value>تم حفظ إعدادات النظام بنجاح وتحديث الذاكرة المؤقتة.</value>
   </data>
 </root>

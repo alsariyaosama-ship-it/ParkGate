@@ -293,9 +293,22 @@ public sealed class CheckInService : ICheckInService
 
     public async Task<Result> VoidEntryAsync(
         VoidEntryRequest request,
+        int? supervisorUserId = null,
         CancellationToken cancellationToken = default)
     {
-        if (!_currentUser.Has(Permission.VoidEntry))
+        var voidedByUserId = supervisorUserId ?? _currentUser.UserId ?? 0;
+
+        if (supervisorUserId.HasValue)
+        {
+            await using var uowCheck = _uowFactory.Create();
+            var approver = await uowCheck.Users.GetByIdAsync(supervisorUserId.Value, cancellationToken);
+            if (approver is null || !approver.IsActive || (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
+            voidedByUserId = supervisorUserId.Value;
+        }
+        else if (!_currentUser.Has(Permission.VoidEntry))
         {
             return Errors.General.Forbidden;
         }
@@ -332,7 +345,6 @@ public sealed class CheckInService : ICheckInService
         }
 
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
-        var voidedByUserId = _currentUser.UserId!.Value;
 
         attempt.Void(voidedByUserId, request.Reason, nowUtc);
         await uow.SaveChangesAsync(cancellationToken);

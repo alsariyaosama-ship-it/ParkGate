@@ -66,11 +66,11 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 **Done when:** the user walks through TEST_SCRIPT.md on two PCs (or two app instances) without defects. → **First demo to the client.**
 
 ## Phase 6 — Management screens · branch `phase/06-management`
-- [ ] T6.1 Holders: search, details + history, edit, status changes.
-- [ ] T6.2 Void entry (from today grid and history).
-- [ ] T6.3 Organizations, age categories, workstations.
-- [ ] T6.4 Users (create, role, deactivate, reset password).
-- [ ] T6.5 Settings screen (cooldown in hours, group size, sound, prefill, park name).
+- [x] T6.1 Holders: search, details + history, edit, status changes.
+- [x] T6.2 Void entry (from today grid and history).
+- [x] T6.3 Organizations, age categories, workstations.
+- [x] T6.4 Users (create, role, deactivate, reset password).
+- [x] T6.5 Settings screen (cooldown in hours, group size, sound, prefill, park name).
 
 ## Phase 7 — Reports · branch `phase/07-reports`
 - [ ] T7.0 Show the user the list of statistics/report columns before building (Q8 answered: statistics only, no financial claims).
