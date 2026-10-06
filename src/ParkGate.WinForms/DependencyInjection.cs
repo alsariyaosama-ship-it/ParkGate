@@ -98,6 +98,17 @@ public static class DependencyInjection
         services.AddTransient<EditBeneficiaryDialog>();
         services.AddTransient<ChangeBeneficiaryStatusDialog>();
         services.AddTransient<VoidReasonDialog>();
+        services.AddTransient<OrganizationsForm>();
+        services.AddTransient<EditOrganizationDialog>();
+        services.AddTransient<AgeCategoriesForm>();
+        services.AddTransient<EditAgeCategoryDialog>();
+        services.AddTransient<WorkstationsForm>();
+        services.AddTransient<EditWorkstationDialog>();
+        services.AddTransient<UsersForm>();
+        services.AddTransient<CreateUserDialog>();
+        services.AddTransient<ChangeUserRoleDialog>();
+        services.AddTransient<ResetUserPasswordDialog>();
+        services.AddTransient<SettingsForm>();
 
         return services;
     }
