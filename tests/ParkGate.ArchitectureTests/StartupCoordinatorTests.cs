@@ -132,5 +132,10 @@ public sealed class StartupCoordinatorTests
         {
             return (TForm)Activator.CreateInstance(typeof(TForm))!;
         }
+
+        public TControl CreateControl<TControl>() where TControl : Control
+        {
+            return (TControl)Activator.CreateInstance(typeof(TControl))!;
+        }
     }
 }

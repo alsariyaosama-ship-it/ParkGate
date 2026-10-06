@@ -8,4 +8,5 @@ namespace ParkGate.WinForms.Services;
 public interface IFormFactory
 {
     TForm Create<TForm>() where TForm : Form;
+    TControl CreateControl<TControl>() where TControl : Control;
 }

@@ -36,6 +36,17 @@ public sealed record CheckInResultDto(
     bool CanBeOverridden,
     IReadOnlyList<CompanionCountDto> Companions);
 
+public sealed record TodayDeskAttemptDto(
+    Guid Id,
+    DateTime AttemptedAtUtc,
+    string CardNumber,
+    string BeneficiaryFullName,
+    string OrganizationName,
+    int TotalPersons,
+    EntryResult Result,
+    DenialReason? DenialReason,
+    bool IsVoided);
+
 public sealed record TodayDeskSummaryDto(
     DateOnly BusinessDate,
     int WorkstationId,
@@ -45,4 +56,5 @@ public sealed record TodayDeskSummaryDto(
     int TotalOverridden,
     int TotalPersons,
     IReadOnlyList<CompanionCountDto> PersonsPerCategory,
-    IReadOnlyList<EntryAttemptDto> RecentAttempts);
+    IReadOnlyList<TodayDeskAttemptDto> RecentAttempts);
+

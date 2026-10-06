@@ -393,24 +393,36 @@ public sealed class CheckInService : ICheckInService
             categoryTotals.Add(new CompanionCountDto(cat.Id, cat.NameAr, countForCat));
         }
 
-        var recentAttemptDtos = attempts.Take(20).Select(a => new EntryAttemptDto(
-            a.Id,
-            a.AttemptedAtUtc,
-            a.BusinessDate,
-            a.WorkstationId,
-            a.UserId,
-            a.BeneficiaryId,
-            a.Result,
-            a.DenialReason,
-            a.OverrideReason,
-            a.OverrideByUserId,
-            a.TotalPersons,
-            a.IsVoided,
-            a.VoidReason,
-            a.VoidedAtUtc,
-            a.VoidedByUserId,
-            a.Companions.Select(c => new CompanionCountDto(c.AgeCategoryId, string.Empty, c.Count)).ToList()
-        )).ToList();
+        var attemptBeneficiaryIds = attempts.Take(20).Select(a => a.BeneficiaryId).Distinct().ToList();
+        var beneficiariesMap = new Dictionary<Guid, (string CardNumber, string FullName)>();
+        foreach (var bId in attemptBeneficiaryIds)
+        {
+            var b = await uow.Beneficiaries.GetByIdAsync(bId, cancellationToken);
+            if (b != null)
+            {
+                beneficiariesMap[bId] = (b.CardNumber.Value, b.FullName);
+            }
+        }
+
+        var allOrgs = await uow.Organizations.GetAllAsync(false, cancellationToken);
+        var orgMap = allOrgs.ToDictionary(o => o.Id, o => o.NameAr);
+
+        var recentAttemptDtos = attempts.Take(20).Select(a =>
+        {
+            beneficiariesMap.TryGetValue(a.BeneficiaryId, out var bInfo);
+            orgMap.TryGetValue(a.OrganizationId, out var orgName);
+
+            return new TodayDeskAttemptDto(
+                a.Id,
+                a.AttemptedAtUtc,
+                bInfo.CardNumber ?? string.Empty,
+                bInfo.FullName ?? string.Empty,
+                orgName ?? string.Empty,
+                a.TotalPersons,
+                a.Result,
+                a.DenialReason,
+                a.IsVoided);
+        }).ToList();
 
         return new TodayDeskSummaryDto(
             BusinessDate: businessDate,
@@ -422,6 +434,7 @@ public sealed class CheckInService : ICheckInService
             TotalPersons: totalPersons,
             PersonsPerCategory: categoryTotals,
             RecentAttempts: recentAttemptDtos);
+
     }
 
     private static Error MapDenialReasonToError(DenialReason reason) => reason switch
