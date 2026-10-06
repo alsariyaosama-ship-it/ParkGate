@@ -168,7 +168,7 @@ public partial class MainForm : RtlFormBase
         _menuExit.Click += (_, _) => Close();
 
         _menuCheckIn.Click += (_, _) => ShowCheckInDesk();
-        _menuBeneficiaries.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Beneficiaries);
+        _menuBeneficiaries.Click += (_, _) => ShowBeneficiaries();
         _menuOrganizations.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Organizations);
         _menuAgeCategories.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_AgeCategories);
         _menuUsers.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_Users);
@@ -181,6 +181,7 @@ public partial class MainForm : RtlFormBase
     }
 
     private Controls.CheckInDeskControl? _checkInDeskControl;
+    private Controls.BeneficiariesControl? _beneficiariesControl;
 
     public void ShowCheckInDesk()
     {
@@ -206,9 +207,59 @@ public partial class MainForm : RtlFormBase
         }
 
         _welcomeCard.Visible = false;
+        if (_beneficiariesControl != null)
+        {
+            _beneficiariesControl.Visible = false;
+        }
+
         _checkInDeskControl.Visible = true;
         _checkInDeskControl.BringToFront();
         _checkInDeskControl.FocusCardNumberBox();
+    }
+
+    public void ShowCheckInDeskWithCard(string cardNumber)
+    {
+        ShowCheckInDesk();
+        if (_checkInDeskControl != null && !string.IsNullOrWhiteSpace(cardNumber))
+        {
+            _checkInDeskControl.SetCardNumber(cardNumber);
+            _ = _checkInDeskControl.SearchCardAsync();
+        }
+    }
+
+    public void ShowBeneficiaries(string? initialSearchTerm = null)
+    {
+        if (_beneficiariesControl == null)
+        {
+            _beneficiariesControl = _formFactory?.CreateControl<Controls.BeneficiariesControl>() ??
+                                    new Controls.BeneficiariesControl(
+                                        null, null, _settingsService,
+                                        _currentUser, _currentWorkstation,
+                                        _formFactory, _notifyService, null);
+
+            _beneficiariesControl.Dock = DockStyle.Fill;
+            _beneficiariesControl.RequestCheckIn += (_, card) => ShowCheckInDeskWithCard(card);
+            _mainContainer.Controls.Add(_beneficiariesControl);
+        }
+
+        _welcomeCard.Visible = false;
+        if (_checkInDeskControl != null)
+        {
+            _checkInDeskControl.Visible = false;
+        }
+
+        _beneficiariesControl.Visible = true;
+        _beneficiariesControl.BringToFront();
+
+        if (!string.IsNullOrWhiteSpace(initialSearchTerm))
+        {
+            _beneficiariesControl.SetSearchQuery(initialSearchTerm);
+            _ = _beneficiariesControl.PerformSearchAsync();
+        }
+        else
+        {
+            _beneficiariesControl.FocusSearchBox();
+        }
     }
 
     private async Task OnMainFormLoadedAsync()

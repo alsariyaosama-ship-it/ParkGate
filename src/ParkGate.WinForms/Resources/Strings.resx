@@ -490,6 +490,9 @@
   <data name="Btn_SaveAndContinue" xml:space="preserve">
     <value>حفظ ومتابعة الدخول</value>
   </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
   <data name="Btn_CancelReg" xml:space="preserve">
     <value>إلغاء</value>
   </data>
@@ -558,5 +561,155 @@
   </data>
   <data name="Btn_SelectOrg" xml:space="preserve">
     <value>اختيار ومتابعة</value>
+  </data>
+  <data name="Title_Beneficiaries" xml:space="preserve">
+    <value>إدارة حاملي البطاقات والمستفيدين</value>
+  </data>
+  <data name="Header_BeneficiariesSearch" xml:space="preserve">
+    <value>البحث في حاملي البطاقات</value>
+  </data>
+  <data name="Label_SearchTerm" xml:space="preserve">
+    <value>البحث (رقم البطاقة / الاسم / الهاتف / الرقم الوطني):</value>
+  </data>
+  <data name="Placeholder_SearchBeneficiary" xml:space="preserve">
+    <value>اكتب للبحث واضغط Enter...</value>
+  </data>
+  <data name="Btn_ClearSearch" xml:space="preserve">
+    <value>مسح</value>
+  </data>
+  <data name="Summary_SearchResults" xml:space="preserve">
+    <value>عدد النتائج: {0}</value>
+  </data>
+  <data name="Col_Ben_CardNumber" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="Col_Ben_Organization" xml:space="preserve">
+    <value>الجهة</value>
+  </data>
+  <data name="Col_Ben_FullName" xml:space="preserve">
+    <value>الاسم الكامل</value>
+  </data>
+  <data name="Col_Ben_Phone" xml:space="preserve">
+    <value>رقم الهاتف</value>
+  </data>
+  <data name="Col_Ben_NationalId" xml:space="preserve">
+    <value>الرقم الوطني</value>
+  </data>
+  <data name="Col_Ben_ExpiryDate" xml:space="preserve">
+    <value>تاريخ الانتهاء</value>
+  </data>
+  <data name="Col_Ben_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_Ben_LastEntry" xml:space="preserve">
+    <value>آخر دخول</value>
+  </data>
+  <data name="Group_Ben_Details" xml:space="preserve">
+    <value>تفاصيل حامل البطاقة</value>
+  </data>
+  <data name="Group_Ben_History" xml:space="preserve">
+    <value>سجل محاولات وحركات الدخول</value>
+  </data>
+  <data name="Btn_EditBeneficiary" xml:space="preserve">
+    <value>تعديل البيانات...</value>
+  </data>
+  <data name="Btn_ChangeStatus" xml:space="preserve">
+    <value>تغيير الحالة...</value>
+  </data>
+  <data name="Btn_CheckInDirect" xml:space="preserve">
+    <value>فتح بشباك الدخول</value>
+  </data>
+  <data name="Title_EditBeneficiary" xml:space="preserve">
+    <value>تعديل بيانات حامل البطاقة</value>
+  </data>
+  <data name="Header_EditBeneficiary" xml:space="preserve">
+    <value>تعديل بيانات المستفيد المسجل</value>
+  </data>
+  <data name="Title_ChangeStatus" xml:space="preserve">
+    <value>تغيير حالة المستفيد</value>
+  </data>
+  <data name="Header_ChangeStatus" xml:space="preserve">
+    <value>تحديث حالة المستفيد في النظام</value>
+  </data>
+  <data name="Label_CurrentStatus" xml:space="preserve">
+    <value>الحالة الحالية: {0}</value>
+  </data>
+  <data name="Label_TargetStatus" xml:space="preserve">
+    <value>الحالة الجديدة المطلوبة:</value>
+  </data>
+  <data name="Label_StatusReasonPrompt" xml:space="preserve">
+    <value>سبب تغيير الحالة (مطلوب عند الإيقاف أو الحظر - 5 أحرف على الأقل):</value>
+  </data>
+  <data name="Msg_StatusChangeSuccess" xml:space="preserve">
+    <value>تم تحديث حالة المستفيد بنجاح.</value>
+  </data>
+  <data name="Msg_EditBeneficiarySuccess" xml:space="preserve">
+    <value>تم حفظ تعديلات بيانات المستفيد بنجاح.</value>
+  </data>
+  <data name="Msg_SelectBeneficiaryFirst" xml:space="preserve">
+    <value>يرجى تحديد مستفيد من القائمة أولاً.</value>
+  </data>
+  <data name="Msg_NoHistoryFound" xml:space="preserve">
+    <value>لا توجد حركات دخول سابقة لهذا المستفيد.</value>
+  </data>
+  <data name="Col_Hist_Time" xml:space="preserve">
+    <value>الوقت والتاريخ</value>
+  </data>
+  <data name="Col_Hist_BusinessDate" xml:space="preserve">
+    <value>تاريخ العمل</value>
+  </data>
+  <data name="Col_Hist_Workstation" xml:space="preserve">
+    <value>الشباك</value>
+  </data>
+  <data name="Col_Hist_Result" xml:space="preserve">
+    <value>النتيجة</value>
+  </data>
+  <data name="Col_Hist_Persons" xml:space="preserve">
+    <value>الأفراد</value>
+  </data>
+  <data name="Col_Hist_Details" xml:space="preserve">
+    <value>التفاصيل / المرافقون</value>
+  </data>
+  <data name="Col_Hist_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_Hist_VoidReason" xml:space="preserve">
+    <value>سبب الإلغاء</value>
+  </data>
+  <data name="Status_Attempt_Active" xml:space="preserve">
+    <value>سارية</value>
+  </data>
+  <data name="Status_Attempt_Voided" xml:space="preserve">
+    <value>ملغاة</value>
+  </data>
+  <data name="Title_VoidEntry" xml:space="preserve">
+    <value>إلغاء عملية دخول</value>
+  </data>
+  <data name="Header_VoidEntry" xml:space="preserve">
+    <value>إلغاء حركة دخول مسجلة (إعادة احتساب فترة السماح)</value>
+  </data>
+  <data name="Label_VoidReasonPrompt" xml:space="preserve">
+    <value>سبب الإلغاء (إلزامي - 5 أحرف على الأقل):</value>
+  </data>
+  <data name="Btn_ConfirmVoid" xml:space="preserve">
+    <value>تأكيد الإلغاء</value>
+  </data>
+  <data name="Msg_ConfirmVoid" xml:space="preserve">
+    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيؤدي ذلك لإعادة احتساب موعد آخر دخول للمستفيد تلقائياً.</value>
+  </data>
+  <data name="Msg_VoidSuccess" xml:space="preserve">
+    <value>تم إلغاء عملية الدخول بنجاح.</value>
+  </data>
+  <data name="Menu_VoidTodayEntry" xml:space="preserve">
+    <value>إلغاء هذه العملية (Void)...</value>
+  </data>
+  <data name="Label_CreatedAt" xml:space="preserve">
+    <value>تاريخ التسجيل: {0}</value>
+  </data>
+  <data name="Label_Notes" xml:space="preserve">
+    <value>ملاحظات:</value>
+  </data>
+  <data name="Label_StatusReason" xml:space="preserve">
+    <value>سبب الإيقاف/الحظر: {0}</value>
   </data>
 </root>

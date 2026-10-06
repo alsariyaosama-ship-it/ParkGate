@@ -292,6 +292,7 @@ internal class Strings
     internal static string Label_RegExpiry => GetString(nameof(Label_RegExpiry));
     internal static string Label_RegNotes => GetString(nameof(Label_RegNotes));
     internal static string Btn_SaveAndContinue => GetString(nameof(Btn_SaveAndContinue));
+    internal static string Btn_Save => GetString(nameof(Btn_Save));
     internal static string Btn_CancelReg => GetString(nameof(Btn_CancelReg));
 
     internal static string Title_Companions => GetString(nameof(Title_Companions));
@@ -320,6 +321,65 @@ internal class Strings
     internal static string Title_SelectOrganization => GetString(nameof(Title_SelectOrganization));
     internal static string Header_SelectOrganization => GetString(nameof(Header_SelectOrganization));
     internal static string Btn_SelectOrg => GetString(nameof(Btn_SelectOrg));
+
+    internal static string Title_Beneficiaries => GetString(nameof(Title_Beneficiaries));
+    internal static string Header_BeneficiariesSearch => GetString(nameof(Header_BeneficiariesSearch));
+    internal static string Label_SearchTerm => GetString(nameof(Label_SearchTerm));
+    internal static string Placeholder_SearchBeneficiary => GetString(nameof(Placeholder_SearchBeneficiary));
+    internal static string Btn_ClearSearch => GetString(nameof(Btn_ClearSearch));
+    internal static string Summary_SearchResults => GetString(nameof(Summary_SearchResults));
+
+    internal static string Col_Ben_CardNumber => GetString(nameof(Col_Ben_CardNumber));
+    internal static string Col_Ben_Organization => GetString(nameof(Col_Ben_Organization));
+    internal static string Col_Ben_FullName => GetString(nameof(Col_Ben_FullName));
+    internal static string Col_Ben_Phone => GetString(nameof(Col_Ben_Phone));
+    internal static string Col_Ben_NationalId => GetString(nameof(Col_Ben_NationalId));
+    internal static string Col_Ben_ExpiryDate => GetString(nameof(Col_Ben_ExpiryDate));
+    internal static string Col_Ben_Status => GetString(nameof(Col_Ben_Status));
+    internal static string Col_Ben_LastEntry => GetString(nameof(Col_Ben_LastEntry));
+
+    internal static string Group_Ben_Details => GetString(nameof(Group_Ben_Details));
+    internal static string Group_Ben_History => GetString(nameof(Group_Ben_History));
+    internal static string Btn_EditBeneficiary => GetString(nameof(Btn_EditBeneficiary));
+    internal static string Btn_ChangeStatus => GetString(nameof(Btn_ChangeStatus));
+    internal static string Btn_CheckInDirect => GetString(nameof(Btn_CheckInDirect));
+
+    internal static string Title_EditBeneficiary => GetString(nameof(Title_EditBeneficiary));
+    internal static string Header_EditBeneficiary => GetString(nameof(Header_EditBeneficiary));
+    internal static string Title_ChangeStatus => GetString(nameof(Title_ChangeStatus));
+    internal static string Header_ChangeStatus => GetString(nameof(Header_ChangeStatus));
+    internal static string Label_CurrentStatus => GetString(nameof(Label_CurrentStatus));
+    internal static string Label_TargetStatus => GetString(nameof(Label_TargetStatus));
+    internal static string Label_StatusReasonPrompt => GetString(nameof(Label_StatusReasonPrompt));
+
+    internal static string Msg_StatusChangeSuccess => GetString(nameof(Msg_StatusChangeSuccess));
+    internal static string Msg_EditBeneficiarySuccess => GetString(nameof(Msg_EditBeneficiarySuccess));
+    internal static string Msg_SelectBeneficiaryFirst => GetString(nameof(Msg_SelectBeneficiaryFirst));
+    internal static string Msg_NoHistoryFound => GetString(nameof(Msg_NoHistoryFound));
+
+    internal static string Col_Hist_Time => GetString(nameof(Col_Hist_Time));
+    internal static string Col_Hist_BusinessDate => GetString(nameof(Col_Hist_BusinessDate));
+    internal static string Col_Hist_Workstation => GetString(nameof(Col_Hist_Workstation));
+    internal static string Col_Hist_Result => GetString(nameof(Col_Hist_Result));
+    internal static string Col_Hist_Persons => GetString(nameof(Col_Hist_Persons));
+    internal static string Col_Hist_Details => GetString(nameof(Col_Hist_Details));
+    internal static string Col_Hist_Status => GetString(nameof(Col_Hist_Status));
+    internal static string Col_Hist_VoidReason => GetString(nameof(Col_Hist_VoidReason));
+
+    internal static string Status_Attempt_Active => GetString(nameof(Status_Attempt_Active));
+    internal static string Status_Attempt_Voided => GetString(nameof(Status_Attempt_Voided));
+
+    internal static string Title_VoidEntry => GetString(nameof(Title_VoidEntry));
+    internal static string Header_VoidEntry => GetString(nameof(Header_VoidEntry));
+    internal static string Label_VoidReasonPrompt => GetString(nameof(Label_VoidReasonPrompt));
+    internal static string Btn_ConfirmVoid => GetString(nameof(Btn_ConfirmVoid));
+    internal static string Msg_ConfirmVoid => GetString(nameof(Msg_ConfirmVoid));
+    internal static string Msg_VoidSuccess => GetString(nameof(Msg_VoidSuccess));
+    internal static string Menu_VoidTodayEntry => GetString(nameof(Menu_VoidTodayEntry));
+
+    internal static string Label_CreatedAt => GetString(nameof(Label_CreatedAt));
+    internal static string Label_Notes => GetString(nameof(Label_Notes));
+    internal static string Label_StatusReason => GetString(nameof(Label_StatusReason));
 
     internal static string GetString(string name)
     {

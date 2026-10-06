@@ -38,6 +38,8 @@ public partial class CheckInDeskControl : UserControl
     private readonly ILogger<CheckInDeskControl>? _logger;
 
     private readonly List<CounterInput> _counterInputs = [];
+    private readonly ContextMenuStrip _todayContextMenu = new();
+    private readonly ToolStripMenuItem _menuVoidToday = new();
     private BeneficiaryDto? _activeHolder;
     private EligibilityPreviewDto? _activeEligibility;
     private int _maxGroupSize = 10;
@@ -161,6 +163,36 @@ public partial class CheckInDeskControl : UserControl
         _btnSaveReg.Click += async (_, _) => await SaveInlineRegistrationAsync();
         _btnRecordEntry.Click += async (_, _) => await RecordEntryAsync();
         _btnOverride.Click += async (_, _) => await OverrideEntryAsync();
+
+        // Today grid context menu for voiding (SPEC §7.2 FR-CHK-09)
+        _menuVoidToday.Text = Strings.Menu_VoidTodayEntry;
+        _menuVoidToday.Click += async (_, _) => await VoidSelectedTodayEntryAsync();
+        _todayContextMenu.Items.Add(_menuVoidToday);
+        _gridToday.ContextMenuStrip = _todayContextMenu;
+
+        _gridToday.MouseDown += (s, e) =>
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var hit = _gridToday.HitTest(e.X, e.Y);
+                if (hit.RowIndex >= 0)
+                {
+                    _gridToday.ClearSelection();
+                    _gridToday.Rows[hit.RowIndex].Selected = true;
+                }
+            }
+        };
+
+        _todayContextMenu.Opening += (_, e) =>
+        {
+            if (_gridToday.SelectedRows.Count == 0 ||
+                _gridToday.SelectedRows[0].Tag is not TodayDeskAttemptDto attempt ||
+                attempt.IsVoided ||
+                attempt.Result == EntryResult.Denied)
+            {
+                e.Cancel = true;
+            }
+        };
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -900,6 +932,7 @@ public partial class CheckInDeskControl : UserControl
                         resultText);
 
                     var row = _gridToday.Rows[rowIndex];
+                    row.Tag = item;
                     if (item.IsVoided)
                     {
                         row.DefaultCellStyle.ForeColor = Color.Gray;
@@ -925,6 +958,158 @@ public partial class CheckInDeskControl : UserControl
         catch (Exception ex)
         {
             _logger?.LogWarning(ex, "Failed to refresh today's desk summary.");
+        }
+    }
+
+    public void SetCardNumber(string cardNumber)
+    {
+        _txtCardNumber.Text = cardNumber;
+    }
+
+    public async Task SearchCardAsync()
+    {
+        await LookupCardAsync();
+    }
+
+    public async Task VoidSelectedTodayEntryAsync()
+    {
+        if (_gridToday.SelectedRows.Count == 0 || _checkInService == null)
+        {
+            return;
+        }
+
+        if (_gridToday.SelectedRows[0].Tag is not TodayDeskAttemptDto attempt ||
+            attempt.IsVoided ||
+            attempt.Result == EntryResult.Denied)
+        {
+            return;
+        }
+
+        string voidReason;
+        int? supervisorUserId = null;
+
+        var isSupervisorOrAdmin = _currentUser != null &&
+            (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
+
+        if (!isSupervisorOrAdmin)
+        {
+            var authDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
+                             new SupervisorAuthDialog(null, _currentUser);
+
+            authDialog.SetContext(defaultReason: "إلغاء عملية دخول مسجلة خطأً");
+
+            if (authDialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            voidReason = authDialog.Reason;
+            supervisorUserId = authDialog.SupervisorUserId;
+        }
+        else
+        {
+            var reasonDialog = _formFactory?.Create<VoidReasonDialog>() ??
+                               new VoidReasonDialog(_notifyService);
+
+            var localTimeStr = DateTimeDisplayHelper.FormatDateTime(
+                DateTimeDisplayHelper.ToParkLocalTime(attempt.AttemptedAtUtc, _timeZoneId));
+
+            reasonDialog.SetContext(
+                attempt.CardNumber,
+                attempt.BeneficiaryFullName,
+                localTimeStr,
+                attempt.TotalPersons);
+
+            if (reasonDialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            voidReason = reasonDialog.Reason;
+        }
+
+        var confirmResult = MessageBox.Show(
+            Strings.Msg_ConfirmVoid,
+            Strings.Title_Confirm,
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question,
+            MessageBoxDefaultButton.Button2,
+            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+
+        if (confirmResult != DialogResult.Yes)
+        {
+            return;
+        }
+
+        using (new BusyScope(this))
+        {
+            try
+            {
+                var request = new VoidEntryRequest(attempt.Id, voidReason);
+                var result = await _checkInService.VoidEntryAsync(request, supervisorUserId);
+
+                if (result.IsSuccess)
+                {
+                    if (_notifyService != null)
+                    {
+                        _notifyService.Info(Strings.Msg_VoidSuccess);
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            Strings.Msg_VoidSuccess,
+                            Strings.Title_Info,
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1,
+                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                    }
+
+                    await RefreshTodayDeskSummaryAsync();
+
+                    if (_activeHolder != null && string.Equals(_activeHolder.CardNumber, attempt.CardNumber, StringComparison.OrdinalIgnoreCase))
+                    {
+                        await LookupCardAsync();
+                    }
+                }
+                else
+                {
+                    var msg = ErrorMessages.GetMessage(result.Error);
+                    if (_notifyService != null)
+                    {
+                        _notifyService.Warning(msg);
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            msg,
+                            Strings.Title_Warning,
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning,
+                            MessageBoxDefaultButton.Button1,
+                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error voiding today entry.");
+                var msg = Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message;
+                if (_notifyService != null)
+                {
+                    _notifyService.Error(msg);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        msg,
+                        Strings.Title_Error,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error,
+                        MessageBoxDefaultButton.Button1,
+                        MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                }
+            }
         }
     }
 

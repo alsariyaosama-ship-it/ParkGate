@@ -214,6 +214,35 @@ public sealed class CheckInServiceTests
     }
 
     [Fact]
+    public async Task VoidEntryAsync_WhenOperatorLoggedInWithSupervisorId_ShouldSucceed()
+    {
+        _currentUser.SetUser(1, "operator1", "Park Operator", UserRole.Operator);
+
+        var supervisor = new User("supervisor1", "Park Supervisor", "hash", UserRole.Supervisor);
+        _uowFactory.CurrentUow.Users.Add(supervisor);
+
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-1"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var entryTime = _uowFactory.CurrentUow.CurrentDbTime.AddHours(-1);
+        var attempt = EntryAttempt.CreateAllowed(
+            Guid.NewGuid(), holder.Id, _org.Id, entryTime, DateOnly.FromDateTime(entryTime),
+            720, entryTime.AddHours(12), 1, 1, EntryChannel.Desk);
+
+        holder.RecordGrantedEntry(entryTime);
+        _attempts.Add(attempt);
+
+        var voidRequest = new VoidEntryRequest(attempt.Id, "Operator called supervisor to void");
+        var result = await _sut.VoidEntryAsync(voidRequest, supervisorUserId: supervisor.Id);
+
+        result.IsSuccess.ShouldBeTrue();
+        attempt.IsVoided.ShouldBeTrue();
+        attempt.VoidedByUserId.ShouldBe(supervisor.Id);
+        holder.LastGrantedEntryUtc.ShouldBeNull();
+        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryVoided" && w.UserId == supervisor.Id);
+    }
+
+    [Fact]
     public async Task GetTodayDeskEntriesAsync_ShouldReturnSummaryAndCounts()
     {
         var today = DateOnly.FromDateTime(_uowFactory.CurrentUow.CurrentDbTime);
