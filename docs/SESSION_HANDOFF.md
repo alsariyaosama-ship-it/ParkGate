@@ -9,61 +9,59 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-06 |
-| Last session | S08 — Phase 6 Management Screens (T6.1..T6.5) |
-| Current phase | Phase 6 — Management screens (Complete, merged into main per user command) |
-| Working branch | `phase/06-management` |
+| Last updated | 2026-10-07 |
+| Last session | S09 — Phase 7 Reports & Statistics (T7.0..T7.3) |
+| Current phase | Phase 7 — Reports (Complete) |
+| Working branch | `phase/07-reports` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 362 passed (151 domain + 77 application + 101 architecture/ui + 33 infra unit) |
-| Integration tests | 14 passed on LocalDB |
-| Total tests | 376 passed |
-| Last commit | `feat(management): implement organizations, age categories, workstations, users and settings screens [T6.3] [T6.4] [T6.5]` |
+| Unit tests | 343 passed (151 domain + 86 application + 106 architecture/ui) |
+| Integration tests | 54 passed on LocalDB (including 6 ClosedXML export tests + ReportQueriesTests) |
+| Total tests | 397 passed |
+| Last commit | `feat(reports): implement reports UI with filters, ClosedXML export, and print preview [T7.2, T7.3]` |
 
 ## State of the work
 
 **Done**
-- Merged Phase 5 PR #6 into `main`, branched `phase/06-management`.
-- T6.1: Beneficiary management screen (`BeneficiariesControl`, `EditBeneficiaryDialog`, `ChangeBeneficiaryStatusDialog`):
-  - Search across card, name, phone, national ID with western/Arabic-Indic digit normalization.
-  - National ID masking for Operator role (`********1234`).
-  - View details, full entry history with colored result badges and void indicators.
-  - Edit beneficiary (Supervisor/Admin) including card, phone, national ID, expiry, notes.
-  - Change status (Active / Suspended / Blocked) with mandatory reason (>= 5 chars).
-  - Direct check-in jump from search result back to desk.
-- T6.2: Void entry from today grid and beneficiary history:
-  - `VoidReasonDialog` with mandatory reason validation (>= 5 chars).
-  - Context menu on desk today grid and beneficiary history grid with supervisor authorization.
-  - Atomically recalculates holder's `LastGrantedEntryUtc` from latest remaining valid entry.
-- T6.3: Organizations, age categories, workstations management:
-  - `OrganizationsForm` + `EditOrganizationDialog`: code, name, custom cooldown in hours, default flag, toggle active.
-  - `AgeCategoriesForm` + `EditAgeCategoryDialog`: name, description, sort order, toggle active.
-  - `WorkstationsForm` + `EditWorkstationDialog`: machine name, display name, type (Desk / Gate), toggle active.
-- T6.4: Users management:
-  - `UsersForm` + `CreateUserDialog` + `ChangeUserRoleDialog` + `ResetUserPasswordDialog`:
-  - Create user with password confirmation and role assignment.
-  - Change role (Operator, Supervisor, Admin) with protection against modifying self.
-  - Reset password with temporary password and `MustChangePassword` enforcement.
-  - Deactivate / reactivate with self-deactivation protection.
-- T6.5: Settings management screen:
-  - `SettingsForm`: Park name, TimeZoneId, Default Cooldown in hours, Max Group Size, Denial Dedup minutes, Prefill companions, Denial sound, Lockout and Auto-lock settings.
-  - Cached settings with automatic cache invalidation on save.
-- All forms wired to `MainForm` menu items by permission with clean `IFormFactory` instantiation, RTL compliance, Segoe UI fonts, and Arabic strings in `Strings.resx`.
-- Test suite expanded to 376 tests (151 domain + 77 application + 101 architecture/ui + 47 infrastructure), zero warnings.
+- Merged Phase 6 PR #7 into `main`, branched `phase/07-reports`.
+- T7.0: Showed the user the list of statistics/report columns and confirmed specifications (Q8 answered: statistics only, no financial claims).
+- T7.1: Report queries & Application service:
+  - DTOs defined for all 6 reports: Daily Summary, Date Range Summary, Organization Statistics, Operator & Workstation Statistics, Denials & Overrides Log, Hourly Distribution.
+  - `IReportQueries` port interface defined in Application.
+  - `IReportService` + `ReportService` implemented with authorization (`Permission.ViewReports`) and date validation.
+  - `ReportQueries` implemented in Infrastructure using `ParkGateDbContext` with `.AsNoTracking()` and projections on `BusinessDate`.
+  - Comprehensive integration tests in `ReportQueriesTests` testing all 6 reports against LocalDB.
+- T7.2: Reports UI (`ReportsControl`):
+  - 6 dedicated tabs for FR-RPT-01..06 with full Arabic RTL layout.
+  - Filter bar: From Date, To Date, Quick date buttons (اليوم، أمس، هذا الأسبوع، هذا الشهر), Organization dropdown, Denial filter dropdown.
+  - Daily Summary KPI banner cards with color coding and companion age category breakdown.
+  - Organization statistics with visit counts, unique beneficiaries visited, and percentage share.
+  - Grand totals footer bars on daily, range, and org statistics tabs.
+  - Wired to `MainForm` menu items (`_menuDailyReport` -> Daily tab, `_menuOrgStatistics` -> Org Stats tab).
+- T7.3: ClosedXML Excel Export & Print Preview:
+  - `IExcelExportService` port in Application; `ClosedXmlExcelExportService` in Infrastructure using ClosedXML 0.105.1.
+  - Generates RTL Excel workbooks (`ws.RightToLeft = true`), ParkGate green headers, zebra striping, formatted totals row, auto-fitted columns.
+  - Wired "تصدير إلى Excel" button with `SaveFileDialog`.
+  - Built-in "معاينة الطباعة" (`PrintPreviewDialog` & `PrintDocument`) for printable reports.
+  - Verified with 6 unit tests in `ExcelExportServiceTests`.
+- Full test suite: 397 tests passing (151 domain + 86 application + 106 architecture/ui + 54 infrastructure), zero compiler warnings.
 
 **In progress**
-- Phase 6 complete. Ready for Phase 7 (Reports).
+- Phase 7 complete. Ready for Phase 8 (Hardening and deployment).
 
 **Not started**
-- Phase 7: Reports · branch `phase/07-reports` (T7.0 .. T7.3).
+- Phase 8: Hardening and deployment · branch `phase/08-deployment` (T8.1 .. T8.5).
 
 ## Next session — start here
 
-1. User requested starting Phase 7 directly:
-   - Merge `phase/06-management` into `main` and branch `phase/07-reports`.
-   - T7.0: Review statistics/report requirements and confirm columns (Q8: statistics only, no financial claims).
-   - T7.1: Implement `IReportQueries` and projections based on `BusinessDate`.
-   - T7.2: Build report screens with date/organization/operator filters.
-   - T7.3: Excel export with ClosedXML and print preview.
+1. User requested progressing automatically:
+   - Push `phase/07-reports` to remote, open Pull Request #8 to `main`, and merge.
+   - Branch `phase/08-deployment`.
+   - Implement Phase 8:
+     - T8.1: `docs/DEPLOYMENT.md` — SQL Express, TCP/IP, firewall, logins, migration bundle, client install, connection setup.
+     - T8.2: `scripts/backup.ps1` + Task Scheduler instructions; Admin "backup now".
+     - T8.3: Publish profile (win-x64) and installer script (Inno Setup).
+     - T8.4: `docs/USER_GUIDE_AR.md` — Arabic user guide.
+     - T8.5: Performance check: lookup < 1 s with 100 000 holders and 1 000 000 attempts (generated data).
 
 ## Blockers / waiting on the user
 
@@ -83,7 +81,11 @@
 
 ## Session log (newest first, max 10)
 
-### S08 — 2026-10-06 — Phase 6 Management Screens (T6.1..T6.5)
+### S09 — 2026-10-07 — Phase 7 Reports & Statistics (T7.0..T7.3)
+- Tasks: T7.0, T7.1, T7.2, T7.3 completed on `phase/07-reports` (Phase 7 complete).
+- Commits: `feat(reports): implement report queries and application service [T7.1]`, `feat(reports): implement reports UI with filters, ClosedXML export, and print preview [T7.2, T7.3]`.
+- Decisions: All 6 reports (Daily, Date Range, Organization Statistics, Operator & Workstation, Denials & Overrides Log, Hourly Peak Hours) implemented per approved specifications; Clean Architecture strictly preserved; `IReportQueries` projects on `BusinessDate` with `.AsNoTracking()`; `ClosedXmlExcelExportService` generates RTL `.xlsx` sheets; `ReportsControl` docked smoothly in `MainForm` with print preview support; 397 tests passing with zero warnings.
+- Test count: 397 total passed (343 unit/architecture + 54 LocalDB infrastructure tests).
 - Tasks: T6.1, T6.2, T6.3, T6.4, T6.5 completed on `phase/06-management` (Phase 6 complete).
 - Commits: `feat(management): implement beneficiary management and void entry [T6.1] [T6.2]`, `feat(management): implement organizations, age categories, workstations, users and settings screens [T6.3] [T6.4] [T6.5]`.
 - Decisions: Full management suite implemented with Clean Architecture; `BeneficiariesControl` smoothly dock-switched in `MainForm`; modal dialogs for add/edit/status/role/password operations with full Arabic validation; `SettingsForm` edits cooldown in hours while storing minutes; self-modification guards in `UsersForm`; all tests passing (376 total).

@@ -73,10 +73,10 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T6.5 Settings screen (cooldown in hours, group size, sound, prefill, park name).
 
 ## Phase 7 — Reports · branch `phase/07-reports`
-- [ ] T7.0 Show the user the list of statistics/report columns before building (Q8 answered: statistics only, no financial claims).
-- [ ] T7.1 Report queries (`IReportQueries`, projections on `BusinessDate`).
-- [ ] T7.2 Reports FR-RPT-01..06 with filters.
-- [ ] T7.3 Excel export (ClosedXML) and print preview.
+- [x] T7.0 Show the user the list of statistics/report columns before building (Q8 answered: statistics only, no financial claims).
+- [x] T7.1 Report queries (`IReportQueries`, projections on `BusinessDate`).
+- [x] T7.2 Reports FR-RPT-01..06 with filters.
+- [x] T7.3 Excel export (ClosedXML) and print preview.
 
 ## Phase 8 — Hardening and deployment · branch `phase/08-deployment`
 - [ ] T8.1 `docs/DEPLOYMENT.md`: SQL Express install, TCP/IP, firewall, SQL logins (app vs migration), migration bundle, client install, connection setup.
