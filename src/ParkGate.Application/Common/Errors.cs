@@ -89,4 +89,9 @@ public static class Errors
         public static readonly Error KeyNotFound = new("Settings.KeyNotFound", "Setting key not found.");
         public static readonly Error InvalidValue = new("Settings.InvalidValue", "Setting value is invalid.");
     }
+
+    public static class Reports
+    {
+        public static readonly Error InvalidDateRange = new("Reports.InvalidDateRange", "Start date must be earlier than or equal to end date.");
+    }
 }

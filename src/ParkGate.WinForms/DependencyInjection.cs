@@ -63,6 +63,7 @@ public static class DependencyInjection
         services.AddTransient<IAgeCategoryService, AgeCategoryService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IWorkstationService, WorkstationService>();
+        services.AddTransient<ParkGate.Application.Reports.Services.IReportService, ParkGate.Application.Reports.Services.ReportService>();
 
         // 5. FluentValidation validators
         services.AddTransient<IValidator<FirstRunAdminRequest>, FirstRunAdminRequestValidator>();
@@ -109,6 +110,7 @@ public static class DependencyInjection
         services.AddTransient<ChangeUserRoleDialog>();
         services.AddTransient<ResetUserPasswordDialog>();
         services.AddTransient<SettingsForm>();
+        services.AddTransient<Controls.ReportsControl>();
 
         return services;
     }
