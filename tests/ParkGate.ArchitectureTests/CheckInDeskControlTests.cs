@@ -340,6 +340,151 @@ public sealed class CheckInDeskControlTests
         lblNatId.Text.ShouldBe("119900123456");
     }
 
+    [Fact]
+    public async Task CheckInDeskControl_LookupCardAsync_WhenCardNotFound_ShowsInlineRegistration()
+    {
+        var fakeBeneficiaryService = new FakeBeneficiaryService();
+        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+
+        var txtCard = GetField<TextBox>(control, "_txtCardNumber");
+        txtCard.Text = "998877";
+
+        await control.LookupCardAsync();
+
+        var grpHolder = GetField<GroupBox>(control, "_grpHolder");
+        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+
+        grpHolder.Visible.ShouldBeFalse();
+        grpReg.Visible.ShouldBeTrue();
+        banner.State.ShouldBe(BannerState.Warning);
+        fakeBeneficiaryService.LastCardNumberLookup.ShouldBe("998877");
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_LookupCardAsync_NormalizesArabicDigits()
+    {
+        var fakeBeneficiaryService = new FakeBeneficiaryService();
+        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+
+        var txtCard = GetField<TextBox>(control, "_txtCardNumber");
+        txtCard.Text = "١٢٣٤٥";
+
+        await control.LookupCardAsync();
+
+        fakeBeneficiaryService.LastCardNumberLookup.ShouldBe("12345");
+        txtCard.Text.ShouldBe("12345");
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_LookupCardAsync_WhenFound_ShowsHolderAndEligibility()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(),
+            OrganizationId: 1,
+            OrganizationName: "صندوق التضامن",
+            CardNumber: "100200",
+            FullName: "محمد أحمد علي",
+            Phone: "0912345678",
+            NationalId: "119900123456",
+            CardExpiryDate: new DateOnly(2028, 1, 1),
+            Status: BeneficiaryStatus.Active,
+            StatusReason: null,
+            LastGrantedEntryUtc: null,
+            Notes: null,
+            CreatedAtUtc: DateTime.UtcNow);
+
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true,
+            Result: EntryResult.Allowed,
+            DenialReason: null,
+            DenialReasonText: string.Empty,
+            CanBeOverridden: false,
+            EffectiveCooldownMinutes: 720,
+            LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null,
+            RemainingCooldownMinutes: null);
+
+        var fakeBeneficiaryService = new FakeBeneficiaryService
+        {
+            LookupReturnResult = [new BeneficiaryLookupResultDto(holder, eligibility, [])]
+        };
+
+        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+
+        var txtCard = GetField<TextBox>(control, "_txtCardNumber");
+        txtCard.Text = "100200";
+
+        await control.LookupCardAsync();
+
+        var grpHolder = GetField<GroupBox>(control, "_grpHolder");
+        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        var lblName = GetField<Label>(control, "_lblHolderName");
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        var btnRecord = GetField<Button>(control, "_btnRecordEntry");
+
+        grpHolder.Visible.ShouldBeTrue();
+        grpReg.Visible.ShouldBeFalse();
+        lblName.Text.ShouldBe("محمد أحمد علي");
+        banner.State.ShouldBe(BannerState.Granted);
+        btnRecord.Enabled.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_RecordEntryAsync_SendsRequestAndRefreshesDesk()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(),
+            OrganizationId: 1,
+            OrganizationName: "صندوق التضامن",
+            CardNumber: "100200",
+            FullName: "محمد أحمد علي",
+            Phone: "0912345678",
+            NationalId: null,
+            CardExpiryDate: null,
+            Status: BeneficiaryStatus.Active,
+            StatusReason: null,
+            LastGrantedEntryUtc: null,
+            Notes: null,
+            CreatedAtUtc: DateTime.UtcNow);
+
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true,
+            Result: EntryResult.Allowed,
+            DenialReason: null,
+            DenialReasonText: string.Empty,
+            CanBeOverridden: false,
+            EffectiveCooldownMinutes: 720,
+            LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null,
+            RemainingCooldownMinutes: null);
+
+        var fakeCheckInService = new FakeCheckInService();
+        using var control = new CheckInDeskControl(null, fakeCheckInService, null, null, null, null, null, null, null, null);
+        control.AutoResetDelayMs = -1;
+
+        control.PopulateAgeCategories(
+        [
+            new AgeCategoryDto(1, "طفل", "أطفال", 1, true)
+        ]);
+
+        control.ShowHolderInfo(holder, eligibility);
+
+        var counterInputs = GetField<List<CounterInput>>(control, "_counterInputs");
+        counterInputs[0].Value = 2;
+
+        await control.RecordEntryAsync();
+
+        fakeCheckInService.LastRecordRequest.ShouldNotBeNull();
+        fakeCheckInService.LastRecordRequest.BeneficiaryId.ShouldBe(holder.Id);
+        fakeCheckInService.LastRecordRequest.Companions.ShouldNotBeNull();
+        fakeCheckInService.LastRecordRequest.Companions.Count.ShouldBe(1);
+        fakeCheckInService.LastRecordRequest.Companions[0].Count.ShouldBe(2);
+
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        banner.State.ShouldBe(BannerState.Granted);
+    }
+
     private sealed class FakeCurrentUser : ParkGate.Application.Security.ICurrentUser
     {
         public int? UserId { get; set; }
@@ -350,5 +495,81 @@ public sealed class CheckInDeskControlTests
         public bool Has(ParkGate.Application.Security.Permission permission) => true;
         public bool HasAny(params ParkGate.Application.Security.Permission[] permissions) => true;
         public bool IsInRole(UserRole role) => Role == role;
+    }
+
+    private sealed class FakeBeneficiaryService : ParkGate.Application.Beneficiaries.Services.IBeneficiaryService
+    {
+        public string? LastCardNumberLookup { get; private set; }
+        public IReadOnlyList<BeneficiaryLookupResultDto> LookupReturnResult { get; set; } = [];
+
+        public Task<ParkGate.Application.Common.Result<IReadOnlyList<BeneficiaryLookupResultDto>>> LookupByCardNumberAsync(string cardNumber, CancellationToken cancellationToken = default)
+        {
+            LastCardNumberLookup = cardNumber;
+            return Task.FromResult(ParkGate.Application.Common.Result.Success(LookupReturnResult));
+        }
+
+        public Task<ParkGate.Application.Common.Result<BeneficiaryLookupResultDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> RegisterAsync(RegisterBeneficiaryRequest request, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> UpdateAsync(UpdateBeneficiaryRequest request, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> ChangeStatusAsync(ChangeBeneficiaryStatusRequest request, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ParkGate.Application.Common.Result<IReadOnlyList<BeneficiaryDto>>> SearchAsync(string searchTerm, int maxResults = 50, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ParkGate.Application.Common.Result<IReadOnlyList<EntryAttemptDto>>> GetHistoryAsync(Guid beneficiaryId, int maxResults = 100, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+    }
+
+    private sealed class FakeCheckInService : ParkGate.Application.CheckIn.Services.ICheckInService
+    {
+        public RecordEntryRequest? LastRecordRequest { get; private set; }
+
+        public Task<ParkGate.Application.Common.Result<CheckInResultDto>> RecordEntryAsync(RecordEntryRequest request, CancellationToken cancellationToken = default)
+        {
+            LastRecordRequest = request;
+            var result = new CheckInResultDto(
+                AttemptId: Guid.NewGuid(),
+                Result: EntryResult.Allowed,
+                DenialReason: null,
+                DenialReasonText: null,
+                AttemptedAtUtc: DateTime.UtcNow,
+                BusinessDate: DateOnly.FromDateTime(DateTime.UtcNow),
+                TotalPersons: 1 + (request.Companions?.Sum(c => c.Count) ?? 0),
+                EffectiveCooldownMinutes: 720,
+                NextEligibleAtUtc: DateTime.UtcNow.AddHours(12),
+                CanBeOverridden: false,
+                Companions: []);
+
+            return Task.FromResult(ParkGate.Application.Common.Result.Success(result));
+        }
+
+        public Task<ParkGate.Application.Common.Result<CheckInResultDto>> OverrideEntryAsync(OverrideEntryRequest request, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ParkGate.Application.Common.Result> VoidEntryAsync(VoidEntryRequest request, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ParkGate.Application.Common.Result<TodayDeskSummaryDto>> GetTodayDeskEntriesAsync(int? workstationId = null, CancellationToken cancellationToken = default)
+        {
+            var summary = new TodayDeskSummaryDto(
+                BusinessDate: DateOnly.FromDateTime(DateTime.UtcNow),
+                WorkstationId: 1,
+                WorkstationName: "Desk 1",
+                TotalGranted: 1,
+                TotalDenied: 0,
+                TotalOverridden: 0,
+                TotalPersons: 3,
+                PersonsPerCategory: [],
+                RecentAttempts: []);
+
+            return Task.FromResult(ParkGate.Application.Common.Result.Success(summary));
+        }
     }
 }

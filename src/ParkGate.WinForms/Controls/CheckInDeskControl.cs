@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
@@ -43,6 +44,10 @@ public partial class CheckInDeskControl : UserControl
     private bool _prefillFromLastVisit;
     private bool _denialSoundEnabled;
     private string? _timeZoneId = "Libya Standard Time";
+
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int AutoResetDelayMs { get; set; } = 1200;
 
     public CheckInDeskControl() : this(null, null, null, null, null, null, null, null, null, null)
     {
@@ -740,8 +745,15 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted("تم تسجيل الدخول بنجاح!", $"المرافقون: {companions.Sum(c => c.Count)} · الإجمالي: {result.Value.TotalPersons} فرد");
                     await RefreshTodayDeskSummaryAsync();
 
-                    await Task.Delay(1200);
-                    ResetDesk();
+                    if (AutoResetDelayMs > 0)
+                    {
+                        await Task.Delay(AutoResetDelayMs);
+                    }
+
+                    if (AutoResetDelayMs >= 0)
+                    {
+                        ResetDesk();
+                    }
                 }
                 else
                 {
@@ -799,8 +811,15 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted("تم تسجيل الدخول بموافقة المشرف (تجاوز)", $"المشرف: {supervisorDialog.SupervisorFullName} · السبب: {supervisorDialog.Reason}");
                     await RefreshTodayDeskSummaryAsync();
 
-                    await Task.Delay(1500);
-                    ResetDesk();
+                    if (AutoResetDelayMs > 0)
+                    {
+                        await Task.Delay(AutoResetDelayMs);
+                    }
+
+                    if (AutoResetDelayMs >= 0)
+                    {
+                        ResetDesk();
+                    }
                 }
                 else
                 {
@@ -846,8 +865,10 @@ public partial class CheckInDeskControl : UserControl
                     _lblTodaySummary.Text = baseStats;
                 }
 
-                _gridToday.SuspendLayout();
-                _gridToday.Rows.Clear();
+                if (IsHandleCreated || _gridToday.IsHandleCreated)
+                {
+                    _gridToday.SuspendLayout();
+                    _gridToday.Rows.Clear();
 
                 foreach (var item in summary.RecentAttempts)
                 {
@@ -898,6 +919,7 @@ public partial class CheckInDeskControl : UserControl
                 }
 
                 _gridToday.ResumeLayout(true);
+            }
             }
         }
         catch (Exception ex)
