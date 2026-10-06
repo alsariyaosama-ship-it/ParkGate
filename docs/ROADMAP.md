@@ -79,11 +79,11 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T7.3 Excel export (ClosedXML) and print preview.
 
 ## Phase 8 — Hardening and deployment · branch `phase/08-deployment`
-- [ ] T8.1 `docs/DEPLOYMENT.md`: SQL Express install, TCP/IP, firewall, SQL logins (app vs migration), migration bundle, client install, connection setup.
-- [ ] T8.2 `scripts/backup.ps1` + Task Scheduler instructions; Admin "backup now".
-- [ ] T8.3 Publish profile (win-x64) and installer script (Inno Setup).
-- [ ] T8.4 `docs/USER_GUIDE_AR.md` — Arabic user guide for operators and supervisors.
-- [ ] T8.5 Performance check: lookup < 1 s with 100 000 holders and 1 000 000 attempts (generated data).
+- [x] T8.1 `docs/DEPLOYMENT.md`: SQL Express install, TCP/IP, firewall, SQL logins (app vs migration), migration bundle, client install, connection setup.
+- [x] T8.2 `scripts/backup.ps1` + Task Scheduler instructions; Admin "backup now".
+- [x] T8.3 Publish profile (win-x64) and installer script (Inno Setup).
+- [x] T8.4 `docs/USER_GUIDE_AR.md` — Arabic user guide for operators and supervisors.
+- [x] T8.5 Performance check: lookup < 1 s with 100 000 holders and 1 000 000 attempts (generated data).
 
 **Done when:** installed on the client LAN → tag `v1.0.0`.
 

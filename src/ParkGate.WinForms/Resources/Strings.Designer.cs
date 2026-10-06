@@ -540,6 +540,10 @@ internal class Strings
     internal static string Msg_NoDataToExport => GetString(nameof(Msg_NoDataToExport));
     internal static string Msg_InvalidDateRange => GetString(nameof(Msg_InvalidDateRange));
     internal static string Error_Reports_InvalidDateRange => GetString(nameof(Error_Reports_InvalidDateRange));
+    internal static string Menu_BackupNow => GetString(nameof(Menu_BackupNow));
+    internal static string Msg_ConfirmBackupNow => GetString(nameof(Msg_ConfirmBackupNow));
+    internal static string Msg_BackupSuccess => GetString(nameof(Msg_BackupSuccess));
+    internal static string Msg_BackupFailed => GetString(nameof(Msg_BackupFailed));
 
     internal static string GetString(string name)
     {

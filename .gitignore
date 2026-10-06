@@ -7,6 +7,7 @@ x64/
 x86/
 [Aa]rtifacts/
 publish/
+dist/
 *.efbundle
 efbundle.exe
 

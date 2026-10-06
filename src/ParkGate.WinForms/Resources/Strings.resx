@@ -1174,4 +1174,17 @@
   <data name="Error_Reports_InvalidDateRange" xml:space="preserve">
     <value>تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية.</value>
   </data>
+  <data name="Menu_BackupNow" xml:space="preserve">
+    <value>نسخ احتياطي لقاعدة البيانات...</value>
+  </data>
+  <data name="Msg_ConfirmBackupNow" xml:space="preserve">
+    <value>هل تريد بدء إنشاء نسخة احتياطية كاملة لقاعدة البيانات الآن؟</value>
+  </data>
+  <data name="Msg_BackupSuccess" xml:space="preserve">
+    <value>تم إنشاء النسخة الاحتياطية لقاعدة البيانات بنجاح في المسار:
+{0}</value>
+  </data>
+  <data name="Msg_BackupFailed" xml:space="preserve">
+    <value>فشل إنشاء النسخة الاحتياطية لقاعدة البيانات: {0}</value>
+  </data>
 </root>

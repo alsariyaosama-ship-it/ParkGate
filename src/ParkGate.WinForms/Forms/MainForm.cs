@@ -26,12 +26,13 @@ public partial class MainForm : RtlFormBase
     private readonly IFormFactory? _formFactory;
     private readonly INotifyService? _notifyService;
     private readonly ILogger<MainForm>? _logger;
+    private readonly IDatabaseBackupService? _databaseBackupService;
 
     private TimeSpan _serverUtcOffset = TimeSpan.Zero;
     private string? _parkTimeZoneId = "Libya Standard Time";
     private bool _isLoggingOut;
 
-    public MainForm() : this(null, null, null, null, null, null, null, null, null)
+    public MainForm() : this(null, null, null, null, null, null, null, null, null, null)
     {
     }
 
@@ -44,7 +45,8 @@ public partial class MainForm : RtlFormBase
         IUnitOfWorkFactory? uowFactory,
         IFormFactory? formFactory,
         INotifyService? notifyService,
-        ILogger<MainForm>? logger)
+        ILogger<MainForm>? logger,
+        IDatabaseBackupService? databaseBackupService = null)
     {
         InitializeComponent();
 
@@ -57,6 +59,7 @@ public partial class MainForm : RtlFormBase
         _formFactory = formFactory;
         _notifyService = notifyService;
         _logger = logger;
+        _databaseBackupService = databaseBackupService;
 
         InitializeFormText();
         ApplyCurrentUser();
@@ -84,6 +87,7 @@ public partial class MainForm : RtlFormBase
         _menuUsers.Text = Strings.Menu_Users;
         _menuWorkstations.Text = Strings.Menu_Workstations;
         _menuSettings.Text = Strings.Menu_Settings;
+        _menuBackupNow.Text = Strings.Menu_BackupNow;
 
         _menuReports.Text = Strings.Menu_Reports;
         _menuDailyReport.Text = Strings.Menu_DailyReport;
@@ -132,12 +136,16 @@ public partial class MainForm : RtlFormBase
         _menuWorkstations.Visible = canManageWorkstations;
         _menuSettings.Visible = canManageSettings;
 
+        var canBackup = _currentUser.Has(Permission.TriggerBackup);
+        _menuBackupNow.Visible = canBackup;
+
         _menuManagement.Visible = canManageBeneficiaries ||
                                   canManageOrganizations ||
                                   canManageAgeCategories ||
                                   canManageUsers ||
                                   canManageWorkstations ||
-                                  canManageSettings;
+                                  canManageSettings ||
+                                  canBackup;
 
         // Reports sub-items
         var canViewReports = _currentUser.Has(Permission.ViewReports);
@@ -174,6 +182,7 @@ public partial class MainForm : RtlFormBase
         _menuUsers.Click += (_, _) => ShowUsers();
         _menuWorkstations.Click += (_, _) => ShowWorkstations();
         _menuSettings.Click += (_, _) => ShowSettings();
+        _menuBackupNow.Click += async (_, _) => await OnBackupNowClickedAsync();
         _menuDailyReport.Click += (_, _) => ShowReports(0);
         _menuOrgStatistics.Click += (_, _) => ShowReports(2);
 
@@ -566,6 +575,53 @@ public partial class MainForm : RtlFormBase
             {
                 e.Cancel = true;
             }
+        }
+    }
+
+    private async Task OnBackupNowClickedAsync()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.TriggerBackup))
+        {
+            _notifyService?.Error(Strings.Error_General_Forbidden);
+            return;
+        }
+
+        if (_notifyService != null && !_notifyService.Confirm(Strings.Msg_ConfirmBackupNow, Strings.App_Title))
+        {
+            return;
+        }
+
+        if (_databaseBackupService == null)
+        {
+            _notifyService?.Error("خدمة النسخ الاحتياطي غير متوفرة.");
+            return;
+        }
+
+        var prevCursor = Cursor.Current;
+        Cursor.Current = Cursors.WaitCursor;
+        _menuBackupNow.Enabled = false;
+
+        try
+        {
+            var result = await _databaseBackupService.BackupDatabaseAsync();
+            if (result.IsSuccess)
+            {
+                _notifyService?.Info(string.Format(Strings.Msg_BackupSuccess, result.Value), Strings.App_Title);
+            }
+            else
+            {
+                _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, result.Error.Message), Strings.App_Title);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Unexpected error during database backup.");
+            _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, ex.Message), Strings.App_Title);
+        }
+        finally
+        {
+            Cursor.Current = prevCursor;
+            _menuBackupNow.Enabled = true;
         }
     }
 }

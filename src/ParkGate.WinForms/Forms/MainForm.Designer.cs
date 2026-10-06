@@ -43,6 +43,7 @@ partial class MainForm
         this._menuWorkstations = new System.Windows.Forms.ToolStripMenuItem();
         this._menuManagementSep2 = new System.Windows.Forms.ToolStripSeparator();
         this._menuSettings = new System.Windows.Forms.ToolStripMenuItem();
+        this._menuBackupNow = new System.Windows.Forms.ToolStripMenuItem();
         this._menuReports = new System.Windows.Forms.ToolStripMenuItem();
         this._menuDailyReport = new System.Windows.Forms.ToolStripMenuItem();
         this._menuOrgStatistics = new System.Windows.Forms.ToolStripMenuItem();
@@ -143,7 +144,8 @@ partial class MainForm
             this._menuUsers,
             this._menuWorkstations,
             this._menuManagementSep2,
-            this._menuSettings});
+            this._menuSettings,
+            this._menuBackupNow});
         this._menuManagement.Name = "_menuManagement";
         this._menuManagement.Size = new System.Drawing.Size(57, 23);
         this._menuManagement.Text = "الإدارة";
@@ -193,6 +195,12 @@ partial class MainForm
         this._menuSettings.Name = "_menuSettings";
         this._menuSettings.Size = new System.Drawing.Size(188, 24);
         this._menuSettings.Text = "إعدادات النظام";
+        // 
+        // _menuBackupNow
+        // 
+        this._menuBackupNow.Name = "_menuBackupNow";
+        this._menuBackupNow.Size = new System.Drawing.Size(188, 24);
+        this._menuBackupNow.Text = "نسخ احتياطي لقاعدة البيانات...";
         // 
         // _menuReports
         // 
@@ -399,6 +407,7 @@ partial class MainForm
     private System.Windows.Forms.ToolStripMenuItem _menuWorkstations;
     private System.Windows.Forms.ToolStripSeparator _menuManagementSep2;
     private System.Windows.Forms.ToolStripMenuItem _menuSettings;
+    private System.Windows.Forms.ToolStripMenuItem _menuBackupNow;
     private System.Windows.Forms.ToolStripMenuItem _menuReports;
     private System.Windows.Forms.ToolStripMenuItem _menuDailyReport;
     private System.Windows.Forms.ToolStripMenuItem _menuOrgStatistics;

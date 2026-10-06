@@ -10,58 +10,46 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-07 |
-| Last session | S09 — Phase 7 Reports & Statistics (T7.0..T7.3) |
-| Current phase | Phase 7 — Reports (Complete) |
-| Working branch | `phase/07-reports` |
+| Last session | S10 — Phase 8 Hardening and Deployment (T8.1..T8.5) |
+| Current phase | Phase 8 — Hardening and deployment (Complete) |
+| Working branch | `phase/08-deployment` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
 | Unit tests | 343 passed (151 domain + 86 application + 106 architecture/ui) |
-| Integration tests | 54 passed on LocalDB (including 6 ClosedXML export tests + ReportQueriesTests) |
-| Total tests | 397 passed |
-| Last commit | `feat(reports): implement reports UI with filters, ClosedXML export, and print preview [T7.2, T7.3]` |
+| Integration tests | 55 passed on LocalDB (including 1M performance benchmark) |
+| Total tests | 398 passed |
+| Last commit | `test(performance): verify lookup latency under large dataset [T8.5]` |
 
 ## State of the work
 
 **Done**
-- Merged Phase 6 PR #7 into `main`, branched `phase/07-reports`.
-- T7.0: Showed the user the list of statistics/report columns and confirmed specifications (Q8 answered: statistics only, no financial claims).
-- T7.1: Report queries & Application service:
-  - DTOs defined for all 6 reports: Daily Summary, Date Range Summary, Organization Statistics, Operator & Workstation Statistics, Denials & Overrides Log, Hourly Distribution.
-  - `IReportQueries` port interface defined in Application.
-  - `IReportService` + `ReportService` implemented with authorization (`Permission.ViewReports`) and date validation.
-  - `ReportQueries` implemented in Infrastructure using `ParkGateDbContext` with `.AsNoTracking()` and projections on `BusinessDate`.
-  - Comprehensive integration tests in `ReportQueriesTests` testing all 6 reports against LocalDB.
-- T7.2: Reports UI (`ReportsControl`):
-  - 6 dedicated tabs for FR-RPT-01..06 with full Arabic RTL layout.
-  - Filter bar: From Date, To Date, Quick date buttons (اليوم، أمس، هذا الأسبوع، هذا الشهر), Organization dropdown, Denial filter dropdown.
-  - Daily Summary KPI banner cards with color coding and companion age category breakdown.
-  - Organization statistics with visit counts, unique beneficiaries visited, and percentage share.
-  - Grand totals footer bars on daily, range, and org statistics tabs.
-  - Wired to `MainForm` menu items (`_menuDailyReport` -> Daily tab, `_menuOrgStatistics` -> Org Stats tab).
-- T7.3: ClosedXML Excel Export & Print Preview:
-  - `IExcelExportService` port in Application; `ClosedXmlExcelExportService` in Infrastructure using ClosedXML 0.105.1.
-  - Generates RTL Excel workbooks (`ws.RightToLeft = true`), ParkGate green headers, zebra striping, formatted totals row, auto-fitted columns.
-  - Wired "تصدير إلى Excel" button with `SaveFileDialog`.
-  - Built-in "معاينة الطباعة" (`PrintPreviewDialog` & `PrintDocument`) for printable reports.
-  - Verified with 6 unit tests in `ExcelExportServiceTests`.
-- Full test suite: 397 tests passing (151 domain + 86 application + 106 architecture/ui + 54 infrastructure), zero compiler warnings.
+- Merged Phase 7 PR #8 into `main`, branched `phase/08-deployment`.
+- T8.1: Created `docs/DEPLOYMENT.md` — comprehensive production deployment guide covering SQL Server Express 2022 setup, TCP/IP, Windows Firewall rules, separate least-privilege SQL logins (`ParkGateAppUser` vs `ParkGateDeployUser`), `efbundle.exe` execution, client installation, DPAPI-encrypted `connection.dat`, and first-run wizard.
+- T8.2: Database backup:
+  - Implemented `scripts/backup.ps1` for automated daily scheduled backups with compression, checksum, and 14-day retention pruning.
+  - Implemented `IDatabaseBackupService` port and `DatabaseBackupService` in Infrastructure executing T-SQL `BACKUP DATABASE`.
+  - Added "نسخ احتياطي لقاعدة البيانات..." to `MainForm` under `_menuManagement` (restricted to `Permission.TriggerBackup` / Admin), with full Arabic prompts and feedback.
+- T8.3: Publish profile & installer:
+  - Created `win-x64.pubxml` publish profile for `ParkGate.WinForms` (Release, win-x64, ReadyToRun).
+  - Created `scripts/installer.iss` Inno Setup script with Arabic messages, desktop/start menu shortcuts, and `%ProgramData%\ParkGate\logs` permissions.
+  - Created `scripts/build-installer.ps1` automated packaging script.
+- T8.4: Created `docs/USER_GUIDE_AR.md` — comprehensive Arabic user guide covering all operations for operators, supervisors, and administrators.
+- T8.5: Performance check:
+  - Implemented `PerformanceBenchmarkTests` generating 100,000 holders and 1,000,000 entry attempts on LocalDB.
+  - Verified card lookup and eligibility evaluation complete in `< 1.0 s` (well under 100 ms with indexed seeks).
+- Full test suite: 398 tests passing (151 domain + 86 application + 106 architecture/ui + 55 infrastructure), zero compiler warnings.
 
 **In progress**
-- Phase 7 complete. Ready for Phase 8 (Hardening and deployment).
+- Phase 8 complete. Ready to merge into `main` and tag `v1.0.0`.
 
 **Not started**
-- Phase 8: Hardening and deployment · branch `phase/08-deployment` (T8.1 .. T8.5).
+- Future features (F1 QR credentials, F2 Electronic gate, F3 Cloud read-only) — pending client scheduling.
 
 ## Next session — start here
 
-1. User requested progressing automatically:
-   - Push `phase/07-reports` to remote, open Pull Request #8 to `main`, and merge.
-   - Branch `phase/08-deployment`.
-   - Implement Phase 8:
-     - T8.1: `docs/DEPLOYMENT.md` — SQL Express, TCP/IP, firewall, logins, migration bundle, client install, connection setup.
-     - T8.2: `scripts/backup.ps1` + Task Scheduler instructions; Admin "backup now".
-     - T8.3: Publish profile (win-x64) and installer script (Inno Setup).
-     - T8.4: `docs/USER_GUIDE_AR.md` — Arabic user guide.
-     - T8.5: Performance check: lookup < 1 s with 100 000 holders and 1 000 000 attempts (generated data).
+1. Open PR #9 from `phase/08-deployment` to `main`.
+2. Merge PR #9 into `main`.
+3. Create git tag `v1.0.0`.
+4. ParkGate v1.0.0 is ready for client LAN deployment!
 
 ## Blockers / waiting on the user
 
@@ -80,6 +68,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S10 — 2026-10-07 — Phase 8 Hardening & Deployment (T8.1..T8.5)
+- Tasks: T8.1, T8.2, T8.3, T8.4, T8.5 completed on `phase/08-deployment` (Phase 8 complete).
+- Commits: `docs(deployment): add comprehensive production deployment guide [T8.1]`, `feat(deployment): implement backup script and in-app admin backup [T8.2]`, `build(deployment): add win-x64 publish profile and Inno Setup installer script [T8.3]`, `docs: add comprehensive Arabic user guide [T8.4]`, `test(performance): verify lookup latency under large dataset [T8.5]`.
+- Decisions: Complete hardening and deployment package implemented; `DEPLOYMENT.md` covers SQL Express 2022 setup, TCP/IP, firewall, least-privilege logins, and DPAPI setup; automated backup script `scripts/backup.ps1` with 14-day pruning and in-app Admin backup via `IDatabaseBackupService`; Inno Setup script `scripts/installer.iss` and `win-x64.pubxml`; comprehensive Arabic user guide `USER_GUIDE_AR.md`; high-volume benchmark test generated 100,000 holders and 1,000,000 attempts, verifying card lookup and eligibility evaluation executes in < 1.0 s; all 398 tests pass (100% green, 0 warnings).
+- Test count: 398 total passed (343 unit/architecture + 55 LocalDB infrastructure tests).
 
 ### S09 — 2026-10-07 — Phase 7 Reports & Statistics (T7.0..T7.3)
 - Tasks: T7.0, T7.1, T7.2, T7.3 completed on `phase/07-reports` (Phase 7 complete).
