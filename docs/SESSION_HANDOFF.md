@@ -10,57 +10,64 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-06 |
-| Last session | S07 — Phase 5 Check-in Desk Core (T5.1..T5.5) |
-| Current phase | Phase 5 — Check-in desk (core) (Complete, ready for PR) |
-| Working branch | `phase/05-checkin` |
+| Last session | S08 — Phase 6 Management Screens (T6.1..T6.5) |
+| Current phase | Phase 6 — Management screens (Complete, merged into main per user command) |
+| Working branch | `phase/06-management` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 302 passed (151 domain + 76 application + 75 architecture/ui) |
-| Integration tests | 47 passed on LocalDB (33 infra unit + 14 LocalDB integration) |
-| Total tests | 349 passed |
-| Last commit | `docs(checkin): create manual test script in Arabic covering all desk flows [T5.5]` |
+| Unit tests | 362 passed (151 domain + 77 application + 101 architecture/ui + 33 infra unit) |
+| Integration tests | 14 passed on LocalDB |
+| Total tests | 376 passed |
+| Last commit | `feat(management): implement organizations, age categories, workstations, users and settings screens [T6.3] [T6.4] [T6.5]` |
 
 ## State of the work
 
 **Done**
-- Merged Phase 4 PR #5 into `main`, branched `phase/05-checkin`.
-- T5.1: Check-in screen layout per SPEC §5.3 (Zones 1-7):
-  - Zone 1: Card number input, organization filter, search, clear, new holder.
-  - Zone 2: Status banner with large text (>= 20 pt), Granted (#1B873F), Denied (#C62828), Warning (#B26A00).
-  - Zone 3: Inline registration form (`_grpRegistration`) with full name, phone, national ID, expiry, notes.
-  - Zone 4: Beneficiary details card (`_grpHolder`) with name, phone, org, masked national ID for Operator, expiry, last entry, status.
-  - Zone 5: Dynamic companion counters per age category with live group size validation (BR-08/BR-09).
-  - Zone 6: Action bar (`_btnRecordEntry` [F5], `_btnOverride` [F9], `_btnClear` [Esc], `_btnNewHolder` [F2]).
-  - Zone 7: Today's workstation grid (last 20 attempts with time, card, name, org, persons, colored result) + summary strip with totals and category breakdown.
-- T5.2: Flows 5.1 and A1–A7 wired to `CheckInService` and `BeneficiaryService`:
-  - Flow 5.1: Standard entry with companion counts and live eligibility decision.
-  - Flow A1: Unregistered card shows inline registration and seamlessly continues to entry.
-  - Flow A2: Ambiguous card across organizations prompts operator selection dialog.
-  - Flow A3: Expired card denial with override capability.
-  - Flow A4: Cooldown active denial with next allowed entry local time display.
-  - Flow A5: Supervisor re-authentication dialog (BR-11, reason >= 5 chars) recording override entry.
-  - Flow A6: Live total persons validation against max group size (10), turning red and disabling entry.
-  - Flow A7: Suspended/blocked status enforcement (blocked cannot be overridden).
-- T5.3: Today desk grid populated from `CheckInService.GetTodayDeskEntriesAsync` with live summary strip and age category counts.
-- T5.4: Denial sound alert on rejection, scanner-friendly card box (Enter search, digit normalization, auto-select), full keyboard shortcut handling (F5, F9, F2, Esc).
-- T5.5: `docs/TEST_SCRIPT.md` manual test script created in Arabic with 10 test scenarios covering all desk flows and two-desk concurrency.
-- Added comprehensive unit tests in `CheckInDeskControlTests.cs` (75 architecture tests green, 0 warnings).
+- Merged Phase 5 PR #6 into `main`, branched `phase/06-management`.
+- T6.1: Beneficiary management screen (`BeneficiariesControl`, `EditBeneficiaryDialog`, `ChangeBeneficiaryStatusDialog`):
+  - Search across card, name, phone, national ID with western/Arabic-Indic digit normalization.
+  - National ID masking for Operator role (`********1234`).
+  - View details, full entry history with colored result badges and void indicators.
+  - Edit beneficiary (Supervisor/Admin) including card, phone, national ID, expiry, notes.
+  - Change status (Active / Suspended / Blocked) with mandatory reason (>= 5 chars).
+  - Direct check-in jump from search result back to desk.
+- T6.2: Void entry from today grid and beneficiary history:
+  - `VoidReasonDialog` with mandatory reason validation (>= 5 chars).
+  - Context menu on desk today grid and beneficiary history grid with supervisor authorization.
+  - Atomically recalculates holder's `LastGrantedEntryUtc` from latest remaining valid entry.
+- T6.3: Organizations, age categories, workstations management:
+  - `OrganizationsForm` + `EditOrganizationDialog`: code, name, custom cooldown in hours, default flag, toggle active.
+  - `AgeCategoriesForm` + `EditAgeCategoryDialog`: name, description, sort order, toggle active.
+  - `WorkstationsForm` + `EditWorkstationDialog`: machine name, display name, type (Desk / Gate), toggle active.
+- T6.4: Users management:
+  - `UsersForm` + `CreateUserDialog` + `ChangeUserRoleDialog` + `ResetUserPasswordDialog`:
+  - Create user with password confirmation and role assignment.
+  - Change role (Operator, Supervisor, Admin) with protection against modifying self.
+  - Reset password with temporary password and `MustChangePassword` enforcement.
+  - Deactivate / reactivate with self-deactivation protection.
+- T6.5: Settings management screen:
+  - `SettingsForm`: Park name, TimeZoneId, Default Cooldown in hours, Max Group Size, Denial Dedup minutes, Prefill companions, Denial sound, Lockout and Auto-lock settings.
+  - Cached settings with automatic cache invalidation on save.
+- All forms wired to `MainForm` menu items by permission with clean `IFormFactory` instantiation, RTL compliance, Segoe UI fonts, and Arabic strings in `Strings.resx`.
+- Test suite expanded to 376 tests (151 domain + 77 application + 101 architecture/ui + 47 infrastructure), zero warnings.
 
 **In progress**
-- Phase 5 complete, pending review and merge into `main`.
+- Phase 6 complete. Ready for Phase 7 (Reports).
 
 **Not started**
-- Phase 6: Management screens · branch `phase/06-management` (T6.1 .. T6.5).
+- Phase 7: Reports · branch `phase/07-reports` (T7.0 .. T7.3).
 
 ## Next session — start here
 
-1. User reviews and merges Phase 5 PR into `main`.
-2. Branch `phase/06-management` from updated `main`.
-3. Start T6.1: Beneficiary management screen (search, details + history, edit, status changes).
-4. Start T6.2: Void entry capability from today grid and beneficiary history.
+1. User requested starting Phase 7 directly:
+   - Merge `phase/06-management` into `main` and branch `phase/07-reports`.
+   - T7.0: Review statistics/report requirements and confirm columns (Q8: statistics only, no financial claims).
+   - T7.1: Implement `IReportQueries` and projections based on `BusinessDate`.
+   - T7.2: Build report screens with date/organization/operator filters.
+   - T7.3: Excel export with ClosedXML and print preview.
 
 ## Blockers / waiting on the user
 
-- User review and merge of Phase 5 Pull Request.
+- None.
 
 ## Known issues / tech debt
 
@@ -75,6 +82,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S08 — 2026-10-06 — Phase 6 Management Screens (T6.1..T6.5)
+- Tasks: T6.1, T6.2, T6.3, T6.4, T6.5 completed on `phase/06-management` (Phase 6 complete).
+- Commits: `feat(management): implement beneficiary management and void entry [T6.1] [T6.2]`, `feat(management): implement organizations, age categories, workstations, users and settings screens [T6.3] [T6.4] [T6.5]`.
+- Decisions: Full management suite implemented with Clean Architecture; `BeneficiariesControl` smoothly dock-switched in `MainForm`; modal dialogs for add/edit/status/role/password operations with full Arabic validation; `SettingsForm` edits cooldown in hours while storing minutes; self-modification guards in `UsersForm`; all tests passing (376 total).
+- Test count: 376 total passed (362 unit/architecture + 14 LocalDB integration tests).
 
 ### S07 — 2026-10-06 — Phase 5 Check-in Desk Core (T5.1..T5.5)
 - Tasks: T5.1, T5.2, T5.3, T5.4, T5.5 completed on `phase/05-checkin` (Phase 5 complete).
