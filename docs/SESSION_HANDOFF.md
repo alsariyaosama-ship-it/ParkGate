@@ -9,44 +9,58 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-05 |
-| Last session | S06 — Phase 4 UI Shell (T4.2, T4.3, T4.4) |
-| Current phase | Phase 4 — UI Shell (Complete, ready for PR) |
-| Working branch | `phase/04-ui-shell` |
+| Last updated | 2026-10-06 |
+| Last session | S07 — Phase 5 Check-in Desk Core (T5.1..T5.5) |
+| Current phase | Phase 5 — Check-in desk (core) (Complete, ready for PR) |
+| Working branch | `phase/05-checkin` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 286 passed (151 domain + 76 application + 59 architecture/ui) |
+| Unit tests | 302 passed (151 domain + 76 application + 75 architecture/ui) |
 | Integration tests | 47 passed on LocalDB (33 infra unit + 14 LocalDB integration) |
-| Total tests | 333 passed |
-| Last commit | `feat(ui): implement supervisor re-authentication dialog [T4.4]` |
+| Total tests | 349 passed |
+| Last commit | `docs(checkin): create manual test script in Arabic covering all desk flows [T5.5]` |
 
 ## State of the work
 
 **Done**
-- Merged Phase 3 PR #4 into `main`, branched `phase/04-ui-shell`.
-- T4.1: Startup sequence: DB connectivity check -> Connection settings dialog (DPAPI machine-scope encryption) -> Pending migrations block (ADR-011) -> First-run wizard (ADR-012) -> Workstation auto-registration -> User login with lockout (BR-18) -> Shell.
-- T4.2: Main shell (`MainForm`): Full RTL, menu dynamically filtered by user permissions per SPEC §4 (File, Operations, Management, Reports, Help), status bar showing authenticated user with Arabic role name, workstation name, live server clock ticking every second in park local time (with automatic server-UTC offset sync), and live connection state.
-- T4.3: Shared UI kit: `StatusBanner` with standard states and colors (#1B873F, #C62828, #B26A00, #455A64) and large font >= 20 pt per SPEC §5.3/AGENTS.md §5.10; `CounterInput` with decrement/increment buttons, direct typing, range clamping, and automatic normalization of Arabic-Indic / Persian digits; `BusyScope` scoped control disablement and wait cursor.
-- T4.4: `SupervisorAuthDialog` re-authentication dialog with supervisor credential validation via `IAuthService` and mandatory reason (>= 5 chars) per BR-11/FR-CHK-06 (`ChangePasswordForm` completed in T4.1).
-- Added `DateTimeDisplayHelper` formatting dates and times per AGENTS.md §5.8 with Western digits 0-9 and ص/م.
-- Added comprehensive unit and architecture tests for all new forms, controls, and helpers (333 tests green).
+- Merged Phase 4 PR #5 into `main`, branched `phase/05-checkin`.
+- T5.1: Check-in screen layout per SPEC §5.3 (Zones 1-7):
+  - Zone 1: Card number input, organization filter, search, clear, new holder.
+  - Zone 2: Status banner with large text (>= 20 pt), Granted (#1B873F), Denied (#C62828), Warning (#B26A00).
+  - Zone 3: Inline registration form (`_grpRegistration`) with full name, phone, national ID, expiry, notes.
+  - Zone 4: Beneficiary details card (`_grpHolder`) with name, phone, org, masked national ID for Operator, expiry, last entry, status.
+  - Zone 5: Dynamic companion counters per age category with live group size validation (BR-08/BR-09).
+  - Zone 6: Action bar (`_btnRecordEntry` [F5], `_btnOverride` [F9], `_btnClear` [Esc], `_btnNewHolder` [F2]).
+  - Zone 7: Today's workstation grid (last 20 attempts with time, card, name, org, persons, colored result) + summary strip with totals and category breakdown.
+- T5.2: Flows 5.1 and A1–A7 wired to `CheckInService` and `BeneficiaryService`:
+  - Flow 5.1: Standard entry with companion counts and live eligibility decision.
+  - Flow A1: Unregistered card shows inline registration and seamlessly continues to entry.
+  - Flow A2: Ambiguous card across organizations prompts operator selection dialog.
+  - Flow A3: Expired card denial with override capability.
+  - Flow A4: Cooldown active denial with next allowed entry local time display.
+  - Flow A5: Supervisor re-authentication dialog (BR-11, reason >= 5 chars) recording override entry.
+  - Flow A6: Live total persons validation against max group size (10), turning red and disabling entry.
+  - Flow A7: Suspended/blocked status enforcement (blocked cannot be overridden).
+- T5.3: Today desk grid populated from `CheckInService.GetTodayDeskEntriesAsync` with live summary strip and age category counts.
+- T5.4: Denial sound alert on rejection, scanner-friendly card box (Enter search, digit normalization, auto-select), full keyboard shortcut handling (F5, F9, F2, Esc).
+- T5.5: `docs/TEST_SCRIPT.md` manual test script created in Arabic with 10 test scenarios covering all desk flows and two-desk concurrency.
+- Added comprehensive unit tests in `CheckInDeskControlTests.cs` (75 architecture tests green, 0 warnings).
 
 **In progress**
-- Phase 4 complete, pending review and merge into `main`.
+- Phase 5 complete, pending review and merge into `main`.
 
 **Not started**
-- Phase 5: Check-in desk (core) · branch `phase/05-checkin` (T5.1 .. T5.5).
+- Phase 6: Management screens · branch `phase/06-management` (T6.1 .. T6.5).
 
 ## Next session — start here
 
-1. User reviews and merges Phase 4 PR into `main`.
-2. Branch `phase/05-checkin` from updated `main`.
-3. Start T5.1: Check-in screen layout per SPEC §5.3:
-   - Zones from top to bottom: Top bar, search zone (card number box, org filter), status banner, holder panel, companions panel, action bar (F5, F9, F2, Esc), today grid + totals.
-4. Start T5.2: Flows 5.1 and A1-A7 wired to `CheckInService` / `BeneficiaryService`.
+1. User reviews and merges Phase 5 PR into `main`.
+2. Branch `phase/06-management` from updated `main`.
+3. Start T6.1: Beneficiary management screen (search, details + history, edit, status changes).
+4. Start T6.2: Void entry capability from today grid and beneficiary history.
 
 ## Blockers / waiting on the user
 
-- User review and merge of Phase 4 Pull Request.
+- User review and merge of Phase 5 Pull Request.
 
 ## Known issues / tech debt
 
@@ -61,6 +75,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S07 — 2026-10-06 — Phase 5 Check-in Desk Core (T5.1..T5.5)
+- Tasks: T5.1, T5.2, T5.3, T5.4, T5.5 completed on `phase/05-checkin` (Phase 5 complete).
+- Commits: `feat(ui): implement check-in desk layout per SPEC §5.3 [T5.1]`, `feat(checkin): wire check-in flows 5.1 and A1-A7 to application services [T5.2]`, `feat(checkin): add today summary tests and keyboard shortcut flow [T5.3] [T5.4]`, `docs(checkin): create manual test script in Arabic covering all desk flows [T5.5]`.
+- Decisions: Check-in desk integrated with Clean Architecture using UserControl DI via `IFormFactory.CreateControl`; `CheckInDeskControl` handles all 7 zones and keyboard shortcuts with zero direct infrastructure coupling; `TodayDeskAttemptDto` added to provide complete display data for today's desk attempts; `TEST_SCRIPT.md` documented in Arabic for client demonstration.
+- Test count: 349 total passed (302 unit/architecture + 47 LocalDB infrastructure tests).
 
 ### S06 — 2026-10-05 — Phase 4 UI Shell (T4.2, T4.3, T4.4)
 - Tasks: T4.2, T4.3, T4.4 completed on `phase/04-ui-shell` (Phase 4 complete).

@@ -57,11 +57,11 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 **Done when:** a user can install on LocalDB, create the admin, log in, and see the shell in RTL at 100 % and 150 % DPI.
 
 ## Phase 5 — Check-in desk (core) · branch `phase/05-checkin`
-- [ ] T5.1 Check-in screen layout per SPEC §5.3.
-- [ ] T5.2 Flows 5.1 and A1–A7 wired to `CheckInService` / `BeneficiaryService`.
-- [ ] T5.3 Today grid + today totals by category for this workstation.
-- [ ] T5.4 Sound on denial, scanner-friendly card box, full keyboard flow.
-- [ ] T5.5 `docs/TEST_SCRIPT.md`: manual test script (Arabic steps) covering every flow incl. two-desk concurrency.
+- [x] T5.1 Check-in screen layout per SPEC §5.3.
+- [x] T5.2 Flows 5.1 and A1–A7 wired to `CheckInService` / `BeneficiaryService`.
+- [x] T5.3 Today grid + today totals by category for this workstation.
+- [x] T5.4 Sound on denial, scanner-friendly card box, full keyboard flow.
+- [x] T5.5 `docs/TEST_SCRIPT.md`: manual test script (Arabic steps) covering every flow incl. two-desk concurrency.
 
 **Done when:** the user walks through TEST_SCRIPT.md on two PCs (or two app instances) without defects. → **First demo to the client.**
 
