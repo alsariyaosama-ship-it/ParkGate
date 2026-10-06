@@ -485,6 +485,52 @@ public sealed class CheckInDeskControlTests
         banner.State.ShouldBe(BannerState.Granted);
     }
 
+    [Fact]
+    public async Task CheckInDeskControl_RefreshTodayDeskSummaryAsync_UpdatesSummaryStripAndBreakdown()
+    {
+        var fakeCheckInService = new FakeCheckInService();
+        using var control = new CheckInDeskControl(null, fakeCheckInService, null, null, null, null, null, null, null, null);
+
+        await control.RefreshTodayDeskSummaryAsync();
+
+        var lblTodaySummary = GetField<Label>(control, "_lblTodaySummary");
+        lblTodaySummary.Text.ShouldContain("المقبول:");
+        lblTodaySummary.Text.ShouldContain("إجمالي الأفراد:");
+    }
+
+    [Fact]
+    public void CheckInDeskControl_ProcessCmdKey_F2_StartsManualRegistration()
+    {
+        using var control = new CheckInDeskControl();
+        var txtCard = GetField<TextBox>(control, "_txtCardNumber");
+        txtCard.Text = "554433";
+
+        var msg = new Message();
+        var handled = typeof(CheckInDeskControl)
+            .GetMethod("ProcessCmdKey", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(control, [msg, Keys.F2]);
+
+        handled.ShouldBe(true);
+        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        grpReg.Visible.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CheckInDeskControl_ProcessCmdKey_Escape_ResetsDesk()
+    {
+        using var control = new CheckInDeskControl();
+        var txtCard = GetField<TextBox>(control, "_txtCardNumber");
+        txtCard.Text = "554433";
+
+        var msg = new Message();
+        var handled = typeof(CheckInDeskControl)
+            .GetMethod("ProcessCmdKey", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(control, [msg, Keys.Escape]);
+
+        handled.ShouldBe(true);
+        txtCard.Text.ShouldBeEmpty();
+    }
+
     private sealed class FakeCurrentUser : ParkGate.Application.Security.ICurrentUser
     {
         public int? UserId { get; set; }
