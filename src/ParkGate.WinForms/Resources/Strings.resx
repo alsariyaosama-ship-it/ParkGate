@@ -985,4 +985,193 @@
   <data name="Msg_SaveSettingsSuccess" xml:space="preserve">
     <value>تم حفظ إعدادات النظام بنجاح وتحديث الذاكرة المؤقتة.</value>
   </data>
+  <data name="Title_Reports" xml:space="preserve">
+    <value>التقارير والإحصائيات</value>
+  </data>
+  <data name="Tab_DailySummary" xml:space="preserve">
+    <value>الملخص اليومي</value>
+  </data>
+  <data name="Tab_DateRangeSummary" xml:space="preserve">
+    <value>ملخص الفترة</value>
+  </data>
+  <data name="Tab_OrgStatistics" xml:space="preserve">
+    <value>إحصائيات الجهات</value>
+  </data>
+  <data name="Tab_OperatorWorkstation" xml:space="preserve">
+    <value>المشغلون ونقاط الدخول</value>
+  </data>
+  <data name="Tab_DenialsAndOverrides" xml:space="preserve">
+    <value>المرفوضات والاستثناءات</value>
+  </data>
+  <data name="Tab_HourlyDistribution" xml:space="preserve">
+    <value>التوزيع الساعي</value>
+  </data>
+  <data name="Label_Date" xml:space="preserve">
+    <value>التاريخ:</value>
+  </data>
+  <data name="Label_FromDate" xml:space="preserve">
+    <value>من تاريخ:</value>
+  </data>
+  <data name="Label_ToDate" xml:space="preserve">
+    <value>إلى تاريخ:</value>
+  </data>
+  <data name="Label_Organization" xml:space="preserve">
+    <value>الجهة التضامنية:</value>
+  </data>
+  <data name="Label_AllOrganizations" xml:space="preserve">
+    <value>— جميع الجهات —</value>
+  </data>
+  <data name="Label_FilterType" xml:space="preserve">
+    <value>نوع السجل:</value>
+  </data>
+  <data name="Filter_All" xml:space="preserve">
+    <value>الكل (المرفوض والاستثناء)</value>
+  </data>
+  <data name="Filter_DeniedOnly" xml:space="preserve">
+    <value>محاولات مرفوضة فقط</value>
+  </data>
+  <data name="Filter_OverriddenOnly" xml:space="preserve">
+    <value>استثناءات مقبولة فقط</value>
+  </data>
+  <data name="Btn_RunReport" xml:space="preserve">
+    <value>عرض التقرير</value>
+  </data>
+  <data name="Btn_ExportExcel" xml:space="preserve">
+    <value>تصدير إلى Excel</value>
+  </data>
+  <data name="Btn_PrintPreview" xml:space="preserve">
+    <value>معاينة الطباعة</value>
+  </data>
+  <data name="Btn_Today" xml:space="preserve">
+    <value>اليوم</value>
+  </data>
+  <data name="Btn_Yesterday" xml:space="preserve">
+    <value>أمس</value>
+  </data>
+  <data name="Btn_ThisWeek" xml:space="preserve">
+    <value>هذا الأسبوع</value>
+  </data>
+  <data name="Btn_ThisMonth" xml:space="preserve">
+    <value>هذا الشهر</value>
+  </data>
+  <data name="Kpi_TotalAttempts" xml:space="preserve">
+    <value>إجمالي المحاولات</value>
+  </data>
+  <data name="Kpi_AllowedEntries" xml:space="preserve">
+    <value>دخول عادي</value>
+  </data>
+  <data name="Kpi_OverriddenEntries" xml:space="preserve">
+    <value>دخول باستثناء</value>
+  </data>
+  <data name="Kpi_TotalVisits" xml:space="preserve">
+    <value>إجمالي الزيارات</value>
+  </data>
+  <data name="Kpi_DeniedEntries" xml:space="preserve">
+    <value>محاولات مرفوضة</value>
+  </data>
+  <data name="Kpi_VoidedEntries" xml:space="preserve">
+    <value>زيارات ملغاة</value>
+  </data>
+  <data name="Kpi_TotalPersons" xml:space="preserve">
+    <value>إجمالي الأفراد</value>
+  </data>
+  <data name="Kpi_Holders" xml:space="preserve">
+    <value>حاملو البطاقات</value>
+  </data>
+  <data name="Kpi_Companions" xml:space="preserve">
+    <value>المرافقون</value>
+  </data>
+  <data name="Col_Date" xml:space="preserve">
+    <value>تاريخ العمل</value>
+  </data>
+  <data name="Col_Day" xml:space="preserve">
+    <value>اليوم</value>
+  </data>
+  <data name="Col_Attempts" xml:space="preserve">
+    <value>المحاولات</value>
+  </data>
+  <data name="Col_Allowed" xml:space="preserve">
+    <value>مقبول</value>
+  </data>
+  <data name="Col_Overridden" xml:space="preserve">
+    <value>استثناء</value>
+  </data>
+  <data name="Col_Visits" xml:space="preserve">
+    <value>إجمالي الزيارات</value>
+  </data>
+  <data name="Col_Denied" xml:space="preserve">
+    <value>مرفوض</value>
+  </data>
+  <data name="Col_Voided" xml:space="preserve">
+    <value>ملغى</value>
+  </data>
+  <data name="Col_Holders" xml:space="preserve">
+    <value>حاملو البطاقات</value>
+  </data>
+  <data name="Col_Companions" xml:space="preserve">
+    <value>المرافقون</value>
+  </data>
+  <data name="Col_TotalPersons" xml:space="preserve">
+    <value>إجمالي الأفراد</value>
+  </data>
+  <data name="Col_Percentage" xml:space="preserve">
+    <value>النسبة %</value>
+  </data>
+  <data name="Col_Organization" xml:space="preserve">
+    <value>الجهة</value>
+  </data>
+  <data name="Col_OrgCode" xml:space="preserve">
+    <value>الكود</value>
+  </data>
+  <data name="Col_UniqueHolders" xml:space="preserve">
+    <value>المستفيدون الفريدون</value>
+  </data>
+  <data name="Col_Operator" xml:space="preserve">
+    <value>المشغل</value>
+  </data>
+  <data name="Col_UserName" xml:space="preserve">
+    <value>اسم المستخدم</value>
+  </data>
+  <data name="Col_Workstation" xml:space="preserve">
+    <value>نقطة الدخول</value>
+  </data>
+  <data name="Col_MachineName" xml:space="preserve">
+    <value>اسم الجهاز</value>
+  </data>
+  <data name="Col_AttemptTime" xml:space="preserve">
+    <value>وقت المحاولة</value>
+  </data>
+  <data name="Col_BeneficiaryName" xml:space="preserve">
+    <value>اسم المستفيد</value>
+  </data>
+  <data name="Col_DenialReason" xml:space="preserve">
+    <value>سبب الرفض</value>
+  </data>
+  <data name="Col_OverrideReason" xml:space="preserve">
+    <value>سبب الاستثناء</value>
+  </data>
+  <data name="Col_Supervisor" xml:space="preserve">
+    <value>المشرف المعتمد</value>
+  </data>
+  <data name="Col_Hour" xml:space="preserve">
+    <value>الساعة</value>
+  </data>
+  <data name="Col_TimeRange" xml:space="preserve">
+    <value>الفترة الزمنية</value>
+  </data>
+  <data name="Col_AvgGroupSize" xml:space="preserve">
+    <value>متوسط المجموعة</value>
+  </data>
+  <data name="Msg_ExportSuccess" xml:space="preserve">
+    <value>تم تصدير التقرير إلى Excel بنجاح.</value>
+  </data>
+  <data name="Msg_NoDataToExport" xml:space="preserve">
+    <value>لا توجد بيانات متاحة للتصدير في التقرير الحالي.</value>
+  </data>
+  <data name="Msg_InvalidDateRange" xml:space="preserve">
+    <value>تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية.</value>
+  </data>
+  <data name="Error_Reports_InvalidDateRange" xml:space="preserve">
+    <value>تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية.</value>
+  </data>
 </root>

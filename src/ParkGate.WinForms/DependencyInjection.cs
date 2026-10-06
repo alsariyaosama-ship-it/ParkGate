@@ -110,6 +110,7 @@ public static class DependencyInjection
         services.AddTransient<ChangeUserRoleDialog>();
         services.AddTransient<ResetUserPasswordDialog>();
         services.AddTransient<SettingsForm>();
+        services.AddTransient<Controls.ReportsControl>();
 
         return services;
     }

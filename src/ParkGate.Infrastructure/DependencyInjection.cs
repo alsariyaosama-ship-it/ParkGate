@@ -48,6 +48,7 @@ public static class DependencyInjection
         services.AddSingleton<IAppSettingsStore, AppSettingsStore>();
         services.AddTransient<IDatabaseStartupService, DatabaseStartupService>();
         services.AddTransient<ParkGate.Application.Ports.Reports.IReportQueries, ParkGate.Infrastructure.Reports.ReportQueries>();
+        services.AddTransient<ParkGate.Application.Ports.Reports.IExcelExportService, ParkGate.Infrastructure.Reports.ClosedXmlExcelExportService>();
 
         return services;
     }

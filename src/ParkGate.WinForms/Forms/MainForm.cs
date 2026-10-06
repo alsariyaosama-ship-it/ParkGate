@@ -174,14 +174,15 @@ public partial class MainForm : RtlFormBase
         _menuUsers.Click += (_, _) => ShowUsers();
         _menuWorkstations.Click += (_, _) => ShowWorkstations();
         _menuSettings.Click += (_, _) => ShowSettings();
-        _menuDailyReport.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_DailyReport);
-        _menuOrgStatistics.Click += (_, _) => ShowNextPhaseNotice(Strings.Menu_OrgStatistics);
+        _menuDailyReport.Click += (_, _) => ShowReports(0);
+        _menuOrgStatistics.Click += (_, _) => ShowReports(2);
 
         _menuAbout.Click += OnAboutClicked;
     }
 
     private Controls.CheckInDeskControl? _checkInDeskControl;
     private Controls.BeneficiariesControl? _beneficiariesControl;
+    private Controls.ReportsControl? _reportsControl;
 
     public void ShowCheckInDesk()
     {
@@ -210,6 +211,10 @@ public partial class MainForm : RtlFormBase
         if (_beneficiariesControl != null)
         {
             _beneficiariesControl.Visible = false;
+        }
+        if (_reportsControl != null)
+        {
+            _reportsControl.Visible = false;
         }
 
         _checkInDeskControl.Visible = true;
@@ -247,6 +252,10 @@ public partial class MainForm : RtlFormBase
         {
             _checkInDeskControl.Visible = false;
         }
+        if (_reportsControl != null)
+        {
+            _reportsControl.Visible = false;
+        }
 
         _beneficiariesControl.Visible = true;
         _beneficiariesControl.BringToFront();
@@ -260,6 +269,38 @@ public partial class MainForm : RtlFormBase
         {
             _beneficiariesControl.FocusSearchBox();
         }
+    }
+
+    public void ShowReports(int tabIndex = 0)
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ViewReports))
+        {
+            return;
+        }
+
+        if (_reportsControl == null)
+        {
+            _reportsControl = _formFactory?.CreateControl<Controls.ReportsControl>() ??
+                              new Controls.ReportsControl(
+                                  null, null, null, _settingsService, _notifyService, null);
+
+            _reportsControl.Dock = DockStyle.Fill;
+            _mainContainer.Controls.Add(_reportsControl);
+        }
+
+        _welcomeCard.Visible = false;
+        if (_checkInDeskControl != null)
+        {
+            _checkInDeskControl.Visible = false;
+        }
+        if (_beneficiariesControl != null)
+        {
+            _beneficiariesControl.Visible = false;
+        }
+
+        _reportsControl.Visible = true;
+        _reportsControl.BringToFront();
+        _reportsControl.SelectReportTab(tabIndex);
     }
 
     private async Task OnMainFormLoadedAsync()
