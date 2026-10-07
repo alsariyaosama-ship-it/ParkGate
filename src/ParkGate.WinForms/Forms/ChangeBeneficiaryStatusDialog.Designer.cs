@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -51,7 +51,7 @@ partial class ChangeBeneficiaryStatusDialog
         // _lblHeader
         // 
         this._lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblHeader.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHeader.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(0, 0);
         this._lblHeader.Name = "_lblHeader";
@@ -88,7 +88,7 @@ partial class ChangeBeneficiaryStatusDialog
         // _lblBeneficiaryInfo
         // 
         this._lblBeneficiaryInfo.AutoSize = true;
-        this._lblBeneficiaryInfo.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblBeneficiaryInfo.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblBeneficiaryInfo.Location = new System.Drawing.Point(365, 16);
         this._lblBeneficiaryInfo.Name = "_lblBeneficiaryInfo";
         this._lblBeneficiaryInfo.Size = new System.Drawing.Size(116, 19);
@@ -107,7 +107,7 @@ partial class ChangeBeneficiaryStatusDialog
         // _lblTargetStatusPrompt
         // 
         this._lblTargetStatusPrompt.AutoSize = true;
-        this._lblTargetStatusPrompt.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTargetStatusPrompt.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblTargetStatusPrompt.Location = new System.Drawing.Point(344, 80);
         this._lblTargetStatusPrompt.Name = "_lblTargetStatusPrompt";
         this._lblTargetStatusPrompt.Size = new System.Drawing.Size(137, 19);
@@ -128,7 +128,7 @@ partial class ChangeBeneficiaryStatusDialog
         // _radActive
         // 
         this._radActive.AutoSize = true;
-        this._radActive.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._radActive.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._radActive.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._radActive.Location = new System.Drawing.Point(359, 3);
         this._radActive.Name = "_radActive";
@@ -141,7 +141,7 @@ partial class ChangeBeneficiaryStatusDialog
         // _radSuspended
         // 
         this._radSuspended.AutoSize = true;
-        this._radSuspended.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._radSuspended.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._radSuspended.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
         this._radSuspended.Location = new System.Drawing.Point(247, 3);
         this._radSuspended.Name = "_radSuspended";
@@ -154,7 +154,7 @@ partial class ChangeBeneficiaryStatusDialog
         // _radBlocked
         // 
         this._radBlocked.AutoSize = true;
-        this._radBlocked.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._radBlocked.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._radBlocked.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(198)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
         this._radBlocked.Location = new System.Drawing.Point(135, 3);
         this._radBlocked.Name = "_radBlocked";
@@ -200,7 +200,7 @@ partial class ChangeBeneficiaryStatusDialog
         // 
         this._btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
         this._btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnConfirm.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnConfirm.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnConfirm.ForeColor = System.Drawing.Color.White;
         this._btnConfirm.Location = new System.Drawing.Point(368, 11);
         this._btnConfirm.Name = "_btnConfirm";

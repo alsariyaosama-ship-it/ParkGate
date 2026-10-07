@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Controls;
 
@@ -111,7 +111,7 @@ partial class ReportsControl
         // _lblTitle
         this._lblTitle.AutoSize = true;
         this._lblTitle.Dock = System.Windows.Forms.DockStyle.Top;
-        this._lblTitle.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+        this._lblTitle.Font = new System.Drawing.Font("Cairo", 14F, System.Drawing.FontStyle.Bold);
         this._lblTitle.ForeColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this._lblTitle.Name = "_lblTitle";
         this._lblTitle.Padding = new System.Windows.Forms.Padding(0, 0, 0, 8);
@@ -201,19 +201,19 @@ partial class ReportsControl
 
         this._btnRunReport.BackColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this._btnRunReport.ForeColor = System.Drawing.Color.White;
-        this._btnRunReport.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+        this._btnRunReport.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
         this._btnRunReport.Size = new System.Drawing.Size(120, 34);
         this._btnRunReport.Text = "عرض التقرير";
 
         this._btnExportExcel.BackColor = System.Drawing.Color.FromArgb(46, 125, 50);
         this._btnExportExcel.ForeColor = System.Drawing.Color.White;
-        this._btnExportExcel.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+        this._btnExportExcel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
         this._btnExportExcel.Size = new System.Drawing.Size(140, 34);
         this._btnExportExcel.Text = "تصدير إلى Excel";
 
         this._btnPrintPreview.BackColor = System.Drawing.Color.FromArgb(55, 71, 79);
         this._btnPrintPreview.ForeColor = System.Drawing.Color.White;
-        this._btnPrintPreview.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+        this._btnPrintPreview.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
         this._btnPrintPreview.Size = new System.Drawing.Size(130, 34);
         this._btnPrintPreview.Text = "معاينة الطباعة";
 
@@ -225,7 +225,7 @@ partial class ReportsControl
         this._tabControl.Controls.Add(this._tabDenials);
         this._tabControl.Controls.Add(this._tabHourly);
         this._tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._tabControl.Font = new System.Drawing.Font("Segoe UI", 10F);
+        this._tabControl.Font = new System.Drawing.Font("Cairo", 10F);
         this._tabControl.ItemSize = new System.Drawing.Size(150, 32);
         this._tabControl.Location = new System.Drawing.Point(0, 150);
         this._tabControl.Name = "_tabControl";
@@ -296,7 +296,7 @@ partial class ReportsControl
         this._lblDateRangeTotals.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._lblDateRangeTotals.Height = 40;
         this._lblDateRangeTotals.BackColor = System.Drawing.Color.FromArgb(232, 245, 233);
-        this._lblDateRangeTotals.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+        this._lblDateRangeTotals.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold);
         this._lblDateRangeTotals.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         this._lblDateRangeTotals.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
 
@@ -320,7 +320,7 @@ partial class ReportsControl
         this._lblOrgStatsTotals.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._lblOrgStatsTotals.Height = 40;
         this._lblOrgStatsTotals.BackColor = System.Drawing.Color.FromArgb(232, 245, 233);
-        this._lblOrgStatsTotals.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+        this._lblOrgStatsTotals.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold);
         this._lblOrgStatsTotals.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         this._lblOrgStatsTotals.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
 
@@ -382,7 +382,7 @@ partial class ReportsControl
 
         this._lblDenialsCount.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._lblDenialsCount.Height = 35;
-        this._lblDenialsCount.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+        this._lblDenialsCount.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
         this._lblDenialsCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         this._lblDenialsCount.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
 
@@ -406,7 +406,7 @@ partial class ReportsControl
         this._lblHourlyTotals.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._lblHourlyTotals.Height = 40;
         this._lblHourlyTotals.BackColor = System.Drawing.Color.FromArgb(232, 245, 233);
-        this._lblHourlyTotals.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+        this._lblHourlyTotals.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold);
         this._lblHourlyTotals.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         this._lblHourlyTotals.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
 
@@ -420,7 +420,7 @@ partial class ReportsControl
         // _lblStatus
         this._lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._lblStatus.Height = 25;
-        this._lblStatus.Font = new System.Drawing.Font("Segoe UI", 9F);
+        this._lblStatus.Font = new System.Drawing.Font("Cairo", 9F);
         this._lblStatus.ForeColor = System.Drawing.Color.FromArgb(69, 90, 100);
         this._lblStatus.Name = "_lblStatus";
         this._lblStatus.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
@@ -431,7 +431,7 @@ partial class ReportsControl
         this.Controls.Add(this._tabControl);
         this.Controls.Add(this._pnlTop);
         this.Controls.Add(this._lblStatus);
-        this.Font = new System.Drawing.Font("Segoe UI", 10F);
+        this.Font = new System.Drawing.Font("Cairo", 10F);
         this.Name = "ReportsControl";
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         this.Size = new System.Drawing.Size(1100, 695);

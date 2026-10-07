@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -45,7 +45,7 @@ partial class VoidReasonDialog
         // _lblHeader
         // 
         this._lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblHeader.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHeader.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(0, 0);
         this._lblHeader.Name = "_lblHeader";
@@ -78,7 +78,7 @@ partial class VoidReasonDialog
         // _lblAttemptInfo
         // 
         this._lblAttemptInfo.AutoSize = true;
-        this._lblAttemptInfo.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblAttemptInfo.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblAttemptInfo.Location = new System.Drawing.Point(345, 16);
         this._lblAttemptInfo.Name = "_lblAttemptInfo";
         this._lblAttemptInfo.Size = new System.Drawing.Size(116, 19);
@@ -131,7 +131,7 @@ partial class VoidReasonDialog
         // 
         this._btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(198)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
         this._btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnConfirm.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnConfirm.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnConfirm.ForeColor = System.Drawing.Color.White;
         this._btnConfirm.Location = new System.Drawing.Point(348, 11);
         this._btnConfirm.Name = "_btnConfirm";

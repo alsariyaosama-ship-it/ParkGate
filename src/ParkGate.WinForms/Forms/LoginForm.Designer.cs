@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -74,7 +74,7 @@ partial class LoginForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblTitle, 2);
         this.lblTitle.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.lblTitle.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this.lblTitle.Location = new System.Drawing.Point(3, 0);
         this.lblTitle.Name = "lblTitle";
@@ -86,7 +86,7 @@ partial class LoginForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblWorkstation, 2);
         this.lblWorkstation.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblWorkstation.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.lblWorkstation.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.lblWorkstation.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
         this.lblWorkstation.Location = new System.Drawing.Point(3, 45);
         this.lblWorkstation.Name = "lblWorkstation";
@@ -106,7 +106,7 @@ partial class LoginForm
         // txtUsername
         // 
         this.txtUsername.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtUsername.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtUsername.Location = new System.Drawing.Point(3, 83);
         this.txtUsername.Name = "txtUsername";
         this.txtUsername.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -125,7 +125,7 @@ partial class LoginForm
         // txtPassword
         // 
         this.txtPassword.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtPassword.Location = new System.Drawing.Point(3, 123);
         this.txtPassword.Name = "txtPassword";
         this.txtPassword.PasswordChar = '●';
@@ -137,7 +137,7 @@ partial class LoginForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblError, 2);
         this.lblError.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblError.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.lblError.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblError.ForeColor = System.Drawing.Color.FromArgb(198, 40, 40);
         this.lblError.Location = new System.Drawing.Point(3, 160);
         this.lblError.Name = "lblError";
@@ -162,7 +162,7 @@ partial class LoginForm
         this.btnLogin.BackColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this.btnLogin.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.btnLogin.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnLogin.ForeColor = System.Drawing.Color.White;
         this.btnLogin.Location = new System.Drawing.Point(283, 3);
         this.btnLogin.Name = "btnLogin";
@@ -176,7 +176,7 @@ partial class LoginForm
         this.btnExit.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnExit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.System;
-        this.btnExit.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.btnExit.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.btnExit.Location = new System.Drawing.Point(177, 3);
         this.btnExit.Name = "btnExit";
         this.btnExit.Size = new System.Drawing.Size(100, 36);
@@ -191,7 +191,7 @@ partial class LoginForm
         this.CancelButton = this.btnExit;
         this.ClientSize = new System.Drawing.Size(480, 293);
         this.Controls.Add(this.tableLayoutPanelMain);
-        this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
         this.MinimizeBox = false;

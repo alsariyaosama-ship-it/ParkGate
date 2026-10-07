@@ -15,7 +15,7 @@ public sealed class RtlFormTests
         form.RightToLeft.ShouldBe(RightToLeft.Yes);
         form.RightToLeftLayout.ShouldBeTrue();
         form.AutoScaleMode.ShouldBe(AutoScaleMode.Dpi);
-        form.Font.Name.ShouldBe("Segoe UI");
+        form.Font.Name.ShouldBe("Cairo");
         form.KeyPreview.ShouldBeTrue();
     }
 

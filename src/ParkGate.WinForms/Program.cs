@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Services;
 using Serilog;
 using WinFormsApp = System.Windows.Forms.Application;
@@ -17,6 +18,10 @@ internal static class Program
         // 1. High DPI initialization
         ApplicationConfiguration.Initialize();
         WinFormsApp.SetHighDpiMode(HighDpiMode.PerMonitorV2);
+
+        // Cairo Typography initialization
+        AppFont.Initialize();
+        WinFormsApp.SetDefaultFont(AppFont.CreateFont(10F, System.Drawing.FontStyle.Regular));
 
         // 2. Logging directory: %ProgramData%\ParkGate\logs
         var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);

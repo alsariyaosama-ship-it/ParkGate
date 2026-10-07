@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -80,7 +80,7 @@ partial class FirstRunAdminForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblHeader, 2);
         this.lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblHeader.Font = new System.Drawing.Font("Segoe UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.lblHeader.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.lblHeader.ForeColor = System.Drawing.Color.FromArgb(45, 55, 72);
         this.lblHeader.Location = new System.Drawing.Point(3, 0);
         this.lblHeader.Name = "lblHeader";
@@ -100,7 +100,7 @@ partial class FirstRunAdminForm
         // txtFullName
         // 
         this.txtFullName.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtFullName.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtFullName.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtFullName.Location = new System.Drawing.Point(3, 63);
         this.txtFullName.Name = "txtFullName";
         this.txtFullName.Size = new System.Drawing.Size(314, 25);
@@ -118,7 +118,7 @@ partial class FirstRunAdminForm
         // txtUsername
         // 
         this.txtUsername.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtUsername.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtUsername.Location = new System.Drawing.Point(3, 103);
         this.txtUsername.Name = "txtUsername";
         this.txtUsername.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -137,7 +137,7 @@ partial class FirstRunAdminForm
         // txtPassword
         // 
         this.txtPassword.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtPassword.Location = new System.Drawing.Point(3, 143);
         this.txtPassword.Name = "txtPassword";
         this.txtPassword.PasswordChar = '●';
@@ -157,7 +157,7 @@ partial class FirstRunAdminForm
         // txtConfirmPassword
         // 
         this.txtConfirmPassword.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtConfirmPassword.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtConfirmPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtConfirmPassword.Location = new System.Drawing.Point(3, 183);
         this.txtConfirmPassword.Name = "txtConfirmPassword";
         this.txtConfirmPassword.PasswordChar = '●';
@@ -182,7 +182,7 @@ partial class FirstRunAdminForm
         this.btnCreate.BackColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this.btnCreate.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnCreate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnCreate.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.btnCreate.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnCreate.ForeColor = System.Drawing.Color.White;
         this.btnCreate.Location = new System.Drawing.Point(294, 3);
         this.btnCreate.Name = "btnCreate";
@@ -196,7 +196,7 @@ partial class FirstRunAdminForm
         this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-        this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.btnCancel.Location = new System.Drawing.Point(188, 3);
         this.btnCancel.Name = "btnCancel";
         this.btnCancel.Size = new System.Drawing.Size(100, 36);
@@ -211,7 +211,7 @@ partial class FirstRunAdminForm
         this.CancelButton = this.btnCancel;
         this.ClientSize = new System.Drawing.Size(520, 315);
         this.Controls.Add(this.tableLayoutPanelMain);
-        this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
         this.MinimizeBox = false;

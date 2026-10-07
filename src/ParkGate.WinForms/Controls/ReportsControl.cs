@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
@@ -391,7 +391,7 @@ public partial class ReportsControl : UserControl
         var lblTitle = new Label
         {
             Text = title,
-            Font = new Font("Segoe UI", 8.5F, FontStyle.Regular),
+            Font = new Font("Cairo", 8.5F, FontStyle.Regular),
             ForeColor = Color.FromArgb(100, 116, 139),
             Dock = DockStyle.Top,
             Height = 28,
@@ -401,7 +401,7 @@ public partial class ReportsControl : UserControl
         var lblVal = new Label
         {
             Text = value,
-            Font = new Font("Segoe UI", 13F, FontStyle.Bold),
+            Font = new Font("Cairo", 13F, FontStyle.Bold),
             ForeColor = accentColor,
             Dock = DockStyle.Fill,
             TextAlign = ContentAlignment.MiddleCenter
@@ -853,10 +853,10 @@ public partial class ReportsControl : UserControl
             return;
         }
 
-        var fontTitle = new Font("Segoe UI", 16F, FontStyle.Bold);
-        var fontSubtitle = new Font("Segoe UI", 10F, FontStyle.Regular);
-        var fontHeader = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-        var fontCell = new Font("Segoe UI", 9F, FontStyle.Regular);
+        var fontTitle = new Font("Cairo", 16F, FontStyle.Bold);
+        var fontSubtitle = new Font("Cairo", 10F, FontStyle.Regular);
+        var fontHeader = new Font("Cairo", 9.5F, FontStyle.Bold);
+        var fontCell = new Font("Cairo", 9F, FontStyle.Regular);
 
         float y = 50;
         float left = e.MarginBounds.Left;

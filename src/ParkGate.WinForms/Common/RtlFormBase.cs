@@ -18,7 +18,7 @@ public class RtlFormBase : Form
         RightToLeft = RightToLeft.Yes;
         RightToLeftLayout = true;
         AutoScaleMode = AutoScaleMode.Dpi;
-        Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        Font = AppFont.CreateFont(10F, FontStyle.Regular);
         KeyPreview = true;
         StartPosition = FormStartPosition.CenterScreen;
     }

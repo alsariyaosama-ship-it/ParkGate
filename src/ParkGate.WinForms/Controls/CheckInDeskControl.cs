@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
@@ -636,7 +636,7 @@ public partial class CheckInDeskControl : UserControl
         var list = new ListBox
         {
             Dock = DockStyle.Fill,
-            Font = new Font("Segoe UI", 10.5F)
+            Font = new Font("Cairo", 10.5F)
         };
 
         foreach (var m in matches)

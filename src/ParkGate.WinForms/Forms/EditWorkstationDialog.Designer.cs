@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -47,7 +47,7 @@ partial class EditWorkstationDialog
         // _lblHeader
         // 
         this._lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblHeader.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHeader.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(0, 0);
         this._lblHeader.Name = "_lblHeader";
@@ -93,7 +93,7 @@ partial class EditWorkstationDialog
         // 
         this._lblMachineNameValue.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblMachineNameValue.AutoSize = true;
-        this._lblMachineNameValue.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblMachineNameValue.Font = new System.Drawing.Font("Cairo", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblMachineNameValue.Location = new System.Drawing.Point(230, 25);
         this._lblMachineNameValue.Name = "_lblMachineNameValue";
         this._lblMachineNameValue.Size = new System.Drawing.Size(51, 17);
@@ -155,7 +155,7 @@ partial class EditWorkstationDialog
         // 
         this._btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnSave.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnSave.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSave.ForeColor = System.Drawing.Color.White;
         this._btnSave.Location = new System.Drawing.Point(328, 11);
         this._btnSave.Name = "_btnSave";

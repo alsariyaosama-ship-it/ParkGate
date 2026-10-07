@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -73,7 +73,7 @@ partial class ChangePasswordForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblHeader, 2);
         this.lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblHeader.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.lblHeader.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.lblHeader.ForeColor = System.Drawing.Color.FromArgb(45, 55, 72);
         this.lblHeader.Location = new System.Drawing.Point(3, 0);
         this.lblHeader.Name = "lblHeader";
@@ -93,7 +93,7 @@ partial class ChangePasswordForm
         // txtCurrentPassword
         // 
         this.txtCurrentPassword.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtCurrentPassword.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtCurrentPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtCurrentPassword.Location = new System.Drawing.Point(3, 53);
         this.txtCurrentPassword.Name = "txtCurrentPassword";
         this.txtCurrentPassword.PasswordChar = '●';
@@ -113,7 +113,7 @@ partial class ChangePasswordForm
         // txtNewPassword
         // 
         this.txtNewPassword.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtNewPassword.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtNewPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtNewPassword.Location = new System.Drawing.Point(3, 93);
         this.txtNewPassword.Name = "txtNewPassword";
         this.txtNewPassword.PasswordChar = '●';
@@ -133,7 +133,7 @@ partial class ChangePasswordForm
         // txtConfirmNewPassword
         // 
         this.txtConfirmNewPassword.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtConfirmNewPassword.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtConfirmNewPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtConfirmNewPassword.Location = new System.Drawing.Point(3, 133);
         this.txtConfirmNewPassword.Name = "txtConfirmNewPassword";
         this.txtConfirmNewPassword.PasswordChar = '●';
@@ -158,7 +158,7 @@ partial class ChangePasswordForm
         this.btnChange.BackColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this.btnChange.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnChange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnChange.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.btnChange.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnChange.ForeColor = System.Drawing.Color.White;
         this.btnChange.Location = new System.Drawing.Point(294, 3);
         this.btnChange.Name = "btnChange";
@@ -172,7 +172,7 @@ partial class ChangePasswordForm
         this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-        this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.btnCancel.Location = new System.Drawing.Point(188, 3);
         this.btnCancel.Name = "btnCancel";
         this.btnCancel.Size = new System.Drawing.Size(100, 36);
@@ -187,7 +187,7 @@ partial class ChangePasswordForm
         this.CancelButton = this.btnCancel;
         this.ClientSize = new System.Drawing.Size(500, 270);
         this.Controls.Add(this.tableLayoutPanelMain);
-        this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
         this.MinimizeBox = false;

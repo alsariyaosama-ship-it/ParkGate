@@ -58,6 +58,8 @@ Name: "{commonappdata}\ParkGate\logs"; Permissions: users-modify
 [Files]
 ; Client binaries from publish output
 Source: "..\dist\client\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Cairo font installation to Windows fonts
+Source: "..\dist\client\Resources\Fonts\Cairo.ttf"; DestDir: "{autofonts}"; FontInstall: "Cairo"; Flags: onlyifdoesntexist uninsneveruninstall
 ; Automated backup script
 Source: "..\scripts\backup.ps1"; DestDir: "{app}\scripts"; Flags: ignoreversion
 

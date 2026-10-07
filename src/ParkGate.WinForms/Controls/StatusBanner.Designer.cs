@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Controls;
 
@@ -45,7 +45,7 @@ partial class StatusBanner
         // 
         this._lblTitle.AutoEllipsis = true;
         this._lblTitle.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTitle.Font = new System.Drawing.Font("Cairo", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblTitle.ForeColor = System.Drawing.Color.White;
         this._lblTitle.Location = new System.Drawing.Point(0, 0);
         this._lblTitle.Margin = new System.Windows.Forms.Padding(0);
@@ -59,7 +59,7 @@ partial class StatusBanner
         // 
         this._lblDetails.AutoEllipsis = true;
         this._lblDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblDetails.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblDetails.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
         this._lblDetails.Location = new System.Drawing.Point(0, 48);
         this._lblDetails.Margin = new System.Windows.Forms.Padding(0);
@@ -76,7 +76,7 @@ partial class StatusBanner
         this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this.Controls.Add(this._layoutPanel);
         this.DoubleBuffered = true;
-        this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.MinimumSize = new System.Drawing.Size(300, 60);
         this.Name = "StatusBanner";
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;

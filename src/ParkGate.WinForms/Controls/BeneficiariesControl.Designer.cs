@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Controls;
 
@@ -108,7 +108,7 @@ partial class BeneficiariesControl
         // _lblSearch
         // 
         this._lblSearch.AutoSize = true;
-        this._lblSearch.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblSearch.Location = new System.Drawing.Point(900, 16);
         this._lblSearch.Name = "_lblSearch";
         this._lblSearch.Size = new System.Drawing.Size(90, 19);
@@ -117,7 +117,7 @@ partial class BeneficiariesControl
         // 
         // _txtSearch
         // 
-        this._txtSearch.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtSearch.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._txtSearch.Location = new System.Drawing.Point(540, 12);
         this._txtSearch.MaxLength = 100;
         this._txtSearch.Name = "_txtSearch";
@@ -129,7 +129,7 @@ partial class BeneficiariesControl
         // 
         this._btnSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnSearch.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnSearch.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSearch.ForeColor = System.Drawing.Color.White;
         this._btnSearch.Location = new System.Drawing.Point(450, 11);
         this._btnSearch.Name = "_btnSearch";
@@ -183,7 +183,7 @@ partial class BeneficiariesControl
         // 
         this._grpResults.Controls.Add(this._gridBeneficiaries);
         this._grpResults.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpResults.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpResults.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpResults.Location = new System.Drawing.Point(8, 4);
         this._grpResults.Name = "_grpResults";
         this._grpResults.Padding = new System.Windows.Forms.Padding(6);
@@ -209,7 +209,7 @@ partial class BeneficiariesControl
             this._colLastEntry,
             this._colExpiryDate});
         this._gridBeneficiaries.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._gridBeneficiaries.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._gridBeneficiaries.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._gridBeneficiaries.Location = new System.Drawing.Point(6, 23);
         this._gridBeneficiaries.MultiSelect = false;
         this._gridBeneficiaries.Name = "_gridBeneficiaries";
@@ -300,7 +300,7 @@ partial class BeneficiariesControl
         this._grpHolderDetails.Controls.Add(this._tblDetails);
         this._grpHolderDetails.Controls.Add(this._pnlDetailsActions);
         this._grpHolderDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpHolderDetails.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpHolderDetails.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpHolderDetails.Location = new System.Drawing.Point(0, 0);
         this._grpHolderDetails.Name = "_grpHolderDetails";
         this._grpHolderDetails.Padding = new System.Windows.Forms.Padding(6);
@@ -333,7 +333,7 @@ partial class BeneficiariesControl
         this._tblDetails.Controls.Add(this._lblDetailNotesTitle, 0, 8);
         this._tblDetails.Controls.Add(this._lblDetailNotes, 1, 8);
         this._tblDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._tblDetails.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._tblDetails.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblDetails.Location = new System.Drawing.Point(6, 23);
         this._tblDetails.Name = "_tblDetails";
         this._tblDetails.RowCount = 9;
@@ -352,7 +352,7 @@ partial class BeneficiariesControl
         // _lblDetailNameTitle
         // 
         this._lblDetailNameTitle.AutoSize = true;
-        this._lblDetailNameTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailNameTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailNameTitle.Location = new System.Drawing.Point(280, 0);
         this._lblDetailNameTitle.Name = "_lblDetailNameTitle";
         this._lblDetailNameTitle.Size = new System.Drawing.Size(81, 15);
@@ -362,7 +362,7 @@ partial class BeneficiariesControl
         // _lblDetailName
         // 
         this._lblDetailName.AutoSize = true;
-        this._lblDetailName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailName.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailName.Location = new System.Drawing.Point(256, 0);
         this._lblDetailName.Name = "_lblDetailName";
         this._lblDetailName.Size = new System.Drawing.Size(10, 15);
@@ -372,7 +372,7 @@ partial class BeneficiariesControl
         // _lblDetailCardTitle
         // 
         this._lblDetailCardTitle.AutoSize = true;
-        this._lblDetailCardTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailCardTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailCardTitle.Location = new System.Drawing.Point(293, 26);
         this._lblDetailCardTitle.Name = "_lblDetailCardTitle";
         this._lblDetailCardTitle.Size = new System.Drawing.Size(68, 15);
@@ -391,7 +391,7 @@ partial class BeneficiariesControl
         // _lblDetailOrgTitle
         // 
         this._lblDetailOrgTitle.AutoSize = true;
-        this._lblDetailOrgTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailOrgTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailOrgTitle.Location = new System.Drawing.Point(323, 52);
         this._lblDetailOrgTitle.Name = "_lblDetailOrgTitle";
         this._lblDetailOrgTitle.Size = new System.Drawing.Size(38, 15);
@@ -410,7 +410,7 @@ partial class BeneficiariesControl
         // _lblDetailPhoneTitle
         // 
         this._lblDetailPhoneTitle.AutoSize = true;
-        this._lblDetailPhoneTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailPhoneTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailPhoneTitle.Location = new System.Drawing.Point(295, 78);
         this._lblDetailPhoneTitle.Name = "_lblDetailPhoneTitle";
         this._lblDetailPhoneTitle.Size = new System.Drawing.Size(66, 15);
@@ -429,7 +429,7 @@ partial class BeneficiariesControl
         // _lblDetailNidTitle
         // 
         this._lblDetailNidTitle.AutoSize = true;
-        this._lblDetailNidTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailNidTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailNidTitle.Location = new System.Drawing.Point(286, 104);
         this._lblDetailNidTitle.Name = "_lblDetailNidTitle";
         this._lblDetailNidTitle.Size = new System.Drawing.Size(75, 15);
@@ -448,7 +448,7 @@ partial class BeneficiariesControl
         // _lblDetailExpiryTitle
         // 
         this._lblDetailExpiryTitle.AutoSize = true;
-        this._lblDetailExpiryTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailExpiryTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailExpiryTitle.Location = new System.Drawing.Point(285, 130);
         this._lblDetailExpiryTitle.Name = "_lblDetailExpiryTitle";
         this._lblDetailExpiryTitle.Size = new System.Drawing.Size(76, 15);
@@ -467,7 +467,7 @@ partial class BeneficiariesControl
         // _lblDetailStatusTitle
         // 
         this._lblDetailStatusTitle.AutoSize = true;
-        this._lblDetailStatusTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailStatusTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailStatusTitle.Location = new System.Drawing.Point(322, 156);
         this._lblDetailStatusTitle.Name = "_lblDetailStatusTitle";
         this._lblDetailStatusTitle.Size = new System.Drawing.Size(39, 15);
@@ -477,7 +477,7 @@ partial class BeneficiariesControl
         // _lblDetailStatus
         // 
         this._lblDetailStatus.AutoSize = true;
-        this._lblDetailStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailStatus.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailStatus.Location = new System.Drawing.Point(256, 156);
         this._lblDetailStatus.Name = "_lblDetailStatus";
         this._lblDetailStatus.Size = new System.Drawing.Size(10, 15);
@@ -487,7 +487,7 @@ partial class BeneficiariesControl
         // _lblDetailReasonTitle
         // 
         this._lblDetailReasonTitle.AutoSize = true;
-        this._lblDetailReasonTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailReasonTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailReasonTitle.Location = new System.Drawing.Point(295, 182);
         this._lblDetailReasonTitle.Name = "_lblDetailReasonTitle";
         this._lblDetailReasonTitle.Size = new System.Drawing.Size(66, 15);
@@ -506,7 +506,7 @@ partial class BeneficiariesControl
         // _lblDetailNotesTitle
         // 
         this._lblDetailNotesTitle.AutoSize = true;
-        this._lblDetailNotesTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailNotesTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblDetailNotesTitle.Location = new System.Drawing.Point(308, 208);
         this._lblDetailNotesTitle.Name = "_lblDetailNotesTitle";
         this._lblDetailNotesTitle.Size = new System.Drawing.Size(53, 15);
@@ -538,7 +538,7 @@ partial class BeneficiariesControl
         // 
         this._btnEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this._btnEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnEdit.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnEdit.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnEdit.ForeColor = System.Drawing.Color.White;
         this._btnEdit.Location = new System.Drawing.Point(260, 7);
         this._btnEdit.Name = "_btnEdit";
@@ -551,7 +551,7 @@ partial class BeneficiariesControl
         // 
         this._btnChangeStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
         this._btnChangeStatus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnChangeStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnChangeStatus.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnChangeStatus.ForeColor = System.Drawing.Color.White;
         this._btnChangeStatus.Location = new System.Drawing.Point(155, 7);
         this._btnChangeStatus.Name = "_btnChangeStatus";
@@ -564,7 +564,7 @@ partial class BeneficiariesControl
         // 
         this._btnCheckInDirect.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._btnCheckInDirect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCheckInDirect.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnCheckInDirect.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnCheckInDirect.ForeColor = System.Drawing.Color.White;
         this._btnCheckInDirect.Location = new System.Drawing.Point(50, 7);
         this._btnCheckInDirect.Name = "_btnCheckInDirect";
@@ -578,7 +578,7 @@ partial class BeneficiariesControl
         this._grpHistory.Controls.Add(this._gridHistory);
         this._grpHistory.Controls.Add(this._pnlHistoryActions);
         this._grpHistory.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpHistory.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpHistory.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpHistory.Location = new System.Drawing.Point(4, 0);
         this._grpHistory.Name = "_grpHistory";
         this._grpHistory.Padding = new System.Windows.Forms.Padding(6);
@@ -604,7 +604,7 @@ partial class BeneficiariesControl
             this._colHistStatus,
             this._colHistVoidReason});
         this._gridHistory.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._gridHistory.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._gridHistory.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._gridHistory.Location = new System.Drawing.Point(6, 23);
         this._gridHistory.MultiSelect = false;
         this._gridHistory.Name = "_gridHistory";
@@ -685,7 +685,7 @@ partial class BeneficiariesControl
         this._btnVoidHistoryEntry.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(198)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
         this._btnVoidHistoryEntry.Enabled = false;
         this._btnVoidHistoryEntry.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnVoidHistoryEntry.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnVoidHistoryEntry.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnVoidHistoryEntry.ForeColor = System.Drawing.Color.White;
         this._btnVoidHistoryEntry.Location = new System.Drawing.Point(444, 5);
         this._btnVoidHistoryEntry.Name = "_btnVoidHistoryEntry";
@@ -700,7 +700,7 @@ partial class BeneficiariesControl
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.Controls.Add(this._splitMain);
         this.Controls.Add(this._pnlSearch);
-        this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.Name = "BeneficiariesControl";
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         this.Size = new System.Drawing.Size(1000, 640);

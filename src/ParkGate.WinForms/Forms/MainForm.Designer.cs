@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -69,7 +69,7 @@ partial class MainForm
         // 
         // _mainMenuStrip
         // 
-        this._mainMenuStrip.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._mainMenuStrip.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._menuFile,
             this._menuOperations,
@@ -239,7 +239,7 @@ partial class MainForm
         // 
         // _statusStrip
         // 
-        this._statusStrip.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._statusStrip.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._statusUser,
             this._statusWorkstation,
@@ -319,7 +319,7 @@ partial class MainForm
         // _lblQuickInfo
         // 
         this._lblQuickInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblQuickInfo.Font = new System.Drawing.Font("Segoe UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblQuickInfo.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblQuickInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this._lblQuickInfo.Location = new System.Drawing.Point(30, 130);
         this._lblQuickInfo.Name = "_lblQuickInfo";
@@ -332,7 +332,7 @@ partial class MainForm
         // _lblWelcomeSubtitle
         // 
         this._lblWelcomeSubtitle.Dock = System.Windows.Forms.DockStyle.Top;
-        this._lblWelcomeSubtitle.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblWelcomeSubtitle.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblWelcomeSubtitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         this._lblWelcomeSubtitle.Location = new System.Drawing.Point(30, 80);
         this._lblWelcomeSubtitle.Name = "_lblWelcomeSubtitle";
@@ -344,7 +344,7 @@ partial class MainForm
         // _lblWelcomeParkName
         // 
         this._lblWelcomeParkName.Dock = System.Windows.Forms.DockStyle.Top;
-        this._lblWelcomeParkName.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblWelcomeParkName.Font = new System.Drawing.Font("Cairo", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblWelcomeParkName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblWelcomeParkName.Location = new System.Drawing.Point(30, 30);
         this._lblWelcomeParkName.Name = "_lblWelcomeParkName";
@@ -369,7 +369,7 @@ partial class MainForm
         this.Controls.Add(this._mainContainer);
         this.Controls.Add(this._statusStrip);
         this.Controls.Add(this._mainMenuStrip);
-        this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.MainMenuStrip = this._mainMenuStrip;
         this.MinimumSize = new System.Drawing.Size(800, 600);
         this.Name = "MainForm";

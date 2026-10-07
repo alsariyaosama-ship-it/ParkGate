@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -93,7 +93,7 @@ partial class ConnectionSettingsForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblHeader, 2);
         this.lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblHeader.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.lblHeader.Font = new System.Drawing.Font("Cairo", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblHeader.ForeColor = System.Drawing.Color.FromArgb(45, 55, 72);
         this.lblHeader.Location = new System.Drawing.Point(3, 0);
         this.lblHeader.Name = "lblHeader";
@@ -115,7 +115,7 @@ partial class ConnectionSettingsForm
         // txtServer
         // 
         this.txtServer.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtServer.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtServer.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtServer.Location = new System.Drawing.Point(3, 53);
         this.txtServer.Name = "txtServer";
         this.txtServer.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -135,7 +135,7 @@ partial class ConnectionSettingsForm
         // txtDatabase
         // 
         this.txtDatabase.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.txtDatabase.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtDatabase.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtDatabase.Location = new System.Drawing.Point(3, 93);
         this.txtDatabase.Name = "txtDatabase";
         this.txtDatabase.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -156,7 +156,7 @@ partial class ConnectionSettingsForm
         // 
         this.cmbAuthType.Dock = System.Windows.Forms.DockStyle.Fill;
         this.cmbAuthType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-        this.cmbAuthType.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.cmbAuthType.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.cmbAuthType.FormattingEnabled = true;
         this.cmbAuthType.Location = new System.Drawing.Point(3, 133);
         this.cmbAuthType.Name = "cmbAuthType";
@@ -177,7 +177,7 @@ partial class ConnectionSettingsForm
         // 
         this.txtUsername.Dock = System.Windows.Forms.DockStyle.Fill;
         this.txtUsername.Enabled = false;
-        this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtUsername.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtUsername.Location = new System.Drawing.Point(3, 173);
         this.txtUsername.Name = "txtUsername";
         this.txtUsername.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -198,7 +198,7 @@ partial class ConnectionSettingsForm
         // 
         this.txtPassword.Dock = System.Windows.Forms.DockStyle.Fill;
         this.txtPassword.Enabled = false;
-        this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.txtPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtPassword.Location = new System.Drawing.Point(3, 213);
         this.txtPassword.Name = "txtPassword";
         this.txtPassword.PasswordChar = '●';
@@ -210,7 +210,7 @@ partial class ConnectionSettingsForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblStatus, 2);
         this.lblStatus.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.lblStatus.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblStatus.Location = new System.Drawing.Point(3, 250);
         this.lblStatus.Name = "lblStatus";
         this.lblStatus.Size = new System.Drawing.Size(514, 35);
@@ -235,7 +235,7 @@ partial class ConnectionSettingsForm
         this.btnSave.BackColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this.btnSave.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnSave.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.btnSave.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnSave.ForeColor = System.Drawing.Color.White;
         this.btnSave.Location = new System.Drawing.Point(384, 3);
         this.btnSave.Name = "btnSave";
@@ -249,7 +249,7 @@ partial class ConnectionSettingsForm
         this.btnTest.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
         this.btnTest.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.System;
-        this.btnTest.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.btnTest.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.btnTest.Location = new System.Drawing.Point(261, 3);
         this.btnTest.Name = "btnTest";
         this.btnTest.Size = new System.Drawing.Size(117, 36);
@@ -263,7 +263,7 @@ partial class ConnectionSettingsForm
         this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
         this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-        this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.btnCancel.Location = new System.Drawing.Point(155, 3);
         this.btnCancel.Name = "btnCancel";
         this.btnCancel.Size = new System.Drawing.Size(100, 36);
@@ -279,7 +279,7 @@ partial class ConnectionSettingsForm
         this.CancelButton = this.btnCancel;
         this.ClientSize = new System.Drawing.Size(560, 385);
         this.Controls.Add(this.tableLayoutPanelMain);
-        this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
         this.MinimizeBox = false;

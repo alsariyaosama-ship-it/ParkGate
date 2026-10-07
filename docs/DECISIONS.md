@@ -97,6 +97,12 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Decision:** Branch per phase, Conventional Commits with task IDs, push every session, PR per phase reviewed by the user, CI on Windows runner (unit + architecture tests).
 - **Consequences:** Every session leaves a recoverable, reviewable state on GitHub.
 
+### ADR-017 — Cairo primary Arabic typography
+- **Status:** Accepted
+- **Context:** The application UI is entirely in Arabic (RTL). Segoe UI was the initial standard font, but Cairo provides superior Arabic legibility, modern calligraphic balance, and aesthetics for kiosks and desktop screens.
+- **Decision:** Adopt Google Font **Cairo** as the primary typography. Embed `Cairo.ttf` in `ParkGate.WinForms` resources, manage loading via `AppFont` and `PrivateFontCollection` with fallback to `Segoe UI`, and set globally via `Application.SetDefaultFont` and `RtlFormBase`.
+- **Consequences:** Beautiful, uniform Arabic typography across all client PCs without external font dependencies.
+
 ---
 
 <!-- Template for new ADRs:

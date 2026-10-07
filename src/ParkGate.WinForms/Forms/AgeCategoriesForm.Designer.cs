@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -51,7 +51,7 @@ partial class AgeCategoriesForm
         // _lblHeader
         // 
         this._lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblHeader.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHeader.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(0, 0);
         this._lblHeader.Name = "_lblHeader";

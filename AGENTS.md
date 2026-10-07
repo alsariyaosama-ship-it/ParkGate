@@ -139,7 +139,7 @@ Maximum 4 production projects. Do not add a project without an ADR (the future F
 
 ## 5. WinForms, Arabic and RTL rules
 
-1. Every form derives from `RtlFormBase` which sets `RightToLeft = Yes`, `RightToLeftLayout = true`, `AutoScaleMode = Dpi`, the app font (Segoe UI 10 pt; status banner ≥ 20 pt), and `KeyPreview = true`.
+1. Every form derives from `RtlFormBase` which sets `RightToLeft = Yes`, `RightToLeftLayout = true`, `AutoScaleMode = Dpi`, the app font (Cairo 10 pt; status banner ≥ 20 pt), and `KeyPreview = true`.
 2. High DPI: `ApplicationConfiguration.Initialize()` with `PerMonitorV2`. Test at 100 % and 150 % scaling.
 3. Layout with `TableLayoutPanel` / `FlowLayoutPanel` and docking; avoid absolute positions so mirroring is correct.
 4. **Designer compatibility:** every form/user control must open in the Visual Studio WinForms designer. Layout code lives in `*.Designer.cs` `InitializeComponent()` only — no logic, no lambdas, no DI there.
