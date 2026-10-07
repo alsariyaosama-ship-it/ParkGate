@@ -52,6 +52,7 @@ public partial class UsersForm : RtlFormBase
         _logger = logger;
 
         InitializeFormText();
+        Theme.ApplyGridStyle(_gridUsers);
         WireEvents();
     }
 
@@ -177,11 +178,14 @@ public partial class UsersForm : RtlFormBase
         }
 
         _gridUsers.ResumeLayout(true);
-        _lblCount.Text = $"عدد المستخدمين: {list.Count}";
+        var activeCount = list.Count(u => u.IsActive);
+        var inactiveCount = list.Count - activeCount;
+        _lblCount.Text = $"إجمالي المستخدمين: {list.Count} (نشط: {activeCount} | معطل: {inactiveCount})";
 
         if (_gridUsers.Rows.Count > 0)
         {
             _gridUsers.Rows[0].Selected = true;
+            OnSelectionChanged();
         }
         else
         {
@@ -191,7 +195,13 @@ public partial class UsersForm : RtlFormBase
 
     private void OnSelectionChanged()
     {
-        if (_gridUsers.SelectedRows.Count == 0)
+        var selected = _gridUsers.SelectedRows.Count > 0
+            ? _gridUsers.SelectedRows[0].Tag as UserDto
+            : (_gridUsers.Rows.Count > 0 && _gridUsers.Rows[0].Selected
+                ? _gridUsers.Rows[0].Tag as UserDto
+                : _gridUsers.CurrentRow?.Tag as UserDto);
+
+        if (selected == null)
         {
             _selectedUser = null;
             _btnChangeRole.Enabled = false;
@@ -200,17 +210,13 @@ public partial class UsersForm : RtlFormBase
             return;
         }
 
-        _selectedUser = _gridUsers.SelectedRows[0].Tag as UserDto;
-        _btnChangeRole.Enabled = _selectedUser != null;
-        _btnResetPassword.Enabled = _selectedUser != null;
-        _btnToggleActive.Enabled = _selectedUser != null;
-
-        if (_selectedUser != null)
-        {
-            _btnToggleActive.Text = _selectedUser.IsActive
-                ? Strings.Btn_Deactivate
-                : Strings.Btn_Reactivate;
-        }
+        _selectedUser = selected;
+        _btnChangeRole.Enabled = true;
+        _btnResetPassword.Enabled = true;
+        _btnToggleActive.Enabled = true;
+        _btnToggleActive.Text = _selectedUser.IsActive
+            ? Strings.Btn_Deactivate
+            : Strings.Btn_Reactivate;
     }
 
     public async Task AddUserAsync()

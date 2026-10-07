@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -193,30 +193,36 @@ partial class ChangeBeneficiaryStatusDialog
         this._pnlButtons.Location = new System.Drawing.Point(0, 340);
         this._pnlButtons.Name = "_pnlButtons";
         this._pnlButtons.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
-        this._pnlButtons.Size = new System.Drawing.Size(500, 50);
+        this._pnlButtons.Size = new System.Drawing.Size(500, 56);
         this._pnlButtons.TabIndex = 2;
         // 
         // _btnConfirm
         // 
         this._btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._btnConfirm.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnConfirm.FlatAppearance.BorderSize = 0;
         this._btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnConfirm.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnConfirm.ForeColor = System.Drawing.Color.White;
-        this._btnConfirm.Location = new System.Drawing.Point(368, 11);
+        this._btnConfirm.Location = new System.Drawing.Point(348, 9);
         this._btnConfirm.Name = "_btnConfirm";
-        this._btnConfirm.Size = new System.Drawing.Size(100, 32);
+        this._btnConfirm.Size = new System.Drawing.Size(120, 38);
         this._btnConfirm.TabIndex = 0;
         this._btnConfirm.Text = "تأكيد التغيير";
         this._btnConfirm.UseVisualStyleBackColor = false;
         // 
         // _btnCancel
         // 
-        this._btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+        this._btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+        this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancel.Location = new System.Drawing.Point(262, 11);
+        this._btnCancel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnCancel.Location = new System.Drawing.Point(238, 9);
         this._btnCancel.Name = "_btnCancel";
-        this._btnCancel.Size = new System.Drawing.Size(100, 32);
+        this._btnCancel.Size = new System.Drawing.Size(100, 38);
         this._btnCancel.TabIndex = 1;
         this._btnCancel.Text = "إلغاء";
         this._btnCancel.UseVisualStyleBackColor = false;
@@ -227,7 +233,7 @@ partial class ChangeBeneficiaryStatusDialog
         this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(500, 390);
+        this.ClientSize = new System.Drawing.Size(500, 396);
         this.Controls.Add(this._tblLayout);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);

@@ -67,7 +67,7 @@ partial class SettingsForm
         // 
         // _pnlHeader
         // 
-        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(99)))), ((int)(((byte)(235)))));
+        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._pnlHeader.Controls.Add(this._lblHeader);
         this._pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);
@@ -394,47 +394,62 @@ partial class SettingsForm
         this._pnlButtons.Location = new System.Drawing.Point(0, 360);
         this._pnlButtons.Name = "_pnlButtons";
         this._pnlButtons.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
-        this._pnlButtons.Size = new System.Drawing.Size(650, 50);
+        this._pnlButtons.Size = new System.Drawing.Size(650, 56);
         this._pnlButtons.TabIndex = 2;
         // 
         // _btnSave
         // 
         this._btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
+        this._btnSave.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnSave.FlatAppearance.BorderSize = 0;
         this._btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnSave.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSave.ForeColor = System.Drawing.Color.White;
-        this._btnSave.Location = new System.Drawing.Point(518, 11);
+        this._btnSave.Location = new System.Drawing.Point(508, 9);
         this._btnSave.Name = "_btnSave";
-        this._btnSave.Size = new System.Drawing.Size(100, 32);
+        this._btnSave.Size = new System.Drawing.Size(110, 38);
         this._btnSave.TabIndex = 0;
         this._btnSave.Text = "حفظ";
         this._btnSave.UseVisualStyleBackColor = false;
         // 
         // _btnReload
         // 
-        this._btnReload.Location = new System.Drawing.Point(412, 11);
+        this._btnReload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnReload.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnReload.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+        this._btnReload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+        this._btnReload.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnReload.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnReload.Location = new System.Drawing.Point(392, 9);
         this._btnReload.Name = "_btnReload";
-        this._btnReload.Size = new System.Drawing.Size(100, 32);
+        this._btnReload.Size = new System.Drawing.Size(110, 38);
         this._btnReload.TabIndex = 1;
         this._btnReload.Text = "إعادة تحميل";
-        this._btnReload.UseVisualStyleBackColor = true;
+        this._btnReload.UseVisualStyleBackColor = false;
         // 
         // _btnClose
         // 
-        this._btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+        this._btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+        this._btnClose.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClose.Location = new System.Drawing.Point(326, 11);
+        this._btnClose.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnClose.Location = new System.Drawing.Point(296, 9);
         this._btnClose.Name = "_btnClose";
-        this._btnClose.Size = new System.Drawing.Size(80, 32);
+        this._btnClose.Size = new System.Drawing.Size(90, 38);
         this._btnClose.TabIndex = 2;
         this._btnClose.Text = "إغلاق";
         this._btnClose.UseVisualStyleBackColor = false;
         // 
         // SettingsForm
         // 
+        this.AcceptButton = this._btnSave;
         this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(650, 410);
+        this.CancelButton = this._btnClose;
+        this.ClientSize = new System.Drawing.Size(650, 416);
         this.Controls.Add(this._tabSettings);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);

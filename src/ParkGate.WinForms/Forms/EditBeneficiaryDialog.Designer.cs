@@ -47,7 +47,7 @@ partial class EditBeneficiaryDialog
         // 
         // _pnlHeader
         // 
-        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
+        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._pnlHeader.Controls.Add(this._lblHeader);
         this._pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);
@@ -269,30 +269,36 @@ partial class EditBeneficiaryDialog
         this._pnlButtons.Location = new System.Drawing.Point(0, 390);
         this._pnlButtons.Name = "_pnlButtons";
         this._pnlButtons.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
-        this._pnlButtons.Size = new System.Drawing.Size(520, 50);
+        this._pnlButtons.Size = new System.Drawing.Size(520, 56);
         this._pnlButtons.TabIndex = 2;
         // 
         // _btnSave
         // 
         this._btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
+        this._btnSave.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnSave.FlatAppearance.BorderSize = 0;
         this._btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnSave.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSave.ForeColor = System.Drawing.Color.White;
-        this._btnSave.Location = new System.Drawing.Point(368, 11);
+        this._btnSave.Location = new System.Drawing.Point(368, 9);
         this._btnSave.Name = "_btnSave";
-        this._btnSave.Size = new System.Drawing.Size(120, 32);
+        this._btnSave.Size = new System.Drawing.Size(120, 38);
         this._btnSave.TabIndex = 0;
         this._btnSave.Text = "حفظ التعديلات";
         this._btnSave.UseVisualStyleBackColor = false;
         // 
         // _btnCancel
         // 
-        this._btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+        this._btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+        this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancel.Location = new System.Drawing.Point(262, 11);
+        this._btnCancel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnCancel.Location = new System.Drawing.Point(258, 9);
         this._btnCancel.Name = "_btnCancel";
-        this._btnCancel.Size = new System.Drawing.Size(100, 32);
+        this._btnCancel.Size = new System.Drawing.Size(100, 38);
         this._btnCancel.TabIndex = 1;
         this._btnCancel.Text = "إلغاء";
         this._btnCancel.UseVisualStyleBackColor = false;
@@ -303,7 +309,7 @@ partial class EditBeneficiaryDialog
         this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(520, 440);
+        this.ClientSize = new System.Drawing.Size(520, 446);
         this.Controls.Add(this._tblLayout);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);

@@ -81,6 +81,7 @@ public partial class CheckInDeskControl : UserControl
         _logger = logger;
 
         InitializeControlText();
+        Theme.ApplyGridStyle(_gridToday);
         WireEvents();
     }
 

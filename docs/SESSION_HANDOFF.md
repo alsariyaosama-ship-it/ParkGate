@@ -10,38 +10,40 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-07 |
-| Last session | S11 — UI Polish & Terminology (Touch Counters, Customer Terminology, LoginForm Redesign) |
+| Last session | S12 — Full UI Standardization (`winforms-ui-design` skill across all forms) |
 | Current phase | Post-Release Polish |
 | Working branch | `main` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 343 passed (151 domain + 86 application + 106 architecture/ui) |
-| Integration tests | 55 passed on LocalDB (including 1M performance benchmark) |
-| Total tests | 398 passed |
-| Last commit | `feat(ui): enlarge touch counter controls, rename holder to customer, and redesign login form` |
+| Unit tests | 382 passed (151 domain + 86 application + 39 infra unit + 106 architecture/ui) |
+| Integration tests | 55 passed on LocalDB (including concurrency and benchmark tests) |
+| Total tests | 437 passed |
+| Last commit | `feat(ui): standardize all forms and controls with winforms-ui-design theme and metrics` |
 
 ## State of the work
 
 **Done**
-- Upgraded `CounterInput` for touch screens: enlarged `+` / `−` buttons to 50x48px (18pt Bold), enlarged value textbox to 70x44px (15pt Bold), and increased row height to 54-56px for comfortable touch input.
-- System-wide terminology replacement: converted "حامل جديد / حامل البطاقة / حاملو البطاقات" to "زبون جديد / الزبون / الزبائن" across `Strings.resx`, `CheckInDeskControl`, `MainForm`, `SettingsForm`, `BeneficiariesControl`, `EditBeneficiaryDialog`, `ReportsControl`, and `ClosedXmlExcelExportService`.
-- Completely redesigned `LoginForm`:
-  - Fixed small textboxes and reversed Left-To-Right input by setting `RightToLeft = Yes` with Cairo 12pt font.
-  - Built an elegant brand emerald green header with ParkGate title, Arabic subtitle, and workstation badge chip.
-  - Designed an elevated card body with Cairo typography, prominent 48px touch-friendly Login button, clean secondary Cancel button, and auto-focus on username field.
-- Full test suite: 382 non-integration tests passed, 0 errors, 0 warnings.
+- Installed and activated `winforms-ui-design` skill.
+- Created `Theme.cs` as the centralized single source of truth for design tokens (Royal Emerald `#1B873F`, neutral surfaces `#FFFFFF`/`#F8FAFC`, slate text, borders, Cairo typography, double-buffered DataGridView styling helper).
+- Modernized and standardized all forms and dialogs in `ParkGate.WinForms`:
+  - `AgeCategoriesForm` & `EditAgeCategoryDialog`: Brand emerald header, subtitle, 44px flat DataGridView header, 40px rows, 36-38px touch/mouse buttons, KPI pills.
+  - `OrganizationsForm` & `EditOrganizationDialog`: Emerald header, Theme grid styling, 36px toolbar buttons, headless selection resilience, active/inactive counts.
+  - `WorkstationsForm` & `EditWorkstationDialog`: Emerald header, Theme grid styling, 36px action buttons, active/inactive stats.
+  - `UsersForm`, `CreateUserDialog`, `ChangeUserRoleDialog`, `ResetUserPasswordDialog`: Standard emerald headers, 36-38px action buttons, Theme grid styling, headless selection resilience.
+  - `SettingsForm`: Brand emerald header, modern 38px flat action buttons.
+  - `EditBeneficiaryDialog`, `ChangeBeneficiaryStatusDialog`, `VoidReasonDialog`: Standardized semantic headers, 38px flat action buttons, RTL alignment.
+  - `BeneficiariesControl`, `ReportsControl`, `CheckInDeskControl`: Applied `Theme.ApplyGridStyle` and Theme button styling across all DataGridViews and toolbars.
+- Zero compiler warnings, 100% test pass rate (382 unit/arch + 55 integration).
 
 **In progress**
-- Phase 8 complete. Ready to merge into `main` and tag `v1.0.0`.
+- Ready to tag or deploy.
 
 **Not started**
 - Future features (F1 QR credentials, F2 Electronic gate, F3 Cloud read-only) — pending client scheduling.
 
 ## Next session — start here
 
-1. Open PR #9 from `phase/08-deployment` to `main`.
-2. Merge PR #9 into `main`.
-3. Create git tag `v1.0.0`.
-4. ParkGate v1.0.0 is ready for client LAN deployment!
+1. System is fully verified with modern Cairo typography, RTL, and Emerald theme.
+2. Proceed with deployment or next user requirements.
 
 ## Blockers / waiting on the user
 

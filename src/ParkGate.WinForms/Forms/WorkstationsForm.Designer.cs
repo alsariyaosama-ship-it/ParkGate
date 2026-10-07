@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -40,12 +40,12 @@ partial class WorkstationsForm
         // 
         // _pnlHeader
         // 
-        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(99)))), ((int)(((byte)(235)))));
+        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._pnlHeader.Controls.Add(this._lblHeader);
         this._pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);
         this._pnlHeader.Name = "_pnlHeader";
-        this._pnlHeader.Size = new System.Drawing.Size(784, 50);
+        this._pnlHeader.Size = new System.Drawing.Size(784, 56);
         this._pnlHeader.TabIndex = 0;
         // 
         // _lblHeader
@@ -56,7 +56,7 @@ partial class WorkstationsForm
         this._lblHeader.Location = new System.Drawing.Point(0, 0);
         this._lblHeader.Name = "_lblHeader";
         this._lblHeader.Padding = new System.Windows.Forms.Padding(16, 0, 16, 0);
-        this._lblHeader.Size = new System.Drawing.Size(784, 50);
+        this._lblHeader.Size = new System.Drawing.Size(784, 56);
         this._lblHeader.TabIndex = 0;
         this._lblHeader.Text = "إدارة محطات العمل ونقاط الدخول";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -68,40 +68,58 @@ partial class WorkstationsForm
         this._pnlToolbar.Controls.Add(this._btnToggleActive);
         this._pnlToolbar.Controls.Add(this._btnRefresh);
         this._pnlToolbar.Dock = System.Windows.Forms.DockStyle.Top;
-        this._pnlToolbar.Location = new System.Drawing.Point(0, 50);
+        this._pnlToolbar.Location = new System.Drawing.Point(0, 56);
         this._pnlToolbar.Name = "_pnlToolbar";
         this._pnlToolbar.Padding = new System.Windows.Forms.Padding(12, 8, 12, 8);
-        this._pnlToolbar.Size = new System.Drawing.Size(784, 48);
+        this._pnlToolbar.Size = new System.Drawing.Size(784, 54);
         this._pnlToolbar.TabIndex = 1;
         // 
         // _btnEdit
         // 
+        this._btnEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnEdit.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnEdit.Enabled = false;
-        this._btnEdit.Location = new System.Drawing.Point(680, 11);
+        this._btnEdit.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+        this._btnEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+        this._btnEdit.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnEdit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnEdit.Location = new System.Drawing.Point(670, 8);
         this._btnEdit.Name = "_btnEdit";
-        this._btnEdit.Size = new System.Drawing.Size(80, 28);
+        this._btnEdit.Size = new System.Drawing.Size(90, 36);
         this._btnEdit.TabIndex = 0;
         this._btnEdit.Text = "تعديل";
-        this._btnEdit.UseVisualStyleBackColor = true;
+        this._btnEdit.UseVisualStyleBackColor = false;
         // 
         // _btnToggleActive
         // 
+        this._btnToggleActive.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnToggleActive.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnToggleActive.Enabled = false;
-        this._btnToggleActive.Location = new System.Drawing.Point(574, 11);
+        this._btnToggleActive.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+        this._btnToggleActive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+        this._btnToggleActive.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnToggleActive.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnToggleActive.Location = new System.Drawing.Point(544, 8);
         this._btnToggleActive.Name = "_btnToggleActive";
-        this._btnToggleActive.Size = new System.Drawing.Size(100, 28);
+        this._btnToggleActive.Size = new System.Drawing.Size(120, 36);
         this._btnToggleActive.TabIndex = 1;
         this._btnToggleActive.Text = "تعطيل/تفعيل";
-        this._btnToggleActive.UseVisualStyleBackColor = true;
+        this._btnToggleActive.UseVisualStyleBackColor = false;
         // 
         // _btnRefresh
         // 
-        this._btnRefresh.Location = new System.Drawing.Point(488, 11);
+        this._btnRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnRefresh.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+        this._btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+        this._btnRefresh.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnRefresh.Location = new System.Drawing.Point(448, 8);
         this._btnRefresh.Name = "_btnRefresh";
-        this._btnRefresh.Size = new System.Drawing.Size(80, 28);
+        this._btnRefresh.Size = new System.Drawing.Size(90, 36);
         this._btnRefresh.TabIndex = 2;
         this._btnRefresh.Text = "تحديث";
-        this._btnRefresh.UseVisualStyleBackColor = true;
+        this._btnRefresh.UseVisualStyleBackColor = false;
         // 
         // _gridWorkstations
         // 
@@ -168,17 +186,17 @@ partial class WorkstationsForm
         this._pnlFooter.Controls.Add(this._lblCount);
         this._pnlFooter.Controls.Add(this._btnClose);
         this._pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
-        this._pnlFooter.Location = new System.Drawing.Point(0, 470);
+        this._pnlFooter.Location = new System.Drawing.Point(0, 464);
         this._pnlFooter.Name = "_pnlFooter";
         this._pnlFooter.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
-        this._pnlFooter.Size = new System.Drawing.Size(784, 42);
+        this._pnlFooter.Size = new System.Drawing.Size(784, 48);
         this._pnlFooter.TabIndex = 3;
         // 
         // _lblCount
         // 
         this._lblCount.Anchor = System.Windows.Forms.AnchorStyles.Right;
         this._lblCount.AutoSize = true;
-        this._lblCount.Location = new System.Drawing.Point(676, 12);
+        this._lblCount.Location = new System.Drawing.Point(676, 14);
         this._lblCount.Name = "_lblCount";
         this._lblCount.Size = new System.Drawing.Size(102, 19);
         this._lblCount.TabIndex = 0;
@@ -187,12 +205,18 @@ partial class WorkstationsForm
         // _btnClose
         // 
         this._btnClose.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._btnClose.Location = new System.Drawing.Point(16, 7);
+        this._btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        this._btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnClose.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+        this._btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+        this._btnClose.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnClose.Location = new System.Drawing.Point(16, 6);
         this._btnClose.Name = "_btnClose";
-        this._btnClose.Size = new System.Drawing.Size(80, 28);
+        this._btnClose.Size = new System.Drawing.Size(90, 36);
         this._btnClose.TabIndex = 1;
         this._btnClose.Text = "إغلاق";
-        this._btnClose.UseVisualStyleBackColor = true;
+        this._btnClose.UseVisualStyleBackColor = false;
         // 
         // WorkstationsForm
         // 

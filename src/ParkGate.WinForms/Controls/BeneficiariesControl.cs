@@ -64,10 +64,23 @@ public partial class BeneficiariesControl : UserControl
         _logger = logger;
 
         InitializeFormText();
+        ApplyStyles();
         ClearBeneficiaryDetails();
         ClearHistoryGrid();
         ApplyPermissions();
         WireEvents();
+    }
+
+    private void ApplyStyles()
+    {
+        Theme.ApplyGridStyle(_gridBeneficiaries);
+        Theme.ApplyGridStyle(_gridHistory);
+        Theme.ApplyPrimaryButtonStyle(_btnCheckInDirect);
+        Theme.ApplySecondaryButtonStyle(_btnEdit);
+        Theme.ApplySecondaryButtonStyle(_btnChangeStatus);
+        Theme.ApplySecondaryButtonStyle(_btnVoidHistoryEntry);
+        Theme.ApplyPrimaryButtonStyle(_btnSearch);
+        Theme.ApplySecondaryButtonStyle(_btnClearSearch);
     }
 
     private void InitializeFormText()

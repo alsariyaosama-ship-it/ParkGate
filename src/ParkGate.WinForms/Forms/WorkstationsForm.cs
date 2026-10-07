@@ -48,6 +48,7 @@ public partial class WorkstationsForm : RtlFormBase
         _logger = logger;
 
         InitializeFormText();
+        Theme.ApplyGridStyle(_gridWorkstations);
         WireEvents();
     }
 
@@ -165,11 +166,14 @@ public partial class WorkstationsForm : RtlFormBase
         }
 
         _gridWorkstations.ResumeLayout(true);
-        _lblCount.Text = $"عدد المحطات: {list.Count}";
+        var activeCount = list.Count(w => w.IsActive);
+        var inactiveCount = list.Count - activeCount;
+        _lblCount.Text = $"إجمالي المحطات: {list.Count} (نشطة: {activeCount} | معطلة: {inactiveCount})";
 
         if (_gridWorkstations.Rows.Count > 0)
         {
             _gridWorkstations.Rows[0].Selected = true;
+            OnSelectionChanged();
         }
         else
         {
@@ -179,7 +183,13 @@ public partial class WorkstationsForm : RtlFormBase
 
     private void OnSelectionChanged()
     {
-        if (_gridWorkstations.SelectedRows.Count == 0)
+        var selected = _gridWorkstations.SelectedRows.Count > 0
+            ? _gridWorkstations.SelectedRows[0].Tag as WorkstationDto
+            : (_gridWorkstations.Rows.Count > 0 && _gridWorkstations.Rows[0].Selected
+                ? _gridWorkstations.Rows[0].Tag as WorkstationDto
+                : _gridWorkstations.CurrentRow?.Tag as WorkstationDto);
+
+        if (selected == null)
         {
             _selectedWorkstation = null;
             _btnEdit.Enabled = false;
@@ -187,16 +197,12 @@ public partial class WorkstationsForm : RtlFormBase
             return;
         }
 
-        _selectedWorkstation = _gridWorkstations.SelectedRows[0].Tag as WorkstationDto;
-        _btnEdit.Enabled = _selectedWorkstation != null;
-        _btnToggleActive.Enabled = _selectedWorkstation != null;
-
-        if (_selectedWorkstation != null)
-        {
-            _btnToggleActive.Text = _selectedWorkstation.IsActive
-                ? Strings.Btn_Deactivate
-                : Strings.Btn_Reactivate;
-        }
+        _selectedWorkstation = selected;
+        _btnEdit.Enabled = true;
+        _btnToggleActive.Enabled = true;
+        _btnToggleActive.Text = _selectedWorkstation.IsActive
+            ? Strings.Btn_Deactivate
+            : Strings.Btn_Reactivate;
     }
 
     public async Task EditWorkstationAsync()

@@ -42,6 +42,7 @@ public partial class OrganizationsForm : RtlFormBase
         _logger = logger;
 
         InitializeFormText();
+        Theme.ApplyGridStyle(_gridOrganizations);
         WireEvents();
     }
 
@@ -78,6 +79,20 @@ public partial class OrganizationsForm : RtlFormBase
             if (e.RowIndex >= 0)
             {
                 await EditOrganizationAsync();
+            }
+        };
+
+        KeyDown += async (_, e) =>
+        {
+            if (e.KeyCode == Keys.F2)
+            {
+                await AddOrganizationAsync();
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.F5)
+            {
+                await LoadOrganizationsAsync();
+                e.Handled = true;
             }
         };
     }
@@ -141,29 +156,36 @@ public partial class OrganizationsForm : RtlFormBase
         }
 
         _gridOrganizations.ResumeLayout(true);
-        _lblCount.Text = $"عدد الجهات: {list.Count}";
+        var activeCount = list.Count(c => c.IsActive);
+        var inactiveCount = list.Count - activeCount;
+        _lblCount.Text = $"إجمالي الجهات: {list.Count}  (النشطة: {activeCount} | المعطلة: {inactiveCount})";
 
         if (_gridOrganizations.Rows.Count > 0)
         {
             _gridOrganizations.Rows[0].Selected = true;
         }
-        else
-        {
-            OnSelectionChanged();
-        }
+        OnSelectionChanged();
     }
 
     private void OnSelectionChanged()
     {
-        if (_gridOrganizations.SelectedRows.Count == 0)
+        if (_gridOrganizations.SelectedRows.Count > 0)
+        {
+            _selectedOrg = _gridOrganizations.SelectedRows[0].Tag as OrganizationDto;
+        }
+        else if (_gridOrganizations.CurrentRow != null)
+        {
+            _selectedOrg = _gridOrganizations.CurrentRow.Tag as OrganizationDto;
+        }
+        else if (_gridOrganizations.Rows.Count > 0 && _gridOrganizations.Rows[0].Selected)
+        {
+            _selectedOrg = _gridOrganizations.Rows[0].Tag as OrganizationDto;
+        }
+        else
         {
             _selectedOrg = null;
-            _btnEdit.Enabled = false;
-            _btnToggleActive.Enabled = false;
-            return;
         }
 
-        _selectedOrg = _gridOrganizations.SelectedRows[0].Tag as OrganizationDto;
         _btnEdit.Enabled = _selectedOrg != null;
         _btnToggleActive.Enabled = _selectedOrg != null;
 

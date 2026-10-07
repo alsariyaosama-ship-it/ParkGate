@@ -59,8 +59,29 @@ public partial class ReportsControl : UserControl
         _logger = logger;
 
         ApplyLocalizedTexts();
+        ApplyStyles();
         UpdateFilterControlsVisibility();
         WireEvents();
+    }
+
+    private void ApplyStyles()
+    {
+        Theme.ApplyPrimaryButtonStyle(_btnRunReport);
+        Theme.ApplySecondaryButtonStyle(_btnExportExcel);
+        Theme.ApplySecondaryButtonStyle(_btnPrintPreview);
+        Theme.ApplySecondaryButtonStyle(_btnToday);
+        Theme.ApplySecondaryButtonStyle(_btnYesterday);
+        Theme.ApplySecondaryButtonStyle(_btnThisWeek);
+        Theme.ApplySecondaryButtonStyle(_btnThisMonth);
+
+        Theme.ApplyGridStyle(_gridDailyOrgs);
+        Theme.ApplyGridStyle(_gridDailyCategories);
+        Theme.ApplyGridStyle(_gridDateRange);
+        Theme.ApplyGridStyle(_gridOrgStats);
+        Theme.ApplyGridStyle(_gridOperators);
+        Theme.ApplyGridStyle(_gridWorkstations);
+        Theme.ApplyGridStyle(_gridDenials);
+        Theme.ApplyGridStyle(_gridHourly);
     }
 
     private void ApplyLocalizedTexts()
