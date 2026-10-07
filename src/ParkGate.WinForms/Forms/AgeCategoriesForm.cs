@@ -42,7 +42,16 @@ public partial class AgeCategoriesForm : RtlFormBase
         _logger = logger;
 
         InitializeFormText();
+        ApplyGridOptimizations();
         WireEvents();
+    }
+
+    private void ApplyGridOptimizations()
+    {
+        // Reduce grid flicker per winforms-ui-design skill §6
+        typeof(DataGridView)
+            .GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+            ?.SetValue(_gridAgeCategories, true, null);
     }
 
     private void InitializeFormText()
@@ -76,6 +85,20 @@ public partial class AgeCategoriesForm : RtlFormBase
             if (e.RowIndex >= 0)
             {
                 await EditAgeCategoryAsync();
+            }
+        };
+
+        KeyDown += async (_, e) =>
+        {
+            if (e.KeyCode == Keys.F2)
+            {
+                await AddAgeCategoryAsync();
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.F5)
+            {
+                await LoadAgeCategoriesAsync();
+                e.Handled = true;
             }
         };
     }
@@ -132,29 +155,36 @@ public partial class AgeCategoriesForm : RtlFormBase
         }
 
         _gridAgeCategories.ResumeLayout(true);
-        _lblCount.Text = $"عدد الفئات: {list.Count}";
+        var activeCount = list.Count(c => c.IsActive);
+        var inactiveCount = list.Count - activeCount;
+        _lblCount.Text = $"إجمالي الفئات: {list.Count}  (النشطة: {activeCount} | المعطلة: {inactiveCount})";
 
         if (_gridAgeCategories.Rows.Count > 0)
         {
             _gridAgeCategories.Rows[0].Selected = true;
         }
-        else
-        {
-            OnSelectionChanged();
-        }
+        OnSelectionChanged();
     }
 
     private void OnSelectionChanged()
     {
-        if (_gridAgeCategories.SelectedRows.Count == 0)
+        if (_gridAgeCategories.SelectedRows.Count > 0)
+        {
+            _selectedCategory = _gridAgeCategories.SelectedRows[0].Tag as AgeCategoryDto;
+        }
+        else if (_gridAgeCategories.CurrentRow != null)
+        {
+            _selectedCategory = _gridAgeCategories.CurrentRow.Tag as AgeCategoryDto;
+        }
+        else if (_gridAgeCategories.Rows.Count > 0 && _gridAgeCategories.Rows[0].Selected)
+        {
+            _selectedCategory = _gridAgeCategories.Rows[0].Tag as AgeCategoryDto;
+        }
+        else
         {
             _selectedCategory = null;
-            _btnEdit.Enabled = false;
-            _btnToggleActive.Enabled = false;
-            return;
         }
 
-        _selectedCategory = _gridAgeCategories.SelectedRows[0].Tag as AgeCategoryDto;
         _btnEdit.Enabled = _selectedCategory != null;
         _btnToggleActive.Enabled = _selectedCategory != null;
 

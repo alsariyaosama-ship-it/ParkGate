@@ -54,6 +54,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
 
     private void WireEvents()
     {
+        Shown += (_, _) => _txtNameAr.Focus();
         _btnSave.Click += async (_, _) => await SaveAsync();
     }
 
