@@ -20,6 +20,20 @@ public sealed class RtlFormTests
     }
 
     [Fact]
+    public void AppFont_CreateFont_ShouldReturnCairoFont()
+    {
+        using var font = AppFont.CreateFont(10F);
+        font.Name.ShouldBe("Cairo");
+    }
+
+    [Fact]
+    public void AgeCategoriesForm_ShouldHaveCairoFont()
+    {
+        using var form = new AgeCategoriesForm();
+        form.Font.Name.ShouldBe("Cairo");
+    }
+
+    [Fact]
     public void MainForm_ShouldInheritRtlFormBaseAndHaveArabicTitle()
     {
         using var form = new MainForm();

@@ -1,11 +1,14 @@
 using System.Drawing;
 using System.Drawing.Text;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace ParkGate.WinForms.Common;
 
 /// <summary>
 /// Provides application-wide Cairo typography with fallback to system fonts.
+/// Automatically registers Cairo font into the GDI subsystem and Windows user fonts.
 /// </summary>
 public static class AppFont
 {
@@ -13,6 +16,11 @@ public static class AppFont
     private static FontFamily? _cairoFamily;
     private static bool _initialized;
     private static readonly object SyncLock = new();
+
+    private const uint FrPrivate = 0x10;
+
+    [DllImport("gdi32.dll", EntryPoint = "AddFontResourceExW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern int AddFontResourceEx(string lpszFilename, uint fl, IntPtr pdv);
 
     public static string FamilyName
     {
@@ -48,25 +56,26 @@ public static class AppFont
 
             try
             {
-                // 1. Check if Cairo font is already installed in the OS
-                using var installed = new InstalledFontCollection();
-                var osFont = installed.Families.FirstOrDefault(f => f.Name.Equals("Cairo", StringComparison.OrdinalIgnoreCase));
-                if (osFont != null)
+                // 1. Check if Cairo font is already available and functioning in OS
+                using (var testFont = new Font("Cairo", 10F, FontStyle.Regular, GraphicsUnit.Point))
                 {
-                    _cairoFamily = new FontFamily(osFont.Name);
-                    _initialized = true;
-                    return;
+                    if (testFont.Name.Equals("Cairo", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _cairoFamily = new FontFamily("Cairo");
+                        _initialized = true;
+                        return;
+                    }
                 }
 
-                // 2. Try loading from application folder
+                // 2. Locate font file from application folder or resources
+                string? fontPath = null;
                 var localFontPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Fonts", "Cairo.ttf");
                 if (File.Exists(localFontPath))
                 {
-                    FontCollection.AddFontFile(localFontPath);
+                    fontPath = localFontPath;
                 }
                 else
                 {
-                    // 3. Extract embedded resource to %ProgramData%\ParkGate\fonts\Cairo.ttf
                     var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
                     var fontDir = Path.Combine(programData, "ParkGate", "fonts");
                     Directory.CreateDirectory(fontDir);
@@ -85,7 +94,47 @@ public static class AppFont
 
                     if (File.Exists(targetFile))
                     {
-                        FontCollection.AddFontFile(targetFile);
+                        fontPath = targetFile;
+                    }
+                }
+
+                // 3. Register font with GDI32 and user Windows registry if font file found
+                if (!string.IsNullOrEmpty(fontPath) && File.Exists(fontPath))
+                {
+                    // Register into GDI process font table for TextRenderer/WinForms controls
+                    AddFontResourceEx(fontPath, FrPrivate, IntPtr.Zero);
+
+                    // Also add to GDI+ PrivateFontCollection
+                    FontCollection.AddFontFile(fontPath);
+
+                    // Try user-level Windows font registration so Visual Studio and system know about it
+                    try
+                    {
+                        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                        var userFontsDir = Path.Combine(localAppData, "Microsoft", "Windows", "Fonts");
+                        Directory.CreateDirectory(userFontsDir);
+                        var userDest = Path.Combine(userFontsDir, "Cairo.ttf");
+                        if (!File.Exists(userDest) && fontPath != userDest)
+                        {
+                            File.Copy(fontPath, userDest, true);
+                        }
+
+                        using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\Fonts", true);
+                        key?.SetValue("Cairo (TrueType)", userDest);
+                    }
+                    catch
+                    {
+                        // Non-critical if user registry access is restricted
+                    }
+                }
+
+                // 4. Resolve FontFamily
+                using (var testFont = new Font("Cairo", 10F, FontStyle.Regular, GraphicsUnit.Point))
+                {
+                    if (testFont.Name.Equals("Cairo", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _cairoFamily = new FontFamily("Cairo");
+                        return;
                     }
                 }
 
@@ -110,6 +159,7 @@ public static class AppFont
     {
         Initialize();
 
+        // 1. Try Cairo from system or resolved family
         if (_cairoFamily != null)
         {
             try
@@ -118,25 +168,31 @@ public static class AppFont
             }
             catch
             {
-                // If specific style fails with variable font, fallback to name-based constructor
-                try
-                {
-                    return new Font(_cairoFamily.Name, size, style, GraphicsUnit.Point);
-                }
-                catch
-                {
-                    // Fall back
-                }
+                // Variable fonts might fail with specific style constructor
             }
         }
 
         try
         {
-            return new Font("Cairo", size, style, GraphicsUnit.Point);
+            var font = new Font("Cairo", size, style, GraphicsUnit.Point);
+            if (font.Name.Equals("Cairo", StringComparison.OrdinalIgnoreCase))
+            {
+                return font;
+            }
         }
         catch
         {
+            // Fall back
+        }
+
+        // 2. System fallbacks
+        try
+        {
             return new Font("Segoe UI", size, style, GraphicsUnit.Point);
+        }
+        catch
+        {
+            return new Font(FontFamily.GenericSansSerif, size, style, GraphicsUnit.Point);
         }
     }
 }
