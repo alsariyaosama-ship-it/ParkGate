@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -65,7 +65,7 @@ partial class EditBeneficiaryDialog
         this._lblHeader.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
         this._lblHeader.Size = new System.Drawing.Size(520, 50);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "تعديل بيانات حامل البطاقة";
+        this._lblHeader.Text = "تعديل بيانات الزبون";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _tblLayout
@@ -313,7 +313,7 @@ partial class EditBeneficiaryDialog
         this.Name = "EditBeneficiaryDialog";
         this.ShowInTaskbar = false;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        this.Text = "تعديل بيانات حامل البطاقة";
+        this.Text = "تعديل بيانات الزبون";
         this._pnlHeader.ResumeLayout(false);
         this._tblLayout.ResumeLayout(false);
         this._tblLayout.PerformLayout();

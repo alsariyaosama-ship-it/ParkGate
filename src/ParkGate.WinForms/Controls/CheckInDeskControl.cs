@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
@@ -340,7 +340,9 @@ public partial class CheckInDeskControl : UserControl
             {
                 Title = $"{cat.NameAr}:",
                 Tag = cat.Id,
-                Width = _flowCounters.ClientSize.Width - 10,
+                Width = Math.Max(260, _flowCounters.ClientSize.Width - 12),
+                Height = 56,
+                Margin = new Padding(2, 4, 2, 4),
                 MinValue = 0,
                 MaxValue = _maxGroupSize - 1,
                 Value = 0
@@ -533,7 +535,7 @@ public partial class CheckInDeskControl : UserControl
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
         if (string.IsNullOrWhiteSpace(card))
         {
-            _notifyService?.Warning("يرجى إدخال رقم البطاقة أولاً لتسجيل حامل جديد.", "تنبيه");
+            _notifyService?.Warning("يرجى إدخال رقم البطاقة أولاً لتسجيل زبون جديد.", "تنبيه");
             FocusCardNumberBox();
             return;
         }
@@ -734,7 +736,7 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
-                    _notifyService?.Info("تم تسجيل حامل البطاقة بنجاح.", "تم التسجيل");
+                    _notifyService?.Info("تم تسجيل الزبون بنجاح.", "تم التسجيل");
                     await LookupCardAsync();
                 }
                 else

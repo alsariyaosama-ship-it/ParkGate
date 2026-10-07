@@ -227,7 +227,7 @@
     <value>الإدارة</value>
   </data>
   <data name="Menu_Beneficiaries" xml:space="preserve">
-    <value>حاملو البطاقات</value>
+    <value>الزبائن</value>
   </data>
   <data name="Menu_Organizations" xml:space="preserve">
     <value>الجهات والمنظمات</value>
@@ -377,7 +377,7 @@
     <value>منتزه المرح العائلي</value>
   </data>
   <data name="About_Description" xml:space="preserve">
-    <value>نظام إدارة والتحكم في الدخول المجاني لحاملي بطاقات صندوق التضامن الاجتماعي والجهات الراعية.</value>
+    <value>نظام إدارة والتحكم في الدخول المجاني لزبائن صندوق التضامن الاجتماعي والجهات الراعية.</value>
   </data>
   <data name="About_Vendor" xml:space="preserve">
     <value>شركة الركاز المتين لتقنية المعلومات</value>
@@ -434,7 +434,7 @@
     <value>بحث (Enter)</value>
   </data>
   <data name="Title_HolderInfo" xml:space="preserve">
-    <value>بيانات حامل البطاقة</value>
+    <value>بيانات الزبون</value>
   </data>
   <data name="Label_HolderName" xml:space="preserve">
     <value>الاسم الكامل:</value>
@@ -470,7 +470,7 @@
     <value>لا يوجد</value>
   </data>
   <data name="Title_InlineRegistration" xml:space="preserve">
-    <value>تسجيل حامل بطاقة جديد (فوري)</value>
+    <value>تسجيل زبون جديد (فوري)</value>
   </data>
   <data name="Label_RegFullName" xml:space="preserve">
     <value>الاسم الرباعي:</value>
@@ -497,13 +497,13 @@
     <value>إلغاء</value>
   </data>
   <data name="Title_Companions" xml:space="preserve">
-    <value>المرافقون مع حامل البطاقة</value>
+    <value>المرافقون مع الزبون</value>
   </data>
   <data name="Label_TotalPersons" xml:space="preserve">
-    <value>الإجمالي مع حامل البطاقة: {0} فرد</value>
+    <value>الإجمالي مع الزبون: {0} فرد</value>
   </data>
   <data name="Notice_HolderCounted" xml:space="preserve">
-    <value>(حامل البطاقة محتسب تلقائياً +1)</value>
+    <value>(الزبون محتسب تلقائياً +1)</value>
   </data>
   <data name="Btn_RecordEntry" xml:space="preserve">
     <value>تسجيل الدخول (F5)</value>
@@ -512,7 +512,7 @@
     <value>تجاوز المشرف (F9)</value>
   </data>
   <data name="Btn_NewHolder" xml:space="preserve">
-    <value>حامل جديد (F2)</value>
+    <value>زبون جديد (F2)</value>
   </data>
   <data name="Btn_Clear" xml:space="preserve">
     <value>مسح الشاشة (Esc)</value>
@@ -527,7 +527,7 @@
     <value>رقم البطاقة</value>
   </data>
   <data name="Col_HolderName" xml:space="preserve">
-    <value>حامل البطاقة</value>
+    <value>اسم الزبون</value>
   </data>
   <data name="Col_Org" xml:space="preserve">
     <value>الجهة</value>
@@ -563,10 +563,10 @@
     <value>اختيار ومتابعة</value>
   </data>
   <data name="Title_Beneficiaries" xml:space="preserve">
-    <value>إدارة حاملي البطاقات والمستفيدين</value>
+    <value>إدارة الزبائن والمستفيدين</value>
   </data>
   <data name="Header_BeneficiariesSearch" xml:space="preserve">
-    <value>البحث في حاملي البطاقات</value>
+    <value>البحث في الزبائن</value>
   </data>
   <data name="Label_SearchTerm" xml:space="preserve">
     <value>البحث (رقم البطاقة / الاسم / الهاتف / الرقم الوطني):</value>
@@ -605,7 +605,7 @@
     <value>آخر دخول</value>
   </data>
   <data name="Group_Ben_Details" xml:space="preserve">
-    <value>تفاصيل حامل البطاقة</value>
+    <value>تفاصيل الزبون</value>
   </data>
   <data name="Group_Ben_History" xml:space="preserve">
     <value>سجل محاولات وحركات الدخول</value>
@@ -620,7 +620,7 @@
     <value>فتح بشباك الدخول</value>
   </data>
   <data name="Title_EditBeneficiary" xml:space="preserve">
-    <value>تعديل بيانات حامل البطاقة</value>
+    <value>تعديل بيانات الزبون</value>
   </data>
   <data name="Header_EditBeneficiary" xml:space="preserve">
     <value>تعديل بيانات المستفيد المسجل</value>
@@ -773,7 +773,7 @@
     <value>الجهة الافتراضية للنظام</value>
   </data>
   <data name="Msg_ConfirmDeactivateOrg" xml:space="preserve">
-    <value>هل أنت متأكد من تعطيل هذه الجهة؟ لن يتمكن حاملو بطاقاتها من الدخول حتى إعادة تفعيلها.</value>
+    <value>هل أنت متأكد من تعطيل هذه الجهة؟ لن يتمكن زبائن بطاقاتها من الدخول حتى إعادة تفعيلها.</value>
   </data>
   <data name="Msg_ConfirmReactivateOrg" xml:space="preserve">
     <value>هل أنت متأكد من إعادة تفعيل هذه الجهة؟</value>
@@ -962,7 +962,7 @@
     <value>فترة السماح الافتراضية بين الزيارات (بالساعات):</value>
   </data>
   <data name="Label_MaxGroupSize" xml:space="preserve">
-    <value>الحد الأقصى لعدد الأفراد في المجموعة (شامل حامل البطاقة):</value>
+    <value>الحد الأقصى لعدد الأفراد في المجموعة (شامل الزبون):</value>
   </data>
   <data name="Label_DenialDedupMinutes" xml:space="preserve">
     <value>مدة عدم تكرار تسجيل المحاولات المرفوضة المتتالية (بالدقائق):</value>
@@ -1076,7 +1076,7 @@
     <value>إجمالي الأفراد</value>
   </data>
   <data name="Kpi_Holders" xml:space="preserve">
-    <value>حاملو البطاقات</value>
+    <value>الزبائن</value>
   </data>
   <data name="Kpi_Companions" xml:space="preserve">
     <value>المرافقون</value>
@@ -1106,7 +1106,7 @@
     <value>ملغى</value>
   </data>
   <data name="Col_Holders" xml:space="preserve">
-    <value>حاملو البطاقات</value>
+    <value>الزبائن</value>
   </data>
   <data name="Col_Companions" xml:space="preserve">
     <value>المرافقون</value>

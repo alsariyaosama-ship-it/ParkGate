@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Controls;
 
@@ -245,7 +245,7 @@ partial class CheckInDeskControl
         this._grpRegistration.Size = new System.Drawing.Size(500, 254);
         this._grpRegistration.TabIndex = 1;
         this._grpRegistration.TabStop = false;
-        this._grpRegistration.Text = "تسجيل حامل بطاقة جديد (فوري)";
+        this._grpRegistration.Text = "تسجيل زبون جديد (فوري)";
         this._grpRegistration.Visible = false;
         // 
         // _tblRegistration
@@ -435,7 +435,7 @@ partial class CheckInDeskControl
         this._grpHolder.Size = new System.Drawing.Size(500, 254);
         this._grpHolder.TabIndex = 0;
         this._grpHolder.TabStop = false;
-        this._grpHolder.Text = "بيانات حامل البطاقة";
+        this._grpHolder.Text = "بيانات الزبون";
         // 
         // _tblHolder
         // 
@@ -480,7 +480,7 @@ partial class CheckInDeskControl
         this._lblHolderNameTitle.Name = "_lblHolderNameTitle";
         this._lblHolderNameTitle.Size = new System.Drawing.Size(77, 17);
         this._lblHolderNameTitle.TabIndex = 0;
-        this._lblHolderNameTitle.Text = "حامل البطاقة:";
+        this._lblHolderNameTitle.Text = "اسم الزبون:";
         // 
         // _lblHolderName
         // 
@@ -635,7 +635,7 @@ partial class CheckInDeskControl
         this._grpCompanions.Size = new System.Drawing.Size(484, 254);
         this._grpCompanions.TabIndex = 0;
         this._grpCompanions.TabStop = false;
-        this._grpCompanions.Text = "المرافقون مع حامل البطاقة";
+        this._grpCompanions.Text = "المرافقون مع الزبون";
         // 
         // _pnlCompanionsTotal
         // 
@@ -660,7 +660,7 @@ partial class CheckInDeskControl
         this._lblCompanionsNotice.Name = "_lblCompanionsNotice";
         this._lblCompanionsNotice.Size = new System.Drawing.Size(185, 15);
         this._lblCompanionsNotice.TabIndex = 1;
-        this._lblCompanionsNotice.Text = "(حامل البطاقة محتسب تلقائياً +1 فرد)";
+        this._lblCompanionsNotice.Text = "(الزبون محتسب تلقائياً +1 فرد)";
         // 
         // _lblTotalPersons
         // 
@@ -672,7 +672,7 @@ partial class CheckInDeskControl
         this._lblTotalPersons.Name = "_lblTotalPersons";
         this._lblTotalPersons.Size = new System.Drawing.Size(248, 21);
         this._lblTotalPersons.TabIndex = 0;
-        this._lblTotalPersons.Text = "الإجمالي مع حامل البطاقة: 1 فرد";
+        this._lblTotalPersons.Text = "الإجمالي مع الزبون: 1 فرد";
         // 
         // _flowCounters
         // 
@@ -754,7 +754,7 @@ partial class CheckInDeskControl
         this._btnNewHolder.Name = "_btnNewHolder";
         this._btnNewHolder.Size = new System.Drawing.Size(160, 38);
         this._btnNewHolder.TabIndex = 2;
-        this._btnNewHolder.Text = "حامل جديد (F2)";
+        this._btnNewHolder.Text = "زبون جديد (F2)";
         this._btnNewHolder.UseVisualStyleBackColor = false;
         // 
         // _btnClear
@@ -854,7 +854,7 @@ partial class CheckInDeskControl
         // _colName
         // 
         this._colName.FillWeight = 120F;
-        this._colName.HeaderText = "حامل البطاقة";
+        this._colName.HeaderText = "اسم الزبون";
         this._colName.Name = "_colName";
         this._colName.ReadOnly = true;
         // 

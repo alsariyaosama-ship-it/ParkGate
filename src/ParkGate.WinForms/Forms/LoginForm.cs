@@ -47,6 +47,7 @@ public partial class LoginForm : RtlFormBase
 
     private void WireEvents()
     {
+        Shown += (_, _) => txtUsername.Focus();
         btnLogin.Click += async (_, _) => await OnLoginAsync();
         btnExit.Click += (_, _) =>
         {

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Controls;
 
@@ -307,7 +307,7 @@ partial class BeneficiariesControl
         this._grpHolderDetails.Size = new System.Drawing.Size(376, 332);
         this._grpHolderDetails.TabIndex = 0;
         this._grpHolderDetails.TabStop = false;
-        this._grpHolderDetails.Text = "تفاصيل حامل البطاقة";
+        this._grpHolderDetails.Text = "تفاصيل الزبون";
         // 
         // _tblDetails
         // 

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -154,7 +154,7 @@ partial class MainForm
         // 
         this._menuBeneficiaries.Name = "_menuBeneficiaries";
         this._menuBeneficiaries.Size = new System.Drawing.Size(188, 24);
-        this._menuBeneficiaries.Text = "حاملو البطاقات";
+        this._menuBeneficiaries.Text = "الزبائن";
         // 
         // _menuManagementSep1
         // 
@@ -338,7 +338,7 @@ partial class MainForm
         this._lblWelcomeSubtitle.Name = "_lblWelcomeSubtitle";
         this._lblWelcomeSubtitle.Size = new System.Drawing.Size(538, 50);
         this._lblWelcomeSubtitle.TabIndex = 1;
-        this._lblWelcomeSubtitle.Text = "منظومة التحكم في الدخول المجاني لحاملي بطاقات الدعم والرعاية";
+        this._lblWelcomeSubtitle.Text = "منظومة التحكم في الدخول المجاني لزبائن بطاقات الدعم والرعاية";
         this._lblWelcomeSubtitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
         // 
         // _lblWelcomeParkName

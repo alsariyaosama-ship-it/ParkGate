@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
@@ -475,7 +475,7 @@ public partial class ReportsControl : UserControl
         }
 
         _lblDateRangeTotals.Text = string.Format(
-            "الإجمالي العام: {0:N0} زيارة مقبولة | {1:N0} حامل بطاقة | {2:N0} مرافق | {3:N0} إجمالي الأفراد | {4:N0} محاولة مرفوضة | {5:N0} ملغاة",
+            "الإجمالي العام: {0:N0} زيارة مقبولة | {1:N0} زبون | {2:N0} مرافق | {3:N0} إجمالي الأفراد | {4:N0} محاولة مرفوضة | {5:N0} ملغاة",
             report.Totals.TotalVisits,
             report.Totals.TotalHolders,
             report.Totals.TotalCompanions,

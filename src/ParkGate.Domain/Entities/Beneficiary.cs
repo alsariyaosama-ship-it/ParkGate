@@ -5,7 +5,7 @@ using ParkGate.Domain.ValueObjects;
 namespace ParkGate.Domain.Entities;
 
 /// <summary>
-/// Beneficiary (حامل البطاقة) entity with protected invariants and lifecycle methods.
+/// Beneficiary (الزبون / المستفيد) entity with protected invariants and lifecycle methods.
 /// </summary>
 public sealed class Beneficiary : IAuditableEntity
 {

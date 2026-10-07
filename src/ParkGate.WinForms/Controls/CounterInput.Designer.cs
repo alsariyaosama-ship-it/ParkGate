@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Controls;
 
@@ -31,9 +31,9 @@ partial class CounterInput
         // 
         this._layoutPanel.ColumnCount = 4;
         this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 42F));
-        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 42F));
+        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 56F));
+        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 76F));
+        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 56F));
         this._layoutPanel.Controls.Add(this._lblTitle, 0, 0);
         this._layoutPanel.Controls.Add(this._btnDecrement, 1, 0);
         this._layoutPanel.Controls.Add(this._txtValue, 2, 0);
@@ -44,19 +44,19 @@ partial class CounterInput
         this._layoutPanel.Name = "_layoutPanel";
         this._layoutPanel.RowCount = 1;
         this._layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-        this._layoutPanel.Size = new System.Drawing.Size(320, 42);
+        this._layoutPanel.Size = new System.Drawing.Size(340, 54);
         this._layoutPanel.TabIndex = 0;
         // 
         // _lblTitle
         // 
         this._lblTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
         this._lblTitle.AutoEllipsis = true;
-        this._lblTitle.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTitle.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._lblTitle.Location = new System.Drawing.Point(148, 8);
+        this._lblTitle.Location = new System.Drawing.Point(194, 12);
         this._lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
         this._lblTitle.Name = "_lblTitle";
-        this._lblTitle.Size = new System.Drawing.Size(168, 25);
+        this._lblTitle.Size = new System.Drawing.Size(142, 30);
         this._lblTitle.TabIndex = 0;
         this._lblTitle.Text = "الفئة:";
         this._lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -64,16 +64,16 @@ partial class CounterInput
         // _btnDecrement
         // 
         this._btnDecrement.Anchor = System.Windows.Forms.AnchorStyles.None;
-        this._btnDecrement.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnDecrement.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnDecrement.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnDecrement.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
         this._btnDecrement.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnDecrement.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._btnDecrement.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._btnDecrement.Location = new System.Drawing.Point(105, 3);
+        this._btnDecrement.Font = new System.Drawing.Font("Cairo", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnDecrement.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnDecrement.Location = new System.Drawing.Point(135, 3);
         this._btnDecrement.Margin = new System.Windows.Forms.Padding(0);
         this._btnDecrement.Name = "_btnDecrement";
-        this._btnDecrement.Size = new System.Drawing.Size(36, 36);
+        this._btnDecrement.Size = new System.Drawing.Size(50, 48);
         this._btnDecrement.TabIndex = 1;
         this._btnDecrement.Text = "−";
         this._btnDecrement.UseVisualStyleBackColor = false;
@@ -81,12 +81,13 @@ partial class CounterInput
         // _txtValue
         // 
         this._txtValue.Anchor = System.Windows.Forms.AnchorStyles.None;
-        this._txtValue.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._txtValue.Location = new System.Drawing.Point(46, 6);
+        this._txtValue.Font = new System.Drawing.Font("Cairo", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._txtValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
+        this._txtValue.Location = new System.Drawing.Point(59, 5);
         this._txtValue.Margin = new System.Windows.Forms.Padding(0);
         this._txtValue.MaxLength = 3;
         this._txtValue.Name = "_txtValue";
-        this._txtValue.Size = new System.Drawing.Size(52, 29);
+        this._txtValue.Size = new System.Drawing.Size(70, 44);
         this._txtValue.TabIndex = 2;
         this._txtValue.Text = "0";
         this._txtValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -94,16 +95,16 @@ partial class CounterInput
         // _btnIncrement
         // 
         this._btnIncrement.Anchor = System.Windows.Forms.AnchorStyles.None;
-        this._btnIncrement.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnIncrement.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(247)))), ((int)(((byte)(242)))));
         this._btnIncrement.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnIncrement.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnIncrement.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(167)))), ((int)(((byte)(219)))), ((int)(((byte)(185)))));
         this._btnIncrement.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnIncrement.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._btnIncrement.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._btnIncrement.Font = new System.Drawing.Font("Cairo", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnIncrement.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._btnIncrement.Location = new System.Drawing.Point(3, 3);
         this._btnIncrement.Margin = new System.Windows.Forms.Padding(0);
         this._btnIncrement.Name = "_btnIncrement";
-        this._btnIncrement.Size = new System.Drawing.Size(36, 36);
+        this._btnIncrement.Size = new System.Drawing.Size(50, 48);
         this._btnIncrement.TabIndex = 3;
         this._btnIncrement.Text = "+";
         this._btnIncrement.UseVisualStyleBackColor = false;
@@ -114,10 +115,10 @@ partial class CounterInput
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.Controls.Add(this._layoutPanel);
         this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this.MinimumSize = new System.Drawing.Size(200, 42);
+        this.MinimumSize = new System.Drawing.Size(220, 54);
         this.Name = "CounterInput";
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this.Size = new System.Drawing.Size(320, 42);
+        this.Size = new System.Drawing.Size(340, 54);
         this.Leave += new System.EventHandler(this.OnControlLeave);
         this._layoutPanel.ResumeLayout(false);
         this._layoutPanel.PerformLayout();

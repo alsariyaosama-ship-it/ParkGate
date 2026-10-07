@@ -10,33 +10,25 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-07 |
-| Last session | S10 — Phase 8 Hardening and Deployment (T8.1..T8.5) |
-| Current phase | Phase 8 — Hardening and deployment (Complete) |
-| Working branch | `phase/08-deployment` |
+| Last session | S11 — UI Polish & Terminology (Touch Counters, Customer Terminology, LoginForm Redesign) |
+| Current phase | Post-Release Polish |
+| Working branch | `main` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
 | Unit tests | 343 passed (151 domain + 86 application + 106 architecture/ui) |
 | Integration tests | 55 passed on LocalDB (including 1M performance benchmark) |
 | Total tests | 398 passed |
-| Last commit | `test(performance): verify lookup latency under large dataset [T8.5]` |
+| Last commit | `feat(ui): enlarge touch counter controls, rename holder to customer, and redesign login form` |
 
 ## State of the work
 
 **Done**
-- Merged Phase 7 PR #8 into `main`, branched `phase/08-deployment`.
-- T8.1: Created `docs/DEPLOYMENT.md` — comprehensive production deployment guide covering SQL Server Express 2022 setup, TCP/IP, Windows Firewall rules, separate least-privilege SQL logins (`ParkGateAppUser` vs `ParkGateDeployUser`), `efbundle.exe` execution, client installation, DPAPI-encrypted `connection.dat`, and first-run wizard.
-- T8.2: Database backup:
-  - Implemented `scripts/backup.ps1` for automated daily scheduled backups with compression, checksum, and 14-day retention pruning.
-  - Implemented `IDatabaseBackupService` port and `DatabaseBackupService` in Infrastructure executing T-SQL `BACKUP DATABASE`.
-  - Added "نسخ احتياطي لقاعدة البيانات..." to `MainForm` under `_menuManagement` (restricted to `Permission.TriggerBackup` / Admin), with full Arabic prompts and feedback.
-- T8.3: Publish profile & installer:
-  - Created `win-x64.pubxml` publish profile for `ParkGate.WinForms` (Release, win-x64, ReadyToRun).
-  - Created `scripts/installer.iss` Inno Setup script with Arabic messages, desktop/start menu shortcuts, and `%ProgramData%\ParkGate\logs` permissions.
-  - Created `scripts/build-installer.ps1` automated packaging script.
-- T8.4: Created `docs/USER_GUIDE_AR.md` — comprehensive Arabic user guide covering all operations for operators, supervisors, and administrators.
-- T8.5: Performance check:
-  - Implemented `PerformanceBenchmarkTests` generating 100,000 holders and 1,000,000 entry attempts on LocalDB.
-  - Verified card lookup and eligibility evaluation complete in `< 1.0 s` (well under 100 ms with indexed seeks).
-- Full test suite: 398 tests passing (151 domain + 86 application + 106 architecture/ui + 55 infrastructure), zero compiler warnings.
+- Upgraded `CounterInput` for touch screens: enlarged `+` / `−` buttons to 50x48px (18pt Bold), enlarged value textbox to 70x44px (15pt Bold), and increased row height to 54-56px for comfortable touch input.
+- System-wide terminology replacement: converted "حامل جديد / حامل البطاقة / حاملو البطاقات" to "زبون جديد / الزبون / الزبائن" across `Strings.resx`, `CheckInDeskControl`, `MainForm`, `SettingsForm`, `BeneficiariesControl`, `EditBeneficiaryDialog`, `ReportsControl`, and `ClosedXmlExcelExportService`.
+- Completely redesigned `LoginForm`:
+  - Fixed small textboxes and reversed Left-To-Right input by setting `RightToLeft = Yes` with Cairo 12pt font.
+  - Built an elegant brand emerald green header with ParkGate title, Arabic subtitle, and workstation badge chip.
+  - Designed an elevated card body with Cairo typography, prominent 48px touch-friendly Login button, clean secondary Cancel button, and auto-focus on username field.
+- Full test suite: 382 non-integration tests passed, 0 errors, 0 warnings.
 
 **In progress**
 - Phase 8 complete. Ready to merge into `main` and tag `v1.0.0`.
@@ -68,6 +60,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S11 — 2026-10-07 — UI Polish & Terminology
+- Tasks: Enlarge touch counter controls, system-wide terminology replacement ("حامل" -> "زبون"), and LoginForm redesign.
+- Commits: `feat(ui): enlarge touch counter controls, rename holder to customer, and redesign login form`.
+- Decisions: Sized `CounterInput` buttons to 50x48px (18pt Bold) and textbox to 70x44px (15pt Bold) for touch screen ergonomics; standardized all user-facing terminology to "زبون جديد" and "الزبائن" across `Strings.resx`, controls, forms, reports, and Excel exports; redesigned `LoginForm` with brand emerald header, workstation chip, elevated card layout, spacious 12pt Cairo inputs with correct `RightToLeft = Yes`, and touch-friendly 48px Login button.
+- Test count: 382 non-integration unit/architecture tests passed (100% green, 0 warnings).
 
 ### S10 — 2026-10-07 — Phase 8 Hardening & Deployment (T8.1..T8.5)
 - Tasks: T8.1, T8.2, T8.3, T8.4, T8.5 completed on `phase/08-deployment` (Phase 8 complete).
@@ -126,9 +124,3 @@
 - Commits: see branch `phase/00-foundation`, merged into `main` via PR #1.
 - Decisions: Architecture tests implemented via reflection covering assembly references and type constraints; `Strings.Designer.cs` set to `#nullable enable` for zero-warning build.
 - GitHub Actions CI verified green on Windows runner.
-
-### S00 — 2026-10-04 — Planning
-- Created SPEC, DATABASE, ROADMAP, DECISIONS, AGENTS, CLAUDE, README, CI workflow, PR template, `.gitignore`, `.gitattributes`, `.editorconfig`, `Directory.Build.props`.
-- Decisions: ADR-001 … ADR-016 — **approved by the user**.
-- User answers: Q2 holder counted separately · Q3 rolling window in hours · Q8 no financial claims, per-organization statistics important · Q11 gate deferred.
-- No code yet.

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace ParkGate.WinForms.Forms;
 
@@ -211,7 +211,7 @@ partial class SettingsForm
         this._lblCooldownHours.Name = "_lblCooldownHours";
         this._lblCooldownHours.Size = new System.Drawing.Size(346, 19);
         this._lblCooldownHours.TabIndex = 0;
-        this._lblCooldownHours.Text = "فترة السماح الافتراضية بين الزيارات لحامل البطاقة (بالساعات):";
+        this._lblCooldownHours.Text = "فترة السماح الافتراضية بين الزيارات للزبون (بالساعات):";
         // 
         // _numCooldownHours
         // 
@@ -232,7 +232,7 @@ partial class SettingsForm
         this._lblMaxGroupSize.Name = "_lblMaxGroupSize";
         this._lblMaxGroupSize.Size = new System.Drawing.Size(342, 19);
         this._lblMaxGroupSize.TabIndex = 2;
-        this._lblMaxGroupSize.Text = "الحد الأقصى لعدد الأفراد في المجموعة (شامل حامل البطاقة):";
+        this._lblMaxGroupSize.Text = "الحد الأقصى لعدد الأفراد في المجموعة (شامل الزبون):";
         // 
         // _numMaxGroupSize
         // 

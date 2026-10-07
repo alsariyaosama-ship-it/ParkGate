@@ -57,7 +57,7 @@ public sealed class ClosedXmlExcelExportService : IExcelExportService
         AddKpiRow(ws, ref row, "إجمالي الزيارات المقبولة", report.TotalVisits, true);
         AddKpiRow(ws, ref row, "المحاولات المرفوضة", report.DeniedEntries);
         AddKpiRow(ws, ref row, "الزيارات الملغاة", report.VoidedEntries);
-        AddKpiRow(ws, ref row, "إجمالي حاملي البطاقات", report.TotalHolders);
+        AddKpiRow(ws, ref row, "إجمالي الزبائن", report.TotalHolders);
         AddKpiRow(ws, ref row, "إجمالي المرافقين", report.TotalCompanions);
         AddKpiRow(ws, ref row, "إجمالي الأفراد (الزوار الفعليين)", report.TotalPersons, true);
 
@@ -147,7 +147,7 @@ public sealed class ClosedXmlExcelExportService : IExcelExportService
         var headers = new List<string>
         {
             "تاريخ العمل", "اليوم", "المحاولات", "مقبول", "استثناء", "إجمالي الزيارات",
-            "مرفوض", "ملغى", "حاملو البطاقات", "المرافقون"
+            "مرفوض", "ملغى", "الزبائن", "المرافقون"
         };
         foreach (var cat in categories)
         {
@@ -236,7 +236,7 @@ public sealed class ClosedXmlExcelExportService : IExcelExportService
 
         var headers = new List<string>
         {
-            "الجهة", "الكود", "عدد الزيارات", "المستفيدون الفريدون", "حاملو البطاقات", "المرافقون"
+            "الجهة", "الكود", "عدد الزيارات", "المستفيدون الفريدون", "الزبائن", "المرافقون"
         };
         foreach (var cat in categories)
         {
