@@ -194,9 +194,6 @@ public partial class BeneficiariesControl : UserControl
         {
             _logger?.LogWarning(ex, "Failed to load time zone in BeneficiariesControl.");
         }
-
-        await PerformSearchAsync();
-        _txtSearch.Focus();
     }
 
     public async Task EnsureLoadedAsync()
