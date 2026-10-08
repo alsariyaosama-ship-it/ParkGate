@@ -51,6 +51,10 @@ public static class DependencyInjection
         services.AddTransient<ParkGate.Application.Ports.Reports.IReportQueries, ParkGate.Infrastructure.Reports.ReportQueries>();
         services.AddTransient<ParkGate.Application.Ports.Reports.IExcelExportService, ParkGate.Infrastructure.Reports.ClosedXmlExcelExportService>();
 
+        services.AddTransient<ParkGate.Application.EntryCards.IEntryCardRepository, ParkGate.Infrastructure.EntryCards.EntryCardRepository>();
+        services.AddTransient<ParkGate.Application.EntryCards.IQrKeyRepository, ParkGate.Infrastructure.EntryCards.QrKeyRepository>();
+        services.AddTransient<ParkGate.Application.EntryCards.ICardScanLog, ParkGate.Infrastructure.EntryCards.CardScanLogRepository>();
+
         return services;
     }
 
