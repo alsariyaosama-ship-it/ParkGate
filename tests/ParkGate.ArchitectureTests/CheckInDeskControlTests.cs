@@ -428,6 +428,7 @@ public sealed class CheckInDeskControlTests
         lblName.Text.ShouldBe("محمد أحمد علي");
         banner.State.ShouldBe(BannerState.Granted);
         btnRecord.Enabled.ShouldBeTrue();
+        txtCard.SelectionLength.ShouldBe(txtCard.Text.Length);
     }
 
     [Fact]
@@ -529,6 +530,99 @@ public sealed class CheckInDeskControlTests
 
         handled.ShouldBe(true);
         txtCard.Text.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_LookupCardAsync_WhenPreviousHolderDisplayed_ClearsPreviousHolderDataBeforeLookup()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(),
+            OrganizationId: 1,
+            OrganizationName: "صندوق التضامن",
+            CardNumber: "100200",
+            FullName: "محمد أحمد علي",
+            Phone: "0912345678",
+            NationalId: "119900123456",
+            CardExpiryDate: new DateOnly(2028, 1, 1),
+            Status: BeneficiaryStatus.Active,
+            StatusReason: null,
+            LastGrantedEntryUtc: null,
+            Notes: null,
+            CreatedAtUtc: DateTime.UtcNow);
+
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true,
+            Result: EntryResult.Allowed,
+            DenialReason: null,
+            DenialReasonText: string.Empty,
+            CanBeOverridden: false,
+            EffectiveCooldownMinutes: 720,
+            LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null,
+            RemainingCooldownMinutes: null);
+
+        var fakeBeneficiaryService = new FakeBeneficiaryService();
+        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+
+        control.ShowHolderInfo(holder, eligibility);
+        var lblName = GetField<Label>(control, "_lblHolderName");
+        var btnRecord = GetField<Button>(control, "_btnRecordEntry");
+        lblName.Text.ShouldBe("محمد أحمد علي");
+        btnRecord.Enabled.ShouldBeTrue();
+
+        var txtCard = GetField<TextBox>(control, "_txtCardNumber");
+        txtCard.Text = "998877";
+
+        await control.LookupCardAsync();
+
+        lblName.Text.ShouldBe("-");
+        btnRecord.Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void CheckInDeskControl_TextChanged_WhenCardNumberDiffersFromActiveHolder_ClearsPreviousHolderDataImmediately()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(),
+            OrganizationId: 1,
+            OrganizationName: "صندوق التضامن",
+            CardNumber: "100200",
+            FullName: "محمد أحمد علي",
+            Phone: "0912345678",
+            NationalId: "119900123456",
+            CardExpiryDate: new DateOnly(2028, 1, 1),
+            Status: BeneficiaryStatus.Active,
+            StatusReason: null,
+            LastGrantedEntryUtc: null,
+            Notes: null,
+            CreatedAtUtc: DateTime.UtcNow);
+
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true,
+            Result: EntryResult.Allowed,
+            DenialReason: null,
+            DenialReasonText: string.Empty,
+            CanBeOverridden: false,
+            EffectiveCooldownMinutes: 720,
+            LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null,
+            RemainingCooldownMinutes: null);
+
+        using var control = new CheckInDeskControl();
+        control.ShowHolderInfo(holder, eligibility);
+
+        var lblName = GetField<Label>(control, "_lblHolderName");
+        var btnRecord = GetField<Button>(control, "_btnRecordEntry");
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        lblName.Text.ShouldBe("محمد أحمد علي");
+        btnRecord.Enabled.ShouldBeTrue();
+
+        var txtCard = GetField<TextBox>(control, "_txtCardNumber");
+        txtCard.Text = "999999";
+
+        lblName.Text.ShouldBe("-");
+        btnRecord.Enabled.ShouldBeFalse();
+        banner.State.ShouldBe(BannerState.Neutral);
     }
 
     private sealed class FakeCurrentUser : ParkGate.Application.Security.ICurrentUser

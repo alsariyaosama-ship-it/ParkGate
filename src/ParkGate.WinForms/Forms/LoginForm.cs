@@ -137,4 +137,9 @@ public partial class LoginForm : RtlFormBase
         txtUsername.Enabled = !busy;
         txtPassword.Enabled = !busy;
     }
+
+    private void btnLogin_Click(object sender, EventArgs e)
+    {
+
+    }
 }

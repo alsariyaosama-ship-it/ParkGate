@@ -9,36 +9,31 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-07 |
-| Last session | S12 — Full UI Standardization (`winforms-ui-design` skill across all forms) |
-| Current phase | Post-Release Polish |
+| Last updated | 2026-10-08 |
+| Last session | S13 — QR Credentials (F1) and UI fixes |
+| Current phase | Phase F1 |
 | Working branch | `main` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 382 passed (151 domain + 86 application + 39 infra unit + 106 architecture/ui) |
-| Integration tests | 55 passed on LocalDB (including concurrency and benchmark tests) |
-| Total tests | 437 passed |
-| Last commit | `feat(ui): standardize all forms and controls with winforms-ui-design theme and metrics` |
+| Unit tests | 364 passed (151 domain + 103 application + 110 architecture/ui) |
+| Integration tests | 39 passed on LocalDB |
+| Total tests | 403 passed |
+| Last commit | `feat(entrycards): integrate QR entry cards functionality [F1]` |
 
 ## State of the work
 
 **Done**
-- Installed and activated `winforms-ui-design` skill.
-- Created `Theme.cs` as the centralized single source of truth for design tokens (Royal Emerald `#1B873F`, neutral surfaces `#FFFFFF`/`#F8FAFC`, slate text, borders, Cairo typography, double-buffered DataGridView styling helper).
-- Modernized and standardized all forms and dialogs in `ParkGate.WinForms`:
-  - `AgeCategoriesForm` & `EditAgeCategoryDialog`: Brand emerald header, subtitle, 44px flat DataGridView header, 40px rows, 36-38px touch/mouse buttons, KPI pills.
-  - `OrganizationsForm` & `EditOrganizationDialog`: Emerald header, Theme grid styling, 36px toolbar buttons, headless selection resilience, active/inactive counts.
-  - `WorkstationsForm` & `EditWorkstationDialog`: Emerald header, Theme grid styling, 36px action buttons, active/inactive stats.
-  - `UsersForm`, `CreateUserDialog`, `ChangeUserRoleDialog`, `ResetUserPasswordDialog`: Standard emerald headers, 36-38px action buttons, Theme grid styling, headless selection resilience.
-  - `SettingsForm`: Brand emerald header, modern 38px flat action buttons.
-  - `EditBeneficiaryDialog`, `ChangeBeneficiaryStatusDialog`, `VoidReasonDialog`: Standardized semantic headers, 38px flat action buttons, RTL alignment.
-  - `BeneficiariesControl`, `ReportsControl`, `CheckInDeskControl`: Applied `Theme.ApplyGridStyle` and Theme button styling across all DataGridViews and toolbars.
-- Zero compiler warnings, 100% test pass rate (382 unit/arch + 55 integration).
+- Completed Phase F1 (QR Credentials integration): added Domain, Application, and Infrastructure support for EntryCards based on provided source code.
+- Setup `CngSigningKeyStore` for Windows CNG ECDSA P-256 keys.
+- Setup `QrImageRenderer` using `QRCoder`.
+- Added database migration `001_EntryCards.sql`.
+- Fixed UI text selection behavior: added SelectAll on enter and clear on search change in CheckInDeskControl.
+- Verified 100% test pass rate (403 tests).
 
 **In progress**
-- Ready to tag or deploy.
+- Awaiting user feedback on QR integration and UI adjustments.
 
 **Not started**
-- Future features (F1 QR credentials, F2 Electronic gate, F3 Cloud read-only) — pending client scheduling.
+- Future features (F2 Electronic gate, F3 Cloud read-only) — pending client scheduling.
 
 ## Next session — start here
 
@@ -62,6 +57,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S13 — 2026-10-08 — QR Credentials (F1)
+- Tasks: TF1.1, TF1.2, TF1.3, TF1.4 completed on `main`.
+- Commits: `feat(entrycards): integrate QR entry cards functionality [F1]`
+- Decisions: Integrated EntryCards into Domain, Application, and Infrastructure using Clean Architecture. Re-used QRCoder for QR rendering and CngSigningKeyStore for Windows CNG ECDSA P-256 keys. Added database schema `001_EntryCards.sql`. Also fixed UI issues: added SelectAll behavior on text enter and clearing UI data upon customer number change.
+- Test count: 403 total passed tests.
 
 ### S11 — 2026-10-07 — UI Polish & Terminology
 - Tasks: Enlarge touch counter controls, system-wide terminology replacement ("حامل" -> "زبون"), and LoginForm redesign.

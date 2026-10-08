@@ -265,4 +265,19 @@ public sealed class BeneficiaryServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.Count.ShouldBe(2);
     }
+
+    [Fact]
+    public async Task SearchAsync_WhenSearchTermIsEmpty_ShouldReturnAllHolders()
+    {
+        var card = CardNumber.Create("CARD-XYZ");
+        var phone = PhoneNumber.Create("0912345678");
+        var holder1 = new Beneficiary(Guid.NewGuid(), _org.Id, card, "Mohamed Salem", phone);
+        var holder2 = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-ABC"), "Ibrahim Salem", phone);
+        _beneficiaries.AddRange([holder1, holder2]);
+
+        var result = await _sut.SearchAsync(string.Empty);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Count.ShouldBe(2);
+    }
 }

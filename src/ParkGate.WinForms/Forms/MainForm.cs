@@ -276,6 +276,7 @@ public partial class MainForm : RtlFormBase
         }
         else
         {
+            _ = _beneficiariesControl.EnsureLoadedAsync();
             _beneficiariesControl.FocusSearchBox();
         }
     }

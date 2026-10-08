@@ -61,8 +61,8 @@ public partial class StatusBanner : UserControl
         {
             _lblDetails.Text = details;
             _lblDetails.Visible = true;
-            _layoutPanel.RowStyles[0].Height = 65F;
-            _layoutPanel.RowStyles[1].Height = 35F;
+            _layoutPanel.RowStyles[0].Height = 58F;
+            _layoutPanel.RowStyles[1].Height = 42F;
         }
 
         BackColor = GetStateColor(state);

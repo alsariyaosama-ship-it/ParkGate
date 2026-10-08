@@ -311,14 +311,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
         int maxResults = 50,
         CancellationToken cancellationToken = default)
     {
-        if (!_currentUser.Has(Permission.CheckIn))
+        if (!_currentUser.HasAny(Permission.CheckIn, Permission.EditBeneficiary, Permission.ChangeBeneficiaryStatus))
         {
             return Errors.General.Forbidden;
-        }
-
-        if (string.IsNullOrWhiteSpace(searchTerm))
-        {
-            return Array.Empty<BeneficiaryDto>();
         }
 
         await using var uow = _uowFactory.Create();
@@ -383,7 +378,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
                 IsEligible: false,
                 Result: EntryResult.Denied,
                 DenialReason: DenialReason.OrganizationInactive,
-                DenialReasonText: "OrganizationInactive",
+                DenialReasonText: GetDenialReasonArabic(DenialReason.OrganizationInactive),
                 CanBeOverridden: false,
                 EffectiveCooldownMinutes: defaultCooldownMinutes,
                 LastGrantedEntryUtc: beneficiary.LastGrantedEntryUtc,
@@ -404,13 +399,23 @@ public sealed class BeneficiaryService : IBeneficiaryService
             IsEligible: decision.IsEligible,
             Result: decision.IsEligible ? EntryResult.Allowed : EntryResult.Denied,
             DenialReason: decision.DenialReason,
-            DenialReasonText: decision.DenialReason?.ToString() ?? string.Empty,
+            DenialReasonText: GetDenialReasonArabic(decision.DenialReason),
             CanBeOverridden: decision.CanBeOverridden,
             EffectiveCooldownMinutes: decision.EffectiveCooldownMinutes,
             LastGrantedEntryUtc: beneficiary.LastGrantedEntryUtc,
             NextAllowedEntryUtc: decision.NextEligibleAtUtc,
             RemainingCooldownMinutes: remainingMinutes);
     }
+
+    private static string GetDenialReasonArabic(DenialReason? reason) => reason switch
+    {
+        DenialReason.CooldownActive => "فترة التهدئة نشطة (سبق الدخول)",
+        DenialReason.CardExpired => "صلاحية البطاقة منتهية",
+        DenialReason.HolderSuspended => "حساب الزبون موقوف مؤقتاً",
+        DenialReason.HolderBlocked => "حساب الزبون محظور",
+        DenialReason.OrganizationInactive => "الجهة الراعية غير نشطة",
+        _ => string.Empty
+    };
 
     private static async Task<(int DefaultCooldownMinutes, string TimeZoneId)> GetSettingsAsync(
         IUnitOfWork uow,

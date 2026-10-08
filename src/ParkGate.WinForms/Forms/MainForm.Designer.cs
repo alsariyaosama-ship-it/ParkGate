@@ -25,366 +25,343 @@ partial class MainForm
 
     private void InitializeComponent()
     {
-        this.components = new System.ComponentModel.Container();
-        this._mainMenuStrip = new System.Windows.Forms.MenuStrip();
-        this._menuFile = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuChangePassword = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuLogout = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuFileSep = new System.Windows.Forms.ToolStripSeparator();
-        this._menuExit = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuOperations = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuCheckIn = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuManagement = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuBeneficiaries = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuManagementSep1 = new System.Windows.Forms.ToolStripSeparator();
-        this._menuOrganizations = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuAgeCategories = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuUsers = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuWorkstations = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuManagementSep2 = new System.Windows.Forms.ToolStripSeparator();
-        this._menuSettings = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuBackupNow = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuReports = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuDailyReport = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuOrgStatistics = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuHelp = new System.Windows.Forms.ToolStripMenuItem();
-        this._menuAbout = new System.Windows.Forms.ToolStripMenuItem();
-        this._statusStrip = new System.Windows.Forms.StatusStrip();
-        this._statusUser = new System.Windows.Forms.ToolStripStatusLabel();
-        this._statusWorkstation = new System.Windows.Forms.ToolStripStatusLabel();
-        this._statusServerTime = new System.Windows.Forms.ToolStripStatusLabel();
-        this._statusConnection = new System.Windows.Forms.ToolStripStatusLabel();
-        this._mainContainer = new System.Windows.Forms.Panel();
-        this._welcomeCard = new System.Windows.Forms.Panel();
-        this._lblQuickInfo = new System.Windows.Forms.Label();
-        this._lblWelcomeSubtitle = new System.Windows.Forms.Label();
-        this._lblWelcomeParkName = new System.Windows.Forms.Label();
-        this._clockTimer = new System.Windows.Forms.Timer(this.components);
-        this._syncTimer = new System.Windows.Forms.Timer(this.components);
-        this._mainMenuStrip.SuspendLayout();
-        this._statusStrip.SuspendLayout();
-        this._mainContainer.SuspendLayout();
-        this._welcomeCard.SuspendLayout();
-        this.SuspendLayout();
+        components = new System.ComponentModel.Container();
+        _mainMenuStrip = new MenuStrip();
+        _menuFile = new ToolStripMenuItem();
+        _menuChangePassword = new ToolStripMenuItem();
+        _menuLogout = new ToolStripMenuItem();
+        _menuFileSep = new ToolStripSeparator();
+        _menuExit = new ToolStripMenuItem();
+        _menuOperations = new ToolStripMenuItem();
+        _menuCheckIn = new ToolStripMenuItem();
+        _menuManagement = new ToolStripMenuItem();
+        _menuBeneficiaries = new ToolStripMenuItem();
+        _menuManagementSep1 = new ToolStripSeparator();
+        _menuOrganizations = new ToolStripMenuItem();
+        _menuAgeCategories = new ToolStripMenuItem();
+        _menuUsers = new ToolStripMenuItem();
+        _menuWorkstations = new ToolStripMenuItem();
+        _menuManagementSep2 = new ToolStripSeparator();
+        _menuSettings = new ToolStripMenuItem();
+        _menuBackupNow = new ToolStripMenuItem();
+        _menuReports = new ToolStripMenuItem();
+        _menuDailyReport = new ToolStripMenuItem();
+        _menuOrgStatistics = new ToolStripMenuItem();
+        _menuHelp = new ToolStripMenuItem();
+        _menuAbout = new ToolStripMenuItem();
+        _statusStrip = new StatusStrip();
+        _statusUser = new ToolStripStatusLabel();
+        _statusWorkstation = new ToolStripStatusLabel();
+        _statusServerTime = new ToolStripStatusLabel();
+        _statusConnection = new ToolStripStatusLabel();
+        _mainContainer = new Panel();
+        _welcomeCard = new Panel();
+        _lblQuickInfo = new Label();
+        _lblWelcomeSubtitle = new Label();
+        _lblWelcomeParkName = new Label();
+        _clockTimer = new System.Windows.Forms.Timer(components);
+        _syncTimer = new System.Windows.Forms.Timer(components);
+        _mainMenuStrip.SuspendLayout();
+        _statusStrip.SuspendLayout();
+        _mainContainer.SuspendLayout();
+        _welcomeCard.SuspendLayout();
+        SuspendLayout();
         // 
         // _mainMenuStrip
         // 
-        this._mainMenuStrip.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._menuFile,
-            this._menuOperations,
-            this._menuManagement,
-            this._menuReports,
-            this._menuHelp});
-        this._mainMenuStrip.Location = new System.Drawing.Point(0, 0);
-        this._mainMenuStrip.Name = "_mainMenuStrip";
-        this._mainMenuStrip.Padding = new System.Windows.Forms.Padding(6, 4, 0, 4);
-        this._mainMenuStrip.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this._mainMenuStrip.Size = new System.Drawing.Size(1008, 31);
-        this._mainMenuStrip.TabIndex = 0;
-        this._mainMenuStrip.Text = "menuStrip1";
+        _mainMenuStrip.Font = new Font("Cairo", 10F);
+        _mainMenuStrip.ImageScalingSize = new Size(20, 20);
+        _mainMenuStrip.Items.AddRange(new ToolStripItem[] { _menuFile, _menuOperations, _menuManagement, _menuReports, _menuHelp });
+        _mainMenuStrip.Location = new Point(0, 0);
+        _mainMenuStrip.Name = "_mainMenuStrip";
+        _mainMenuStrip.Padding = new Padding(8, 6, 0, 6);
+        _mainMenuStrip.RightToLeft = RightToLeft.Yes;
+        _mainMenuStrip.Size = new Size(1350, 48);
+        _mainMenuStrip.TabIndex = 0;
+        _mainMenuStrip.Text = "menuStrip1";
         // 
         // _menuFile
         // 
-        this._menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._menuChangePassword,
-            this._menuLogout,
-            this._menuFileSep,
-            this._menuExit});
-        this._menuFile.Name = "_menuFile";
-        this._menuFile.Size = new System.Drawing.Size(46, 23);
-        this._menuFile.Text = "ملف";
+        _menuFile.DropDownItems.AddRange(new ToolStripItem[] { _menuChangePassword, _menuLogout, _menuFileSep, _menuExit });
+        _menuFile.Name = "_menuFile";
+        _menuFile.Size = new Size(62, 36);
+        _menuFile.Text = "ملف";
         // 
         // _menuChangePassword
         // 
-        this._menuChangePassword.Name = "_menuChangePassword";
-        this._menuChangePassword.Size = new System.Drawing.Size(200, 24);
-        this._menuChangePassword.Text = "تغيير كلمة المرور...";
+        _menuChangePassword.Name = "_menuChangePassword";
+        _menuChangePassword.Size = new Size(229, 36);
+        _menuChangePassword.Text = "تغيير كلمة المرور...";
         // 
         // _menuLogout
         // 
-        this._menuLogout.Name = "_menuLogout";
-        this._menuLogout.Size = new System.Drawing.Size(200, 24);
-        this._menuLogout.Text = "تسجيل الخروج";
+        _menuLogout.Name = "_menuLogout";
+        _menuLogout.Size = new Size(229, 36);
+        _menuLogout.Text = "تسجيل الخروج";
         // 
         // _menuFileSep
         // 
-        this._menuFileSep.Name = "_menuFileSep";
-        this._menuFileSep.Size = new System.Drawing.Size(197, 6);
+        _menuFileSep.Name = "_menuFileSep";
+        _menuFileSep.Size = new Size(226, 6);
         // 
         // _menuExit
         // 
-        this._menuExit.Name = "_menuExit";
-        this._menuExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-        this._menuExit.Size = new System.Drawing.Size(200, 24);
-        this._menuExit.Text = "خروج";
+        _menuExit.Name = "_menuExit";
+        _menuExit.ShortcutKeys = Keys.Alt | Keys.F4;
+        _menuExit.Size = new Size(229, 36);
+        _menuExit.Text = "خروج";
         // 
         // _menuOperations
         // 
-        this._menuOperations.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._menuCheckIn});
-        this._menuOperations.Name = "_menuOperations";
-        this._menuOperations.Size = new System.Drawing.Size(69, 23);
-        this._menuOperations.Text = "العمليات";
+        _menuOperations.DropDownItems.AddRange(new ToolStripItem[] { _menuCheckIn });
+        _menuOperations.Name = "_menuOperations";
+        _menuOperations.Size = new Size(88, 36);
+        _menuOperations.Text = "العمليات";
         // 
         // _menuCheckIn
         // 
-        this._menuCheckIn.Name = "_menuCheckIn";
-        this._menuCheckIn.ShortcutKeys = System.Windows.Forms.Keys.F1;
-        this._menuCheckIn.Size = new System.Drawing.Size(193, 24);
-        this._menuCheckIn.Text = "شباك الدخول";
+        _menuCheckIn.Name = "_menuCheckIn";
+        _menuCheckIn.ShortcutKeys = Keys.F1;
+        _menuCheckIn.Size = new Size(225, 36);
+        _menuCheckIn.Text = "شباك الدخول";
         // 
         // _menuManagement
         // 
-        this._menuManagement.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._menuBeneficiaries,
-            this._menuManagementSep1,
-            this._menuOrganizations,
-            this._menuAgeCategories,
-            this._menuUsers,
-            this._menuWorkstations,
-            this._menuManagementSep2,
-            this._menuSettings,
-            this._menuBackupNow});
-        this._menuManagement.Name = "_menuManagement";
-        this._menuManagement.Size = new System.Drawing.Size(57, 23);
-        this._menuManagement.Text = "الإدارة";
+        _menuManagement.DropDownItems.AddRange(new ToolStripItem[] { _menuBeneficiaries, _menuManagementSep1, _menuOrganizations, _menuAgeCategories, _menuUsers, _menuWorkstations, _menuManagementSep2, _menuSettings, _menuBackupNow });
+        _menuManagement.Name = "_menuManagement";
+        _menuManagement.Size = new Size(71, 36);
+        _menuManagement.Text = "الإدارة";
         // 
         // _menuBeneficiaries
         // 
-        this._menuBeneficiaries.Name = "_menuBeneficiaries";
-        this._menuBeneficiaries.Size = new System.Drawing.Size(188, 24);
-        this._menuBeneficiaries.Text = "الزبائن";
+        _menuBeneficiaries.Name = "_menuBeneficiaries";
+        _menuBeneficiaries.Size = new Size(312, 36);
+        _menuBeneficiaries.Text = "الزبائن";
         // 
         // _menuManagementSep1
         // 
-        this._menuManagementSep1.Name = "_menuManagementSep1";
-        this._menuManagementSep1.Size = new System.Drawing.Size(185, 6);
+        _menuManagementSep1.Name = "_menuManagementSep1";
+        _menuManagementSep1.Size = new Size(309, 6);
         // 
         // _menuOrganizations
         // 
-        this._menuOrganizations.Name = "_menuOrganizations";
-        this._menuOrganizations.Size = new System.Drawing.Size(188, 24);
-        this._menuOrganizations.Text = "الجهات والمنظمات";
+        _menuOrganizations.Name = "_menuOrganizations";
+        _menuOrganizations.Size = new Size(312, 36);
+        _menuOrganizations.Text = "الجهات والمنظمات";
         // 
         // _menuAgeCategories
         // 
-        this._menuAgeCategories.Name = "_menuAgeCategories";
-        this._menuAgeCategories.Size = new System.Drawing.Size(188, 24);
-        this._menuAgeCategories.Text = "الفئات العمرية";
+        _menuAgeCategories.Name = "_menuAgeCategories";
+        _menuAgeCategories.Size = new Size(312, 36);
+        _menuAgeCategories.Text = "الفئات العمرية";
         // 
         // _menuUsers
         // 
-        this._menuUsers.Name = "_menuUsers";
-        this._menuUsers.Size = new System.Drawing.Size(188, 24);
-        this._menuUsers.Text = "المستخدمون";
+        _menuUsers.Name = "_menuUsers";
+        _menuUsers.Size = new Size(312, 36);
+        _menuUsers.Text = "المستخدمون";
         // 
         // _menuWorkstations
         // 
-        this._menuWorkstations.Name = "_menuWorkstations";
-        this._menuWorkstations.Size = new System.Drawing.Size(188, 24);
-        this._menuWorkstations.Text = "محطات العمل";
+        _menuWorkstations.Name = "_menuWorkstations";
+        _menuWorkstations.Size = new Size(312, 36);
+        _menuWorkstations.Text = "محطات العمل";
         // 
         // _menuManagementSep2
         // 
-        this._menuManagementSep2.Name = "_menuManagementSep2";
-        this._menuManagementSep2.Size = new System.Drawing.Size(185, 6);
+        _menuManagementSep2.Name = "_menuManagementSep2";
+        _menuManagementSep2.Size = new Size(309, 6);
         // 
         // _menuSettings
         // 
-        this._menuSettings.Name = "_menuSettings";
-        this._menuSettings.Size = new System.Drawing.Size(188, 24);
-        this._menuSettings.Text = "إعدادات النظام";
+        _menuSettings.Name = "_menuSettings";
+        _menuSettings.Size = new Size(312, 36);
+        _menuSettings.Text = "إعدادات النظام";
         // 
         // _menuBackupNow
         // 
-        this._menuBackupNow.Name = "_menuBackupNow";
-        this._menuBackupNow.Size = new System.Drawing.Size(188, 24);
-        this._menuBackupNow.Text = "نسخ احتياطي لقاعدة البيانات...";
+        _menuBackupNow.Name = "_menuBackupNow";
+        _menuBackupNow.Size = new Size(312, 36);
+        _menuBackupNow.Text = "نسخ احتياطي لقاعدة البيانات...";
         // 
         // _menuReports
         // 
-        this._menuReports.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._menuDailyReport,
-            this._menuOrgStatistics});
-        this._menuReports.Name = "_menuReports";
-        this._menuReports.Size = new System.Drawing.Size(65, 23);
-        this._menuReports.Text = "التقارير";
+        _menuReports.DropDownItems.AddRange(new ToolStripItem[] { _menuDailyReport, _menuOrgStatistics });
+        _menuReports.Name = "_menuReports";
+        _menuReports.Size = new Size(74, 36);
+        _menuReports.Text = "التقارير";
         // 
         // _menuDailyReport
         // 
-        this._menuDailyReport.Name = "_menuDailyReport";
-        this._menuDailyReport.Size = new System.Drawing.Size(171, 24);
-        this._menuDailyReport.Text = "التقرير اليومي";
+        _menuDailyReport.Name = "_menuDailyReport";
+        _menuDailyReport.Size = new Size(216, 36);
+        _menuDailyReport.Text = "التقرير اليومي";
         // 
         // _menuOrgStatistics
         // 
-        this._menuOrgStatistics.Name = "_menuOrgStatistics";
-        this._menuOrgStatistics.Size = new System.Drawing.Size(171, 24);
-        this._menuOrgStatistics.Text = "إحصائيات الجهات";
+        _menuOrgStatistics.Name = "_menuOrgStatistics";
+        _menuOrgStatistics.Size = new Size(216, 36);
+        _menuOrgStatistics.Text = "إحصائيات الجهات";
         // 
         // _menuHelp
         // 
-        this._menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._menuAbout});
-        this._menuHelp.Name = "_menuHelp";
-        this._menuHelp.Size = new System.Drawing.Size(69, 23);
-        this._menuHelp.Text = "مساعدة";
+        _menuHelp.DropDownItems.AddRange(new ToolStripItem[] { _menuAbout });
+        _menuHelp.Name = "_menuHelp";
+        _menuHelp.Size = new Size(88, 36);
+        _menuHelp.Text = "مساعدة";
         // 
         // _menuAbout
         // 
-        this._menuAbout.Name = "_menuAbout";
-        this._menuAbout.Size = new System.Drawing.Size(171, 24);
-        this._menuAbout.Text = "حول المنظومة...";
+        _menuAbout.Name = "_menuAbout";
+        _menuAbout.Size = new Size(218, 36);
+        _menuAbout.Text = "حول المنظومة...";
         // 
         // _statusStrip
         // 
-        this._statusStrip.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._statusUser,
-            this._statusWorkstation,
-            this._statusServerTime,
-            this._statusConnection});
-        this._statusStrip.Location = new System.Drawing.Point(0, 655);
-        this._statusStrip.Name = "_statusStrip";
-        this._statusStrip.Padding = new System.Windows.Forms.Padding(14, 0, 1, 0);
-        this._statusStrip.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this._statusStrip.Size = new System.Drawing.Size(1008, 26);
-        this._statusStrip.TabIndex = 1;
-        this._statusStrip.Text = "statusStrip1";
+        _statusStrip.Font = new Font("Cairo", 9.5F);
+        _statusStrip.ImageScalingSize = new Size(20, 20);
+        _statusStrip.Items.AddRange(new ToolStripItem[] { _statusUser, _statusWorkstation, _statusServerTime, _statusConnection });
+        _statusStrip.Location = new Point(0, 852);
+        _statusStrip.Name = "_statusStrip";
+        _statusStrip.Padding = new Padding(18, 2, 1, 2);
+        _statusStrip.RightToLeft = RightToLeft.Yes;
+        _statusStrip.Size = new Size(1350, 48);
+        _statusStrip.TabIndex = 1;
+        _statusStrip.Text = "statusStrip1";
         // 
         // _statusUser
         // 
-        this._statusUser.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-        this._statusUser.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-        this._statusUser.Name = "_statusUser";
-        this._statusUser.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-        this._statusUser.Size = new System.Drawing.Size(95, 21);
-        this._statusUser.Text = "المستخدم: -";
+        _statusUser.BorderSides = ToolStripStatusLabelBorderSides.Left;
+        _statusUser.BorderStyle = Border3DStyle.Etched;
+        _statusUser.Name = "_statusUser";
+        _statusUser.Padding = new Padding(10, 2, 10, 2);
+        _statusUser.Size = new Size(119, 38);
+        _statusUser.Text = "المستخدم: -";
         // 
         // _statusWorkstation
         // 
-        this._statusWorkstation.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-        this._statusWorkstation.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-        this._statusWorkstation.Name = "_statusWorkstation";
-        this._statusWorkstation.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-        this._statusWorkstation.Size = new System.Drawing.Size(81, 21);
-        this._statusWorkstation.Text = "المحطة: -";
+        _statusWorkstation.BorderSides = ToolStripStatusLabelBorderSides.Left;
+        _statusWorkstation.BorderStyle = Border3DStyle.Etched;
+        _statusWorkstation.Name = "_statusWorkstation";
+        _statusWorkstation.Padding = new Padding(10, 2, 10, 2);
+        _statusWorkstation.Size = new Size(102, 38);
+        _statusWorkstation.Text = "المحطة: -";
         // 
         // _statusServerTime
         // 
-        this._statusServerTime.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-        this._statusServerTime.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-        this._statusServerTime.Name = "_statusServerTime";
-        this._statusServerTime.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-        this._statusServerTime.Size = new System.Drawing.Size(107, 21);
-        this._statusServerTime.Text = "وقت الخادم: -";
+        _statusServerTime.BorderSides = ToolStripStatusLabelBorderSides.Left;
+        _statusServerTime.BorderStyle = Border3DStyle.Etched;
+        _statusServerTime.Name = "_statusServerTime";
+        _statusServerTime.Padding = new Padding(10, 2, 10, 2);
+        _statusServerTime.Size = new Size(129, 38);
+        _statusServerTime.Text = "وقت الخادم: -";
         // 
         // _statusConnection
         // 
-        this._statusConnection.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-        this._statusConnection.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-        this._statusConnection.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
-        this._statusConnection.Name = "_statusConnection";
-        this._statusConnection.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-        this._statusConnection.Size = new System.Drawing.Size(106, 21);
-        this._statusConnection.Text = "متصل بالخادم";
+        _statusConnection.BorderSides = ToolStripStatusLabelBorderSides.Left;
+        _statusConnection.BorderStyle = Border3DStyle.Etched;
+        _statusConnection.ForeColor = Color.FromArgb(27, 135, 63);
+        _statusConnection.Name = "_statusConnection";
+        _statusConnection.Padding = new Padding(10, 2, 10, 2);
+        _statusConnection.Size = new Size(127, 38);
+        _statusConnection.Text = "متصل بالخادم";
         // 
         // _mainContainer
         // 
-        this._mainContainer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
-        this._mainContainer.Controls.Add(this._welcomeCard);
-        this._mainContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._mainContainer.Location = new System.Drawing.Point(0, 31);
-        this._mainContainer.Name = "_mainContainer";
-        this._mainContainer.Padding = new System.Windows.Forms.Padding(20);
-        this._mainContainer.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this._mainContainer.Size = new System.Drawing.Size(1008, 624);
-        this._mainContainer.TabIndex = 2;
+        _mainContainer.BackColor = Color.FromArgb(245, 247, 250);
+        _mainContainer.Controls.Add(_welcomeCard);
+        _mainContainer.Dock = DockStyle.Fill;
+        _mainContainer.Location = new Point(0, 48);
+        _mainContainer.Margin = new Padding(4);
+        _mainContainer.Name = "_mainContainer";
+        _mainContainer.Padding = new Padding(12);
+        _mainContainer.RightToLeft = RightToLeft.Yes;
+        _mainContainer.Size = new Size(1350, 804);
+        _mainContainer.TabIndex = 2;
         // 
         // _welcomeCard
         // 
-        this._welcomeCard.Anchor = System.Windows.Forms.AnchorStyles.None;
-        this._welcomeCard.BackColor = System.Drawing.Color.White;
-        this._welcomeCard.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-        this._welcomeCard.Controls.Add(this._lblQuickInfo);
-        this._welcomeCard.Controls.Add(this._lblWelcomeSubtitle);
-        this._welcomeCard.Controls.Add(this._lblWelcomeParkName);
-        this._welcomeCard.Location = new System.Drawing.Point(204, 150);
-        this._welcomeCard.Name = "_welcomeCard";
-        this._welcomeCard.Padding = new System.Windows.Forms.Padding(30);
-        this._welcomeCard.Size = new System.Drawing.Size(600, 300);
-        this._welcomeCard.TabIndex = 0;
+        _welcomeCard.Anchor = AnchorStyles.None;
+        _welcomeCard.BackColor = Color.White;
+        _welcomeCard.BorderStyle = BorderStyle.FixedSingle;
+        _welcomeCard.Controls.Add(_lblQuickInfo);
+        _welcomeCard.Controls.Add(_lblWelcomeSubtitle);
+        _welcomeCard.Controls.Add(_lblWelcomeParkName);
+        _welcomeCard.Location = new Point(269, 176);
+        _welcomeCard.Margin = new Padding(4);
+        _welcomeCard.Name = "_welcomeCard";
+        _welcomeCard.Padding = new Padding(40);
+        _welcomeCard.Size = new Size(812, 450);
+        _welcomeCard.TabIndex = 0;
         // 
         // _lblQuickInfo
         // 
-        this._lblQuickInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblQuickInfo.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._lblQuickInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
-        this._lblQuickInfo.Location = new System.Drawing.Point(30, 130);
-        this._lblQuickInfo.Name = "_lblQuickInfo";
-        this._lblQuickInfo.Size = new System.Drawing.Size(538, 138);
-        this._lblQuickInfo.TabIndex = 2;
-        this._lblQuickInfo.Text = "اضغط F1 لفتح شباك الدخول وتسجيل المستفيدين.\r\nاستخدم القوائم أعلاه لإدارة النظام أ" +
-    "و عرض التقارير حسب الصلاحيات الممنوحة.";
-        this._lblQuickInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+        _lblQuickInfo.Dock = DockStyle.Fill;
+        _lblQuickInfo.Font = new Font("Cairo", 10.5F);
+        _lblQuickInfo.ForeColor = Color.FromArgb(69, 90, 100);
+        _lblQuickInfo.Location = new Point(40, 190);
+        _lblQuickInfo.Margin = new Padding(4, 0, 4, 0);
+        _lblQuickInfo.Name = "_lblQuickInfo";
+        _lblQuickInfo.Size = new Size(730, 218);
+        _lblQuickInfo.TabIndex = 2;
+        _lblQuickInfo.Text = "اضغط F1 لفتح شباك الدخول وتسجيل المستفيدين.\r\nاستخدم القوائم أعلاه لإدارة النظام أو عرض التقارير حسب الصلاحيات الممنوحة.";
+        _lblQuickInfo.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _lblWelcomeSubtitle
         // 
-        this._lblWelcomeSubtitle.Dock = System.Windows.Forms.DockStyle.Top;
-        this._lblWelcomeSubtitle.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._lblWelcomeSubtitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._lblWelcomeSubtitle.Location = new System.Drawing.Point(30, 80);
-        this._lblWelcomeSubtitle.Name = "_lblWelcomeSubtitle";
-        this._lblWelcomeSubtitle.Size = new System.Drawing.Size(538, 50);
-        this._lblWelcomeSubtitle.TabIndex = 1;
-        this._lblWelcomeSubtitle.Text = "منظومة التحكم في الدخول المجاني لزبائن بطاقات الدعم والرعاية";
-        this._lblWelcomeSubtitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+        _lblWelcomeSubtitle.Dock = DockStyle.Top;
+        _lblWelcomeSubtitle.Font = new Font("Cairo", 12F);
+        _lblWelcomeSubtitle.ForeColor = Color.FromArgb(45, 55, 72);
+        _lblWelcomeSubtitle.Location = new Point(40, 115);
+        _lblWelcomeSubtitle.Margin = new Padding(4, 0, 4, 0);
+        _lblWelcomeSubtitle.Name = "_lblWelcomeSubtitle";
+        _lblWelcomeSubtitle.Size = new Size(730, 75);
+        _lblWelcomeSubtitle.TabIndex = 1;
+        _lblWelcomeSubtitle.Text = "منظومة التحكم في الدخول المجاني لزبائن بطاقات الدعم والرعاية";
+        _lblWelcomeSubtitle.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _lblWelcomeParkName
         // 
-        this._lblWelcomeParkName.Dock = System.Windows.Forms.DockStyle.Top;
-        this._lblWelcomeParkName.Font = new System.Drawing.Font("Cairo", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblWelcomeParkName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
-        this._lblWelcomeParkName.Location = new System.Drawing.Point(30, 30);
-        this._lblWelcomeParkName.Name = "_lblWelcomeParkName";
-        this._lblWelcomeParkName.Size = new System.Drawing.Size(538, 50);
-        this._lblWelcomeParkName.TabIndex = 0;
-        this._lblWelcomeParkName.Text = "منتزه المرح العائلي";
-        this._lblWelcomeParkName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+        _lblWelcomeParkName.Dock = DockStyle.Top;
+        _lblWelcomeParkName.Font = new Font("Cairo", 20F, FontStyle.Bold);
+        _lblWelcomeParkName.ForeColor = Color.FromArgb(27, 135, 63);
+        _lblWelcomeParkName.Location = new Point(40, 40);
+        _lblWelcomeParkName.Margin = new Padding(4, 0, 4, 0);
+        _lblWelcomeParkName.Name = "_lblWelcomeParkName";
+        _lblWelcomeParkName.Size = new Size(730, 75);
+        _lblWelcomeParkName.TabIndex = 0;
+        _lblWelcomeParkName.Text = "منتزه المرح العائلي";
+        _lblWelcomeParkName.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _clockTimer
         // 
-        this._clockTimer.Interval = 1000;
+        _clockTimer.Interval = 1000;
         // 
         // _syncTimer
         // 
-        this._syncTimer.Interval = 60000;
+        _syncTimer.Interval = 60000;
         // 
         // MainForm
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-        this.ClientSize = new System.Drawing.Size(1008, 681);
-        this.Controls.Add(this._mainContainer);
-        this.Controls.Add(this._statusStrip);
-        this.Controls.Add(this._mainMenuStrip);
-        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this.MainMenuStrip = this._mainMenuStrip;
-        this.MinimumSize = new System.Drawing.Size(800, 600);
-        this.Name = "MainForm";
-        this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this.RightToLeftLayout = true;
-        this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-        this.Text = "ParkGate";
-        this._mainMenuStrip.ResumeLayout(false);
-        this._mainMenuStrip.PerformLayout();
-        this._statusStrip.ResumeLayout(false);
-        this._statusStrip.PerformLayout();
-        this._mainContainer.ResumeLayout(false);
-        this._welcomeCard.ResumeLayout(false);
-        this.ResumeLayout(false);
-        this.PerformLayout();
+        AutoScaleDimensions = new SizeF(120F, 120F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(1350, 900);
+        Controls.Add(_mainContainer);
+        Controls.Add(_statusStrip);
+        Controls.Add(_mainMenuStrip);
+        MainMenuStrip = _mainMenuStrip;
+        Margin = new Padding(4);
+        MinimumSize = new Size(1196, 788);
+        Name = "MainForm";
+        Text = "ParkGate";
+        _mainMenuStrip.ResumeLayout(false);
+        _mainMenuStrip.PerformLayout();
+        _statusStrip.ResumeLayout(false);
+        _statusStrip.PerformLayout();
+        _mainContainer.ResumeLayout(false);
+        _welcomeCard.ResumeLayout(false);
+        ResumeLayout(false);
+        PerformLayout();
 
     }
 

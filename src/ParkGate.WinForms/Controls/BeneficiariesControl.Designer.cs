@@ -107,55 +107,67 @@ partial class BeneficiariesControl
         // 
         // _lblSearch
         // 
+        this._lblSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblSearch.AutoSize = true;
         this._lblSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblSearch.Location = new System.Drawing.Point(900, 16);
+        this._lblSearch.Location = new System.Drawing.Point(895, 13);
         this._lblSearch.Name = "_lblSearch";
-        this._lblSearch.Size = new System.Drawing.Size(90, 19);
+        this._lblSearch.Size = new System.Drawing.Size(95, 26);
         this._lblSearch.TabIndex = 0;
         this._lblSearch.Text = "بحث سريع:";
         // 
         // _txtSearch
         // 
-        this._txtSearch.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._txtSearch.Location = new System.Drawing.Point(540, 12);
+        this._txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+        this._txtSearch.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtSearch.Location = new System.Drawing.Point(525, 9);
         this._txtSearch.MaxLength = 100;
         this._txtSearch.Name = "_txtSearch";
         this._txtSearch.PlaceholderText = "رقم البطاقة / الاسم / الهاتف / الرقم الوطني...";
-        this._txtSearch.Size = new System.Drawing.Size(350, 27);
+        this._txtSearch.Size = new System.Drawing.Size(360, 34);
         this._txtSearch.TabIndex = 1;
         // 
         // _btnSearch
         // 
+        this._btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._btnSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
+        this._btnSearch.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnSearch.FlatAppearance.BorderSize = 0;
         this._btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnSearch.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSearch.ForeColor = System.Drawing.Color.White;
-        this._btnSearch.Location = new System.Drawing.Point(450, 11);
+        this._btnSearch.Location = new System.Drawing.Point(435, 9);
         this._btnSearch.Name = "_btnSearch";
-        this._btnSearch.Size = new System.Drawing.Size(80, 29);
+        this._btnSearch.Size = new System.Drawing.Size(84, 34);
         this._btnSearch.TabIndex = 2;
         this._btnSearch.Text = "بحث";
         this._btnSearch.UseVisualStyleBackColor = false;
         // 
         // _btnClearSearch
         // 
-        this._btnClearSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+        this._btnClearSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+        this._btnClearSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnClearSearch.Cursor = System.Windows.Forms.Cursors.Hand;
+        this._btnClearSearch.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
         this._btnClearSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClearSearch.Location = new System.Drawing.Point(360, 11);
+        this._btnClearSearch.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClearSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._btnClearSearch.Location = new System.Drawing.Point(345, 9);
         this._btnClearSearch.Name = "_btnClearSearch";
-        this._btnClearSearch.Size = new System.Drawing.Size(80, 29);
+        this._btnClearSearch.Size = new System.Drawing.Size(84, 34);
         this._btnClearSearch.TabIndex = 3;
         this._btnClearSearch.Text = "مسح";
         this._btnClearSearch.UseVisualStyleBackColor = false;
         // 
         // _lblSearchResultCount
         // 
+        this._lblSearchResultCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
         this._lblSearchResultCount.AutoSize = true;
+        this._lblSearchResultCount.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblSearchResultCount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
-        this._lblSearchResultCount.Location = new System.Drawing.Point(20, 16);
+        this._lblSearchResultCount.Location = new System.Drawing.Point(20, 14);
         this._lblSearchResultCount.Name = "_lblSearchResultCount";
-        this._lblSearchResultCount.Size = new System.Drawing.Size(100, 19);
+        this._lblSearchResultCount.Size = new System.Drawing.Size(120, 24);
         this._lblSearchResultCount.TabIndex = 4;
         this._lblSearchResultCount.Text = "عدد النتائج: 0";
         // 
@@ -198,7 +210,9 @@ partial class BeneficiariesControl
         this._gridBeneficiaries.AllowUserToDeleteRows = false;
         this._gridBeneficiaries.BackgroundColor = System.Drawing.Color.White;
         this._gridBeneficiaries.BorderStyle = System.Windows.Forms.BorderStyle.None;
-        this._gridBeneficiaries.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        this._gridBeneficiaries.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+        this._gridBeneficiaries.ColumnHeadersHeight = 34;
+        this._gridBeneficiaries.RowTemplate.Height = 32;
         this._gridBeneficiaries.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._colCardNumber,
             this._colOrganization,
@@ -215,7 +229,6 @@ partial class BeneficiariesControl
         this._gridBeneficiaries.Name = "_gridBeneficiaries";
         this._gridBeneficiaries.ReadOnly = true;
         this._gridBeneficiaries.RowHeadersVisible = false;
-        this._gridBeneficiaries.RowTemplate.Height = 28;
         this._gridBeneficiaries.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
         this._gridBeneficiaries.Size = new System.Drawing.Size(972, 203);
         this._gridBeneficiaries.TabIndex = 0;
@@ -312,7 +325,7 @@ partial class BeneficiariesControl
         // _tblDetails
         // 
         this._tblDetails.ColumnCount = 2;
-        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95F));
+        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 115F));
         this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblDetails.Controls.Add(this._lblDetailNameTitle, 0, 0);
         this._tblDetails.Controls.Add(this._lblDetailName, 1, 0);
@@ -337,14 +350,14 @@ partial class BeneficiariesControl
         this._tblDetails.Location = new System.Drawing.Point(6, 23);
         this._tblDetails.Name = "_tblDetails";
         this._tblDetails.RowCount = 9;
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
         this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblDetails.Size = new System.Drawing.Size(364, 258);
         this._tblDetails.TabIndex = 0;

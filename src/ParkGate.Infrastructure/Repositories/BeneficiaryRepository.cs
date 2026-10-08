@@ -63,7 +63,10 @@ public sealed class BeneficiaryRepository : IBeneficiaryRepository
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
-            return Array.Empty<Beneficiary>();
+            return await _context.Beneficiaries
+                .OrderBy(b => b.FullName)
+                .Take(maxResults)
+                .ToListAsync(cancellationToken);
         }
 
         var trimmed = searchTerm.Trim();

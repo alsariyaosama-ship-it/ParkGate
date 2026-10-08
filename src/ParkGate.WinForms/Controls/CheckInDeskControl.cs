@@ -150,6 +150,10 @@ public partial class CheckInDeskControl : UserControl
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 await LookupCardAsync();
+                if (!_grpRegistration.Visible)
+                {
+                    FocusCardNumberBox();
+                }
             }
             else if (e.KeyCode == Keys.Escape)
             {
@@ -157,7 +161,27 @@ public partial class CheckInDeskControl : UserControl
             }
         };
 
-        _btnSearch.Click += async (_, _) => await LookupCardAsync();
+        _txtCardNumber.Enter += (_, _) => _txtCardNumber.SelectAll();
+
+        // Clear previous holder data if user changes the search card number
+        _txtCardNumber.TextChanged += (_, _) =>
+        {
+            var currentCard = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text).Trim();
+            if (_activeHolder != null && !string.Equals(_activeHolder.CardNumber, currentCard, StringComparison.OrdinalIgnoreCase))
+            {
+                ClearPreviousHolderData();
+                _statusBanner.Reset();
+            }
+        };
+
+        _btnSearch.Click += async (_, _) =>
+        {
+            await LookupCardAsync();
+            if (!_grpRegistration.Visible)
+            {
+                FocusCardNumberBox();
+            }
+        };
         _btnClear.Click += (_, _) => ResetDesk();
         _btnNewHolder.Click += (_, _) => StartManualRegistration();
         _btnCancelReg.Click += (_, _) => HideInlineRegistration();
@@ -379,24 +403,35 @@ public partial class CheckInDeskControl : UserControl
 
     public void ResetDesk()
     {
+        ClearPreviousHolderData();
+        _txtCardNumber.Clear();
+        _statusBanner.Reset();
+        FocusCardNumberBox();
+    }
+
+    public void ClearPreviousHolderData()
+    {
         _activeHolder = null;
         _activeEligibility = null;
 
-        _txtCardNumber.Clear();
         ClearHolderInfo();
         HideInlineRegistration();
+
+        _txtRegFullName.Clear();
+        _txtRegPhone.Clear();
+        _txtRegNationalId.Clear();
+        _dtpRegExpiry.Checked = false;
+        _txtRegNotes.Clear();
 
         foreach (var counter in _counterInputs)
         {
             counter.Reset();
         }
 
-        _statusBanner.Reset();
         _btnRecordEntry.Enabled = false;
         _btnOverride.Enabled = false;
 
         UpdateLiveTotalPersons();
-        FocusCardNumberBox();
     }
 
     private void ClearHolderInfo()
@@ -475,9 +510,11 @@ public partial class CheckInDeskControl : UserControl
             }
             else
             {
-                var reasonText = !string.IsNullOrWhiteSpace(eligibility.DenialReasonText)
-                    ? eligibility.DenialReasonText
-                    : Strings.Banner_Denied;
+                var reasonText = eligibility.DenialReason.HasValue
+                    ? GetDenialReasonArabic(eligibility.DenialReason.Value)
+                    : (!string.IsNullOrWhiteSpace(eligibility.DenialReasonText)
+                        ? eligibility.DenialReasonText
+                        : Strings.Banner_Denied);
 
                 string? details = null;
 
@@ -552,17 +589,22 @@ public partial class CheckInDeskControl : UserControl
 
         if (string.IsNullOrWhiteSpace(normalized))
         {
+            ClearPreviousHolderData();
             _statusBanner.SetWarning("يرجى إدخال أو مسح رقم البطاقة", null);
             FocusCardNumberBox();
             return;
         }
+
+        // Always clear previous customer data and reset banner when initiating a new search
+        ClearPreviousHolderData();
+        _statusBanner.Reset();
 
         if (_beneficiaryService == null)
         {
             return;
         }
 
-        using (new BusyScope(this, _btnSearch, _btnRecordEntry, _btnOverride, _btnNewHolder))
+        using (new BusyScope(this, _btnSearch, _btnNewHolder))
         {
             try
             {
@@ -572,6 +614,7 @@ public partial class CheckInDeskControl : UserControl
                 if (lookupResult.IsFailure)
                 {
                     _statusBanner.SetDenied(ErrorMessages.GetMessage(lookupResult.Error));
+                    FocusCardNumberBox();
                     return;
                 }
 
@@ -609,8 +652,14 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error occurred during card lookup.");
-                _statusBanner.SetDenied("تعذّر الاتصال بقاعدة البيانات", ex.Message);
+                _statusBanner.SetDenied("تعذّر الاتصال بقاعدة البيانات", "يرجى التحقق من الاتصال بالخادم والمحاولة مرة أخرى.");
+                FocusCardNumberBox();
             }
+        }
+
+        if (!_grpRegistration.Visible)
+        {
+            FocusCardNumberBox();
         }
     }
 
@@ -802,7 +851,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error recording entry.");
-                _statusBanner.SetDenied("فشل تسجيل الدخول", ex.Message);
+                _statusBanner.SetDenied("فشل تسجيل الدخول", "حدث خطأ غير متوقع أثناء معالجة العملية.");
             }
         }
     }
@@ -864,10 +913,20 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error performing override.");
-                _statusBanner.SetDenied("فشل التجاوز", ex.Message);
+                _statusBanner.SetDenied("فشل التجاوز", "حدث خطأ غير متوقع أثناء معالجة التجاوز.");
             }
         }
     }
+
+    private static string GetDenialReasonArabic(DenialReason reason) => reason switch
+    {
+        DenialReason.CooldownActive => "فترة التهدئة نشطة (سبق الدخول)",
+        DenialReason.CardExpired => "صلاحية البطاقة منتهية",
+        DenialReason.HolderSuspended => "حساب الزبون موقوف مؤقتاً",
+        DenialReason.HolderBlocked => "حساب الزبون محظور",
+        DenialReason.OrganizationInactive => "الجهة الراعية غير نشطة",
+        _ => Strings.Banner_Denied
+    };
 
     public async Task RefreshTodayDeskSummaryAsync()
     {

@@ -144,7 +144,7 @@ public partial class BeneficiariesControl : UserControl
         Load += async (_, _) => await OnControlLoadedAsync();
 
         _btnSearch.Click += async (_, _) => await PerformSearchAsync();
-        _btnClearSearch.Click += (_, _) => ClearSearch();
+        _btnClearSearch.Click += async (_, _) => await ClearSearchAsync();
 
         _txtSearch.KeyDown += async (_, e) =>
         {
@@ -195,7 +195,16 @@ public partial class BeneficiariesControl : UserControl
             _logger?.LogWarning(ex, "Failed to load time zone in BeneficiariesControl.");
         }
 
+        await PerformSearchAsync();
         _txtSearch.Focus();
+    }
+
+    public async Task EnsureLoadedAsync()
+    {
+        if (_loadedBeneficiaries.Count == 0)
+        {
+            await PerformSearchAsync();
+        }
     }
 
     public void FocusSearchBox()
@@ -219,12 +228,6 @@ public partial class BeneficiariesControl : UserControl
         var rawTerm = _txtSearch.Text.Trim();
         var term = DigitNormalizer.NormalizeDigits(rawTerm);
 
-        if (string.IsNullOrWhiteSpace(term))
-        {
-            ClearSearch();
-            return;
-        }
-
         using (new BusyScope(this, _btnSearch, _btnClearSearch))
         {
             try
@@ -236,7 +239,9 @@ public partial class BeneficiariesControl : UserControl
                     _loadedBeneficiaries.AddRange(result.Value);
 
                     PopulateBeneficiariesGrid(_loadedBeneficiaries);
-                    _lblSearchResultCount.Text = string.Format(Strings.Summary_SearchResults, _loadedBeneficiaries.Count);
+                    _lblSearchResultCount.Text = string.IsNullOrWhiteSpace(term)
+                        ? $"إجمالي المستفيدين: {_loadedBeneficiaries.Count}"
+                        : string.Format(Strings.Summary_SearchResults, _loadedBeneficiaries.Count);
                 }
                 else
                 {
@@ -252,15 +257,16 @@ public partial class BeneficiariesControl : UserControl
         }
     }
 
-    private void ClearSearch()
+    public async Task ClearSearchAsync()
     {
         _txtSearch.Clear();
-        _loadedBeneficiaries.Clear();
-        _gridBeneficiaries.Rows.Clear();
-        _lblSearchResultCount.Text = string.Format(Strings.Summary_SearchResults, 0);
-        ClearBeneficiaryDetails();
-        ClearHistoryGrid();
+        await PerformSearchAsync();
         _txtSearch.Focus();
+    }
+
+    private void ClearSearch()
+    {
+        _ = ClearSearchAsync();
     }
 
     private void PopulateBeneficiariesGrid(IReadOnlyList<BeneficiaryDto> beneficiaries)

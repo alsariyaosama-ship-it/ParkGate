@@ -66,7 +66,7 @@ partial class CheckInDeskControl
         this._lblCompanionsNotice = new System.Windows.Forms.Label();
         this._lblTotalPersons = new System.Windows.Forms.Label();
         this._flowCounters = new System.Windows.Forms.FlowLayoutPanel();
-        this._pnlActions = new System.Windows.Forms.Panel();
+        this._pnlActions = new System.Windows.Forms.TableLayoutPanel();
         this._flowActions = new System.Windows.Forms.FlowLayoutPanel();
         this._btnRecordEntry = new System.Windows.Forms.Button();
         this._btnOverride = new System.Windows.Forms.Button();
@@ -114,10 +114,10 @@ partial class CheckInDeskControl
         this._mainLayout.Margin = new System.Windows.Forms.Padding(0);
         this._mainLayout.Name = "_mainLayout";
         this._mainLayout.RowCount = 5;
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 68F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 76F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 55F));
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 45F));
         this._mainLayout.Size = new System.Drawing.Size(988, 641);
         this._mainLayout.TabIndex = 0;
@@ -135,8 +135,8 @@ partial class CheckInDeskControl
         this._pnlSearch.Location = new System.Drawing.Point(0, 0);
         this._pnlSearch.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
         this._pnlSearch.Name = "_pnlSearch";
-        this._pnlSearch.Padding = new System.Windows.Forms.Padding(6);
-        this._pnlSearch.Size = new System.Drawing.Size(988, 44);
+        this._pnlSearch.Padding = new System.Windows.Forms.Padding(8, 6, 8, 6);
+        this._pnlSearch.Size = new System.Drawing.Size(988, 50);
         this._pnlSearch.TabIndex = 0;
         // 
         // _btnSearch
@@ -147,9 +147,9 @@ partial class CheckInDeskControl
         this._btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSearch.ForeColor = System.Drawing.Color.White;
-        this._btnSearch.Location = new System.Drawing.Point(8, 6);
+        this._btnSearch.Location = new System.Drawing.Point(8, 7);
         this._btnSearch.Name = "_btnSearch";
-        this._btnSearch.Size = new System.Drawing.Size(120, 30);
+        this._btnSearch.Size = new System.Drawing.Size(125, 34);
         this._btnSearch.TabIndex = 4;
         this._btnSearch.Text = "بحث (Enter)";
         this._btnSearch.UseVisualStyleBackColor = false;
@@ -158,11 +158,11 @@ partial class CheckInDeskControl
         // 
         this._cmbOrganization.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._cmbOrganization.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-        this._cmbOrganization.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._cmbOrganization.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._cmbOrganization.FormattingEnabled = true;
-        this._cmbOrganization.Location = new System.Drawing.Point(140, 7);
+        this._cmbOrganization.Location = new System.Drawing.Point(145, 8);
         this._cmbOrganization.Name = "_cmbOrganization";
-        this._cmbOrganization.Size = new System.Drawing.Size(260, 27);
+        this._cmbOrganization.Size = new System.Drawing.Size(260, 32);
         this._cmbOrganization.TabIndex = 3;
         // 
         // _lblOrganization
@@ -170,20 +170,20 @@ partial class CheckInDeskControl
         this._lblOrganization.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblOrganization.AutoSize = true;
         this._lblOrganization.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblOrganization.Location = new System.Drawing.Point(406, 11);
+        this._lblOrganization.Location = new System.Drawing.Point(412, 11);
         this._lblOrganization.Name = "_lblOrganization";
-        this._lblOrganization.Size = new System.Drawing.Size(46, 19);
+        this._lblOrganization.Size = new System.Drawing.Size(52, 24);
         this._lblOrganization.TabIndex = 2;
         this._lblOrganization.Text = "الجهة:";
         // 
         // _txtCardNumber
         // 
         this._txtCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._txtCardNumber.Location = new System.Drawing.Point(470, 5);
+        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._txtCardNumber.Location = new System.Drawing.Point(475, 6);
         this._txtCardNumber.MaxLength = 50;
         this._txtCardNumber.Name = "_txtCardNumber";
-        this._txtCardNumber.Size = new System.Drawing.Size(390, 31);
+        this._txtCardNumber.Size = new System.Drawing.Size(385, 36);
         this._txtCardNumber.TabIndex = 1;
         // 
         // _lblCardNumber
@@ -194,7 +194,7 @@ partial class CheckInDeskControl
         this._lblCardNumber.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         this._lblCardNumber.Location = new System.Drawing.Point(866, 11);
         this._lblCardNumber.Name = "_lblCardNumber";
-        this._lblCardNumber.Size = new System.Drawing.Size(89, 20);
+        this._lblCardNumber.Size = new System.Drawing.Size(95, 26);
         this._lblCardNumber.TabIndex = 0;
         this._lblCardNumber.Text = "رقم البطاقة:";
         // 
@@ -203,12 +203,12 @@ partial class CheckInDeskControl
         this._statusBanner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this._statusBanner.Dock = System.Windows.Forms.DockStyle.Fill;
         this._statusBanner.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._statusBanner.Location = new System.Drawing.Point(0, 50);
+        this._statusBanner.Location = new System.Drawing.Point(0, 56);
         this._statusBanner.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
-        this._statusBanner.MinimumSize = new System.Drawing.Size(300, 55);
+        this._statusBanner.MinimumSize = new System.Drawing.Size(300, 60);
         this._statusBanner.Name = "_statusBanner";
         this._statusBanner.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this._statusBanner.Size = new System.Drawing.Size(988, 62);
+        this._statusBanner.Size = new System.Drawing.Size(988, 70);
         this._statusBanner.TabIndex = 1;
         // 
         // _splitMiddle
@@ -251,7 +251,7 @@ partial class CheckInDeskControl
         // _tblRegistration
         // 
         this._tblRegistration.ColumnCount = 2;
-        this._tblRegistration.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
+        this._tblRegistration.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 165F));
         this._tblRegistration.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblRegistration.Controls.Add(this._lblRegFullName, 0, 0);
         this._tblRegistration.Controls.Add(this._txtRegFullName, 1, 0);
@@ -270,12 +270,12 @@ partial class CheckInDeskControl
         this._tblRegistration.Location = new System.Drawing.Point(8, 26);
         this._tblRegistration.Name = "_tblRegistration";
         this._tblRegistration.RowCount = 6;
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
         this._tblRegistration.Size = new System.Drawing.Size(484, 220);
         this._tblRegistration.TabIndex = 0;
         // 
@@ -440,7 +440,7 @@ partial class CheckInDeskControl
         // _tblHolder
         // 
         this._tblHolder.ColumnCount = 2;
-        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
+        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 145F));
         this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblHolder.Controls.Add(this._lblHolderNameTitle, 0, 0);
         this._tblHolder.Controls.Add(this._lblHolderName, 1, 0);
@@ -624,7 +624,6 @@ partial class CheckInDeskControl
         // _grpCompanions
         // 
         this._grpCompanions.BackColor = System.Drawing.Color.White;
-        this._grpCompanions.Controls.Add(this._pnlCompanionsTotal);
         this._grpCompanions.Controls.Add(this._flowCounters);
         this._grpCompanions.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpCompanions.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
@@ -636,43 +635,6 @@ partial class CheckInDeskControl
         this._grpCompanions.TabIndex = 0;
         this._grpCompanions.TabStop = false;
         this._grpCompanions.Text = "المرافقون مع الزبون";
-        // 
-        // _pnlCompanionsTotal
-        // 
-        this._pnlCompanionsTotal.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(253)))), ((int)(((byte)(244)))));
-        this._pnlCompanionsTotal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-        this._pnlCompanionsTotal.Controls.Add(this._lblCompanionsNotice);
-        this._pnlCompanionsTotal.Controls.Add(this._lblTotalPersons);
-        this._pnlCompanionsTotal.Dock = System.Windows.Forms.DockStyle.Bottom;
-        this._pnlCompanionsTotal.Location = new System.Drawing.Point(8, 196);
-        this._pnlCompanionsTotal.Name = "_pnlCompanionsTotal";
-        this._pnlCompanionsTotal.Padding = new System.Windows.Forms.Padding(6);
-        this._pnlCompanionsTotal.Size = new System.Drawing.Size(468, 50);
-        this._pnlCompanionsTotal.TabIndex = 1;
-        // 
-        // _lblCompanionsNotice
-        // 
-        this._lblCompanionsNotice.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
-        this._lblCompanionsNotice.AutoSize = true;
-        this._lblCompanionsNotice.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._lblCompanionsNotice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
-        this._lblCompanionsNotice.Location = new System.Drawing.Point(6, 16);
-        this._lblCompanionsNotice.Name = "_lblCompanionsNotice";
-        this._lblCompanionsNotice.Size = new System.Drawing.Size(185, 15);
-        this._lblCompanionsNotice.TabIndex = 1;
-        this._lblCompanionsNotice.Text = "(الزبون محتسب تلقائياً +1 فرد)";
-        // 
-        // _lblTotalPersons
-        // 
-        this._lblTotalPersons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._lblTotalPersons.AutoSize = true;
-        this._lblTotalPersons.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblTotalPersons.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
-        this._lblTotalPersons.Location = new System.Drawing.Point(210, 13);
-        this._lblTotalPersons.Name = "_lblTotalPersons";
-        this._lblTotalPersons.Size = new System.Drawing.Size(248, 21);
-        this._lblTotalPersons.TabIndex = 0;
-        this._lblTotalPersons.Text = "الإجمالي مع الزبون: 1 فرد";
         // 
         // _flowCounters
         // 
@@ -688,25 +650,37 @@ partial class CheckInDeskControl
         // 
         // _pnlActions
         // 
-        this._pnlActions.Controls.Add(this._flowActions);
+        this._pnlActions.ColumnCount = 2;
+        this._pnlActions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._pnlActions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._pnlActions.Controls.Add(this._flowActions, 0, 0);
+        this._pnlActions.Controls.Add(this._pnlCompanionsTotal, 1, 0);
         this._pnlActions.Dock = System.Windows.Forms.DockStyle.Fill;
         this._pnlActions.Location = new System.Drawing.Point(0, 378);
         this._pnlActions.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
         this._pnlActions.Name = "_pnlActions";
-        this._pnlActions.Size = new System.Drawing.Size(988, 44);
+        this._pnlActions.RowCount = 1;
+        this._pnlActions.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._pnlActions.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+        this._pnlActions.Size = new System.Drawing.Size(988, 48);
         this._pnlActions.TabIndex = 3;
         // 
         // _flowActions
         // 
+        this._flowActions.AutoSize = true;
+        this._flowActions.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
         this._flowActions.Controls.Add(this._btnRecordEntry);
         this._flowActions.Controls.Add(this._btnOverride);
         this._flowActions.Controls.Add(this._btnNewHolder);
         this._flowActions.Controls.Add(this._btnClear);
         this._flowActions.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._flowActions.Location = new System.Drawing.Point(0, 0);
+        this._flowActions.Location = new System.Drawing.Point(348, 0);
+        this._flowActions.Margin = new System.Windows.Forms.Padding(0);
         this._flowActions.Name = "_flowActions";
-        this._flowActions.Size = new System.Drawing.Size(988, 44);
+        this._flowActions.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+        this._flowActions.Size = new System.Drawing.Size(640, 48);
         this._flowActions.TabIndex = 0;
+        this._flowActions.WrapContents = false;
         // 
         // _btnRecordEntry
         // 
@@ -714,12 +688,12 @@ partial class CheckInDeskControl
         this._btnRecordEntry.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnRecordEntry.FlatAppearance.BorderSize = 0;
         this._btnRecordEntry.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnRecordEntry.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnRecordEntry.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnRecordEntry.ForeColor = System.Drawing.Color.White;
-        this._btnRecordEntry.Location = new System.Drawing.Point(780, 2);
-        this._btnRecordEntry.Margin = new System.Windows.Forms.Padding(3, 2, 8, 2);
+        this._btnRecordEntry.Location = new System.Drawing.Point(448, 2);
+        this._btnRecordEntry.Margin = new System.Windows.Forms.Padding(3, 2, 0, 2);
         this._btnRecordEntry.Name = "_btnRecordEntry";
-        this._btnRecordEntry.Size = new System.Drawing.Size(200, 38);
+        this._btnRecordEntry.Size = new System.Drawing.Size(190, 42);
         this._btnRecordEntry.TabIndex = 0;
         this._btnRecordEntry.Text = "تسجيل الدخول (F5)";
         this._btnRecordEntry.UseVisualStyleBackColor = false;
@@ -731,12 +705,12 @@ partial class CheckInDeskControl
         this._btnOverride.Enabled = false;
         this._btnOverride.FlatAppearance.BorderSize = 0;
         this._btnOverride.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnOverride.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnOverride.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnOverride.ForeColor = System.Drawing.Color.White;
-        this._btnOverride.Location = new System.Drawing.Point(599, 2);
-        this._btnOverride.Margin = new System.Windows.Forms.Padding(3, 2, 8, 2);
+        this._btnOverride.Location = new System.Drawing.Point(288, 2);
+        this._btnOverride.Margin = new System.Windows.Forms.Padding(3, 2, 5, 2);
         this._btnOverride.Name = "_btnOverride";
-        this._btnOverride.Size = new System.Drawing.Size(170, 38);
+        this._btnOverride.Size = new System.Drawing.Size(155, 42);
         this._btnOverride.TabIndex = 1;
         this._btnOverride.Text = "تجاوز المشرف (F9)";
         this._btnOverride.UseVisualStyleBackColor = false;
@@ -749,10 +723,10 @@ partial class CheckInDeskControl
         this._btnNewHolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnNewHolder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnNewHolder.ForeColor = System.Drawing.Color.White;
-        this._btnNewHolder.Location = new System.Drawing.Point(428, 2);
-        this._btnNewHolder.Margin = new System.Windows.Forms.Padding(3, 2, 8, 2);
+        this._btnNewHolder.Location = new System.Drawing.Point(143, 2);
+        this._btnNewHolder.Margin = new System.Windows.Forms.Padding(3, 2, 5, 2);
         this._btnNewHolder.Name = "_btnNewHolder";
-        this._btnNewHolder.Size = new System.Drawing.Size(160, 38);
+        this._btnNewHolder.Size = new System.Drawing.Size(140, 42);
         this._btnNewHolder.TabIndex = 2;
         this._btnNewHolder.Text = "زبون جديد (F2)";
         this._btnNewHolder.UseVisualStyleBackColor = false;
@@ -763,15 +737,56 @@ partial class CheckInDeskControl
         this._btnClear.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
         this._btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClear.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClear.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._btnClear.Location = new System.Drawing.Point(287, 2);
-        this._btnClear.Margin = new System.Windows.Forms.Padding(3, 2, 8, 2);
+        this._btnClear.Location = new System.Drawing.Point(13, 2);
+        this._btnClear.Margin = new System.Windows.Forms.Padding(0, 2, 5, 2);
         this._btnClear.Name = "_btnClear";
-        this._btnClear.Size = new System.Drawing.Size(130, 38);
+        this._btnClear.Size = new System.Drawing.Size(125, 42);
         this._btnClear.TabIndex = 3;
         this._btnClear.Text = "مسح الشاشة (Esc)";
         this._btnClear.UseVisualStyleBackColor = false;
+        // 
+        // _pnlCompanionsTotal
+        // 
+        this._pnlCompanionsTotal.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(253)))), ((int)(((byte)(244)))));
+        this._pnlCompanionsTotal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+        this._pnlCompanionsTotal.Controls.Add(this._lblTotalPersons);
+        this._pnlCompanionsTotal.Controls.Add(this._lblCompanionsNotice);
+        this._pnlCompanionsTotal.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._pnlCompanionsTotal.Location = new System.Drawing.Point(0, 2);
+        this._pnlCompanionsTotal.Margin = new System.Windows.Forms.Padding(0, 2, 8, 2);
+        this._pnlCompanionsTotal.Name = "_pnlCompanionsTotal";
+        this._pnlCompanionsTotal.Padding = new System.Windows.Forms.Padding(8, 2, 8, 2);
+        this._pnlCompanionsTotal.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+        this._pnlCompanionsTotal.Size = new System.Drawing.Size(340, 44);
+        this._pnlCompanionsTotal.TabIndex = 1;
+        // 
+        // _lblTotalPersons
+        // 
+        this._lblTotalPersons.AutoSize = true;
+        this._lblTotalPersons.Dock = System.Windows.Forms.DockStyle.Right;
+        this._lblTotalPersons.Font = new System.Drawing.Font("Cairo", 11.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTotalPersons.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
+        this._lblTotalPersons.Location = new System.Drawing.Point(140, 2);
+        this._lblTotalPersons.Name = "_lblTotalPersons";
+        this._lblTotalPersons.Size = new System.Drawing.Size(190, 38);
+        this._lblTotalPersons.TabIndex = 0;
+        this._lblTotalPersons.Text = "الإجمالي مع الزبون: 1 فرد";
+        this._lblTotalPersons.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+        // 
+        // _lblCompanionsNotice
+        // 
+        this._lblCompanionsNotice.AutoSize = true;
+        this._lblCompanionsNotice.Dock = System.Windows.Forms.DockStyle.Left;
+        this._lblCompanionsNotice.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblCompanionsNotice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
+        this._lblCompanionsNotice.Location = new System.Drawing.Point(8, 2);
+        this._lblCompanionsNotice.Name = "_lblCompanionsNotice";
+        this._lblCompanionsNotice.Size = new System.Drawing.Size(155, 38);
+        this._lblCompanionsNotice.TabIndex = 1;
+        this._lblCompanionsNotice.Text = "(الزبون محتسب تلقائياً +1 فرد)";
+        this._lblCompanionsNotice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _grpToday
         // 
@@ -809,7 +824,9 @@ partial class CheckInDeskControl
         dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
         this._gridToday.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-        this._gridToday.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        this._gridToday.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+        this._gridToday.ColumnHeadersHeight = 36;
+        this._gridToday.RowTemplate.Height = 32;
         this._gridToday.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._colTime,
             this._colCard,
@@ -834,7 +851,7 @@ partial class CheckInDeskControl
         this._gridToday.ReadOnly = true;
         this._gridToday.RowHeadersVisible = false;
         this._gridToday.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-        this._gridToday.Size = new System.Drawing.Size(976, 158);
+        this._gridToday.Size = new System.Drawing.Size(976, 152);
         this._gridToday.TabIndex = 0;
         // 
         // _colTime
@@ -885,10 +902,10 @@ partial class CheckInDeskControl
         this._lblTodaySummary.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._lblTodaySummary.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblTodaySummary.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._lblTodaySummary.Location = new System.Drawing.Point(6, 181);
+        this._lblTodaySummary.Location = new System.Drawing.Point(6, 175);
         this._lblTodaySummary.Name = "_lblTodaySummary";
-        this._lblTodaySummary.Padding = new System.Windows.Forms.Padding(6, 0, 6, 0);
-        this._lblTodaySummary.Size = new System.Drawing.Size(976, 26);
+        this._lblTodaySummary.Padding = new System.Windows.Forms.Padding(8, 2, 8, 2);
+        this._lblTodaySummary.Size = new System.Drawing.Size(976, 32);
         this._lblTodaySummary.TabIndex = 1;
         this._lblTodaySummary.Text = "المقبول: 0 | التجاوز: 0 | المرفوض: 0 | إجمالي الأفراد: 0";
         this._lblTodaySummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -901,7 +918,7 @@ partial class CheckInDeskControl
         this.Controls.Add(this._mainLayout);
         this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.Name = "CheckInDeskControl";
-        this.Padding = new System.Windows.Forms.Padding(10);
+        this.Padding = new System.Windows.Forms.Padding(6);
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         this.Size = new System.Drawing.Size(1008, 661);
         this._mainLayout.ResumeLayout(false);
@@ -976,7 +993,7 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Panel _pnlCompanionsTotal;
     private System.Windows.Forms.Label _lblTotalPersons;
     private System.Windows.Forms.Label _lblCompanionsNotice;
-    private System.Windows.Forms.Panel _pnlActions;
+    private System.Windows.Forms.TableLayoutPanel _pnlActions;
     private System.Windows.Forms.FlowLayoutPanel _flowActions;
     private System.Windows.Forms.Button _btnRecordEntry;
     private System.Windows.Forms.Button _btnOverride;

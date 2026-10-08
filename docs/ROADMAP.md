@@ -89,7 +89,14 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 ---
 
+## Phase F1 — QR Credentials
+- [x] TF1.1 Integrate EntryCard source files into Domain, Application, and Infrastructure.
+- [x] TF1.2 Add CNG keystore and QRCoder for token signing and generation.
+- [x] TF1.3 Add database migration script `001_EntryCards.sql`.
+- [x] TF1.4 Ensure 100% tests pass and dependency rules are respected.
+
+**Done when:** QR token generation, signing, and verification are functionally complete and passing all test cases.
+
 ## Future (do not start without explicit approval)
-- **F1 QR credentials** — `AccessCredentials` table, token issue/revoke, QR card printing, `QrDesk` channel. (SPEC §9 F1)
 - **F2 Electronic gate** — deferred by the client; decide Q11 when scheduled; `IGateController`; `ParkGate.GateService` host. (SPEC §9 F2)
 - **F3 Cloud read-only** — decide Q12 first; one-way sync worker. (SPEC §9 F3)

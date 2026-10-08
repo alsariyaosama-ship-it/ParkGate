@@ -240,7 +240,8 @@ public sealed class FakeBeneficiaryRepository : IBeneficiaryRepository
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
-            return Task.FromResult<IReadOnlyList<Beneficiary>>([]);
+            IReadOnlyList<Beneficiary> all = _beneficiaries.OrderBy(b => b.FullName).Take(maxResults).ToList();
+            return Task.FromResult(all);
         }
 
         var trimmed = searchTerm.Trim();

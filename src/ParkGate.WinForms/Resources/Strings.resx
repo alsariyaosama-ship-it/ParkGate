@@ -313,6 +313,123 @@
   <data name="Error_Auth_SupervisorRequired" xml:space="preserve">
     <value>هذا الإجراء يتطلب صلاحية مشرف أو مدير.</value>
   </data>
+  <data name="Error_CheckIn_CooldownActive" xml:space="preserve">
+    <value>فترة التهدئة نشطة — سبق الدخول ضمن الفترة المحددة ولا يسمح بالدخول حالياً.</value>
+  </data>
+  <data name="Error_CheckIn_OrganizationInactive" xml:space="preserve">
+    <value>الجهة التابع لها الزبون معطّلة أو غير نشطة حالياً.</value>
+  </data>
+  <data name="Error_CheckIn_ExceedsMaxGroupSize" xml:space="preserve">
+    <value>إجمالي عدد الأفراد يتجاوز الحد الأقصى المسموح به للمجموعة في المرة الواحدة.</value>
+  </data>
+  <data name="Error_CheckIn_NegativeCompanions" xml:space="preserve">
+    <value>أعداد المرافقين لا يمكن أن تكون سالبة.</value>
+  </data>
+  <data name="Error_CheckIn_OverrideReasonRequired" xml:space="preserve">
+    <value>يرجى كتابة سبب التجاوز (5 أحرف على الأقل).</value>
+  </data>
+  <data name="Error_CheckIn_OverrideNotAllowed" xml:space="preserve">
+    <value>لا يُسمح بالتجاوز للزبائن المحظورين أو الجهات غير النشطة.</value>
+  </data>
+  <data name="Error_CheckIn_AttemptNotFound" xml:space="preserve">
+    <value>لم يتم العثور على محاولة الدخول المطلوبة.</value>
+  </data>
+  <data name="Error_CheckIn_CannotVoidDeniedAttempt" xml:space="preserve">
+    <value>لا يمكن إلغاء محاولة دخول تم رفضها مسبقاً.</value>
+  </data>
+  <data name="Error_CheckIn_AlreadyVoided" xml:space="preserve">
+    <value>تم إلغاء محاولة الدخول هذه مسبقاً.</value>
+  </data>
+  <data name="Error_CheckIn_VoidReasonRequired" xml:space="preserve">
+    <value>يرجى كتابة سبب الإلغاء (5 أحرف على الأقل).</value>
+  </data>
+  <data name="Error_Beneficiary_NotFound" xml:space="preserve">
+    <value>لم يتم العثور على بيانات الزبون المطلوبة.</value>
+  </data>
+  <data name="Error_Beneficiary_CardNotFound" xml:space="preserve">
+    <value>رقم البطاقة غير مسجل بالمنظومة.</value>
+  </data>
+  <data name="Error_Beneficiary_CardAlreadyExists" xml:space="preserve">
+    <value>رقم البطاقة مسجل مسبقاً لنفس الجهة الراعية.</value>
+  </data>
+  <data name="Error_Beneficiary_NationalIdAlreadyExists" xml:space="preserve">
+    <value>الرقم الوطني مسجل مسبقاً لزبون آخر.</value>
+  </data>
+  <data name="Error_Beneficiary_MultipleHoldersFound" xml:space="preserve">
+    <value>تم العثور على رقم البطاقة في أكثر من جهة راعية.</value>
+  </data>
+  <data name="Error_Beneficiary_Blocked" xml:space="preserve">
+    <value>حساب الزبون محظور تماماً من الدخول.</value>
+  </data>
+  <data name="Error_Beneficiary_Suspended" xml:space="preserve">
+    <value>حساب الزبون موقوف مؤقتاً.</value>
+  </data>
+  <data name="Error_Beneficiary_CardExpired" xml:space="preserve">
+    <value>صلاحية البطاقة منتهية.</value>
+  </data>
+  <data name="Error_Beneficiary_InvalidStatusTransition" xml:space="preserve">
+    <value>تغيير حالة الزبون المطلوب غير صالح.</value>
+  </data>
+  <data name="Error_Organization_NotFound" xml:space="preserve">
+    <value>لم يتم العثور على الجهة المطلوبة.</value>
+  </data>
+  <data name="Error_Organization_CodeAlreadyExists" xml:space="preserve">
+    <value>رمز الجهة مسجل مسبقاً لجهة أخرى.</value>
+  </data>
+  <data name="Error_Organization_NameAlreadyExists" xml:space="preserve">
+    <value>اسم الجهة مسجل مسبقاً لجهة أخرى.</value>
+  </data>
+  <data name="Error_Organization_CannotDeactivateDefault" xml:space="preserve">
+    <value>لا يمكن تعطيل الجهة الافتراضية للمنظومة.</value>
+  </data>
+  <data name="Error_AgeCategory_NotFound" xml:space="preserve">
+    <value>لم يتم العثور على الفئة العمرية المطلوبة.</value>
+  </data>
+  <data name="Error_AgeCategory_NameAlreadyExists" xml:space="preserve">
+    <value>اسم الفئة العمرية مسجل مسبقاً.</value>
+  </data>
+  <data name="Error_User_NotFound" xml:space="preserve">
+    <value>لم يتم العثور على المستخدم المطلوب.</value>
+  </data>
+  <data name="Error_User_UsernameAlreadyExists" xml:space="preserve">
+    <value>اسم المستخدم مستخدم مسبقاً، يرجى اختيار اسم آخر.</value>
+  </data>
+  <data name="Error_User_CannotDeactivateSelf" xml:space="preserve">
+    <value>لا يمكنك تعطيل حسابك الخاص أثناء تسجيل الدخول به.</value>
+  </data>
+  <data name="Error_User_CannotChangeOwnRole" xml:space="preserve">
+    <value>لا يمكنك تغيير صلاحيات حسابك الخاص.</value>
+  </data>
+  <data name="Error_Workstation_NotFound" xml:space="preserve">
+    <value>لم يتم العثور على محطة العمل المطلوبة.</value>
+  </data>
+  <data name="Error_Workstation_MachineNameAlreadyExists" xml:space="preserve">
+    <value>اسم الجهاز مسجل مسبقاً لمحطة عمل أخرى.</value>
+  </data>
+  <data name="Error_Settings_KeyNotFound" xml:space="preserve">
+    <value>مفتاح الإعداد المطلوب غير موجود.</value>
+  </data>
+  <data name="Error_Settings_InvalidValue" xml:space="preserve">
+    <value>قيمة الإعداد المدخلة غير صالحة.</value>
+  </data>
+  <data name="Error_Reports_InvalidDateRange" xml:space="preserve">
+    <value>يجب أن يكون تاريخ البداية يسبق أو يساوي تاريخ النهاية.</value>
+  </data>
+  <data name="Denial_CooldownActive" xml:space="preserve">
+    <value>فترة التهدئة نشطة (سبق الدخول)</value>
+  </data>
+  <data name="Denial_CardExpired" xml:space="preserve">
+    <value>صلاحية البطاقة منتهية</value>
+  </data>
+  <data name="Denial_HolderSuspended" xml:space="preserve">
+    <value>حساب الزبون موقوف مؤقتاً</value>
+  </data>
+  <data name="Denial_HolderBlocked" xml:space="preserve">
+    <value>حساب الزبون محظور</value>
+  </data>
+  <data name="Denial_OrganizationInactive" xml:space="preserve">
+    <value>الجهة الراعية غير نشطة</value>
+  </data>
   <data name="Val_UserNameRequired" xml:space="preserve">
     <value>اسم المستخدم مطلوب.</value>
   </data>
@@ -1169,9 +1286,6 @@
     <value>لا توجد بيانات متاحة للتصدير في التقرير الحالي.</value>
   </data>
   <data name="Msg_InvalidDateRange" xml:space="preserve">
-    <value>تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية.</value>
-  </data>
-  <data name="Error_Reports_InvalidDateRange" xml:space="preserve">
     <value>تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية.</value>
   </data>
   <data name="Menu_BackupNow" xml:space="preserve">
