@@ -65,6 +65,17 @@ public static class DependencyInjection
         services.AddTransient<IWorkstationService, WorkstationService>();
         services.AddTransient<ParkGate.Application.Reports.Services.IReportService, ParkGate.Application.Reports.Services.ReportService>();
 
+        // EntryCards
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton(new ParkGate.Application.EntryCards.EntryCardOptions { ValidityDays = 365 });
+        services.AddSingleton(sp => new ParkGate.Application.EntryCards.QrTokenVerifier(
+            sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>().GetTrustedKeysAsync().GetAwaiter().GetResult()));
+        services.AddTransient<ParkGate.Application.EntryCards.CardScanService>();
+        
+        services.AddSingleton(sp => ParkGate.Infrastructure.EntryCards.QrSigningBootstrap.CreateSignerAsync(
+            sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>(), Environment.MachineName).GetAwaiter().GetResult());
+        services.AddTransient<ParkGate.Application.EntryCards.EntryCardIssuer>();
+
         // 5. FluentValidation validators
         services.AddTransient<IValidator<FirstRunAdminRequest>, FirstRunAdminRequestValidator>();
         services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
@@ -111,6 +122,7 @@ public static class DependencyInjection
         services.AddTransient<ResetUserPasswordDialog>();
         services.AddTransient<SettingsForm>();
         services.AddTransient<Controls.ReportsControl>();
+        services.AddTransient<Forms.IssueQrDialog>();
 
         return services;
     }

@@ -59,6 +59,7 @@ partial class BeneficiariesControl
         this._btnEdit = new System.Windows.Forms.Button();
         this._btnChangeStatus = new System.Windows.Forms.Button();
         this._btnCheckInDirect = new System.Windows.Forms.Button();
+        this._btnIssueQr = new System.Windows.Forms.Button();
         this._grpHistory = new System.Windows.Forms.GroupBox();
         this._gridHistory = new System.Windows.Forms.DataGridView();
         this._colHistTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -540,6 +541,7 @@ partial class BeneficiariesControl
         this._pnlDetailsActions.Controls.Add(this._btnEdit);
         this._pnlDetailsActions.Controls.Add(this._btnChangeStatus);
         this._pnlDetailsActions.Controls.Add(this._btnCheckInDirect);
+        this._pnlDetailsActions.Controls.Add(this._btnIssueQr);
         this._pnlDetailsActions.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._pnlDetailsActions.Location = new System.Drawing.Point(6, 281);
         this._pnlDetailsActions.Name = "_pnlDetailsActions";
@@ -585,6 +587,19 @@ partial class BeneficiariesControl
         this._btnCheckInDirect.TabIndex = 2;
         this._btnCheckInDirect.Text = "فتح بالشباك";
         this._btnCheckInDirect.UseVisualStyleBackColor = false;
+        // 
+        // _btnIssueQr
+        // 
+        this._btnIssueQr.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
+        this._btnIssueQr.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+        this._btnIssueQr.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnIssueQr.ForeColor = System.Drawing.Color.White;
+        this._btnIssueQr.Location = new System.Drawing.Point(155, 7);
+        this._btnIssueQr.Name = "_btnIssueQr";
+        this._btnIssueQr.Size = new System.Drawing.Size(120, 30);
+        this._btnIssueQr.TabIndex = 3;
+        this._btnIssueQr.Text = "إصدار بطاقة QR";
+        this._btnIssueQr.UseVisualStyleBackColor = false;
         // 
         // _grpHistory
         // 
@@ -781,6 +796,7 @@ partial class BeneficiariesControl
     private System.Windows.Forms.Button _btnEdit;
     private System.Windows.Forms.Button _btnChangeStatus;
     private System.Windows.Forms.Button _btnCheckInDirect;
+    private System.Windows.Forms.Button _btnIssueQr;
     private System.Windows.Forms.GroupBox _grpHistory;
     private System.Windows.Forms.DataGridView _gridHistory;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colHistTime;

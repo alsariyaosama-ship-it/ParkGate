@@ -81,6 +81,7 @@ public partial class BeneficiariesControl : UserControl
         Theme.ApplySecondaryButtonStyle(_btnVoidHistoryEntry);
         Theme.ApplyPrimaryButtonStyle(_btnSearch);
         Theme.ApplySecondaryButtonStyle(_btnClearSearch);
+        Theme.ApplyPrimaryButtonStyle(_btnIssueQr);
     }
 
     private void InitializeFormText()
@@ -137,6 +138,7 @@ public partial class BeneficiariesControl : UserControl
         _btnEdit.Visible = canEdit;
         _btnChangeStatus.Visible = canChangeStatus;
         _btnCheckInDirect.Visible = canCheckIn;
+        _btnIssueQr.Visible = canEdit; // Assume same permission as editing beneficiary
     }
 
     private void WireEvents()
@@ -160,6 +162,7 @@ public partial class BeneficiariesControl : UserControl
         _btnEdit.Click += async (_, _) => await OpenEditDialogAsync();
         _btnChangeStatus.Click += async (_, _) => await OpenChangeStatusDialogAsync();
         _btnCheckInDirect.Click += (_, _) => OnCheckInDirectClicked();
+        _btnIssueQr.Click += async (_, _) => await OpenIssueQrDialogAsync();
 
         _gridHistory.SelectionChanged += (_, _) => UpdateVoidButtonState();
         _btnVoidHistoryEntry.Click += async (_, _) => await VoidSelectedHistoryEntryAsync();
@@ -384,6 +387,7 @@ public partial class BeneficiariesControl : UserControl
         _btnEdit.Enabled = true;
         _btnChangeStatus.Enabled = true;
         _btnCheckInDirect.Enabled = true;
+        _btnIssueQr.Enabled = b.Status == BeneficiaryStatus.Active;
     }
 
     private void ClearBeneficiaryDetails()
@@ -403,6 +407,7 @@ public partial class BeneficiariesControl : UserControl
         _btnEdit.Enabled = false;
         _btnChangeStatus.Enabled = false;
         _btnCheckInDirect.Enabled = false;
+        _btnIssueQr.Enabled = false;
     }
 
     private async Task LoadBeneficiaryHistoryAsync(Guid beneficiaryId)
@@ -611,6 +616,21 @@ public partial class BeneficiariesControl : UserControl
         if (_selectedBeneficiary != null)
         {
             RequestCheckIn?.Invoke(this, _selectedBeneficiary.CardNumber);
+        }
+    }
+
+    private async Task OpenIssueQrDialogAsync()
+    {
+        if (_selectedBeneficiary == null || _selectedBeneficiary.Status != BeneficiaryStatus.Active)
+        {
+            return;
+        }
+
+        var dialog = _formFactory?.Create<IssueQrDialog>() ?? new IssueQrDialog();
+        using (dialog)
+        {
+            await dialog.LoadAndShowAsync(_selectedBeneficiary);
+            dialog.ShowDialog(this);
         }
     }
 
