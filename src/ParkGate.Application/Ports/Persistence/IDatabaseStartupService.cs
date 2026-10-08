@@ -15,4 +15,9 @@ public interface IDatabaseStartupService
     /// Retrieves the list of any pending EF Core migrations that have not yet been applied.
     /// </summary>
     Task<IReadOnlyList<string>> GetPendingMigrationsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Ensures that EntryCards database schema tables, views and stored procedures are created.
+    /// </summary>
+    Task EnsureEntryCardsSchemaAsync(CancellationToken cancellationToken = default);
 }

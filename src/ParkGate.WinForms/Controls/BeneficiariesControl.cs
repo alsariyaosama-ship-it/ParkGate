@@ -626,11 +626,27 @@ public partial class BeneficiariesControl : UserControl
             return;
         }
 
-        var dialog = _formFactory?.Create<IssueQrDialog>() ?? new IssueQrDialog();
-        using (dialog)
+        try
         {
-            await dialog.LoadAndShowAsync(_selectedBeneficiary);
-            dialog.ShowDialog(this);
+            Cursor = Cursors.WaitCursor;
+            _btnIssueQr.Enabled = false;
+
+            var dialog = _formFactory?.Create<IssueQrDialog>() ?? new IssueQrDialog();
+            using (dialog)
+            {
+                await dialog.LoadAndShowAsync(_selectedBeneficiary);
+                Cursor = Cursors.Default;
+                dialog.ShowDialog(this);
+            }
+        }
+        catch (Exception ex)
+        {
+            _notifyService?.Error("حدث خطأ أثناء إصدار رمز QR: " + ex.Message, "خطأ");
+        }
+        finally
+        {
+            Cursor = Cursors.Default;
+            _btnIssueQr.Enabled = _selectedBeneficiary?.Status == BeneficiaryStatus.Active;
         }
     }
 

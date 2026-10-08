@@ -16,7 +16,7 @@ public static class CngSigningKeyStore
 
     public static ECDsa OpenOrCreate(string keyName = DefaultKeyName)
     {
-        using CngKey key = CngKey.Exists(keyName)
+        var key = CngKey.Exists(keyName)
             ? CngKey.Open(keyName)
             : CngKey.Create(CngAlgorithm.ECDsaP256, keyName, new CngKeyCreationParameters
             {
@@ -49,7 +49,7 @@ public static class QrSigningBootstrap
         ECDsa privateKey = CngSigningKeyStore.OpenOrCreate();
         try
         {
-            byte keyId = await keys.RegisterAsync(privateKey.ExportSubjectPublicKeyInfo(), stationName, ct);
+            byte keyId = await keys.RegisterAsync(privateKey.ExportSubjectPublicKeyInfo(), stationName, ct).ConfigureAwait(false);
             return new QrTokenSigner(privateKey, keyId);
         }
         catch

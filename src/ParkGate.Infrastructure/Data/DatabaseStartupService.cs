@@ -50,4 +50,11 @@ public sealed class DatabaseStartupService : IDatabaseStartupService
         var pending = await context.Database.GetPendingMigrationsAsync(cancellationToken);
         return pending.ToList();
     }
+
+    public async Task EnsureEntryCardsSchemaAsync(CancellationToken cancellationToken = default)
+    {
+        await EntryCards.EntryCardSchemaInitializer.EnsureSchemaAsync(
+            _connectionStringProvider.CurrentConnectionString,
+            cancellationToken).ConfigureAwait(false);
+    }
 }

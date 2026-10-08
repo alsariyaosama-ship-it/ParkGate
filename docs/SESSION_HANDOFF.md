@@ -10,27 +10,27 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-08 |
-| Last session | S14 — QR UI Dialog and Bug Fix (F1 completion) |
+| Last session | S15 — Fix QR Generation UI Thread Deadlock & GDI+ Stream Loop |
 | Current phase | Phase F1 |
 | Working branch | `main` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
 | Unit tests | 364 passed (151 domain + 103 application + 110 architecture/ui) |
-| Integration tests | 39 passed on LocalDB |
-| Total tests | 403 passed |
-| Last commit | `feat(ui): add QR card issuance dialog to beneficiaries control [T1.5]` |
+| Integration tests | 40 passed on LocalDB |
+| Total tests | 404 passed |
+| Last commit | `fix(ui): resolve deadlock and GDI stream invalidation when issuing QR cards` |
 
 ## State of the work
 
 **Done**
-- Completed Phase F1 (QR Credentials integration): added Domain, Application, and Infrastructure support for EntryCards based on provided source code.
-- Setup `CngSigningKeyStore` for Windows CNG ECDSA P-256 keys.
-- Setup `QrImageRenderer` using `QRCoder`.
-- Added database migration `001_EntryCards.sql`.
-- Fixed UI text selection behavior: added SelectAll on enter and clear on search change in CheckInDeskControl.
-- Verified 100% test pass rate (403 tests).
+- Fixed UI thread deadlock: wrapped async singleton DI factory resolutions (`QrTokenSigner`, `QrTokenVerifier`) in `Task.Run` and added `ConfigureAwait(false)` to all repository methods.
+- Fixed `CngSigningKeyStore.OpenOrCreate`: removed premature `using` disposal of `CngKey` handle so `ECDsaCng` remains functional.
+- Fixed GDI+ stream loop: copied rendered PNG stream to a standalone in-memory `Bitmap` before disposing `MemoryStream`, and added safe disposal of previous images.
+- Added automatic schema initializer `EntryCardSchemaInitializer` to ensure `QrSigningKeys`, `EntryCards`, and associated stored procedures exist on database startup without manual SQL steps.
+- Wrapped dialog invocation in `try-catch-finally` with cursor and button state protection.
+- Verified all 404 tests green.
 
 **In progress**
-- Awaiting user feedback on QR integration and UI adjustments.
+- Awaiting user confirmation of QR generation.
 
 **Not started**
 - Future features (F2 Electronic gate, F3 Cloud read-only) — pending client scheduling.
@@ -58,11 +58,16 @@
 
 ## Session log (newest first, max 10)
 
-### S14 — 2026-10-08 — Bug Fix & QR Issue Dialog (F1 UI)
-- Tasks: Fixed `PerformSearchAsync` executing twice concurrently on `BeneficiariesControl` load, locking cursor in `BusyScope`. Completed Phase F1 UI by implementing `IssueQrDialog`.
-- Commits: `fix(ui): remove redundant PerformSearchAsync on load to prevent busy cursor lock`, `feat(ui): add QR card issuance dialog to beneficiaries control [T1.5]`.
-- Decisions: Added `IssueQrDialog` using `QrImageRenderer` to generate the image directly into a PictureBox, wired to `BeneficiariesControl`. Registered EntryCards services in `DependencyInjection.cs`.
-- Test count: 403 total passed tests (zero warnings).
+### S15 — 2026-10-08 — Fix QR Issue Deadlock and Loop
+- Tasks: Diagnosed and resolved UI freeze / infinite loop when clicking "إصدار بطاقة QR".
+- Commits: `fix(ui): resolve deadlock and GDI stream invalidation when issuing QR cards`.
+- Decisions: 
+  1. Offloaded DI factory async registration onto ThreadPool using `Task.Run` and added `.ConfigureAwait(false)` in `EntryCardRepositories` and `CngSigningKeyStore` to prevent blocking the WinForms UI `SynchronizationContext`.
+  2. Fixed premature disposal of `CngKey` in `CngSigningKeyStore.OpenOrCreate`.
+  3. Fixed GDI+ paint exception by cloning the PNG stream into an independent `Bitmap` instead of binding directly to a disposed `MemoryStream`.
+  4. Added `EntryCardSchemaInitializer` and hooked it into `DatabaseStartupService` and `StartupCoordinator` to automatically create entry cards DB tables and stored procedures if missing.
+  5. Added `CngSigningKeyStoreTests` unit test.
+- Test count: 404 total passed tests (zero warnings).
 
 ### S13 — 2026-10-08 — QR Credentials (F1)
 - Tasks: TF1.1, TF1.2, TF1.3, TF1.4 completed on `main`.

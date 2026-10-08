@@ -42,17 +42,24 @@ public partial class IssueQrDialog : RtlFormBase
 
         try
         {
+            _lblInstruction.Text = "جاري إصدار وتوقيع الرمز الرقمي...";
             var card = await _issuer.IssueAsync(beneficiary.Id);
             
             // Generate QR Image using QrImageRenderer
             byte[] qrPngBytes = QrImageRenderer.RenderPng(card.QrText);
             
             using var ms = new MemoryStream(qrPngBytes);
-            _picQrCode.Image = Image.FromStream(ms);
+            using var rawImage = Image.FromStream(ms);
+            _picQrCode.Image?.Dispose();
+            _picQrCode.Image = new Bitmap(rawImage);
+
+            _lblInstruction.Text = "هذا الرمز مخصص للاستخدام عبر تطبيق البوابة";
         }
         catch (Exception ex)
         {
             _notifyService?.Error("حدث خطأ غير متوقع أثناء إنتاج الرمز: " + ex.Message, "خطأ");
+            _lblInstruction.Text = "فشل إصدار الرمز";
+            _picQrCode.Image?.Dispose();
             _picQrCode.Image = null;
         }
     }

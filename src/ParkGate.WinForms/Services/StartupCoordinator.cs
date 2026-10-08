@@ -69,6 +69,9 @@ public sealed class StartupCoordinator : IStartupCoordinator
 
         _logger.LogInformation("Database schema verified up-to-date (no pending migrations).");
 
+        // Step 2b: Ensure EntryCards schema exists
+        await _startupService.EnsureEntryCardsSchemaAsync(cancellationToken);
+
         // Step 3: Workstation auto-registration (FR-AUTH-05)
         var wsResult = await _authService.EnsureWorkstationRegisteredAsync(Environment.MachineName, cancellationToken);
         if (wsResult.IsFailure)

@@ -69,11 +69,12 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton(new ParkGate.Application.EntryCards.EntryCardOptions { ValidityDays = 365 });
         services.AddSingleton(sp => new ParkGate.Application.EntryCards.QrTokenVerifier(
-            sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>().GetTrustedKeysAsync().GetAwaiter().GetResult()));
+            Task.Run(() => sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>().GetTrustedKeysAsync()).GetAwaiter().GetResult()));
         services.AddTransient<ParkGate.Application.EntryCards.CardScanService>();
         
-        services.AddSingleton(sp => ParkGate.Infrastructure.EntryCards.QrSigningBootstrap.CreateSignerAsync(
-            sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>(), Environment.MachineName).GetAwaiter().GetResult());
+        services.AddSingleton(sp => 
+            Task.Run(() => ParkGate.Infrastructure.EntryCards.QrSigningBootstrap.CreateSignerAsync(
+                sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>(), Environment.MachineName)).GetAwaiter().GetResult());
         services.AddTransient<ParkGate.Application.EntryCards.EntryCardIssuer>();
 
         // 5. FluentValidation validators

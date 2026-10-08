@@ -19,14 +19,14 @@ public sealed class EntryCardRepository : IEntryCardRepository
     public async Task<EntryCardRecord?> FindAsync(Guid cardId, CancellationToken ct = default)
     {
         await using var connection = new SqlConnection(_connectionStringProvider.CurrentConnectionString);
-        await connection.OpenAsync(ct);
+        await connection.OpenAsync(ct).ConfigureAwait(false);
 
         await using var command = connection.CreateCommand();
         command.CommandText = "SELECT BeneficiaryId, IsRevoked, PermitActive FROM dbo.vw_EntryCardLookup WHERE CardId = @CardId";
         command.Parameters.AddWithValue("@CardId", cardId);
 
-        await using var reader = await command.ExecuteReaderAsync(ct);
-        if (await reader.ReadAsync(ct))
+        await using var reader = await command.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        if (await reader.ReadAsync(ct).ConfigureAwait(false))
         {
             return new EntryCardRecord(
                 cardId,
@@ -41,7 +41,7 @@ public sealed class EntryCardRepository : IEntryCardRepository
     public async Task ReplaceActiveCardAsync(Guid beneficiaryId, Guid cardId, byte keyId, DateOnly expiresOn, CancellationToken ct = default)
     {
         await using var connection = new SqlConnection(_connectionStringProvider.CurrentConnectionString);
-        await connection.OpenAsync(ct);
+        await connection.OpenAsync(ct).ConfigureAwait(false);
 
         await using var command = connection.CreateCommand();
         command.CommandType = CommandType.StoredProcedure;
@@ -51,13 +51,13 @@ public sealed class EntryCardRepository : IEntryCardRepository
         command.Parameters.AddWithValue("@KeyId", keyId);
         command.Parameters.AddWithValue("@ExpiresOn", expiresOn.ToDateTime(TimeOnly.MinValue));
 
-        await command.ExecuteNonQueryAsync(ct);
+        await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
     }
 
     public async Task RevokeAsync(Guid cardId, string reason, CancellationToken ct = default)
     {
         await using var connection = new SqlConnection(_connectionStringProvider.CurrentConnectionString);
-        await connection.OpenAsync(ct);
+        await connection.OpenAsync(ct).ConfigureAwait(false);
 
         await using var command = connection.CreateCommand();
         command.CommandType = CommandType.StoredProcedure;
@@ -65,7 +65,7 @@ public sealed class EntryCardRepository : IEntryCardRepository
         command.Parameters.AddWithValue("@CardId", cardId);
         command.Parameters.AddWithValue("@Reason", reason);
 
-        await command.ExecuteNonQueryAsync(ct);
+        await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
     }
 }
 
@@ -81,14 +81,14 @@ public sealed class QrKeyRepository : IQrKeyRepository
     public async Task<IReadOnlyList<QrPublicKey>> GetTrustedKeysAsync(CancellationToken ct = default)
     {
         await using var connection = new SqlConnection(_connectionStringProvider.CurrentConnectionString);
-        await connection.OpenAsync(ct);
+        await connection.OpenAsync(ct).ConfigureAwait(false);
 
         await using var command = connection.CreateCommand();
         command.CommandText = "SELECT KeyId, PublicKeySpki FROM dbo.QrSigningKeys WHERE RevokedAt IS NULL";
 
         var keys = new List<QrPublicKey>();
-        await using var reader = await command.ExecuteReaderAsync(ct);
-        while (await reader.ReadAsync(ct))
+        await using var reader = await command.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        while (await reader.ReadAsync(ct).ConfigureAwait(false))
         {
             keys.Add(new QrPublicKey(reader.GetByte(0), (byte[])reader.GetValue(1)));
         }
@@ -99,7 +99,7 @@ public sealed class QrKeyRepository : IQrKeyRepository
     public async Task<byte> RegisterAsync(byte[] subjectPublicKeyInfo, string stationName, CancellationToken ct = default)
     {
         await using var connection = new SqlConnection(_connectionStringProvider.CurrentConnectionString);
-        await connection.OpenAsync(ct);
+        await connection.OpenAsync(ct).ConfigureAwait(false);
 
         await using var command = connection.CreateCommand();
         command.CommandType = CommandType.StoredProcedure;
@@ -110,7 +110,7 @@ public sealed class QrKeyRepository : IQrKeyRepository
         var outParam = new SqlParameter("@KeyId", SqlDbType.TinyInt) { Direction = ParameterDirection.Output };
         command.Parameters.Add(outParam);
 
-        await command.ExecuteNonQueryAsync(ct);
+        await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
 
         return (byte)outParam.Value;
     }
@@ -128,7 +128,7 @@ public sealed class CardScanLogRepository : ICardScanLog
     public async Task WriteAsync(CardScanLogEntry entry, CancellationToken ct = default)
     {
         await using var connection = new SqlConnection(_connectionStringProvider.CurrentConnectionString);
-        await connection.OpenAsync(ct);
+        await connection.OpenAsync(ct).ConfigureAwait(false);
 
         await using var command = connection.CreateCommand();
         command.CommandText = "INSERT INTO dbo.CardScanLog (StationName, Status, CardId, RawPrefix) VALUES (@StationName, @Status, @CardId, @RawPrefix)";
@@ -137,6 +137,6 @@ public sealed class CardScanLogRepository : ICardScanLog
         command.Parameters.AddWithValue("@CardId", (object?)entry.CardId ?? DBNull.Value);
         command.Parameters.AddWithValue("@RawPrefix", (object?)entry.RawPrefix ?? DBNull.Value);
 
-        await command.ExecuteNonQueryAsync(ct);
+        await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
     }
 }
