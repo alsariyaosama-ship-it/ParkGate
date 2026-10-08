@@ -10,14 +10,14 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-08 |
-| Last session | S13 — QR Credentials (F1) and UI fixes |
+| Last session | S14 — QR UI Dialog and Bug Fix (F1 completion) |
 | Current phase | Phase F1 |
 | Working branch | `main` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
 | Unit tests | 364 passed (151 domain + 103 application + 110 architecture/ui) |
 | Integration tests | 39 passed on LocalDB |
 | Total tests | 403 passed |
-| Last commit | `feat(entrycards): integrate QR entry cards functionality [F1]` |
+| Last commit | `feat(ui): add QR card issuance dialog to beneficiaries control [T1.5]` |
 
 ## State of the work
 
@@ -57,6 +57,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S14 — 2026-10-08 — Bug Fix & QR Issue Dialog (F1 UI)
+- Tasks: Fixed `PerformSearchAsync` executing twice concurrently on `BeneficiariesControl` load, locking cursor in `BusyScope`. Completed Phase F1 UI by implementing `IssueQrDialog`.
+- Commits: `fix(ui): remove redundant PerformSearchAsync on load to prevent busy cursor lock`, `feat(ui): add QR card issuance dialog to beneficiaries control [T1.5]`.
+- Decisions: Added `IssueQrDialog` using `QrImageRenderer` to generate the image directly into a PictureBox, wired to `BeneficiariesControl`. Registered EntryCards services in `DependencyInjection.cs`.
+- Test count: 403 total passed tests (zero warnings).
 
 ### S13 — 2026-10-08 — QR Credentials (F1)
 - Tasks: TF1.1, TF1.2, TF1.3, TF1.4 completed on `main`.
