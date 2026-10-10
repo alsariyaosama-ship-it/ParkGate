@@ -22,6 +22,13 @@ public sealed class BeneficiaryRepository : IBeneficiaryRepository
             .SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Beneficiary>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        return await _context.Beneficiaries
+            .Where(b => ids.Contains(b.Id))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Beneficiary?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Beneficiaries

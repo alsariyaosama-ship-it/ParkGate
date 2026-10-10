@@ -406,15 +406,8 @@ public sealed class CheckInService : ICheckInService
         }
 
         var attemptBeneficiaryIds = attempts.Take(20).Select(a => a.BeneficiaryId).Distinct().ToList();
-        var beneficiariesMap = new Dictionary<Guid, (string CardNumber, string FullName)>();
-        foreach (var bId in attemptBeneficiaryIds)
-        {
-            var b = await uow.Beneficiaries.GetByIdAsync(bId, cancellationToken);
-            if (b != null)
-            {
-                beneficiariesMap[bId] = (b.CardNumber.Value, b.FullName);
-            }
-        }
+        var beneficiaries = await uow.Beneficiaries.GetByIdsAsync(attemptBeneficiaryIds, cancellationToken);
+        var beneficiariesMap = beneficiaries.ToDictionary(b => b.Id, b => (CardNumber: b.CardNumber.Value, FullName: b.FullName));
 
         var allOrgs = await uow.Organizations.GetAllAsync(false, cancellationToken);
         var orgMap = allOrgs.ToDictionary(o => o.Id, o => o.NameAr);

@@ -36,6 +36,7 @@ public partial class CheckInDeskControl : UserControl
     private readonly IFormFactory? _formFactory;
     private readonly INotifyService? _notifyService;
     private readonly ILogger<CheckInDeskControl>? _logger;
+    private readonly ParkGate.Application.EntryCards.CardScanService? _cardScanService;
 
     private readonly List<CounterInput> _counterInputs = [];
     private readonly ContextMenuStrip _todayContextMenu = new();
@@ -51,7 +52,7 @@ public partial class CheckInDeskControl : UserControl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int AutoResetDelayMs { get; set; } = 1200;
 
-    public CheckInDeskControl() : this(null, null, null, null, null, null, null, null, null, null)
+    public CheckInDeskControl() : this(null, null, null, null, null, null, null, null, null, null, null)
     {
     }
 
@@ -65,7 +66,8 @@ public partial class CheckInDeskControl : UserControl
         ICurrentWorkstation? currentWorkstation,
         IFormFactory? formFactory,
         INotifyService? notifyService,
-        ILogger<CheckInDeskControl>? logger)
+        ILogger<CheckInDeskControl>? logger,
+        ParkGate.Application.EntryCards.CardScanService? cardScanService = null)
     {
         InitializeComponent();
 
@@ -79,6 +81,7 @@ public partial class CheckInDeskControl : UserControl
         _formFactory = formFactory;
         _notifyService = notifyService;
         _logger = logger;
+        _cardScanService = cardScanService;
 
         InitializeControlText();
         Theme.ApplyGridStyle(_gridToday);
@@ -598,6 +601,52 @@ public partial class CheckInDeskControl : UserControl
         // Always clear previous customer data and reset banner when initiating a new search
         ClearPreviousHolderData();
         _statusBanner.Reset();
+
+        // 1. Check if scanned input is a signed QR token (203 digits per QrTokenFormat.DigitLength)
+        if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength && _cardScanService != null)
+        {
+            using (new BusyScope(this, _btnSearch, _btnNewHolder))
+            {
+                try
+                {
+                    var scanResult = await _cardScanService.ScanAsync(normalized);
+                    if (!scanResult.IsAccepted)
+                    {
+                        _statusBanner.SetDenied(scanResult.MessageAr, "رمز QR غير صالح أو ملغى");
+                        if (_denialSoundEnabled)
+                        {
+                            System.Media.SystemSounds.Exclamation.Play();
+                        }
+                        FocusCardNumberBox();
+                        return;
+                    }
+
+                    if (scanResult.BeneficiaryId.HasValue && _beneficiaryService != null)
+                    {
+                        var lookupById = await _beneficiaryService.GetByIdAsync(scanResult.BeneficiaryId.Value);
+                        if (lookupById.IsSuccess)
+                        {
+                            var matched = lookupById.Value;
+                            _txtCardNumber.Text = matched.Beneficiary.CardNumber;
+                            ShowHolderInfo(matched.Beneficiary, matched.Eligibility);
+
+                            if (_prefillFromLastVisit && matched.LastCompanions?.Count > 0)
+                            {
+                                PrefillCompanions(matched.LastCompanions);
+                            }
+                            return;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Error scanning QR card token.");
+                    _statusBanner.SetDenied("حدث خطأ أثناء فحص رمز QR: " + ex.Message);
+                    FocusCardNumberBox();
+                    return;
+                }
+            }
+        }
 
         if (_beneficiaryService == null)
         {

@@ -6,6 +6,7 @@ namespace ParkGate.Application.Ports.Persistence;
 public interface IBeneficiaryRepository
 {
     Task<Beneficiary?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Beneficiary>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
     Task<Beneficiary?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Beneficiary>> GetByCardNumberAsync(CardNumber cardNumber, CancellationToken cancellationToken = default);
     Task<Beneficiary?> GetByOrgAndCardAsync(int organizationId, CardNumber cardNumber, CancellationToken cancellationToken = default);

@@ -208,6 +208,13 @@ public sealed class FakeBeneficiaryRepository : IBeneficiaryRepository
     public Task<Beneficiary?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         Task.FromResult(_beneficiaries.FirstOrDefault(b => b.Id == id));
 
+    public Task<IReadOnlyList<Beneficiary>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        var idSet = ids.ToHashSet();
+        IReadOnlyList<Beneficiary> matches = _beneficiaries.Where(b => idSet.Contains(b.Id)).ToList();
+        return Task.FromResult(matches);
+    }
+
     public Task<Beneficiary?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken = default) =>
         Task.FromResult(_beneficiaries.FirstOrDefault(b => b.Id == id));
 

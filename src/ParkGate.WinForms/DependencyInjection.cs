@@ -67,6 +67,7 @@ public static class DependencyInjection
 
         // EntryCards
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton(new ParkGate.Application.EntryCards.GateStation(Environment.MachineName));
         services.AddSingleton(new ParkGate.Application.EntryCards.EntryCardOptions { ValidityDays = 365 });
         services.AddSingleton(sp => new ParkGate.Application.EntryCards.QrTokenVerifier(
             Task.Run(() => sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>().GetTrustedKeysAsync()).GetAwaiter().GetResult()));

@@ -9,36 +9,36 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-08 |
-| Last session | S15 — Fix QR Generation UI Thread Deadlock & GDI+ Stream Loop |
+| Last updated | 2026-10-10 |
+| Last session | S16 — System-wide Audit & Hardening (DI, QR Scanner Desk, Print/Save QR, N+1 Query Fix) |
 | Current phase | Phase F1 |
 | Working branch | `main` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
 | Unit tests | 364 passed (151 domain + 103 application + 110 architecture/ui) |
 | Integration tests | 40 passed on LocalDB |
 | Total tests | 404 passed |
-| Last commit | `fix(ui): resolve deadlock and GDI stream invalidation when issuing QR cards` |
+| Last commit | `fix(core): resolve DI registration, integrate QR desk scanner, add print/save, and eliminate N+1 queries` |
 
 ## State of the work
 
 **Done**
-- Fixed UI thread deadlock: wrapped async singleton DI factory resolutions (`QrTokenSigner`, `QrTokenVerifier`) in `Task.Run` and added `ConfigureAwait(false)` to all repository methods.
-- Fixed `CngSigningKeyStore.OpenOrCreate`: removed premature `using` disposal of `CngKey` handle so `ECDsaCng` remains functional.
-- Fixed GDI+ stream loop: copied rendered PNG stream to a standalone in-memory `Bitmap` before disposing `MemoryStream`, and added safe disposal of previous images.
-- Added automatic schema initializer `EntryCardSchemaInitializer` to ensure `QrSigningKeys`, `EntryCards`, and associated stored procedures exist on database startup without manual SQL steps.
-- Wrapped dialog invocation in `try-catch-finally` with cursor and button state protection.
-- Verified all 404 tests green.
+- Completed comprehensive 5-dimension audit across the entire system (Architecture, Logic, Code, Performance, UX).
+- Fixed DI container missing registration: registered `GateStation` in `DependencyInjection.cs` enabling `CardScanService`.
+- Integrated cryptographic QR scanner directly into `CheckInDeskControl`: auto-detects 203-digit QR tokens, verifies ECDSA P-256 signature, validates expiration and revocation, and loads beneficiary eligibility.
+- Added "طباعة" (Print Card layout with park banner) and "حفظ" (Save as PNG) in `IssueQrDialog`.
+- Fixed N+1 query issue in `CheckInService.GetTodayDeskEntriesAsync` by introducing batch `GetByIdsAsync` in `IBeneficiaryRepository`.
+- 100% test pass rate preserved (404/404 tests passing, 0 warnings).
 
 **In progress**
-- Awaiting user confirmation of QR generation.
+- User review and feedback.
 
 **Not started**
 - Future features (F2 Electronic gate, F3 Cloud read-only) — pending client scheduling.
 
 ## Next session — start here
 
-1. System is fully verified with modern Cairo typography, RTL, and Emerald theme.
-2. Proceed with deployment or next user requirements.
+1. Present audit findings to Osama.
+2. Proceed with client acceptance or any requested refinements.
 
 ## Blockers / waiting on the user
 
@@ -57,6 +57,16 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S16 — 2026-10-10 — System-wide Audit & Hardening
+- Tasks: Complete audit across architecture, code logic, performance, and UX.
+- Commits: `fix(core): resolve DI registration, integrate QR desk scanner, add print/save, and eliminate N+1 queries`.
+- Decisions:
+  1. Registered `GateStation` in WinForms DI composition root to fix `CardScanService` resolution.
+  2. Integrated `CardScanService` into `CheckInDeskControl` to allow desk barcode scanners to scan printed QR cards directly.
+  3. Added Print and Save PNG capabilities to `IssueQrDialog`.
+  4. Added `GetByIdsAsync` to `IBeneficiaryRepository` to eliminate N+1 database queries in today's entries widget.
+- Test count: 404 total passed tests (zero warnings).
 
 ### S15 — 2026-10-08 — Fix QR Issue Deadlock and Loop
 - Tasks: Diagnosed and resolved UI freeze / infinite loop when clicking "إصدار بطاقة QR".
