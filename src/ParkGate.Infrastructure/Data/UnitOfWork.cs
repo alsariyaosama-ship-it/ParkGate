@@ -22,6 +22,7 @@ public sealed class UnitOfWork : IUnitOfWork
         Workstations = new WorkstationRepository(context);
         AppSettings = new AppSettingRepository(context);
         AuditLogs = new AuditLogRepository(context);
+        SyncOutboxes = new SyncOutboxRepository(context);
     }
 
     public IBeneficiaryRepository Beneficiaries { get; }
@@ -32,6 +33,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public IWorkstationRepository Workstations { get; }
     public IAppSettingRepository AppSettings { get; }
     public IAuditLogRepository AuditLogs { get; }
+    public ISyncOutboxRepository SyncOutboxes { get; }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {

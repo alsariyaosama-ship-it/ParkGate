@@ -100,7 +100,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 ---
 
 ## Phase F3 — Cloud Sync Agent · branch `phase/f3-sync-agent`
-- [ ] TF3.1 Architecture & ADR: register ADR-018, update package props, update solution project count rule in architecture tests.
+- [x] TF3.1 Architecture & ADR: register ADR-018, update package props, update solution project count rule in architecture tests.
 - [ ] TF3.2 Domain & Persistence: define `SyncOutbox` entity, EF Core configuration, migration `AddSyncOutboxTable`, `ISyncOutboxRepository`.
 - [ ] TF3.3 Transactional Outbox Capture: capture `SyncableTypes` mutations inside DbContext SaveChanges transaction.
 - [ ] TF3.4 Sync Engine: implement `OutboxDeduplicator` (Last-Write-Wins), `PayloadEncryptionService` (AES), `CloudPushService`.

@@ -19,6 +19,7 @@ public class ParkGateDbContext : DbContext
     public DbSet<Workstation> Workstations => Set<Workstation>();
     public DbSet<AppSetting> AppSettings => Set<AppSetting>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<SyncOutbox> SyncOutboxes => Set<SyncOutbox>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

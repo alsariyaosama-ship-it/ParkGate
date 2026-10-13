@@ -372,6 +372,49 @@ public sealed class FakeAuditLogRepository : IAuditLogRepository
         Task.FromResult<IReadOnlyList<AuditLog>>(_logs.OrderByDescending(l => l.AtUtc).Take(count).ToList());
 }
 
+public sealed class FakeSyncOutboxRepository : ISyncOutboxRepository
+{
+    private readonly List<SyncOutbox> _outboxes = [];
+
+    public IReadOnlyList<SyncOutbox> Items => _outboxes.AsReadOnly();
+
+    public Task<IReadOnlyList<SyncOutbox>> GetPendingBatchAsync(int batchSize, int maxRetries, CancellationToken cancellationToken = default)
+    {
+        var pending = _outboxes
+            .Where(x => !x.IsProcessed && x.RetryCount < maxRetries)
+            .OrderBy(x => x.CreatedAtUtc)
+            .Take(batchSize)
+            .ToList();
+        return Task.FromResult<IReadOnlyList<SyncOutbox>>(pending);
+    }
+
+    public Task AddAsync(SyncOutbox outbox, CancellationToken cancellationToken = default)
+    {
+        _outboxes.Add(outbox);
+        return Task.CompletedTask;
+    }
+
+    public Task AddRangeAsync(IEnumerable<SyncOutbox> outboxes, CancellationToken cancellationToken = default)
+    {
+        _outboxes.AddRange(outboxes);
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteRangeAsync(IEnumerable<SyncOutbox> outboxes, CancellationToken cancellationToken = default)
+    {
+        foreach (var item in outboxes.ToList())
+        {
+            _outboxes.Remove(item);
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task<int> GetPendingCountAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_outboxes.Count(x => !x.IsProcessed));
+    }
+}
+
 public sealed class FakeUnitOfWork : IUnitOfWork
 {
     public IUserRepository Users { get; }
@@ -382,6 +425,7 @@ public sealed class FakeUnitOfWork : IUnitOfWork
     public IEntryAttemptRepository EntryAttempts { get; }
     public IAgeCategoryRepository AgeCategories { get; }
     public IAuditLogRepository AuditLogs { get; }
+    public ISyncOutboxRepository SyncOutboxes { get; }
 
     public DateTime CurrentDbTime { get; set; } = new(2026, 10, 5, 10, 0, 0, DateTimeKind.Utc);
     public int SaveChangesCalls { get; private set; }
@@ -403,6 +447,7 @@ public sealed class FakeUnitOfWork : IUnitOfWork
         EntryAttempts = new FakeEntryAttemptRepository(attempts);
         AgeCategories = new FakeAgeCategoryRepository(categories);
         AuditLogs = new FakeAuditLogRepository();
+        SyncOutboxes = new FakeSyncOutboxRepository();
     }
 
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;

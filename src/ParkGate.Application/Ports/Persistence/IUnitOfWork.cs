@@ -10,6 +10,7 @@ public interface IUnitOfWork : IAsyncDisposable, IDisposable
     IWorkstationRepository Workstations { get; }
     IAppSettingRepository AppSettings { get; }
     IAuditLogRepository AuditLogs { get; }
+    ISyncOutboxRepository SyncOutboxes { get; }
 
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitAsync(CancellationToken cancellationToken = default);
