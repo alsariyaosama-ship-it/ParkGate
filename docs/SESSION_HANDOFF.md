@@ -9,36 +9,41 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-10 |
-| Last session | S16 — System-wide Audit & Hardening (DI, QR Scanner Desk, Print/Save QR, N+1 Query Fix) |
-| Current phase | Phase F1 |
-| Working branch | `main` |
+| Last updated | 2026-10-13 |
+| Last session | S17 — Standalone Cloud Sync Agent (Phase F3) |
+| Current phase | Phase F3 |
+| Working branch | `phase/f3-sync-agent` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 364 passed (151 domain + 103 application + 110 architecture/ui) |
-| Integration tests | 40 passed on LocalDB |
-| Total tests | 404 passed |
-| Last commit | `fix(core): resolve DI registration, integrate QR desk scanner, add print/save, and eliminate N+1 queries` |
+| Unit tests | 376 passed (159 domain + 107 application + 110 architecture) |
+| Integration tests | 50 passed on LocalDB (including SyncOutboxIntegrationTests) |
+| Total tests | 443 passed |
+| Last commit | `feat(deploy): add SyncAgent service scripts, docs and integration tests [TF3.6]` |
 
 ## State of the work
 
 **Done**
-- Completed comprehensive 5-dimension audit across the entire system (Architecture, Logic, Code, Performance, UX).
-- Fixed DI container missing registration: registered `GateStation` in `DependencyInjection.cs` enabling `CardScanService`.
-- Integrated cryptographic QR scanner directly into `CheckInDeskControl`: auto-detects 203-digit QR tokens, verifies ECDSA P-256 signature, validates expiration and revocation, and loads beneficiary eligibility.
-- Added "طباعة" (Print Card layout with park banner) and "حفظ" (Save as PNG) in `IssueQrDialog`.
-- Fixed N+1 query issue in `CheckInService.GetTodayDeskEntriesAsync` by introducing batch `GetByIdsAsync` in `IBeneficiaryRepository`.
-- 100% test pass rate preserved (404/404 tests passing, 0 warnings).
+- Implemented standalone worker service application `ParkGate.SyncAgent` matching proven `HRSys.SyncAgent` architecture.
+- ADR-018 accepted: standalone Worker Service project targeting .NET 10 with Windows Service support.
+- Defined `SyncOutbox` entity, EF Core mapping, and migration `AddSyncOutboxTable` with index `IX_SyncOutboxes_Pending`.
+- Automatic transactional outbox capture in `ParkGateDbContext` on `SyncableTypes` (Beneficiary, EntryAttempt, Companion, Organization, AgeCategory).
+- `OutboxDeduplicator` implementing Last-Write-Wins batch mutation deduplication.
+- `PayloadEncryptionService` using AES-256-CBC to encrypt sensitive fields (`NationalId`, `Phone`) prior to cloud push.
+- `CloudPushService` HTTP client posting batches to `/api/sync/push` with API Key and immediate pruning of delivered records.
+- Standalone Worker Service `ParkGate.SyncAgent` with `OutboxProcessorWorker`, `HeartbeatWorker` (recording pulse in AppSettings), DPAPI credentials support, and Serilog logging.
+- Windows Service installation (`scripts/install-sync-service.ps1`) and uninstallation (`scripts/uninstall-sync-service.ps1`) scripts.
+- Deployment documentation in `docs/DEPLOYMENT.md`.
+- 100% test pass rate preserved (443/443 tests green, 0 warnings).
 
 **In progress**
-- User review and feedback.
+- User review and acceptance of Phase F3.
 
 **Not started**
-- Future features (F2 Electronic gate, F3 Cloud read-only) — pending client scheduling.
+- Future features (F2 Electronic gate) — deferred by client.
 
 ## Next session — start here
 
-1. Present audit findings to Osama.
-2. Proceed with client acceptance or any requested refinements.
+1. Review Phase F3 Pull Request with Osama.
+2. Merge `phase/f3-sync-agent` into `main` upon approval.
 
 ## Blockers / waiting on the user
 
@@ -57,6 +62,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S17 — 2026-10-13 — Standalone Cloud Sync Agent (Phase F3)
+- Tasks: TF3.1, TF3.2, TF3.3, TF3.4, TF3.5, TF3.6 completed on `phase/f3-sync-agent`.
+- Commits: ADR-018, outbox persistence, transactional capture, sync engine (deduplicator, AES encryption, cloud push), `ParkGate.SyncAgent` Worker Service, Windows Service scripts and integration tests.
+- Decisions: Adopted standalone Worker Service (`ParkGate.SyncAgent`) matching `HRSys.SyncAgent` architecture. Integrated transactional outbox capture inside DbContext, AES-256 field encryption for beneficiary data, Last-Write-Wins batch pruning, and DPAPI-secured connection resolution.
+- Test count: 443 total passed (376 unit/architecture + 67 LocalDB infrastructure/integration tests, zero warnings).
 
 ### S16 — 2026-10-10 — System-wide Audit & Hardening
 - Tasks: Complete audit across architecture, code logic, performance, and UX.

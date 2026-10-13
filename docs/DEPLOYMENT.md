@@ -178,3 +178,45 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
 3. توجه إلى **الإدارة ← المستخدمين**:
    - أنشئ حسابات موظفي الشبابيك برتبة **موظف شباك (Operator)** وحسابات المشرفين برتبة **مشرف (Supervisor)**.
 4. أجرِ محاولة دخول تجريبية واختبر قارئ الباركود وسرعة الاستجابة على الشبكة.
+
+---
+
+## 8. نشر خدمة المزامنة السحابية (ParkGate SyncAgent)
+
+تطبيق خدمة مستقل يعمل في الخلفية على جهاز السيرفر لنقل التغييرات المسجلة في جدول `SyncOutboxes` إلى السيرفر السحابي (Cloud API) بصمت وأمان:
+
+### 8.1 الإعداد والتهيئة
+1. يتواجد الملف التنفيذي `ParkGate.SyncAgent.exe` في مجلد التثبيت أو النشر.
+2. يستخدم الووركر نفس إعدادات الاتصال المشفرة بتقنية DPAPI من `%ProgramData%\ParkGate\connection.dat` أو من ملف الإعدادات `appsettings.json`.
+3. اضبط إعدادات السحابة في `appsettings.json` (أو `%ProgramData%\ParkGate\appsettings.local.json`):
+   ```json
+   "SyncOptions": {
+     "Enabled": true,
+     "IntervalSeconds": 30,
+     "BatchSize": 100,
+     "MaxRetries": 10
+   },
+   "CloudApi": {
+     "BaseUrl": "https://api.yourpark.ly/",
+     "ApiKey": "YOUR_CLOUD_API_KEY",
+     "AesKey": "YOUR_AES_256_BASE64_KEY"
+   }
+   ```
+
+### 8.2 التثبيت كخدمة ويندوز (Windows Service)
+لتشغيل الووركر كخدمة تبدأ تلقائياً مع إقلاع السيرفر:
+1. افتح PowerShell كمسؤول (Run as Administrator).
+2. نفّذ أمر التثبيت:
+   ```powershell
+   .\scripts\install-sync-service.ps1
+   ```
+3. للتحقق من حالة الخدمة وسجلاتها:
+   - افتح تطبيق الخدمات `services.msc` وتأكد من حالة `ParkGate Sync Agent` (Running).
+   - توجد ملفات السجل الدوارة في: `%ProgramData%\ParkGate\logs\sync-agent-YYYYMMDD.txt`.
+
+### 8.3 إيقاف أو إزالة الخدمة
+لإزالة خدمة الويندوز عند الحاجة:
+```powershell
+.\scripts\uninstall-sync-service.ps1
+```
+
