@@ -103,7 +103,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] TF3.1 Architecture & ADR: register ADR-018, update package props, update solution project count rule in architecture tests.
 - [x] TF3.2 Domain & Persistence: define `SyncOutbox` entity, EF Core configuration, migration `AddSyncOutboxTable`, `ISyncOutboxRepository`.
 - [x] TF3.3 Transactional Outbox Capture: capture `SyncableTypes` mutations inside DbContext SaveChanges transaction.
-- [ ] TF3.4 Sync Engine: implement `OutboxDeduplicator` (Last-Write-Wins), `PayloadEncryptionService` (AES), `CloudPushService`.
+- [x] TF3.4 Sync Engine: implement `OutboxDeduplicator` (Last-Write-Wins), `PayloadEncryptionService` (AES), `CloudPushService`.
 - [ ] TF3.5 Standalone Worker Service: create `ParkGate.SyncAgent` project, `OutboxProcessorWorker`, `HeartbeatWorker`, DPAPI connection provider, Serilog logging.
 - [ ] TF3.6 Deployment & Hardening: add Windows Service install/uninstall scripts, E2E tests, zero-warning verification.
 
