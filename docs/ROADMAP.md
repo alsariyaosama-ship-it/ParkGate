@@ -97,6 +97,18 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 **Done when:** QR token generation, signing, and verification are functionally complete and passing all test cases.
 
+---
+
+## Phase F3 — Cloud Sync Agent · branch `phase/f3-sync-agent`
+- [x] TF3.1 Architecture & ADR: register ADR-018, update package props, update solution project count rule in architecture tests.
+- [x] TF3.2 Domain & Persistence: define `SyncOutbox` entity, EF Core configuration, migration `AddSyncOutboxTable`, `ISyncOutboxRepository`.
+- [x] TF3.3 Transactional Outbox Capture: capture `SyncableTypes` mutations inside DbContext SaveChanges transaction.
+- [x] TF3.4 Sync Engine: implement `OutboxDeduplicator` (Last-Write-Wins), `PayloadEncryptionService` (AES), `CloudPushService`.
+- [x] TF3.5 Standalone Worker Service: create `ParkGate.SyncAgent` project, `OutboxProcessorWorker`, `HeartbeatWorker`, DPAPI connection provider, Serilog logging.
+- [x] TF3.6 Deployment & Hardening: add Windows Service install/uninstall scripts, E2E tests, zero-warning verification.
+
+**Done when:** Standalone SyncAgent runs, processes outbox batches, pushes to cloud endpoint, prunes successfully synced rows, and all unit/architecture tests pass with zero warnings.
+
 ## Future (do not start without explicit approval)
 - **F2 Electronic gate** — deferred by the client; decide Q11 when scheduled; `IGateController`; `ParkGate.GateService` host. (SPEC §9 F2)
-- **F3 Cloud read-only** — decide Q12 first; one-way sync worker. (SPEC §9 F3)
+

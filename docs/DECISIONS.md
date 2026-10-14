@@ -103,6 +103,12 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Decision:** Adopt Google Font **Cairo** as the primary typography. Embed `Cairo.ttf` in `ParkGate.WinForms` resources, manage loading via `AppFont` and `PrivateFontCollection` with fallback to `Segoe UI`, and set globally via `Application.SetDefaultFont` and `RtlFormBase`.
 - **Consequences:** Beautiful, uniform Arabic typography across all client PCs without external font dependencies.
 
+### ADR-018 — Standalone Sync Agent Service Project (`ParkGate.SyncAgent`)
+- **Status:** Accepted
+- **Context:** Cloud dashboard synchronization (Phase F3) requires a robust background worker that pushes outbox events to the cloud API without impacting desk operator responsiveness. The user decided to adopt a standalone service application model matching the proven `HRSys.SyncAgent` pattern.
+- **Decision:** Introduce a standalone Worker Service project `src/ParkGate.SyncAgent` targeting `net10.0`. It runs as a Windows Service (via `Microsoft.Extensions.Hosting.WindowsServices`) or interactive console, reads DB connection from `%ProgramData%\ParkGate\connection.dat` (DPAPI), processes the transactional outbox table in batches, deduplicates mutations (Last-Write-Wins), encrypts sensitive beneficiary fields (AES), and pushes batches to the cloud endpoint with immediate pruning of successful records.
+- **Consequences:** Increases approved production projects from 4 to 5. Decouples synchronization resilience and execution lifecycle from desk user logins.
+
 ---
 
 <!-- Template for new ADRs:
@@ -112,3 +118,4 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Decision:**
 - **Consequences:**
 -->
+

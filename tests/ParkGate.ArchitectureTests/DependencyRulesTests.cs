@@ -104,14 +104,28 @@ public sealed class DependencyRulesTests
     }
 
     [Fact]
-    public void Solution_ShouldNotExceedFourProductionProjects()
+    public void Solution_ShouldNotExceedApprovedProductionProjects()
     {
-        // Enforce maximum 4 production projects (AGENTS.md §3)
+        // Enforce maximum 5 production projects approved by ADR-018 (Domain, Application, Infrastructure, WinForms, SyncAgent)
         var srcDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));
         if (Directory.Exists(srcDir))
         {
             var projectFiles = Directory.GetFiles(srcDir, "*.csproj", SearchOption.AllDirectories);
-            projectFiles.Length.ShouldBeLessThanOrEqualTo(4);
+            projectFiles.Length.ShouldBeLessThanOrEqualTo(5);
+
+            var allowedProjectNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ParkGate.Domain.csproj",
+                "ParkGate.Application.csproj",
+                "ParkGate.Infrastructure.csproj",
+                "ParkGate.WinForms.csproj",
+                "ParkGate.SyncAgent.csproj"
+            };
+
+            foreach (var file in projectFiles)
+            {
+                allowedProjectNames.ShouldContain(Path.GetFileName(file));
+            }
         }
     }
 }
