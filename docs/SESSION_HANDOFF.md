@@ -10,34 +10,38 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-14 |
-| Last session | S18 — Merge Phase F3 & Adopt Laravel for Web App |
-| Current phase | Phase F4 (Planning / Cloud Dashboard) |
-| Working branch | `main` |
-| Build | Clean (0 warnings, 0 errors, Release & Debug) |
-| Unit tests | 376 passed (159 domain + 107 application + 110 architecture) |
-| Integration tests | 50 passed on LocalDB (including SyncOutboxIntegrationTests) |
-| Total tests | 443 passed |
-| Last commit | `Merge branch 'phase/f3-sync-agent' into main [Phase F3 - Cloud Sync Agent]` |
+| Last session | S18 — Cloud Web App & Dashboard (Phase F4) |
+| Current phase | Phase F4 |
+| Working branch | `phase/f4-cloud-dashboard` |
+| Build | Clean (.NET 10: 0 warnings, 0 errors; Vite: 0 errors) |
+| .NET Unit tests | 376 passed (159 domain + 107 application + 110 architecture) |
+| .NET Integration tests | 50 passed on LocalDB |
+| Laravel tests | 32 passed (Feature + Unit, 100% green) |
+| Total tests | 475 passed across .NET and Laravel suites |
+| Last commit | `feat(web): implement Laravel Inertia Vue 3 web dashboard and sync API [TF4.1..TF4.6]` |
 
 ## State of the work
 
 **Done**
-- Merged Phase F3 (`phase/f3-sync-agent`) into `main` with approval from Osama.
-- Adopted ADR-019: Laravel selected for the cloud web application, sync endpoint receiver (`/api/sync/push`), and dashboard.
-- Standalone worker service `ParkGate.SyncAgent` now part of `main`.
-- Desktop app (`ParkGate.WinForms`), Worker (`ParkGate.SyncAgent`), Domain, Application, and Infrastructure fully tested and build clean.
-- All unit and integration tests passing (443/443 passed, 0 warnings).
+- Scaffolding of Laravel web application inside `web/` using Breeze (Inertia.js + Vue 3).
+- Implemented and migrated relational sync schema (Organizations, AgeCategories, Beneficiaries, EntryAttempts, EntryAttemptCompanions, SyncBatches, ParkHeartbeats).
+- Implemented `POST /api/sync/push` endpoint with `X-Api-Key` authentication, transactional batch ingestion, and AES-256-CBC decryption interoperable with `ParkGate.Infrastructure.Security.AesHelper`.
+- Implemented `POST /api/sync/heartbeat` endpoint and park online/offline live indicator.
+- Designed and built Arabic RTL Cloud Dashboard in Vue 3 (Cairo typography, KPI cards, hourly entry distribution visualizer, organization breakdown, and recent admissions table).
+- Implemented Beneficiary Search & Details screen with pagination and filtering.
+- Implemented Cloud Reports screen with date range filtering, summary counters, and printable view.
+- 100% test pass rate preserved (443/443 .NET tests green + 32/32 Laravel tests green).
 
 **In progress**
-- Planning Laravel cloud application and API schema to consume sync payloads.
+- User review and acceptance of Phase F4.
 
 **Not started**
 - Future features (F2 Electronic gate) — deferred by client.
 
 ## Next session — start here
 
-1. Scaffold/initialize Laravel web application and dashboard project.
-2. Define Laravel API endpoints (`/api/sync/push`, `/api/sync/heartbeat`), authentication via API Key, AES-256 decryption, and database schema.
+1. Review Phase F4 Web Dashboard with Osama.
+2. Merge `phase/f4-cloud-dashboard` into `main` upon approval.
 
 ## Blockers / waiting on the user
 
@@ -57,11 +61,11 @@
 
 ## Session log (newest first, max 10)
 
-### S18 — 2026-10-14 — Merge Phase F3 & Adopt Laravel for Web App
-- Tasks: Merged `phase/f3-sync-agent` into `main`. Registered ADR-019 (Laravel chosen for cloud web app, API endpoint, and dashboard).
-- Commits: `Merge branch 'phase/f3-sync-agent' into main [Phase F3 - Cloud Sync Agent]`.
-- Decisions: Adopted Laravel for the cloud reporting application and sync intake API (`/api/sync/push`).
-- Test count: 443 total passed (376 unit/architecture + 67 LocalDB infrastructure/integration tests, zero warnings).
+### S18 — 2026-10-14 — Cloud Web App & Dashboard (Phase F4)
+- Tasks: TF4.1..TF4.6 completed on `phase/f4-cloud-dashboard`. Merged Phase F3 into `main`. Registered ADR-019.
+- Commits: `Merge branch 'phase/f3-sync-agent' into main`, `feat(web): implement Laravel Inertia Vue 3 web dashboard and sync API [TF4.1..TF4.6]`.
+- Decisions: Adopted Laravel 11 with Breeze (Inertia.js + Vue 3) inside `web/`. Built sync API endpoint (`/api/sync/push`) with API key validation, AES-256 decryption, and atomic transaction ingestion. Built Heartbeat status monitor, Arabic RTL Dashboard, Beneficiaries search, and Reports.
+- Test count: 475 total passed (443 .NET tests + 32 Laravel tests, zero warnings/errors).
 
 ### S17 — 2026-10-13 — Standalone Cloud Sync Agent (Phase F3)
 - Tasks: TF3.1, TF3.2, TF3.3, TF3.4, TF3.5, TF3.6 completed on `phase/f3-sync-agent`.

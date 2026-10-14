@@ -109,6 +109,20 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 **Done when:** Standalone SyncAgent runs, processes outbox batches, pushes to cloud endpoint, prunes successfully synced rows, and all unit/architecture tests pass with zero warnings.
 
+---
+
+## Phase F4 — Cloud Web App & Dashboard (Laravel + Inertia) · branch `phase/f4-cloud-dashboard`
+- [x] TF4.1 Scaffold Laravel application with Breeze (Inertia.js + Vue 3) in `web/` directory.
+- [x] TF4.2 Design and migrate database schema matching sync entity model (Organizations, AgeCategories, Beneficiaries, EntryAttempts, Companions, SyncBatches).
+- [x] TF4.3 Implement Sync API endpoint (`POST /api/sync/push`) with API Key authentication, AES-256 decryption, and atomic batch ingestion.
+- [x] TF4.4 Implement Heartbeat API endpoint (`POST /api/sync/heartbeat`) and park status indicator.
+- [x] TF4.5 Implement Web Dashboard (Arabic RTL, Live Stats, Today's Admissions, Organizations Summary, Charts).
+- [x] TF4.6 Implement Cloud Reports and Beneficiary Search views with Inertia.
+
+**Done when:** Laravel web application ingests sync payloads pushed by `ParkGate.SyncAgent`, stores records, and presents live dashboard and reports in Arabic RTL.
+
+---
+
 ## Future (do not start without explicit approval)
 - **F2 Electronic gate** — deferred by the client; decide Q11 when scheduled; `IGateController`; `ParkGate.GateService` host. (SPEC §9 F2)
 
