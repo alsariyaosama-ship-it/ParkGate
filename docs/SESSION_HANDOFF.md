@@ -9,41 +9,35 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-13 |
-| Last session | S17 — Standalone Cloud Sync Agent (Phase F3) |
-| Current phase | Phase F3 |
-| Working branch | `phase/f3-sync-agent` |
+| Last updated | 2026-10-14 |
+| Last session | S18 — Merge Phase F3 & Adopt Laravel for Web App |
+| Current phase | Phase F4 (Planning / Cloud Dashboard) |
+| Working branch | `main` |
 | Build | Clean (0 warnings, 0 errors, Release & Debug) |
 | Unit tests | 376 passed (159 domain + 107 application + 110 architecture) |
 | Integration tests | 50 passed on LocalDB (including SyncOutboxIntegrationTests) |
 | Total tests | 443 passed |
-| Last commit | `feat(deploy): add SyncAgent service scripts, docs and integration tests [TF3.6]` |
+| Last commit | `Merge branch 'phase/f3-sync-agent' into main [Phase F3 - Cloud Sync Agent]` |
 
 ## State of the work
 
 **Done**
-- Implemented standalone worker service application `ParkGate.SyncAgent` matching proven `HRSys.SyncAgent` architecture.
-- ADR-018 accepted: standalone Worker Service project targeting .NET 10 with Windows Service support.
-- Defined `SyncOutbox` entity, EF Core mapping, and migration `AddSyncOutboxTable` with index `IX_SyncOutboxes_Pending`.
-- Automatic transactional outbox capture in `ParkGateDbContext` on `SyncableTypes` (Beneficiary, EntryAttempt, Companion, Organization, AgeCategory).
-- `OutboxDeduplicator` implementing Last-Write-Wins batch mutation deduplication.
-- `PayloadEncryptionService` using AES-256-CBC to encrypt sensitive fields (`NationalId`, `Phone`) prior to cloud push.
-- `CloudPushService` HTTP client posting batches to `/api/sync/push` with API Key and immediate pruning of delivered records.
-- Standalone Worker Service `ParkGate.SyncAgent` with `OutboxProcessorWorker`, `HeartbeatWorker` (recording pulse in AppSettings), DPAPI credentials support, and Serilog logging.
-- Windows Service installation (`scripts/install-sync-service.ps1`) and uninstallation (`scripts/uninstall-sync-service.ps1`) scripts.
-- Deployment documentation in `docs/DEPLOYMENT.md`.
-- 100% test pass rate preserved (443/443 tests green, 0 warnings).
+- Merged Phase F3 (`phase/f3-sync-agent`) into `main` with approval from Osama.
+- Adopted ADR-019: Laravel selected for the cloud web application, sync endpoint receiver (`/api/sync/push`), and dashboard.
+- Standalone worker service `ParkGate.SyncAgent` now part of `main`.
+- Desktop app (`ParkGate.WinForms`), Worker (`ParkGate.SyncAgent`), Domain, Application, and Infrastructure fully tested and build clean.
+- All unit and integration tests passing (443/443 passed, 0 warnings).
 
 **In progress**
-- User review and acceptance of Phase F3.
+- Planning Laravel cloud application and API schema to consume sync payloads.
 
 **Not started**
 - Future features (F2 Electronic gate) — deferred by client.
 
 ## Next session — start here
 
-1. Review Phase F3 Pull Request with Osama.
-2. Merge `phase/f3-sync-agent` into `main` upon approval.
+1. Scaffold/initialize Laravel web application and dashboard project.
+2. Define Laravel API endpoints (`/api/sync/push`, `/api/sync/heartbeat`), authentication via API Key, AES-256 decryption, and database schema.
 
 ## Blockers / waiting on the user
 
@@ -62,6 +56,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S18 — 2026-10-14 — Merge Phase F3 & Adopt Laravel for Web App
+- Tasks: Merged `phase/f3-sync-agent` into `main`. Registered ADR-019 (Laravel chosen for cloud web app, API endpoint, and dashboard).
+- Commits: `Merge branch 'phase/f3-sync-agent' into main [Phase F3 - Cloud Sync Agent]`.
+- Decisions: Adopted Laravel for the cloud reporting application and sync intake API (`/api/sync/push`).
+- Test count: 443 total passed (376 unit/architecture + 67 LocalDB infrastructure/integration tests, zero warnings).
 
 ### S17 — 2026-10-13 — Standalone Cloud Sync Agent (Phase F3)
 - Tasks: TF3.1, TF3.2, TF3.3, TF3.4, TF3.5, TF3.6 completed on `phase/f3-sync-agent`.

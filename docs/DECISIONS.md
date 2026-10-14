@@ -109,6 +109,12 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Decision:** Introduce a standalone Worker Service project `src/ParkGate.SyncAgent` targeting `net10.0`. It runs as a Windows Service (via `Microsoft.Extensions.Hosting.WindowsServices`) or interactive console, reads DB connection from `%ProgramData%\ParkGate\connection.dat` (DPAPI), processes the transactional outbox table in batches, deduplicates mutations (Last-Write-Wins), encrypts sensitive beneficiary fields (AES), and pushes batches to the cloud endpoint with immediate pruning of successful records.
 - **Consequences:** Increases approved production projects from 4 to 5. Decouples synchronization resilience and execution lifecycle from desk user logins.
 
+### ADR-019 — Laravel for Cloud Web Application and Dashboard
+- **Status:** Accepted
+- **Context:** Cloud dashboard (Phase F3 / Cloud Reporting) requires a server-side web application and REST API endpoint to ingest the SyncAgent's push payload (`/api/sync/push`) and display cloud dashboards and management reports.
+- **Decision:** Use **Laravel** (PHP) as the framework for the cloud web application, API, and control panel.
+- **Consequences:** SyncAgent will post JSON batches to Laravel API endpoints; Laravel will authenticate via API key, receive AES-256 encrypted fields, process/store synchronization data, and render the web dashboard.
+
 ---
 
 <!-- Template for new ADRs:
