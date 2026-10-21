@@ -79,7 +79,7 @@ partial class LoginForm
         _lblAppName.Name = "_lblAppName";
         _lblAppName.Size = new Size(535, 50);
         _lblAppName.TabIndex = 0;
-        _lblAppName.Text = "ParkGate";
+        _lblAppName.Text = "بوابة منتزه المرح العائلي";
         _lblAppName.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _lblAppSubtitle

@@ -8,14 +8,11 @@ namespace ParkGate.Infrastructure.Data;
 /// </summary>
 public sealed class DatabaseStartupService : IDatabaseStartupService
 {
-    private readonly IDbContextFactory<ParkGateDbContext> _contextFactory;
     private readonly IAppConnectionStringProvider _connectionStringProvider;
 
     public DatabaseStartupService(
-        IDbContextFactory<ParkGateDbContext> contextFactory,
         IAppConnectionStringProvider connectionStringProvider)
     {
-        _contextFactory = contextFactory;
         _connectionStringProvider = connectionStringProvider;
     }
 
@@ -23,20 +20,12 @@ public sealed class DatabaseStartupService : IDatabaseStartupService
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
-                return await context.Database.CanConnectAsync(cancellationToken);
-            }
-            else
-            {
-                var options = new DbContextOptionsBuilder<ParkGateDbContext>()
-                    .UseSqlServer(connectionString)
-                    .Options;
+            var effectiveConnectionString = string.IsNullOrWhiteSpace(connectionString)
+                ? _connectionStringProvider.CurrentConnectionString
+                : connectionString;
 
-                await using var testContext = new ParkGateDbContext(options);
-                return await testContext.Database.CanConnectAsync(cancellationToken);
-            }
+            await using var context = CreateContext(effectiveConnectionString);
+            return await context.Database.CanConnectAsync(cancellationToken);
         }
         catch
         {
@@ -46,7 +35,7 @@ public sealed class DatabaseStartupService : IDatabaseStartupService
 
     public async Task<IReadOnlyList<string>> GetPendingMigrationsAsync(CancellationToken cancellationToken = default)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        await using var context = CreateContext(_connectionStringProvider.CurrentConnectionString);
         var pending = await context.Database.GetPendingMigrationsAsync(cancellationToken);
         return pending.ToList();
     }
@@ -56,5 +45,17 @@ public sealed class DatabaseStartupService : IDatabaseStartupService
         await EntryCards.EntryCardSchemaInitializer.EnsureSchemaAsync(
             _connectionStringProvider.CurrentConnectionString,
             cancellationToken).ConfigureAwait(false);
+    }
+
+    private static ParkGateDbContext CreateContext(string connectionString)
+    {
+        var options = new DbContextOptionsBuilder<ParkGateDbContext>()
+            .UseSqlServer(connectionString, sql =>
+            {
+                sql.MigrationsAssembly(typeof(ParkGateDbContext).Assembly.FullName);
+            })
+            .Options;
+
+        return new ParkGateDbContext(options);
     }
 }

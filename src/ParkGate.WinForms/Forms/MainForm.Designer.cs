@@ -353,7 +353,7 @@ partial class MainForm
         Margin = new Padding(4);
         MinimumSize = new Size(1196, 788);
         Name = "MainForm";
-        Text = "ParkGate";
+        Text = "بوابة منتزه المرح العائلي";
         _mainMenuStrip.ResumeLayout(false);
         _mainMenuStrip.PerformLayout();
         _statusStrip.ResumeLayout(false);

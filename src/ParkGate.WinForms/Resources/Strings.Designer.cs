@@ -61,24 +61,24 @@ internal class Strings
     }
 
     /// <summary>
-    ///   Looks up a localized string similar to منظومة بوابة الحديقة — ParkGate.
+    ///   Looks up a localized string similar to بوابة منتزه المرح العائلي.
     /// </summary>
     internal static string App_Title
     {
         get
         {
-            return ResourceManager.GetString("App_Title", resourceCulture) ?? "منظومة بوابة الحديقة — ParkGate";
+            return ResourceManager.GetString("App_Title", resourceCulture) ?? "بوابة منتزه المرح العائلي";
         }
     }
 
     /// <summary>
-    ///   Looks up a localized string similar to ParkGate.
+    ///   Looks up a localized string similar to بوابة منتزه المرح العائلي.
     /// </summary>
     internal static string App_Name
     {
         get
         {
-            return ResourceManager.GetString("App_Name", resourceCulture) ?? "ParkGate";
+            return ResourceManager.GetString("App_Name", resourceCulture) ?? "بوابة منتزه المرح العائلي";
         }
     }
 

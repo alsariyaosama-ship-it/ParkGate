@@ -9,39 +9,37 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-14 |
-| Last session | S18 — Cloud Web App & Dashboard (Phase F4) |
-| Current phase | Phase F4 |
+| Last updated | 2026-10-21 |
+| Last session | S19 — Production Installer, SQLEXPRESS Setup, Rebranding & App Icon |
+| Current phase | Production Deployment & Packaging |
 | Working branch | `phase/f4-cloud-dashboard` |
-| Build | Clean (.NET 10: 0 warnings, 0 errors; Vite: 0 errors) |
+| Build | Clean (.NET 10: 0 warnings, 0 errors) |
 | .NET Unit tests | 376 passed (159 domain + 107 application + 110 architecture) |
 | .NET Integration tests | 50 passed on LocalDB |
-| Laravel tests | 32 passed (Feature + Unit, 100% green) |
-| Total tests | 475 passed across .NET and Laravel suites |
-| Last commit | `feat(web): implement Laravel Inertia Vue 3 web dashboard and sync API [TF4.1..TF4.6]` |
+| Total tests | 426 passed across .NET test suites |
+| Installer | `dist/installer/ParkGate_Setup_v1.0.0.exe` (53.3 MB) |
 
 ## State of the work
 
 **Done**
-- Scaffolding of Laravel web application inside `web/` using Breeze (Inertia.js + Vue 3).
-- Implemented and migrated relational sync schema (Organizations, AgeCategories, Beneficiaries, EntryAttempts, EntryAttemptCompanions, SyncBatches, ParkHeartbeats).
-- Implemented `POST /api/sync/push` endpoint with `X-Api-Key` authentication, transactional batch ingestion, and AES-256-CBC decryption interoperable with `ParkGate.Infrastructure.Security.AesHelper`.
-- Implemented `POST /api/sync/heartbeat` endpoint and park online/offline live indicator.
-- Designed and built Arabic RTL Cloud Dashboard in Vue 3 (Cairo typography, KPI cards, hourly entry distribution visualizer, organization breakdown, and recent admissions table).
-- Implemented Beneficiary Search & Details screen with pagination and filtering.
-- Implemented Cloud Reports screen with date range filtering, summary counters, and printable view.
-- 100% test pass rate preserved (443/443 .NET tests green + 32/32 Laravel tests green).
+- Resolved production database upgrade error by applying missing migration `20261013152901_AddSyncOutboxTable`.
+- Directed production deployment to SQL Server Express (`.\SQLEXPRESS;Database=ParkGate`) using DPAPI-protected `%ProgramData%\ParkGate\connection.dat`.
+- Integrated official app icon (`ICON\icon.ico`) into WinForms `.csproj`, forms (`RtlFormBase`), taskbar, shortcuts, and Inno Setup installer.
+- Updated application title to **بوابة منتزه المرح العائلي** across resources, forms, window titles, and installer shortcuts.
+- Updated Inno Setup installer (`scripts/installer.iss`) with wizard page for **Server vs Client** installation mode:
+  - **Server mode**: Runs migrations (`ParkGate.Migrations.exe`), configures DPAPI connection to `.\SQLEXPRESS`, and opens firewall ports 1433/1434.
+  - **Client mode**: Skips database migrations and local server setup, installs client UI only.
+- Compiled final production package and installer at `dist\installer\ParkGate_Setup_v1.0.0.exe`.
 
 **In progress**
-- User review and acceptance of Phase F4.
+- User verification on production environment.
 
 **Not started**
 - Future features (F2 Electronic gate) — deferred by client.
 
 ## Next session — start here
 
-1. Review Phase F4 Web Dashboard with Osama.
-2. Merge `phase/f4-cloud-dashboard` into `main` upon approval.
+1. Test installation via `ParkGate_Setup_v1.0.0.exe` on production server and client workstations.
 
 ## Blockers / waiting on the user
 
@@ -60,6 +58,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S19 — 2026-10-21 — Production Installer, SQLEXPRESS Setup, Rebranding & App Icon
+- Tasks: Configured production SQLEXPRESS connection, fixed missing migrations, introduced Inno Setup Server/Client selection, rebranded to "بوابة منتزه المرح العائلي", integrated official app icon (`ICON\icon.ico`), and generated `ParkGate_Setup_v1.0.0.exe`.
+- Commits: Pending final session commit.
+- Decisions: Integrated wizard role selection in Inno Setup to run migrations and local SQL server configuration only when "Server" mode is chosen. Embedded custom application icon in WinForms assembly and base form (`RtlFormBase`).
+- Test count: 426 total passed unit & architecture tests (zero warnings).
 
 ### S18 — 2026-10-14 — Cloud Web App & Dashboard (Phase F4)
 - Tasks: TF4.1..TF4.6 completed on `phase/f4-cloud-dashboard`. Merged Phase F3 into `main`. Registered ADR-019.

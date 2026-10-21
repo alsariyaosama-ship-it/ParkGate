@@ -35,6 +35,7 @@ public partial class LoginForm : RtlFormBase
     private void InitializeFormText()
     {
         Text = Strings.Title_Login;
+        _lblAppName.Text = Strings.App_Title;
         lblTitle.Text = Strings.Header_Login;
         lblUsername.Text = Strings.Label_LoginUsername;
         lblPassword.Text = Strings.Label_LoginPassword;
