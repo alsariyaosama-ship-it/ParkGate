@@ -77,16 +77,20 @@ public static class ErrorMessages
             // Organization
             "Organization.NotFound" => Strings.GetOptionalString("Error_Organization_NotFound") ?? "لم يتم العثور على الجهة المطلوبة.",
             "Organization.CodeAlreadyExists" => Strings.GetOptionalString("Error_Organization_CodeAlreadyExists") ?? "رمز الجهة مسجل مسبقاً لجهة أخرى.",
+            "Organization.CodeAlreadyExistsInactive" => Strings.GetOptionalString("Error_Organization_CodeAlreadyExistsInactive") ?? "رمز الجهة مسجل مسبقاً لجهة غير مفعلة، يمكنك إعادة تفعيلها.",
             "Organization.NameAlreadyExists" => Strings.GetOptionalString("Error_Organization_NameAlreadyExists") ?? "اسم الجهة مسجل مسبقاً لجهة أخرى.",
+            "Organization.NameAlreadyExistsInactive" => Strings.GetOptionalString("Error_Organization_NameAlreadyExistsInactive") ?? "اسم الجهة مسجل مسبقاً لجهة غير مفعلة، يمكنك إعادة تفعيلها.",
             "Organization.CannotDeactivateDefault" => Strings.GetOptionalString("Error_Organization_CannotDeactivateDefault") ?? "لا يمكن تعطيل الجهة الافتراضية للمنظومة.",
 
             // AgeCategory
             "AgeCategory.NotFound" => Strings.GetOptionalString("Error_AgeCategory_NotFound") ?? "لم يتم العثور على الفئة العمرية المطلوبة.",
             "AgeCategory.NameAlreadyExists" => Strings.GetOptionalString("Error_AgeCategory_NameAlreadyExists") ?? "اسم الفئة العمرية مسجل مسبقاً.",
+            "AgeCategory.NameAlreadyExistsInactive" => Strings.GetOptionalString("Error_AgeCategory_NameAlreadyExistsInactive") ?? "اسم الفئة العمرية مسجل مسبقاً لفئة غير مفعلة، يمكنك إعادة تفعيلها.",
 
             // User
             "User.NotFound" => Strings.GetOptionalString("Error_User_NotFound") ?? "لم يتم العثور على المستخدم المطلوب.",
             "User.UsernameAlreadyExists" => Strings.GetOptionalString("Error_User_UsernameAlreadyExists") ?? "اسم المستخدم مستخدم مسبقاً، يرجى اختيار اسم آخر.",
+            "User.UsernameAlreadyExistsInactive" => Strings.GetOptionalString("Error_User_UsernameAlreadyExistsInactive") ?? "اسم المستخدم مسجل مسبقاً لحساب غير مفعل، يمكنك إعادة تفعيله.",
             "User.CannotDeactivateSelf" => Strings.GetOptionalString("Error_User_CannotDeactivateSelf") ?? "لا يمكنك تعطيل حسابك الخاص أثناء تسجيل الدخول به.",
             "User.CannotChangeOwnRole" => Strings.GetOptionalString("Error_User_CannotChangeOwnRole") ?? "لا يمكنك تغيير صلاحيات حسابك الخاص.",
 

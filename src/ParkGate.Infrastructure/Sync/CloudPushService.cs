@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -36,13 +37,18 @@ public sealed class CloudPushService : ICloudPushService
         {
             _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         }
+
+        if (_httpClient.Timeout == TimeSpan.FromSeconds(100))
+        {
+            _httpClient.Timeout = TimeSpan.FromSeconds(20);
+        }
     }
 
-    public async Task<bool> PushBatchAsync(IReadOnlyList<SyncOutbox> batch, CancellationToken cancellationToken = default)
+    public async Task<PushBatchResult> PushBatchAsync(IReadOnlyList<SyncOutbox> batch, CancellationToken cancellationToken = default)
     {
         if (batch.Count == 0)
         {
-            return true;
+            return PushBatchResult.Success();
         }
 
         try
@@ -66,7 +72,7 @@ public sealed class CloudPushService : ICloudPushService
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation("Successfully pushed batch of {Count} records to cloud.", batch.Count);
-                return true;
+                return PushBatchResult.Success();
             }
 
             var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -75,12 +81,42 @@ public sealed class CloudPushService : ICloudPushService
                 response.StatusCode,
                 errorContent);
 
-            return false;
+            var statusCode = response.StatusCode;
+            if (statusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+            {
+                return PushBatchResult.Failure(PushFailureKind.Unauthorized, $"Status {(int)statusCode}: {errorContent}");
+            }
+
+            if (statusCode is HttpStatusCode.BadRequest || (int)statusCode == 422)
+            {
+                return PushBatchResult.Failure(PushFailureKind.PayloadRejected, $"Status {(int)statusCode}: {errorContent}");
+            }
+
+            if ((int)statusCode >= 500 && (int)statusCode <= 599)
+            {
+                return PushBatchResult.Failure(PushFailureKind.ServerError, $"Status {(int)statusCode}: {errorContent}");
+            }
+
+            return PushBatchResult.Failure(PushFailureKind.PayloadRejected, $"Status {(int)statusCode}: {errorContent}");
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Timeout while attempting to push sync batch to cloud API.");
+            return PushBatchResult.Failure(PushFailureKind.NetworkOrTimeout, $"Request timed out: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP/Network error while attempting to push sync batch to cloud API.");
+            return PushBatchResult.Failure(PushFailureKind.NetworkOrTimeout, $"Network error: {ex.Message}");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception while attempting to push sync batch to cloud API.");
-            return false;
+            return PushBatchResult.Failure(PushFailureKind.NetworkOrTimeout, $"Unexpected error: {ex.Message}");
         }
     }
 }

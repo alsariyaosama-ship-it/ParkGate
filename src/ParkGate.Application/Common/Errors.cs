@@ -60,7 +60,9 @@ public static class Errors
     {
         public static readonly Error NotFound = new("Organization.NotFound", "Organization not found.");
         public static readonly Error CodeAlreadyExists = new("Organization.CodeAlreadyExists", "Organization code already exists.");
+        public static readonly Error CodeAlreadyExistsInactive = new("Organization.CodeAlreadyExistsInactive", "Organization code already exists for an inactive organization.");
         public static readonly Error NameAlreadyExists = new("Organization.NameAlreadyExists", "Organization name already exists.");
+        public static readonly Error NameAlreadyExistsInactive = new("Organization.NameAlreadyExistsInactive", "Organization name already exists for an inactive organization.");
         public static readonly Error CannotDeactivateDefault = new("Organization.CannotDeactivateDefault", "Default organization cannot be deactivated.");
     }
 
@@ -68,12 +70,14 @@ public static class Errors
     {
         public static readonly Error NotFound = new("AgeCategory.NotFound", "Age category not found.");
         public static readonly Error NameAlreadyExists = new("AgeCategory.NameAlreadyExists", "Age category name already exists.");
+        public static readonly Error NameAlreadyExistsInactive = new("AgeCategory.NameAlreadyExistsInactive", "Age category name already exists for an inactive category.");
     }
 
     public static class User
     {
         public static readonly Error NotFound = new("User.NotFound", "User not found.");
         public static readonly Error UsernameAlreadyExists = new("User.UsernameAlreadyExists", "Username is already taken.");
+        public static readonly Error UsernameAlreadyExistsInactive = new("User.UsernameAlreadyExistsInactive", "Username is already taken by an inactive user.");
         public static readonly Error CannotDeactivateSelf = new("User.CannotDeactivateSelf", "You cannot deactivate your own account.");
         public static readonly Error CannotChangeOwnRole = new("User.CannotChangeOwnRole", "You cannot change your own role.");
     }

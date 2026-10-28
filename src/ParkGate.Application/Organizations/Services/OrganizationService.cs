@@ -70,13 +70,17 @@ public sealed class OrganizationService : IOrganizationService
         var existingCode = await uow.Organizations.GetByCodeAsync(request.Code, cancellationToken);
         if (existingCode is not null)
         {
-            return Errors.Organization.CodeAlreadyExists;
+            return !existingCode.IsActive
+                ? Errors.Organization.CodeAlreadyExistsInactive
+                : Errors.Organization.CodeAlreadyExists;
         }
 
         var existingName = await uow.Organizations.GetByNameAsync(request.NameAr, cancellationToken);
         if (existingName is not null)
         {
-            return Errors.Organization.NameAlreadyExists;
+            return !existingName.IsActive
+                ? Errors.Organization.NameAlreadyExistsInactive
+                : Errors.Organization.NameAlreadyExists;
         }
 
         var org = new Organization(

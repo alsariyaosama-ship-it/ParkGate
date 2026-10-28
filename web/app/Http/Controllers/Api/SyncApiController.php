@@ -57,6 +57,21 @@ class SyncApiController extends Controller
                 'message' => 'Batch ingested successfully.',
                 'processed' => $stats['processed'],
             ], 200);
+        } catch (\InvalidArgumentException $e) {
+            SyncBatch::create([
+                'records_count' => count($records),
+                'status' => 'Failed',
+                'error_message' => $e->getMessage(),
+                'ip_address' => $request->ip(),
+                'created_at' => now(),
+            ]);
+
+            Log::warning("Sync push validation error: {$e->getMessage()}");
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unprocessable payload: ' . $e->getMessage(),
+            ], 422);
         } catch (\Throwable $e) {
             SyncBatch::create([
                 'records_count' => count($records),

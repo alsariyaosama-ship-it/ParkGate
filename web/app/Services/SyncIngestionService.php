@@ -18,27 +18,30 @@ class SyncIngestionService
      */
     public static function decrypt(?string $cipherTextBase64, ?string $base64Key): ?string
     {
-        if (empty($cipherTextBase64) || empty($base64Key)) {
-            return $cipherTextBase64;
+        if ($cipherTextBase64 === null || $cipherTextBase64 === '') {
+            return null;
         }
 
-        try {
-            $raw = base64_decode($cipherTextBase64, true);
-            $key = base64_decode($base64Key, true);
-
-            if ($raw === false || $key === false || strlen($key) !== 32 || strlen($raw) < 16) {
-                return $cipherTextBase64;
-            }
-
-            $iv = substr($raw, 0, 16);
-            $cipher = substr($raw, 16);
-
-            $decrypted = openssl_decrypt($cipher, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
-            return $decrypted !== false ? $decrypted : $cipherTextBase64;
-        } catch (\Throwable $e) {
-            Log::warning("Decryption exception: {$e->getMessage()}");
-            return $cipherTextBase64;
+        if (empty($base64Key)) {
+            throw new \RuntimeException("Encryption key parkgate.aes_key is not configured on web server.");
         }
+
+        $raw = base64_decode($cipherTextBase64, true);
+        $key = base64_decode($base64Key, true);
+
+        if ($raw === false || $key === false || strlen($key) !== 32 || strlen($raw) < 16) {
+            throw new \InvalidArgumentException("Invalid AES key or malformed ciphertext payload.");
+        }
+
+        $iv = substr($raw, 0, 16);
+        $cipher = substr($raw, 16);
+
+        $decrypted = openssl_decrypt($cipher, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        if ($decrypted === false) {
+            throw new \InvalidArgumentException("Decryption failed: possible key mismatch or corrupted ciphertext.");
+        }
+
+        return $decrypted;
     }
 
     /**
@@ -170,12 +173,12 @@ class SyncIngestionService
         }
 
         $phone = $data['Phone'] ?? null;
-        if ($phone && $aesKey) {
+        if ($phone !== null && $phone !== '') {
             $phone = self::decrypt($phone, $aesKey);
         }
 
         $nationalId = $data['NationalId'] ?? null;
-        if ($nationalId && $aesKey) {
+        if ($nationalId !== null && $nationalId !== '') {
             $nationalId = self::decrypt($nationalId, $aesKey);
         }
 

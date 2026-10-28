@@ -87,7 +87,7 @@ public sealed class SyncOutboxIntegrationTests : IClassFixture<LocalDbTestFixtur
             NullLogger<CloudPushService>.Instance);
 
         var pushResult = await pushService.PushBatchAsync(deduplicated);
-        pushResult.ShouldBeTrue();
+        pushResult.IsSuccess.ShouldBeTrue();
         handler.CallCount.ShouldBe(1);
 
         // 6. Test Pruning (Immediate Delete upon success)

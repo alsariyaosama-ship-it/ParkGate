@@ -47,6 +47,7 @@ public partial class CheckInDeskControl : UserControl
     private bool _prefillFromLastVisit;
     private bool _denialSoundEnabled;
     private string? _timeZoneId = "Libya Standard Time";
+    private bool _isSearching;
 
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -586,21 +587,29 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task LookupCardAsync()
     {
-        var rawCard = _txtCardNumber.Text;
-        var normalized = DigitNormalizer.NormalizeDigits(rawCard).Trim();
-        _txtCardNumber.Text = normalized;
-
-        if (string.IsNullOrWhiteSpace(normalized))
+        if (_isSearching)
         {
-            ClearPreviousHolderData();
-            _statusBanner.SetWarning("يرجى إدخال أو مسح رقم البطاقة", null);
-            FocusCardNumberBox();
             return;
         }
 
-        // Always clear previous customer data and reset banner when initiating a new search
-        ClearPreviousHolderData();
-        _statusBanner.Reset();
+        _isSearching = true;
+        try
+        {
+            var rawCard = _txtCardNumber.Text;
+            var normalized = DigitNormalizer.NormalizeDigits(rawCard).Trim();
+            _txtCardNumber.Text = normalized;
+
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                ClearPreviousHolderData();
+                _statusBanner.SetWarning("يرجى إدخال أو مسح رقم البطاقة", null);
+                FocusCardNumberBox();
+                return;
+            }
+
+            // Always clear previous customer data and reset banner when initiating a new search
+            ClearPreviousHolderData();
+            _statusBanner.Reset();
 
         // 1. Check if scanned input is a signed QR token (203 digits per QrTokenFormat.DigitLength)
         if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength && _cardScanService != null)
@@ -711,6 +720,11 @@ public partial class CheckInDeskControl : UserControl
             FocusCardNumberBox();
         }
     }
+    finally
+    {
+        _isSearching = false;
+    }
+}
 
     private BeneficiaryLookupResultDto? DisambiguateOrganization(IReadOnlyList<BeneficiaryLookupResultDto> matches)
     {

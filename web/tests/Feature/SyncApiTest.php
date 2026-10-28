@@ -152,4 +152,28 @@ class SyncApiTest extends TestCase
 
         $this->assertDatabaseCount('sync_batches', 1);
     }
+
+    public function test_push_with_corrupt_encrypted_field_returns_422(): void
+    {
+        $records = [
+            [
+                'id' => 1,
+                'entityType' => 'Beneficiary',
+                'entityId' => '99999999-9999-9999-9999-999999999999',
+                'operationType' => 'Insert',
+                'payloadJson' => json_encode([
+                    'Id' => '99999999-9999-9999-9999-999999999999',
+                    'CardNumber' => 'CARD-BAD',
+                    'FullName' => 'فاسد التشفير',
+                    'Phone' => 'not-valid-base64-ciphertext-!!!',
+                ]),
+            ],
+        ];
+
+        $response = $this->withHeaders(['X-Api-Key' => $this->apiKey])
+            ->postJson('/api/sync/push', ['records' => $records]);
+
+        $response->assertStatus(422)
+            ->assertJson(['success' => false]);
+    }
 }

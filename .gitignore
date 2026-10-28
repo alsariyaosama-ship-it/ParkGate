@@ -71,3 +71,4 @@ web/public/hot
 web/storage/*.key
 web/.phpunit.result.cache
 *.zip
+artifacts/
