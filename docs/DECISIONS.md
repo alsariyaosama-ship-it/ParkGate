@@ -117,6 +117,20 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 
 ---
 
+### ADR-020 — Gift Vouchers: ECDSA with separate signing context, EF-managed table, rolling interval, companion limit
+- **Status:** Accepted (2026-10-29)
+- **Context:** Phase F5 adds gift vouchers issued at the gate and redeemed at the rides window. Decisions required on: signing, storage, interval semantics, companion limit.
+- **Decision:**
+  1. **Signing context:** Gift QR tokens use the same ECDSA P-256 / SHA-256 infrastructure as entry cards (`QrTokenFormat`) but a separate context string `"ParkGate.GiftVoucher/v1"` so a gift QR can never be accepted at the entry desk and vice versa.
+  2. **Storage:** `GiftVouchers` is an EF Core-managed table (entity + `IEntityTypeConfiguration`), not a raw SQL table like `EntryCards`. Migration: `AddGiftVouchersAndCompanionLimit`.
+  3. **Rolling interval:** gift eligibility uses a rolling window of days (`GiftIntervalDays` per org, default 30) measured from the last non-voided voucher's `IssuedAtUtc`, matching BR-03/BR-04 style.
+  4. **Companion limit:** `MaxFreeCompanions` per org (NULL = no limit). Infants (age category `IsCompanionLimitExempt = true`) do not count. Exceeding the limit **rejects** check-in; no supervisor override.
+  5. **Cloud sync:** `GiftVoucher` is NOT added to `OutboxEntityExtractor.SyncableTypes` in Phase F5.
+  6. **Keyboard shortcuts:** F6 = issue gift, F7 = supervisor override gift (added to AGENTS.md §5.11).
+- **Consequences:** Existing entry-card QRs continue to verify unchanged (regression-tested). New `GiftVouchers` table isolated from the sync outbox. Companion limit enforced server-side in `CheckInService`.
+
+---
+
 <!-- Template for new ADRs:
 ### ADR-0XX — Title
 - **Status:** Proposed | Accepted | Superseded by ADR-0YY

@@ -123,6 +123,24 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 ---
 
+## Phase F5 — Gift Vouchers (QR) and Free-Companion Limit · branch `phase/f5-gift-vouchers`
+- [ ] T-G0 Preconditions, branch, documentation
+- [ ] T-G1 Domain model and policy
+- [ ] T-G2 Application plumbing: permissions, errors, QR purpose
+- [ ] T-G3 Free-companion limit (BR-25/26) end to end in Application
+- [ ] T-G4 Gift voucher use cases (Application)
+- [ ] T-G5 Infrastructure persistence + migration
+- [ ] T-G6 Infrastructure: report queries, QR image adapter, DI
+- [ ] T-G7 WinForms: organization policy and age-category flag screens
+- [ ] T-G8 WinForms: desk integration (companion limit + gift panel + QR dialog)
+- [ ] T-G9 WinForms: Gift redemption screen (rides window)
+- [ ] T-G10 WinForms: gift receipts report + Excel export
+- [ ] T-G11 Hardening, docs, handoff
+
+**Done when:** full gift voucher flow (issue → redeem → report) works end-to-end; companion limit enforced; all tests green.
+
+---
+
 ## Future (do not start without explicit approval)
 - **F2 Electronic gate** — deferred by the client; decide Q11 when scheduled; `IGateController`; `ParkGate.GateService` host. (SPEC §9 F2)
 
