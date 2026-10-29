@@ -11,4 +11,5 @@ public interface IOrganizationService
     Task<Result<OrganizationDto>> UpdateAsync(UpdateOrganizationRequest request, CancellationToken cancellationToken = default);
     Task<Result> DeactivateAsync(int id, CancellationToken cancellationToken = default);
     Task<Result> ReactivateAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result<OrganizationDto>> SetPolicyAsync(SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default);
 }

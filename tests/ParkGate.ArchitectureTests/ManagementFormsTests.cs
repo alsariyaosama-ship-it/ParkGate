@@ -408,6 +408,9 @@ public sealed class ManagementFormsTests
 
         public Task<Result> ReactivateAsync(int id, CancellationToken cancellationToken = default)
             => Task.FromResult(Result.Success());
+
+        public Task<Result<OrganizationDto>> SetPolicyAsync(SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default)
+            => Task.FromResult(Result<OrganizationDto>.Success(_orgs.First(o => o.Id == request.OrganizationId)));
     }
 
     private sealed class FakeAgeCategoryService : IAgeCategoryService

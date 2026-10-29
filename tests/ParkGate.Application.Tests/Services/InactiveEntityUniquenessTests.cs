@@ -6,6 +6,7 @@ using ParkGate.Application.AgeCategories.Services;
 using ParkGate.Application.Common;
 using ParkGate.Application.Organizations.DTOs;
 using ParkGate.Application.Organizations.Services;
+using ParkGate.Application.Organizations.Validators;
 using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
@@ -51,7 +52,8 @@ public sealed class InactiveEntityUniquenessTests
             _currentUser,
             _currentWorkstation,
             validator,
-            Substitute.For<IValidator<UpdateOrganizationRequest>>());
+            Substitute.For<IValidator<UpdateOrganizationRequest>>(),
+            new SetOrganizationPolicyRequestValidator());
 
         var result = await service.CreateAsync(new CreateOrganizationRequest("OLD_ORG", "اسم جديد", null, false));
 
@@ -79,7 +81,8 @@ public sealed class InactiveEntityUniquenessTests
             _currentUser,
             _currentWorkstation,
             validator,
-            Substitute.For<IValidator<UpdateOrganizationRequest>>());
+            Substitute.For<IValidator<UpdateOrganizationRequest>>(),
+            new SetOrganizationPolicyRequestValidator());
 
         var result = await service.CreateAsync(new CreateOrganizationRequest("NEW_CODE", "الجهة المعطلة", null, false));
 

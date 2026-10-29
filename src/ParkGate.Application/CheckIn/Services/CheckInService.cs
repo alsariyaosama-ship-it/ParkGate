@@ -85,6 +85,11 @@ public sealed class CheckInService : ICheckInService
             return Errors.CheckIn.ExceedsMaxGroupSize;
         }
 
+        if (await ExceedsFreeCompanionLimitAsync(uow, org, companionList, cancellationToken))
+        {
+            return Errors.CheckIn.ExceedsFreeCompanionLimit;
+        }
+
         var context = new EligibilityContext(org, holder, defaultCooldown, nowUtc, businessDate);
         var decision = _eligibilityPolicy.Evaluate(context);
 
@@ -227,6 +232,11 @@ public sealed class CheckInService : ICheckInService
         if (totalPersons > maxGroupSize)
         {
             return Errors.CheckIn.ExceedsMaxGroupSize;
+        }
+
+        if (await ExceedsFreeCompanionLimitAsync(uow, org, companionList, cancellationToken))
+        {
+            return Errors.CheckIn.ExceedsFreeCompanionLimit;
         }
 
         var context = new EligibilityContext(org, holder, defaultCooldown, nowUtc, businessDate);
@@ -451,6 +461,27 @@ public sealed class CheckInService : ICheckInService
         DenialReason.CardExpired => Errors.Beneficiary.CardExpired,
         _ => Errors.CheckIn.CooldownActive
     };
+
+    private static async Task<bool> ExceedsFreeCompanionLimitAsync(
+        IUnitOfWork uow,
+        Organization org,
+        IReadOnlyList<CompanionRequestDto> companions,
+        CancellationToken ct)
+    {
+        if (org.MaxFreeCompanions is null)
+        {
+            return false;
+        }
+
+        var allCategories = await uow.AgeCategories.GetAllAsync(ct);
+        var exemptIds = allCategories.Where(c => c.IsCompanionLimitExempt).Select(c => c.Id).ToHashSet();
+
+        var counted = companions
+            .Where(c => !exemptIds.Contains(c.AgeCategoryId))
+            .Sum(c => c.Count);
+
+        return counted > org.MaxFreeCompanions.Value;
+    }
 
     private static async Task<(int DefaultCooldownMinutes, int MaxGroupSize, int DenialDedupMinutes, string TimeZoneId)> GetSettingsAsync(
         IUnitOfWork uow,

@@ -87,6 +87,8 @@ public sealed class AgeCategoryService : IAgeCategoryService
             request.SortOrder,
             isActive: true);
 
+        category.SetCompanionLimitExempt(request.IsCompanionLimitExempt);
+
         uow.AgeCategories.Add(category);
         await uow.SaveChangesAsync(cancellationToken);
 
@@ -128,6 +130,7 @@ public sealed class AgeCategoryService : IAgeCategoryService
         }
 
         category.Update(request.NameAr, request.DescriptionAr, request.SortOrder);
+        category.SetCompanionLimitExempt(request.IsCompanionLimitExempt);
         await uow.SaveChangesAsync(cancellationToken);
 
         await _auditWriter.WriteAsync(

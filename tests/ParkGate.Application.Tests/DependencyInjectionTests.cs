@@ -161,8 +161,8 @@ public sealed class DependencyInjectionTests
                          sd.ServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
             .ToList();
 
-        // Exactly 16 request validators in Application
-        validatorDescriptors.Count.ShouldBe(16);
+        // Exactly 17 request validators in Application (16 original + SetOrganizationPolicyRequestValidator)
+        validatorDescriptors.Count.ShouldBe(17);
 
         foreach (var desc in validatorDescriptors)
         {

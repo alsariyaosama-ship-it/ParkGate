@@ -113,7 +113,8 @@ public sealed class PermissionEnforcementTests
             _operatorUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
-            new UpdateOrganizationRequestValidator());
+            new UpdateOrganizationRequestValidator(),
+            new SetOrganizationPolicyRequestValidator());
 
         var createRes = await sut.CreateAsync(new CreateOrganizationRequest("NEW", "منظمة جديدة", 360));
         createRes.IsFailure.ShouldBeTrue();

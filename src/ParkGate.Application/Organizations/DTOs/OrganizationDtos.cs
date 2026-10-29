@@ -8,7 +8,11 @@ public sealed record OrganizationDto(
     string NameAr,
     int? CooldownMinutes,
     bool IsDefault,
-    bool IsActive);
+    bool IsActive,
+    int? MaxFreeCompanions = null,
+    bool GiftEnabled = false,
+    decimal GiftValue = 0m,
+    int GiftIntervalDays = 30);
 
 public sealed record CreateOrganizationRequest(
     string Code,
@@ -23,6 +27,13 @@ public sealed record UpdateOrganizationRequest(
     int? CooldownMinutes,
     bool IsDefault);
 
+public sealed record SetOrganizationPolicyRequest(
+    int OrganizationId,
+    int? MaxFreeCompanions,
+    bool GiftEnabled,
+    decimal GiftValue,
+    int GiftIntervalDays);
+
 public static class OrganizationMappingExtensions
 {
     public static OrganizationDto ToDto(this Organization org) =>
@@ -32,5 +43,9 @@ public static class OrganizationMappingExtensions
             org.NameAr,
             org.CooldownMinutes,
             org.IsDefault,
-            org.IsActive);
+            org.IsActive,
+            org.MaxFreeCompanions,
+            org.GiftEnabled,
+            org.GiftValue,
+            org.GiftIntervalDays);
 }
