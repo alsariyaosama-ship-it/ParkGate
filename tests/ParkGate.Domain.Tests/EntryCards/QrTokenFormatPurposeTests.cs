@@ -41,3 +41,4 @@ public sealed class QrTokenFormatPurposeTests
         giftVoucher.ShouldBe(Encoding.ASCII.GetBytes("ParkGate.GiftVoucher/v1").Concat(body).ToArray());
     }
 }
+

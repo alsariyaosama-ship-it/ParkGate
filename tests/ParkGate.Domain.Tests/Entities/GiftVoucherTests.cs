@@ -284,3 +284,4 @@ public sealed class GiftVoucherTests
         voucher.IsExpired(_businessDate.AddDays(1)).ShouldBeTrue();
     }
 }
+

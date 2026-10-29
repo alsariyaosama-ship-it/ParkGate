@@ -99,3 +99,4 @@ public sealed class OrganizationGiftTests
         Should.Throw<ArgumentOutOfRangeException>(() => org.SetMaxFreeCompanions(-1));
     }
 }
+

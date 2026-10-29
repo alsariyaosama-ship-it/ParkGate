@@ -12,7 +12,9 @@ public static class RolePermissions
         [UserRole.Operator] =
         [
             Permission.CheckIn,
-            Permission.ViewTodayDeskEntries
+            Permission.ViewTodayDeskEntries,
+            Permission.IssueGift,
+            Permission.RedeemGift
         ],
 
         [UserRole.Supervisor] =
@@ -23,7 +25,11 @@ public static class RolePermissions
             Permission.ChangeBeneficiaryStatus,
             Permission.OverrideDenial,
             Permission.VoidEntry,
-            Permission.ViewReports
+            Permission.ViewReports,
+            Permission.IssueGift,
+            Permission.RedeemGift,
+            Permission.OverrideGiftInterval,
+            Permission.VoidGift
         ],
 
         [UserRole.Admin] =
@@ -40,7 +46,11 @@ public static class RolePermissions
             Permission.ManageSettings,
             Permission.ManageUsers,
             Permission.ManageWorkstations,
-            Permission.TriggerBackup
+            Permission.TriggerBackup,
+            Permission.IssueGift,
+            Permission.RedeemGift,
+            Permission.OverrideGiftInterval,
+            Permission.VoidGift
         ]
     };
 

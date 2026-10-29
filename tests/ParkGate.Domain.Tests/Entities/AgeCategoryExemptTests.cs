@@ -30,3 +30,4 @@ public sealed class AgeCategoryExemptTests
         category.IsCompanionLimitExempt.ShouldBeFalse();
     }
 }
+

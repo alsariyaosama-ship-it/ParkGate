@@ -26,5 +26,11 @@ public enum Permission
     ManageSettings,
     ManageUsers,
     ManageWorkstations,
-    TriggerBackup
+    TriggerBackup,
+
+    // Gift Vouchers
+    IssueGift,
+    RedeemGift,
+    OverrideGiftInterval,
+    VoidGift
 }

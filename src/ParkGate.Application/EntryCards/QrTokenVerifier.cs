@@ -4,7 +4,7 @@ using ParkGate.Domain.EntryCards;
 namespace ParkGate.Application.EntryCards;
 
 /// <summary>
-/// يتحقق من توقيع الرمز الممسوح بالمفاتيح العامة فقط — آمن للتثبيت على كل أجهزة البوابة.
+/// يتحقق من توقيع الرمز الممسوح بالمفاتيح العامة فقط — آمن للتثبيت على كل أجهزة البوابة وشبابيك الألعاب.
 /// </summary>
 public sealed class QrTokenVerifier : IDisposable
 {
@@ -27,7 +27,7 @@ public sealed class QrTokenVerifier : IDisposable
         }
     }
 
-    public QrVerifyResult Verify(string? scannedText)
+    public QrVerifyResult Verify(string? scannedText, QrPurpose purpose = QrPurpose.EntryCard)
     {
         Span<byte> raw = stackalloc byte[QrTokenFormat.TotalLength];
         if (!QrTokenFormat.TryFromDigits(scannedText, raw) || raw[0] != QrTokenFormat.FormatVersion)
@@ -42,7 +42,7 @@ public sealed class QrTokenVerifier : IDisposable
 
         ReadOnlySpan<byte> body = raw[..QrTokenFormat.BodyLength];
         ReadOnlySpan<byte> signature = raw[QrTokenFormat.BodyLength..];
-        byte[] message = QrTokenFormat.MessageToSign(body);
+        byte[] message = QrTokenFormat.MessageToSign(body, purpose);
 
         bool valid;
         lock (_sync)

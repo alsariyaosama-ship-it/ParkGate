@@ -18,6 +18,10 @@ public static class ModelBuilderExtensions
             CooldownMinutes = (int?)null,
             IsDefault = true,
             IsActive = true,
+            MaxFreeCompanions = (int?)null,
+            GiftEnabled = false,
+            GiftValue = 0m,
+            GiftIntervalDays = 30,
             CreatedAtUtc = seedTimeUtc,
             CreatedByUserId = (int?)null,
             UpdatedAtUtc = (DateTime?)null,
@@ -32,7 +36,8 @@ public static class ModelBuilderExtensions
                 NameAr = "بالغ",
                 DescriptionAr = (string?)"13 سنة فأكثر",
                 SortOrder = 1,
-                IsActive = true
+                IsActive = true,
+                IsCompanionLimitExempt = false
             },
             new
             {
@@ -40,7 +45,8 @@ public static class ModelBuilderExtensions
                 NameAr = "طفل",
                 DescriptionAr = (string?)"من 3 إلى 12 سنة",
                 SortOrder = 2,
-                IsActive = true
+                IsActive = true,
+                IsCompanionLimitExempt = false
             },
             new
             {
@@ -48,7 +54,8 @@ public static class ModelBuilderExtensions
                 NameAr = "رضيع",
                 DescriptionAr = (string?)"أقل من 3 سنوات",
                 SortOrder = 3,
-                IsActive = true
+                IsActive = true,
+                IsCompanionLimitExempt = true
             });
 
         // Seed AppSettings (DATABASE.md §5)
