@@ -1,4 +1,4 @@
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Globalization;
 using System.Numerics;
 using System.Text;
@@ -52,11 +52,19 @@ public static class QrTokenFormat
         CardId: new Guid(body.Slice(2, 16)),
         ExpiresOn: ExpiryEpoch.AddDays(BinaryPrimitives.ReadUInt16BigEndian(body.Slice(18, 2))));
 
-    public static byte[] MessageToSign(ReadOnlySpan<byte> body)
+    private static byte[] ContextFor(QrPurpose purpose) => purpose switch
     {
-        var message = new byte[Context.Length + body.Length];
-        Context.CopyTo(message, 0);
-        body.CopyTo(message.AsSpan(Context.Length));
+        QrPurpose.EntryCard => Encoding.ASCII.GetBytes("ParkGate.EntryCard/v1"),
+        QrPurpose.GiftVoucher => Encoding.ASCII.GetBytes("ParkGate.GiftVoucher/v1"),
+        _ => throw new ArgumentOutOfRangeException(nameof(purpose)),
+    };
+
+    public static byte[] MessageToSign(ReadOnlySpan<byte> body, QrPurpose purpose = QrPurpose.EntryCard)
+    {
+        var context = ContextFor(purpose);
+        var message = new byte[context.Length + body.Length];
+        context.CopyTo(message, 0);
+        body.CopyTo(message.AsSpan(context.Length));
         return message;
     }
 
