@@ -23,6 +23,7 @@ public sealed class UnitOfWork : IUnitOfWork
         AppSettings = new AppSettingRepository(context);
         AuditLogs = new AuditLogRepository(context);
         SyncOutboxes = new SyncOutboxRepository(context);
+        GiftVouchers = new GiftVoucherRepository(context);
     }
 
     public IBeneficiaryRepository Beneficiaries { get; }
@@ -34,8 +35,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public IAppSettingRepository AppSettings { get; }
     public IAuditLogRepository AuditLogs { get; }
     public ISyncOutboxRepository SyncOutboxes { get; }
-    // Placeholder — replaced with GiftVoucherRepository in T-G5
-    public IGiftVoucherRepository GiftVouchers { get; } = null!;
+    public IGiftVoucherRepository GiftVouchers { get; }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {

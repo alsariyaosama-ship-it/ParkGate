@@ -20,6 +20,7 @@ public class ParkGateDbContext : DbContext
     public DbSet<AppSetting> AppSettings => Set<AppSetting>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<SyncOutbox> SyncOutboxes => Set<SyncOutbox>();
+    public DbSet<GiftVoucher> GiftVouchers => Set<GiftVoucher>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -9,6 +9,7 @@ public sealed class GiftVoucher
 {
     public const int MaxOverrideReasonLength = 250;
     public const int MinOverrideReasonLength = 5;
+    public const int MaxVoidReasonLength = 250;
     public const int MinVoidReasonLength = 5;
 
     public int Id { get; private set; }

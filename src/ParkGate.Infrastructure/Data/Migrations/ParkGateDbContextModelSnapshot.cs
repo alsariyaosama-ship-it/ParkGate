@@ -37,6 +37,11 @@ namespace ParkGate.Infrastructure.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsCompanionLimitExempt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("NameAr")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -59,6 +64,7 @@ namespace ParkGate.Infrastructure.Data.Migrations
                             Id = 1,
                             DescriptionAr = "13 سنة فأكثر",
                             IsActive = true,
+                            IsCompanionLimitExempt = false,
                             NameAr = "بالغ",
                             SortOrder = 1
                         },
@@ -67,6 +73,7 @@ namespace ParkGate.Infrastructure.Data.Migrations
                             Id = 2,
                             DescriptionAr = "من 3 إلى 12 سنة",
                             IsActive = true,
+                            IsCompanionLimitExempt = false,
                             NameAr = "طفل",
                             SortOrder = 2
                         },
@@ -75,6 +82,7 @@ namespace ParkGate.Infrastructure.Data.Migrations
                             Id = 3,
                             DescriptionAr = "أقل من 3 سنوات",
                             IsActive = true,
+                            IsCompanionLimitExempt = true,
                             NameAr = "رضيع",
                             SortOrder = 3
                         });
@@ -441,6 +449,136 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ParkGate.Domain.Entities.GiftVoucher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("BeneficiaryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("BusinessDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("ExpiresOn")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsOverride")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("IssuedAtUtc")
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<int>("IssuedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IssuedWorkstationId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("KeyId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OverrideByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OverrideReason")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTime?>("RedeemedAtUtc")
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<DateOnly?>("RedeemedBusinessDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("RedeemedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RedeemedWorkstationId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 3)
+                        .HasColumnType("decimal(10,3)");
+
+                    b.Property<string>("VoidReason")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTime?>("VoidedAtUtc")
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<int?>("VoidedByUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessDate")
+                        .HasDatabaseName("IX_GiftVouchers_BusinessDate");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("BusinessDate"), new[] { "Status", "Value", "OrganizationId" });
+
+                    b.HasIndex("IssuedByUserId");
+
+                    b.HasIndex("IssuedWorkstationId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("OverrideByUserId");
+
+                    b.HasIndex("RedeemedBusinessDate")
+                        .HasDatabaseName("IX_GiftVouchers_RedeemedBusinessDate")
+                        .HasFilter("[RedeemedBusinessDate] IS NOT NULL");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("RedeemedBusinessDate"), new[] { "Value", "OrganizationId", "RedeemedWorkstationId" });
+
+                    b.HasIndex("RedeemedByUserId");
+
+                    b.HasIndex("RedeemedWorkstationId");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasDatabaseName("UX_GiftVouchers_Token");
+
+                    b.HasIndex("VoidedByUserId");
+
+                    b.HasIndex("BeneficiaryId", "IssuedAtUtc")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_GiftVouchers_Beneficiary_Time");
+
+                    b.ToTable("GiftVouchers", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_GiftVouchers_Override", "([IsOverride] = 0 AND [OverrideByUserId] IS NULL AND [OverrideReason] IS NULL) OR ([IsOverride] = 1 AND [OverrideByUserId] IS NOT NULL AND [OverrideReason] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_GiftVouchers_Status", "([Status] = 1 AND [RedeemedAtUtc] IS NULL AND [VoidedAtUtc] IS NULL) OR ([Status] = 2 AND [RedeemedAtUtc] IS NOT NULL AND [RedeemedBusinessDate] IS NOT NULL AND [RedeemedByUserId] IS NOT NULL AND [RedeemedWorkstationId] IS NOT NULL AND [VoidedAtUtc] IS NULL) OR ([Status] = 3 AND [VoidedAtUtc] IS NOT NULL AND [VoidedByUserId] IS NOT NULL AND [VoidReason] IS NOT NULL AND [RedeemedAtUtc] IS NULL)");
+
+                            t.HasCheckConstraint("CK_GiftVouchers_Value", "[Value] > 0");
+                        });
+                });
+
             modelBuilder.Entity("ParkGate.Domain.Entities.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -466,11 +604,30 @@ namespace ParkGate.Infrastructure.Data.Migrations
                     b.Property<int?>("CreatedByUserId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("GiftEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("GiftIntervalDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(30);
+
+                    b.Property<decimal>("GiftValue")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(10, 3)
+                        .HasColumnType("decimal(10,3)")
+                        .HasDefaultValue(0m);
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("MaxFreeCompanions")
+                        .HasColumnType("int");
 
                     b.Property<string>("NameAr")
                         .IsRequired()
@@ -504,6 +661,12 @@ namespace ParkGate.Infrastructure.Data.Migrations
                     b.ToTable("Organizations", null, t =>
                         {
                             t.HasCheckConstraint("CK_Organizations_CooldownMinutes", "[CooldownMinutes] IS NULL OR ([CooldownMinutes] >= 1 AND [CooldownMinutes] <= 10080)");
+
+                            t.HasCheckConstraint("CK_Organizations_GiftIntervalDays", "[GiftIntervalDays] >= 1 AND [GiftIntervalDays] <= 365");
+
+                            t.HasCheckConstraint("CK_Organizations_GiftValue", "[GiftEnabled] = 0 OR [GiftValue] > 0");
+
+                            t.HasCheckConstraint("CK_Organizations_MaxFreeCompanions", "[MaxFreeCompanions] IS NULL OR ([MaxFreeCompanions] >= 0 AND [MaxFreeCompanions] <= 50)");
                         });
 
                     b.HasData(
@@ -512,6 +675,9 @@ namespace ParkGate.Infrastructure.Data.Migrations
                             Id = 1,
                             Code = "SSF",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            GiftEnabled = false,
+                            GiftIntervalDays = 30,
+                            GiftValue = 0m,
                             IsActive = true,
                             IsDefault = true,
                             NameAr = "صندوق التضامن الاجتماعي"
@@ -744,6 +910,53 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .HasForeignKey("EntryAttemptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ParkGate.Domain.Entities.GiftVoucher", b =>
+                {
+                    b.HasOne("ParkGate.Domain.Entities.Beneficiary", null)
+                        .WithMany()
+                        .HasForeignKey("BeneficiaryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ParkGate.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("IssuedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ParkGate.Domain.Entities.Workstation", null)
+                        .WithMany()
+                        .HasForeignKey("IssuedWorkstationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ParkGate.Domain.Entities.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ParkGate.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("OverrideByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ParkGate.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("RedeemedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ParkGate.Domain.Entities.Workstation", null)
+                        .WithMany()
+                        .HasForeignKey("RedeemedWorkstationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ParkGate.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("VoidedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("ParkGate.Domain.Entities.EntryAttempt", b =>

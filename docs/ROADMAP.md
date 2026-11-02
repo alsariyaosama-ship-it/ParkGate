@@ -129,7 +129,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T-G2 Application plumbing: permissions, errors, QR purpose
 - [x] T-G3 Free-companion limit (BR-25/26) end to end in Application
 - [x] T-G4 Gift voucher use cases (Application)
-- [ ] T-G5 Infrastructure persistence + migration
+- [x] T-G5 Infrastructure persistence + migration
 - [ ] T-G6 Infrastructure: report queries, QR image adapter, DI
 - [ ] T-G7 WinForms: organization policy and age-category flag screens
 - [ ] T-G8 WinForms: desk integration (companion limit + gift panel + QR dialog)
