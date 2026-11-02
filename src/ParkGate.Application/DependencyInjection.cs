@@ -5,6 +5,7 @@ using ParkGate.Application.Auth.Services;
 using ParkGate.Application.Beneficiaries.Services;
 using ParkGate.Application.CheckIn.Services;
 using ParkGate.Application.EntryCards;
+using ParkGate.Application.GiftVouchers.Services;
 using ParkGate.Application.Organizations.Services;
 using ParkGate.Application.Reports.Services;
 using ParkGate.Application.Security;
@@ -21,6 +22,7 @@ public static class DependencyInjection
     {
         // 1. Domain policies
         services.AddSingleton<IEntryEligibilityPolicy, RollingWindowEligibilityPolicy>();
+        services.AddSingleton<IGiftEligibilityPolicy, RollingIntervalGiftEligibilityPolicy>();
 
         // 2. Security contexts
         services.AddSingleton<CurrentUserContext>();
@@ -41,6 +43,7 @@ public static class DependencyInjection
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IWorkstationService, WorkstationService>();
         services.AddTransient<IReportService, ReportService>();
+        services.AddTransient<IGiftVoucherService, GiftVoucherService>();
 
         // 4. EntryCards services
         services.AddTransient<CardScanService>();

@@ -124,11 +124,11 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 ---
 
 ## Phase F5 — Gift Vouchers (QR) and Free-Companion Limit · branch `phase/f5-gift-vouchers`
-- [ ] T-G0 Preconditions, branch, documentation
-- [ ] T-G1 Domain model and policy
-- [ ] T-G2 Application plumbing: permissions, errors, QR purpose
-- [ ] T-G3 Free-companion limit (BR-25/26) end to end in Application
-- [ ] T-G4 Gift voucher use cases (Application)
+- [x] T-G0 Preconditions, branch, documentation
+- [x] T-G1 Domain model and policy
+- [x] T-G2 Application plumbing: permissions, errors, QR purpose
+- [x] T-G3 Free-companion limit (BR-25/26) end to end in Application
+- [x] T-G4 Gift voucher use cases (Application)
 - [ ] T-G5 Infrastructure persistence + migration
 - [ ] T-G6 Infrastructure: report queries, QR image adapter, DI
 - [ ] T-G7 WinForms: organization policy and age-category flag screens

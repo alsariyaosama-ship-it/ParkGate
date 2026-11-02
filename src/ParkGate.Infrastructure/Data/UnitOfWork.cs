@@ -34,6 +34,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public IAppSettingRepository AppSettings { get; }
     public IAuditLogRepository AuditLogs { get; }
     public ISyncOutboxRepository SyncOutboxes { get; }
+    // Placeholder — replaced with GiftVoucherRepository in T-G5
+    public IGiftVoucherRepository GiftVouchers { get; } = null!;
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
