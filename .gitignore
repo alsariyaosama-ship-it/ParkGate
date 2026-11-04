@@ -72,3 +72,6 @@ web/storage/*.key
 web/.phpunit.result.cache
 *.zip
 artifacts/
+
+# Graphify knowledge graph
+graphify-out/
