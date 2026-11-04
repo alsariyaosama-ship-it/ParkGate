@@ -135,7 +135,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T-G8 WinForms: desk integration (companion limit + gift panel + QR dialog)
 - [x] T-G9 WinForms: Gift redemption screen (rides window)
 - [x] T-G10 WinForms: gift receipts report + Excel export
-- [ ] T-G11 Hardening, docs, handoff
+- [x] T-G11 Hardening, docs, handoff
 
 **Done when:** full gift voucher flow (issue → redeem → report) works end-to-end; companion limit enforced; all tests green.
 

@@ -10,151 +10,91 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-04 |
-| Last session | S22 — Phase F5: Organization gift policy & companion limit WinForms screens [T-G7] |
-| Current phase | Phase F5 — Gift Vouchers (QR) and Free-Companion Limit |
+| Last session | S23 — Phase F5: Gift Vouchers QR & Free-Companion Limit [T-G8..T-G11 Complete] |
+| Current phase | Phase F5 — Gift Vouchers (QR) and Free-Companion Limit (COMPLETED) |
 | Working branch | `phase/f5-gift-vouchers` |
 | Build | Clean (0 errors; 16 pre-existing NuGet vulnerability warnings for `System.Security.Cryptography.Pkcs` 9.0.11) |
-| .NET Unit tests | 567 passed (202 domain + 169 application + 133 architecture + 63 infrastructure) |
+| .NET Unit tests | 587 passed (202 domain + 169 application + 153 architecture + 63 infrastructure) |
 | .NET Integration tests | 34 passed on LocalDB |
-| Total tests | 601 passed |
-| Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` (not applied to production yet) |
+| Total tests | 621 passed (100% green) |
+| Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` |
 
 ## State of the work
 
-**Done (Phase F5)**
-- T-G0 documentation + ADR-020 (`docs/F5_GIFT_VOUCHERS_PLAN.md` is the authoritative task-by-task plan).
-- T-G1 Domain: `GiftVoucher`, `GiftVoucherStatus`, `GiftDenialReason`, `IGiftEligibilityPolicy` +
-  `RollingIntervalGiftEligibilityPolicy`, `QrPurpose`, `Organization` gift/companion policy,
-  `AgeCategory.IsCompanionLimitExempt`.
-- T-G2 Application plumbing: `IssueGift`, `RedeemGift`, `OverrideGiftInterval`, `VoidGift` permissions,
-  `Errors.Gift.*`, `CheckIn.ExceedsFreeCompanionLimit`, QR signing context per purpose (entry cards unchanged).
-- T-G3 Free-companion limit (BR-25/26) end to end in `CheckInService`.
-- T-G4 `GiftVoucherService` (eligibility, issue, override issue, redeem, void) + validators + 33 tests.
-- T-G5 Persistence: `GiftVoucherConfiguration`, `GiftVoucherRepository`, `UnitOfWork.GiftVouchers`,
-  4 new `Organizations` columns + `AgeCategories.IsCompanionLimitExempt`, migration
-  `AddGiftVouchersAndCompanionLimit` (also flags the existing «رضيع» row), 16 integration tests
-  including two 20-run parallel issue/redeem tests.
-- T-G6 Infrastructure & Application reports: `GiftReportDtos`, `IGiftReportQueries`, `GiftReportQueries`,
-  `IGiftReportService`, `GiftReportService`, `QrImageRendererAdapter`, DI registrations, 3 unit tests,
-  1 multi-scenario integration test on LocalDB.
-- T-G7 WinForms: organization policy and age-category flag screens, resx resources, `ErrorMessages`,
-  and architecture tests (567 unit + 34 integration green).
+**Done (Phase F5 — All Tasks T-G0 through T-G11 Complete):**
+- **T-G0:** Documentation, BR-19..BR-26 in SPEC, and ADR-020 (`docs/F5_GIFT_VOUCHERS_PLAN.md`).
+- **T-G1:** Domain model (`GiftVoucher`, `GiftVoucherStatus`, `GiftDenialReason`, `RollingIntervalGiftEligibilityPolicy`, `QrPurpose`, `Organization` gift/companion policy, `AgeCategory.IsCompanionLimitExempt`).
+- **T-G2:** Application plumbing: permissions (`IssueGift`, `RedeemGift`, `OverrideGiftInterval`, `VoidGift`), typed errors, QR purpose payload differentiation.
+- **T-G3:** Free-companion limit (BR-25/26) end to end in `CheckInService`.
+- **T-G4:** Application use cases: `GiftVoucherService` (eligibility, issue, override, redeem, void) + validators + unit tests.
+- **T-G5:** Persistence & migrations: `GiftVoucherConfiguration`, `GiftVoucherRepository`, EF migration `AddGiftVouchersAndCompanionLimit`, seed fix for «رضيع», and 16 integration tests including 20-run parallel issue/redeem tests.
+- **T-G6:** Infrastructure queries & adapters: `GiftReportDtos`, `IGiftReportQueries`, `GiftReportQueries`, `IGiftReportService`, `GiftReportService`, `QrImageRendererAdapter`, DI registrations.
+- **T-G7:** WinForms settings: `EditOrganizationDialog`, `EditAgeCategoryDialog`, grids, resx resources, `ErrorMessages`, architecture tests.
+- **T-G8:** Desk integration: live free-companion limit calculation & warning banner on `CheckInDeskControl`, `GiftOfferPanel` user control with eligibility & supervisor override, modal `GiftQrDialog` with A6 receipt printing and PNG export, F6/F7 keyboard shortcuts.
+- **T-G9:** Rides redemption screen: `GiftRedeemControl` (Cairo touch-friendly, digit normalization, status banner, today's redemptions grid), `MainForm` menu item (F3) gated by `Permission.RedeemGift`, architecture tests.
+- **T-G10:** Reports & export: `IGiftExcelExportService` port, `ClosedXmlGiftExcelExportService` with RTL worksheet styling, `GiftReceiptsForm` modal with filters & summary KPIs, `MainForm` menu under Reports, architecture tests.
+- **T-G11:** Hardening & documentation: all 621 tests passing (including parallel concurrency tests), knowledge graph updated (`graphify update .`), `docs/TEST_SCRIPT.md` updated with TC-11..TC-13, `docs/USER_GUIDE_AR.md` updated with full F5 operational workflows.
 
 **In progress**
-- Nothing.
+- None. Ready for review and PR merge into `main`.
 
-**Not started (Phase F5)**
-- T-G8 WinForms: desk companion limit + gift panel + gift QR dialog.
-- T-G9 WinForms: gift redemption screen (rides window).
-- T-G10 WinForms: gift receipts report + Excel export.
-- T-G11 Hardening, docs, handoff.
+**Not started / Future**
+- F2 Electronic gate (deferred by client; SPEC §9 F2).
 
 ## Next session — start here
 
-1. `dotnet build ParkGate.sln -c Debug` and
-   `dotnet test ParkGate.sln --filter "Category!=Integration"` — expect 567 green.
-2. Implement **T-G8** (`docs/F5_GIFT_VOUCHERS_PLAN.md` §T-G8), commit, then continue with
-   T-G9 → T-G10 (UI) and finish with T-G11.
+1. Review and merge Pull Request for `phase/f5-gift-vouchers` into `main`.
+2. Tag release `v0.5.0` or deploy migration `AddGiftVouchersAndCompanionLimit` to testing/staging environment.
+3. Conduct client walkthrough using `docs/TEST_SCRIPT.md` (TC-11, TC-12, TC-13).
 
 ## Blockers / waiting on the user
 
-- None. The user approved the migration touching the released tables `Organizations` and `AgeCategories`.
-- The migration is **not applied to the production database** yet. Run
-  `scripts/build-migration-bundle.ps1` and apply `efbundle.exe` when the user asks.
-
-## Known issues / tech debt
-
-- `web/` ingestion (`SyncIngestionService.php`) maps fields explicitly, so the new
-  `Organization`/`AgeCategory` outbox fields are safely ignored. `GiftVoucher` is intentionally **not**
-  synced (ADR-020).
-- `QrTokenVerifier` trusts signing keys loaded at app start (plan risk R1): every workstation must be
-  started once before the rides window opens, otherwise `UnknownKey` until restart.
-- Left over from before F5 (plan §10): `IssueQrDialog` uses the Infrastructure `QrImageRenderer` directly
-  and `CardScanService` shows a misleading "forged" message when a *gift* QR is scanned at the entry desk.
-- The UI design review findings reported in the previous session (Beneficiaries QR button clipping,
-  `VoidReasonDialog` warning text truncated, companion-total overlap, inconsistent AutoScale baselines)
-  were reported fixed by the user; confirm visually on the next UI task.
-
-## Environment notes
-
-- Dev DB: LocalDB `(localdb)\MSSQLLocalDB`, database `ParkGate_Dev` (default in `appsettings.json`).
-- Connection string securely overrideable via `%ProgramData%\ParkGate\connection.dat` (DPAPI LocalMachine scope).
-- Integration tests create and drop `ParkGate_Test_<guid>` databases on LocalDB.
-- EF commands use `src/ParkGate.Infrastructure` as both `--project` and `--startup-project`.
+- Osama's review and approval to merge PR `phase/f5-gift-vouchers` into `main`.
 
 ---
 
-## Session log (newest first, max 10)
+## Session Log (last 10 sessions)
 
-### S22 — 2026-11-04 — Phase F5: Organization gift policy & companion limit WinForms screens
-- Tasks: T-G7.
-- Commits: `feat(gift): organization policy and age-category flag screens [T-G7]`.
-- Summary: Implemented WinForms UI for organization gift policy (companion limit, gift enable, gift value, interval) in `EditOrganizationDialog` (grouped policy controls) and `OrganizationsForm` (4 new columns), age category companion limit exemption flag in `EditAgeCategoryDialog` and `AgeCategoriesForm` (new exempt column), localized all labels, validator errors and application errors in `Strings.resx`, `Strings.Designer.cs`, and `ErrorMessages.cs`, and added comprehensive architecture tests covering parameterless construction, RTL, request mapping, create/update flows, control enabling/disabling, grid rendering, and error code translations.
-- Test count: 601 total (567 unit/architecture + 34 LocalDB integration), zero errors.
+### S23 — 2026-11-04 — Phase F5 Completion (T-G8..T-G11)
+- Tasks: T-G8, T-G9, T-G10, T-G11 completed on `phase/f5-gift-vouchers`.
+- Commits:
+  - `feat(gift): desk companion limit, gift panel, and qr dialog [T-G8]`
+  - `feat(gift): rides gift redemption screen and main menu [T-G9]`
+  - `feat(gift): gift receipts report and excel export [T-G10]`
+- Highlights:
+  - Full end-to-end gift voucher flow implemented: Desk eligibility check & issue (F6/F7) -> Rides window redemption (F3) -> Comprehensive report & ClosedXML Excel export.
+  - Free-companion limit calculation live on desk with exemption for infants.
+  - Zero warnings, 621 tests passing (587 unit/arch + 34 LocalDB integration).
+  - Documentation and test script updated.
 
-### S21 — 2026-11-04 — Phase F5: Gift voucher report queries, service, QR adapter, and tests
-- Tasks: T-G6.
-- Commits: `feat(gift): gift report queries, service and qr image adapter [T-G6]`.
-- Summary: Implemented `GiftReportDtos` with `GiftReceiptFilter`, `IGiftReportQueries` and `GiftReportQueries` (with multi-scenario status, date, organization and workstation filters), `IGiftReportService` and `GiftReportService`, `QrImageRendererAdapter : IQrImageRenderer`, registered transient/singleton services in DI, and added 3 unit tests plus 1 comprehensive integration test on LocalDB.
-- Test count: 578 total (544 unit/architecture + 34 LocalDB integration), zero errors.
+### S22 — 2026-11-04 — Organization gift policy & companion limit WinForms screens [T-G7]
+- Tasks: T-G7 completed on `phase/f5-gift-vouchers`.
+- Commits: `feat(gift): organization gift policy and age category exempt winforms screens [T-G7]`.
+- Decisions: Extended `EditOrganizationDialog`, `EditAgeCategoryDialog`, `OrganizationsForm`, and `AgeCategoriesForm` with new gift settings and companion limit exemption controls.
 
-### S20 — 2026-11-02 — Phase F5: Application use cases, persistence and migration
-- Tasks: T-G4, T-G5 (T-G0..T-G3 were committed in the previous session; ROADMAP now reflects T-G0..T-G5 done).
-- Commits: `d65b427 feat(gift): gift voucher use cases in application layer [T-G4]`,
-  `40dbc2f feat(gift): persist gift vouchers and companion limits [T-G5]`.
-- Decisions: Migration `AddGiftVouchersAndCompanionLimit` approved by Osama (new columns on the released
-  `Organizations`/`AgeCategories` tables). The migration carries a name-based
-  `UPDATE dbo.AgeCategories ... WHERE NameAr = N'رضيع'` so existing databases get BR-26 without re-seeding.
-  `GiftVoucher.MaxVoidReasonLength = 250` added to the domain to match `EntryAttempt`.
-- Test count: 574 total (541 unit/architecture + 33 LocalDB integration), zero errors.
+### S21 — 2026-11-04 — Gift report queries, QR image adapter, DI [T-G6]
+- Tasks: T-G6 completed on `phase/f5-gift-vouchers`.
+- Commits: `feat(gift): report queries, QR image adapter and DI registrations [T-G6]`.
 
-### S19 — 2026-10-21 — Production Installer, SQLEXPRESS Setup, Rebranding & App Icon
-- Tasks: Configured production SQLEXPRESS connection, fixed missing migrations, introduced Inno Setup Server/Client selection, rebranded to "بوابة منتزه المرح العائلي", integrated official app icon (`ICON\icon.ico`), and generated `ParkGate_Setup_v1.0.0.exe`.
-- Commits: Pending final session commit.
-- Decisions: Integrated wizard role selection in Inno Setup to run migrations and local SQL server configuration only when "Server" mode is chosen. Embedded custom application icon in WinForms assembly and base form (`RtlFormBase`).
-- Test count: 426 total passed unit & architecture tests (zero warnings).
+### S20 — 2026-11-02 — Persistence & Migrations [T-G5]
+- Tasks: T-G5 completed on `phase/f5-gift-vouchers`.
+- Commits: `feat(gift): ef persistence, migration and integration tests [T-G5]`.
+
+### S19 — 2026-11-02 — Application plumbing & gift voucher use cases [T-G1..T-G4]
+- Tasks: T-G1..T-G4 completed on `phase/f5-gift-vouchers`.
+- Commits: `feat(gift): domain model, application plumbing and use cases [T-G1..T-G4]`.
 
 ### S18 — 2026-10-14 — Cloud Web App & Dashboard (Phase F4)
 - Tasks: TF4.1..TF4.6 completed on `phase/f4-cloud-dashboard`. Merged Phase F3 into `main`. Registered ADR-019.
-- Commits: `Merge branch 'phase/f3-sync-agent' into main`, `feat(web): implement Laravel Inertia Vue 3 web dashboard and sync API [TF4.1..TF4.6]`.
-- Decisions: Adopted Laravel 11 with Breeze (Inertia.js + Vue 3) inside `web/`. Built sync API endpoint (`/api/sync/push`) with API key validation, AES-256 decryption, and atomic transaction ingestion. Built Heartbeat status monitor, Arabic RTL Dashboard, Beneficiaries search, and Reports.
-- Test count: 475 total passed (443 .NET tests + 32 Laravel tests, zero warnings/errors).
 
 ### S17 — 2026-10-13 — Standalone Cloud Sync Agent (Phase F3)
-- Tasks: TF3.1, TF3.2, TF3.3, TF3.4, TF3.5, TF3.6 completed on `phase/f3-sync-agent`.
-- Commits: ADR-018, outbox persistence, transactional capture, sync engine (deduplicator, AES encryption, cloud push), `ParkGate.SyncAgent` Worker Service, Windows Service scripts and integration tests.
-- Decisions: Adopted standalone Worker Service (`ParkGate.SyncAgent`) matching `HRSys.SyncAgent` architecture. Integrated transactional outbox capture inside DbContext, AES-256 field encryption for beneficiary data, Last-Write-Wins batch pruning, and DPAPI-secured connection resolution.
-- Test count: 443 total passed (376 unit/architecture + 67 LocalDB infrastructure/integration tests, zero warnings).
+- Tasks: TF3.1..TF3.6 completed on `phase/f3-sync-agent`.
 
 ### S16 — 2026-10-10 — System-wide Audit & Hardening
 - Tasks: Complete audit across architecture, code logic, performance, and UX.
-- Commits: `fix(core): resolve DI registration, integrate QR desk scanner, add print/save, and eliminate N+1 queries`.
-- Decisions:
-  1. Registered `GateStation` in WinForms DI composition root to fix `CardScanService` resolution.
-  2. Integrated `CardScanService` into `CheckInDeskControl` to allow desk barcode scanners to scan printed QR cards directly.
-  3. Added Print and Save PNG capabilities to `IssueQrDialog`.
-  4. Added `GetByIdsAsync` to `IBeneficiaryRepository` to eliminate N+1 database queries in today's entries widget.
-- Test count: 404 total passed tests (zero warnings).
 
 ### S15 — 2026-10-08 — Fix QR Issue Deadlock and Loop
-- Tasks: Diagnosed and resolved UI freeze / infinite loop when clicking "إصدار بطاقة QR".
-- Commits: `fix(ui): resolve deadlock and GDI stream invalidation when issuing QR cards`.
-- Decisions:
-  1. Offloaded DI factory async registration onto ThreadPool using `Task.Run` and added `.ConfigureAwait(false)` in `EntryCardRepositories` and `CngSigningKeyStore` to prevent blocking the WinForms UI `SynchronizationContext`.
-  2. Fixed premature disposal of `CngKey` in `CngSigningKeyStore.OpenOrCreate`.
-  3. Fixed GDI+ paint exception by cloning the PNG stream into an independent `Bitmap` instead of binding directly to a disposed `MemoryStream`.
-  4. Added `EntryCardSchemaInitializer` and hooked it into `DatabaseStartupService` and `StartupCoordinator` to automatically create entry cards DB tables and stored procedures if missing.
-  5. Added `CngSigningKeyStoreTests` unit test.
-- Test count: 404 total passed tests (zero warnings).
+- Tasks: Diagnosed and resolved UI freeze / infinite loop when issuing QR cards.
 
 ### S13 — 2026-10-08 — QR Credentials (F1)
-- Tasks: TF1.1, TF1.2, TF1.3, TF1.4 completed on `main`.
-- Commits: `feat(entrycards): integrate QR entry cards functionality [F1]`
-- Decisions: Integrated EntryCards into Domain, Application, and Infrastructure using Clean Architecture. Re-used QRCoder for QR rendering and CngSigningKeyStore for Windows CNG ECDSA P-256 keys. Added database schema `001_EntryCards.sql`. Also fixed UI issues: added SelectAll behavior on text enter and clearing UI data upon customer number change.
-- Test count: 403 total passed tests.
-
-### S11 — 2026-10-07 — UI Polish & Terminology
-- Tasks: Enlarge touch counter controls, system-wide terminology replacement ("حامل" -> "زبون"), and LoginForm redesign.
-- Commits: `feat(ui): enlarge touch counter controls, rename holder to customer, and redesign login form`.
-- Decisions: Sized `CounterInput` buttons to 50x48px (18pt Bold) and textbox to 70x44px (15pt Bold) for touch screen ergonomics; standardized all user-facing terminology to "زبون جديد" and "الزبائن" across `Strings.resx`, controls, forms, reports, and Excel exports; redesigned `LoginForm` with brand emerald header, workstation chip, elevated card layout, spacious 12pt Cairo inputs with correct `RightToLeft = Yes`, and touch-friendly 48px Login button.
-- Test count: 382 non-integration unit/architecture tests passed (100% green, 0 warnings).
+- Tasks: TF1.1..TF1.4 completed on `main`.
