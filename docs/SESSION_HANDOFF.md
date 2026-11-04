@@ -10,13 +10,13 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-04 |
-| Last session | S21 — Phase F5: Gift voucher report queries, service, QR adapter, and integration tests [T-G6] |
+| Last session | S22 — Phase F5: Organization gift policy & companion limit WinForms screens [T-G7] |
 | Current phase | Phase F5 — Gift Vouchers (QR) and Free-Companion Limit |
 | Working branch | `phase/f5-gift-vouchers` |
 | Build | Clean (0 errors; 16 pre-existing NuGet vulnerability warnings for `System.Security.Cryptography.Pkcs` 9.0.11) |
-| .NET Unit tests | 544 passed (202 domain + 169 application + 110 architecture + 63 infrastructure) |
+| .NET Unit tests | 567 passed (202 domain + 169 application + 133 architecture + 63 infrastructure) |
 | .NET Integration tests | 34 passed on LocalDB |
-| Total tests | 578 passed |
+| Total tests | 601 passed |
 | Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` (not applied to production yet) |
 
 ## State of the work
@@ -37,12 +37,13 @@
 - T-G6 Infrastructure & Application reports: `GiftReportDtos`, `IGiftReportQueries`, `GiftReportQueries`,
   `IGiftReportService`, `GiftReportService`, `QrImageRendererAdapter`, DI registrations, 3 unit tests,
   1 multi-scenario integration test on LocalDB.
+- T-G7 WinForms: organization policy and age-category flag screens, resx resources, `ErrorMessages`,
+  and architecture tests (567 unit + 34 integration green).
 
 **In progress**
 - Nothing.
 
 **Not started (Phase F5)**
-- T-G7 WinForms: organization gift policy + age-category exempt flag screens.
 - T-G8 WinForms: desk companion limit + gift panel + gift QR dialog.
 - T-G9 WinForms: gift redemption screen (rides window).
 - T-G10 WinForms: gift receipts report + Excel export.
@@ -51,9 +52,9 @@
 ## Next session — start here
 
 1. `dotnet build ParkGate.sln -c Debug` and
-   `dotnet test ParkGate.sln --filter "Category!=Integration"` — expect 544 green.
-2. Implement **T-G7** (`docs/F5_GIFT_VOUCHERS_PLAN.md` §T-G7), commit, then continue with
-   T-G8 → T-G10 (UI) and finish with T-G11.
+   `dotnet test ParkGate.sln --filter "Category!=Integration"` — expect 567 green.
+2. Implement **T-G8** (`docs/F5_GIFT_VOUCHERS_PLAN.md` §T-G8), commit, then continue with
+   T-G9 → T-G10 (UI) and finish with T-G11.
 
 ## Blockers / waiting on the user
 
@@ -84,6 +85,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S22 — 2026-11-04 — Phase F5: Organization gift policy & companion limit WinForms screens
+- Tasks: T-G7.
+- Commits: `feat(gift): organization policy and age-category flag screens [T-G7]`.
+- Summary: Implemented WinForms UI for organization gift policy (companion limit, gift enable, gift value, interval) in `EditOrganizationDialog` (grouped policy controls) and `OrganizationsForm` (4 new columns), age category companion limit exemption flag in `EditAgeCategoryDialog` and `AgeCategoriesForm` (new exempt column), localized all labels, validator errors and application errors in `Strings.resx`, `Strings.Designer.cs`, and `ErrorMessages.cs`, and added comprehensive architecture tests covering parameterless construction, RTL, request mapping, create/update flows, control enabling/disabling, grid rendering, and error code translations.
+- Test count: 601 total (567 unit/architecture + 34 LocalDB integration), zero errors.
 
 ### S21 — 2026-11-04 — Phase F5: Gift voucher report queries, service, QR adapter, and tests
 - Tasks: T-G6.
@@ -151,15 +158,3 @@
 - Commits: `feat(ui): enlarge touch counter controls, rename holder to customer, and redesign login form`.
 - Decisions: Sized `CounterInput` buttons to 50x48px (18pt Bold) and textbox to 70x44px (15pt Bold) for touch screen ergonomics; standardized all user-facing terminology to "زبون جديد" and "الزبائن" across `Strings.resx`, controls, forms, reports, and Excel exports; redesigned `LoginForm` with brand emerald header, workstation chip, elevated card layout, spacious 12pt Cairo inputs with correct `RightToLeft = Yes`, and touch-friendly 48px Login button.
 - Test count: 382 non-integration unit/architecture tests passed (100% green, 0 warnings).
-
-### S10 — 2026-10-07 — Phase 8 Hardening & Deployment (T8.1..T8.5)
-- Tasks: T8.1, T8.2, T8.3, T8.4, T8.5 completed on `phase/08-deployment` (Phase 8 complete).
-- Commits: `docs(deployment): add comprehensive production deployment guide [T8.1]`, `feat(deployment): implement backup script and in-app admin backup [T8.2]`, `build(deployment): add win-x64 publish profile and Inno Setup installer script [T8.3]`, `docs: add comprehensive Arabic user guide [T8.4]`, `test(performance): verify lookup latency under large dataset [T8.5]`.
-- Decisions: Complete hardening and deployment package implemented; `DEPLOYMENT.md` covers SQL Express 2022 setup, TCP/IP, firewall, least-privilege logins, and DPAPI setup; automated backup script `scripts/backup.ps1` with 14-day pruning and in-app Admin backup via `IDatabaseBackupService`; Inno Setup script `scripts/installer.iss` and `win-x64.pubxml`; comprehensive Arabic user guide `USER_GUIDE_AR.md`; high-volume benchmark test generated 100,000 holders and 1,000,000 attempts, verifying card lookup and eligibility evaluation executes in < 1.0 s; all 398 tests pass (100% green, 0 warnings).
-- Test count: 398 total passed (343 unit/architecture + 55 LocalDB infrastructure tests).
-
-### S09 — 2026-10-07 — Phase 7 Reports & Statistics (T7.0..T7.3) and Phase 6 Management
-- Tasks: T7.0, T7.1, T7.2, T7.3 completed on `phase/07-reports` (Phase 7 complete); T6.1..T6.5 completed on `phase/06-management`.
-- Commits: `feat(reports): implement report queries and application service [T7.1]`, `feat(reports): implement reports UI with filters, ClosedXML export, and print preview [T7.2, T7.3]`, `feat(management): implement beneficiary management and void entry [T6.1] [T6.2]`, `feat(management): implement organizations, age categories, workstations, users and settings screens [T6.3] [T6.4] [T6.5]`.
-- Decisions: All 6 reports implemented per approved specifications; `IReportQueries` projects on `BusinessDate` with `AsNoTracking()`; `ClosedXmlExcelExportService` generates RTL `.xlsx` sheets; management suite built with modal dialogs, full Arabic validation, self-modification guards in `UsersForm`; `SettingsForm` edits cooldown in hours while storing minutes.
-- Test count: 397 total passed (343 unit/architecture + 54 LocalDB infrastructure tests).
