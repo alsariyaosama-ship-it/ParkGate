@@ -34,6 +34,7 @@ partial class MainForm
         _menuExit = new ToolStripMenuItem();
         _menuOperations = new ToolStripMenuItem();
         _menuCheckIn = new ToolStripMenuItem();
+        _menuGiftRedemption = new ToolStripMenuItem();
         _menuManagement = new ToolStripMenuItem();
         _menuBeneficiaries = new ToolStripMenuItem();
         _menuManagementSep1 = new ToolStripSeparator();
@@ -113,7 +114,7 @@ partial class MainForm
         // 
         // _menuOperations
         // 
-        _menuOperations.DropDownItems.AddRange(new ToolStripItem[] { _menuCheckIn });
+        _menuOperations.DropDownItems.AddRange(new ToolStripItem[] { _menuCheckIn, _menuGiftRedemption });
         _menuOperations.Name = "_menuOperations";
         _menuOperations.Size = new Size(88, 36);
         _menuOperations.Text = "العمليات";
@@ -124,6 +125,13 @@ partial class MainForm
         _menuCheckIn.ShortcutKeys = Keys.F1;
         _menuCheckIn.Size = new Size(225, 36);
         _menuCheckIn.Text = "شباك الدخول";
+        // 
+        // _menuGiftRedemption
+        // 
+        _menuGiftRedemption.Name = "_menuGiftRedemption";
+        _menuGiftRedemption.ShortcutKeys = Keys.F3;
+        _menuGiftRedemption.Size = new Size(250, 36);
+        _menuGiftRedemption.Text = "شباك الألعاب – صرف الهدايا";
         // 
         // _menuManagement
         // 
@@ -375,6 +383,7 @@ partial class MainForm
     private System.Windows.Forms.ToolStripMenuItem _menuExit;
     private System.Windows.Forms.ToolStripMenuItem _menuOperations;
     private System.Windows.Forms.ToolStripMenuItem _menuCheckIn;
+    private System.Windows.Forms.ToolStripMenuItem _menuGiftRedemption;
     private System.Windows.Forms.ToolStripMenuItem _menuManagement;
     private System.Windows.Forms.ToolStripMenuItem _menuBeneficiaries;
     private System.Windows.Forms.ToolStripSeparator _menuManagementSep1;

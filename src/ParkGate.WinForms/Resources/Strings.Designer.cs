@@ -602,6 +602,26 @@ internal class Strings
     internal static string Msg_NoQrImageAvailable => GetString(nameof(Msg_NoQrImageAvailable));
     internal static string Msg_PrintFailed => GetString(nameof(Msg_PrintFailed));
     internal static string Btn_Print => GetString(nameof(Btn_Print));
+    internal static string Menu_GiftRedemption => GetString(nameof(Menu_GiftRedemption));
+    internal static string Title_GiftRedeem => GetString(nameof(Title_GiftRedeem));
+    internal static string Label_ScanGiftQr => GetString(nameof(Label_ScanGiftQr));
+    internal static string Watermark_ScanGiftQr => GetString(nameof(Watermark_ScanGiftQr));
+    internal static string Btn_RedeemGift => GetString(nameof(Btn_RedeemGift));
+    internal static string Banner_GiftRedeemedSuccess => GetString(nameof(Banner_GiftRedeemedSuccess));
+    internal static string Banner_ScanReady => GetString(nameof(Banner_ScanReady));
+    internal static string Banner_ScanReadyDetails => GetString(nameof(Banner_ScanReadyDetails));
+    internal static string Group_RedeemedVoucherDetails => GetString(nameof(Group_RedeemedVoucherDetails));
+    internal static string Group_TodayRedemptions => GetString(nameof(Group_TodayRedemptions));
+    internal static string Label_TodayRedemptionsSummary => GetString(nameof(Label_TodayRedemptionsSummary));
+    internal static string Col_RedeemedTime => GetString(nameof(Col_RedeemedTime));
+    internal static string Msg_GiftInputEmpty => GetString(nameof(Msg_GiftInputEmpty));
+    internal static string Label_ReceiptNoTitle => GetString(nameof(Label_ReceiptNoTitle));
+    internal static string Label_ValueTitle => GetString(nameof(Label_ValueTitle));
+    internal static string Col_ReceiptNo => GetString(nameof(Col_ReceiptNo));
+    internal static string Col_Value => GetString(nameof(Col_Value));
+    internal static string Label_CardNumberTitle => GetString(nameof(Label_CardNumberTitle));
+    internal static string Label_OrganizationTitle => GetString(nameof(Label_OrganizationTitle));
+    internal static string Label_HolderNameTitle => GetString(nameof(Label_HolderNameTitle));
 
     internal static string GetString(string name)
     {

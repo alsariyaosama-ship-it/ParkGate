@@ -1481,4 +1481,64 @@
   <data name="Btn_Print" xml:space="preserve">
     <value>طباعة</value>
   </data>
+  <data name="Menu_GiftRedemption" xml:space="preserve">
+    <value>شباك الألعاب – صرف الهدايا</value>
+  </data>
+  <data name="Title_GiftRedeem" xml:space="preserve">
+    <value>شباك الألعاب – صرف قسائم الهدايا</value>
+  </data>
+  <data name="Label_ScanGiftQr" xml:space="preserve">
+    <value>امسح رمز QR الخاص بالهدية أو أدخل رقم الوصل:</value>
+  </data>
+  <data name="Watermark_ScanGiftQr" xml:space="preserve">
+    <value>امسح الكيوركود هنا أو أدخل رقم الوصل ثم اضغط Enter...</value>
+  </data>
+  <data name="Btn_RedeemGift" xml:space="preserve">
+    <value>صرف الهدية (Enter)</value>
+  </data>
+  <data name="Banner_GiftRedeemedSuccess" xml:space="preserve">
+    <value>هدية صالحة — قيمتها {0:0.###} {1} — سلّم الكوبون للزبون</value>
+  </data>
+  <data name="Banner_ScanReady" xml:space="preserve">
+    <value>جاهز لمسح قسيمة الهدية</value>
+  </data>
+  <data name="Banner_ScanReadyDetails" xml:space="preserve">
+    <value>قم بمسح رمز الاستجابة السريعة (QR) أو إدخال رقم الوصل</value>
+  </data>
+  <data name="Group_RedeemedVoucherDetails" xml:space="preserve">
+    <value>تفاصيل القسيمة المصروفة</value>
+  </data>
+  <data name="Group_TodayRedemptions" xml:space="preserve">
+    <value>سجل الهدايا المصروفة اليوم بهذا الشباك (آخر 20 قسيمة)</value>
+  </data>
+  <data name="Label_TodayRedemptionsSummary" xml:space="preserve">
+    <value>إجمالي المصروف اليوم: {0} قسيمة بقيمة {1:0.###} {2}</value>
+  </data>
+  <data name="Col_RedeemedTime" xml:space="preserve">
+    <value>وقت الصرف</value>
+  </data>
+  <data name="Msg_GiftInputEmpty" xml:space="preserve">
+    <value>يرجى مسح رمز الهدية أو إدخال رقم الوصل أولاً.</value>
+  </data>
+  <data name="Label_ReceiptNoTitle" xml:space="preserve">
+    <value>رقم الوصل:</value>
+  </data>
+  <data name="Label_ValueTitle" xml:space="preserve">
+    <value>قيمة القسيمة:</value>
+  </data>
+  <data name="Col_ReceiptNo" xml:space="preserve">
+    <value>رقم الوصل</value>
+  </data>
+  <data name="Col_Value" xml:space="preserve">
+    <value>القيمة (د.ل)</value>
+  </data>
+  <data name="Label_CardNumberTitle" xml:space="preserve">
+    <value>رقم البطاقة:</value>
+  </data>
+  <data name="Label_OrganizationTitle" xml:space="preserve">
+    <value>الجهة:</value>
+  </data>
+  <data name="Label_HolderNameTitle" xml:space="preserve">
+    <value>اسم المستفيد:</value>
+  </data>
 </root>

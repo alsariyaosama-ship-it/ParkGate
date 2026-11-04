@@ -59,6 +59,7 @@ public static class DependencyInjection
         services.AddTransient<Forms.IssueQrDialog>();
         services.AddTransient<Controls.GiftOfferPanel>();
         services.AddTransient<GiftQrDialog>();
+        services.AddTransient<Controls.GiftRedeemControl>();
 
         return services;
     }
