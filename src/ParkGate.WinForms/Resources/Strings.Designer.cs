@@ -545,6 +545,41 @@ internal class Strings
     internal static string Msg_BackupSuccess => GetString(nameof(Msg_BackupSuccess));
     internal static string Msg_BackupFailed => GetString(nameof(Msg_BackupFailed));
 
+    internal static string Grp_Org_Policy => GetString(nameof(Grp_Org_Policy));
+    internal static string Label_Org_MaxFreeCompanions => GetString(nameof(Label_Org_MaxFreeCompanions));
+    internal static string Label_Org_GiftEnabled => GetString(nameof(Label_Org_GiftEnabled));
+    internal static string Label_Org_GiftValue => GetString(nameof(Label_Org_GiftValue));
+    internal static string Label_Org_GiftInterval => GetString(nameof(Label_Org_GiftInterval));
+    internal static string Label_Age_IsCompanionLimitExempt => GetString(nameof(Label_Age_IsCompanionLimitExempt));
+    internal static string Col_Org_MaxCompanions => GetString(nameof(Col_Org_MaxCompanions));
+    internal static string Col_Org_GiftEnabled => GetString(nameof(Col_Org_GiftEnabled));
+    internal static string Col_Org_GiftValue => GetString(nameof(Col_Org_GiftValue));
+    internal static string Col_Org_GiftInterval => GetString(nameof(Col_Org_GiftInterval));
+    internal static string Col_Age_IsExempt => GetString(nameof(Col_Age_IsExempt));
+    internal static string Unit_Days => GetString(nameof(Unit_Days));
+    internal static string Unit_Currency => GetString(nameof(Unit_Currency));
+    internal static string Val_MaxFreeCompanionsOutOfRange => GetString(nameof(Val_MaxFreeCompanionsOutOfRange));
+    internal static string Val_GiftIntervalOutOfRange => GetString(nameof(Val_GiftIntervalOutOfRange));
+    internal static string Val_GiftValueRequired => GetString(nameof(Val_GiftValueRequired));
+    internal static string Val_GiftValueNegative => GetString(nameof(Val_GiftValueNegative));
+    internal static string Error_CheckIn_ExceedsFreeCompanionLimit => GetString(nameof(Error_CheckIn_ExceedsFreeCompanionLimit));
+    internal static string Error_Gift_OrganizationInactive => GetString(nameof(Error_Gift_OrganizationInactive));
+    internal static string Error_Gift_NotEnabled => GetString(nameof(Error_Gift_NotEnabled));
+    internal static string Error_Gift_HolderBlocked => GetString(nameof(Error_Gift_HolderBlocked));
+    internal static string Error_Gift_HolderSuspended => GetString(nameof(Error_Gift_HolderSuspended));
+    internal static string Error_Gift_IntervalNotElapsed => GetString(nameof(Error_Gift_IntervalNotElapsed));
+    internal static string Error_Gift_OverrideReasonRequired => GetString(nameof(Error_Gift_OverrideReasonRequired));
+    internal static string Error_Gift_OverrideNotAllowed => GetString(nameof(Error_Gift_OverrideNotAllowed));
+    internal static string Error_Gift_NotFound => GetString(nameof(Error_Gift_NotFound));
+    internal static string Error_Gift_AlreadyRedeemed => GetString(nameof(Error_Gift_AlreadyRedeemed));
+    internal static string Error_Gift_Voided => GetString(nameof(Error_Gift_Voided));
+    internal static string Error_Gift_Expired => GetString(nameof(Error_Gift_Expired));
+    internal static string Error_Gift_InvalidCode => GetString(nameof(Error_Gift_InvalidCode));
+    internal static string Error_Gift_Forged => GetString(nameof(Error_Gift_Forged));
+    internal static string Error_Gift_CannotVoidRedeemed => GetString(nameof(Error_Gift_CannotVoidRedeemed));
+    internal static string Error_Gift_VoidReasonRequired => GetString(nameof(Error_Gift_VoidReasonRequired));
+    internal static string Error_Gift_InvalidPolicy => GetString(nameof(Error_Gift_InvalidPolicy));
+
     internal static string GetString(string name)
     {
         return ResourceManager.GetString(name, resourceCulture) ?? name;

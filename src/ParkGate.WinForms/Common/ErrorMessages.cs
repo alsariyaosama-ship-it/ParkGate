@@ -62,6 +62,25 @@ public static class ErrorMessages
             "CheckIn.CannotVoidDeniedAttempt" => Strings.GetOptionalString("Error_CheckIn_CannotVoidDeniedAttempt") ?? "لا يمكن إلغاء محاولة دخول تم رفضها مسبقاً.",
             "CheckIn.AlreadyVoided" => Strings.GetOptionalString("Error_CheckIn_AlreadyVoided") ?? "تم إلغاء محاولة الدخول هذه مسبقاً.",
             "CheckIn.VoidReasonRequired" => Strings.GetOptionalString("Error_CheckIn_VoidReasonRequired") ?? "يرجى كتابة سبب الإلغاء (5 أحرف على الأقل).",
+            "CheckIn.ExceedsFreeCompanionLimit" => Strings.GetOptionalString("Error_CheckIn_ExceedsFreeCompanionLimit") ?? "يتجاوز عدد المرافقين الحد الأقصى المسموح به للدخول المجاني لهذه الجهة.",
+
+            // Gift
+            "Gift.OrganizationInactive" => Strings.GetOptionalString("Error_Gift_OrganizationInactive") ?? "الجهة التابع لها الزبون معطلة، لا يمكن إصدار هدية.",
+            "Gift.NotEnabled" => Strings.GetOptionalString("Error_Gift_NotEnabled") ?? "هدايا الألعاب غير مفعلة للجهة التابع لها هذا الزبون.",
+            "Gift.HolderBlocked" => Strings.GetOptionalString("Error_Gift_HolderBlocked") ?? "حساب الزبون محظور، لا يمكن إصدار هدية.",
+            "Gift.HolderSuspended" => Strings.GetOptionalString("Error_Gift_HolderSuspended") ?? "حساب الزبون موقوف مؤقتاً، لا يمكن إصدار هدية.",
+            "Gift.IntervalNotElapsed" => Strings.GetOptionalString("Error_Gift_IntervalNotElapsed") ?? "لم تنتهِ فترة الانتظار المقررة منذ آخر هدية مستلمة لهذا الزبون.",
+            "Gift.OverrideReasonRequired" => Strings.GetOptionalString("Error_Gift_OverrideReasonRequired") ?? "سبب تجاوز مدة الانتظار مطلوب (5 أحرف على الأقل).",
+            "Gift.OverrideNotAllowed" => Strings.GetOptionalString("Error_Gift_OverrideNotAllowed") ?? "لا يُسمح بتجاوز سبب المنع الحالي لإصدار الهدية.",
+            "Gift.NotFound" => Strings.GetOptionalString("Error_Gift_NotFound") ?? "لم يتم العثور على قسيمة الهدية المطلوبة.",
+            "Gift.AlreadyRedeemed" => Strings.GetOptionalString("Error_Gift_AlreadyRedeemed") ?? "تم صرف قسيمة الهدية هذه واستبدالها بوصل مسبقاً.",
+            "Gift.Voided" => Strings.GetOptionalString("Error_Gift_Voided") ?? "تم إلغاء قسيمة الهدية هذه.",
+            "Gift.Expired" => Strings.GetOptionalString("Error_Gift_Expired") ?? "صلاحية قسيمة الهدية منتهية (صلاحيتها تنتهي بنهاية يوم إصدارها).",
+            "Gift.InvalidCode" => Strings.GetOptionalString("Error_Gift_InvalidCode") ?? "رمز QR الخاص بالهدية غير صالح أو تم توقيعه بمفتاح غير معروف.",
+            "Gift.Forged" => Strings.GetOptionalString("Error_Gift_Forged") ?? "فشل التحقق من التوقيع الرقمي للهدية أو الرمز غير مطابق.",
+            "Gift.CannotVoidRedeemed" => Strings.GetOptionalString("Error_Gift_CannotVoidRedeemed") ?? "لا يمكن إلغاء قسيمة هدية تم صرفها واستبدالها بالفعل.",
+            "Gift.VoidReasonRequired" => Strings.GetOptionalString("Error_Gift_VoidReasonRequired") ?? "سبب إلغاء الهدية مطلوب (5 أحرف على الأقل).",
+            "Gift.InvalidPolicy" => Strings.GetOptionalString("Error_Gift_InvalidPolicy") ?? "إعدادات سياسة الهدايا للجهة غير صالحة.",
 
             // Beneficiary
             "Beneficiary.NotFound" => Strings.GetOptionalString("Error_Beneficiary_NotFound") ?? "لم يتم العثور على بيانات الزبون المطلوبة.",

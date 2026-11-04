@@ -49,6 +49,13 @@ public partial class EditOrganizationDialog : RtlFormBase
         _lblNameAr.Text = Strings.Label_Org_Name;
         _chkCustomCooldown.Text = Strings.Label_Org_CustomCooldown;
         _chkIsDefault.Text = Strings.Label_Org_IsDefault;
+
+        _grpPolicy.Text = Strings.Grp_Org_Policy;
+        _chkMaxFreeCompanions.Text = Strings.Label_Org_MaxFreeCompanions;
+        _chkGiftEnabled.Text = Strings.Label_Org_GiftEnabled;
+        _lblGiftValue.Text = Strings.Label_Org_GiftValue;
+        _lblGiftInterval.Text = Strings.Label_Org_GiftInterval;
+
         _btnSave.Text = Strings.Btn_Save;
         _btnCancel.Text = Strings.Btn_Cancel;
     }
@@ -58,6 +65,18 @@ public partial class EditOrganizationDialog : RtlFormBase
         _chkCustomCooldown.CheckedChanged += (_, _) =>
         {
             _numCooldownHours.Enabled = _chkCustomCooldown.Checked;
+        };
+
+        _chkMaxFreeCompanions.CheckedChanged += (_, _) =>
+        {
+            _numMaxFreeCompanions.Enabled = _chkMaxFreeCompanions.Checked;
+        };
+
+        _chkGiftEnabled.CheckedChanged += (_, _) =>
+        {
+            var enabled = _chkGiftEnabled.Checked;
+            _numGiftValue.Enabled = enabled;
+            _numGiftIntervalDays.Enabled = enabled;
         };
 
         _btnSave.Click += async (_, _) => await SaveAsync();
@@ -86,6 +105,26 @@ public partial class EditOrganizationDialog : RtlFormBase
         }
 
         _chkIsDefault.Checked = org.IsDefault;
+
+        // Policy
+        if (org.MaxFreeCompanions.HasValue)
+        {
+            _chkMaxFreeCompanions.Checked = true;
+            _numMaxFreeCompanions.Value = Math.Max(0, Math.Min(50, org.MaxFreeCompanions.Value));
+            _numMaxFreeCompanions.Enabled = true;
+        }
+        else
+        {
+            _chkMaxFreeCompanions.Checked = false;
+            _numMaxFreeCompanions.Value = 0;
+            _numMaxFreeCompanions.Enabled = false;
+        }
+
+        _chkGiftEnabled.Checked = org.GiftEnabled;
+        _numGiftValue.Value = org.GiftValue >= 0m ? org.GiftValue : 0m;
+        _numGiftIntervalDays.Value = org.GiftIntervalDays >= 1 && org.GiftIntervalDays <= 365 ? org.GiftIntervalDays : 30;
+        _numGiftValue.Enabled = org.GiftEnabled;
+        _numGiftIntervalDays.Enabled = org.GiftEnabled;
     }
 
     public async Task SaveAsync()
@@ -118,6 +157,14 @@ public partial class EditOrganizationDialog : RtlFormBase
 
         var isDefault = _chkIsDefault.Checked;
 
+        int? maxFreeCompanions = _chkMaxFreeCompanions.Checked
+            ? (int)_numMaxFreeCompanions.Value
+            : null;
+
+        var giftEnabled = _chkGiftEnabled.Checked;
+        var giftValue = _numGiftValue.Value;
+        var giftIntervalDays = (int)_numGiftIntervalDays.Value;
+
         using (new BusyScope(this, _btnSave, _btnCancel))
         {
             try
@@ -125,36 +172,51 @@ public partial class EditOrganizationDialog : RtlFormBase
                 if (_existingOrg == null)
                 {
                     // Create
-                    var request = new CreateOrganizationRequest(code, nameAr, cooldownMinutes, isDefault);
-                    var result = await _organizationService.CreateAsync(request);
-                    if (result.IsSuccess)
+                    var createRequest = new CreateOrganizationRequest(code, nameAr, cooldownMinutes, isDefault);
+                    var createResult = await _organizationService.CreateAsync(createRequest);
+                    if (!createResult.IsSuccess)
                     {
-                        SavedOrganization = result.Value;
-                        _notifyService?.Info(Strings.Msg_SaveOrgSuccess);
-                        DialogResult = DialogResult.OK;
-                        Close();
+                        ShowWarning(ErrorMessages.GetMessage(createResult.Error));
+                        return;
                     }
-                    else
+
+                    var orgId = createResult.Value.Id;
+                    var policyRequest = new SetOrganizationPolicyRequest(orgId, maxFreeCompanions, giftEnabled, giftValue, giftIntervalDays);
+                    var policyResult = await _organizationService.SetPolicyAsync(policyRequest);
+                    if (!policyResult.IsSuccess)
                     {
-                        ShowWarning(ErrorMessages.GetMessage(result.Error));
+                        ShowWarning(ErrorMessages.GetMessage(policyResult.Error));
+                        return;
                     }
+
+                    SavedOrganization = policyResult.Value;
+                    _notifyService?.Info(Strings.Msg_SaveOrgSuccess);
+                    DialogResult = DialogResult.OK;
+                    Close();
                 }
                 else
                 {
                     // Update
-                    var request = new UpdateOrganizationRequest(_existingOrg.Id, code, nameAr, cooldownMinutes, isDefault);
-                    var result = await _organizationService.UpdateAsync(request);
-                    if (result.IsSuccess)
+                    var updateRequest = new UpdateOrganizationRequest(_existingOrg.Id, code, nameAr, cooldownMinutes, isDefault);
+                    var updateResult = await _organizationService.UpdateAsync(updateRequest);
+                    if (!updateResult.IsSuccess)
                     {
-                        SavedOrganization = result.Value;
-                        _notifyService?.Info(Strings.Msg_SaveOrgSuccess);
-                        DialogResult = DialogResult.OK;
-                        Close();
+                        ShowWarning(ErrorMessages.GetMessage(updateResult.Error));
+                        return;
                     }
-                    else
+
+                    var policyRequest = new SetOrganizationPolicyRequest(_existingOrg.Id, maxFreeCompanions, giftEnabled, giftValue, giftIntervalDays);
+                    var policyResult = await _organizationService.SetPolicyAsync(policyRequest);
+                    if (!policyResult.IsSuccess)
                     {
-                        ShowWarning(ErrorMessages.GetMessage(result.Error));
+                        ShowWarning(ErrorMessages.GetMessage(policyResult.Error));
+                        return;
                     }
+
+                    SavedOrganization = policyResult.Value;
+                    _notifyService?.Info(Strings.Msg_SaveOrgSuccess);
+                    DialogResult = DialogResult.OK;
+                    Close();
                 }
             }
             catch (Exception ex)

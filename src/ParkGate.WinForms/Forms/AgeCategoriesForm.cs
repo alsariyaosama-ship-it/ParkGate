@@ -67,6 +67,7 @@ public partial class AgeCategoriesForm : RtlFormBase
         _colName.HeaderText = Strings.Col_Age_Name;
         _colDescription.HeaderText = Strings.Col_Age_Description;
         _colSortOrder.HeaderText = Strings.Col_Age_SortOrder;
+        _colIsExempt.HeaderText = Strings.Col_Age_IsExempt;
         _colStatus.HeaderText = Strings.Col_Age_Status;
     }
 
@@ -134,11 +135,13 @@ public partial class AgeCategoriesForm : RtlFormBase
         foreach (var c in list)
         {
             var statusText = c.IsActive ? Strings.Status_Active : Strings.Status_Inactive;
+            var exemptText = c.IsCompanionLimitExempt ? "نعم" : "لا";
 
             var rowIndex = _gridAgeCategories.Rows.Add(
                 c.NameAr,
                 c.DescriptionAr ?? "-",
                 c.SortOrder,
+                exemptText,
                 statusText);
 
             var row = _gridAgeCategories.Rows[rowIndex];
