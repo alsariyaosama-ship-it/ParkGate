@@ -59,6 +59,10 @@ public partial class OrganizationsForm : RtlFormBase
         _colCode.HeaderText = Strings.Col_Org_Code;
         _colName.HeaderText = Strings.Col_Org_Name;
         _colCooldown.HeaderText = Strings.Col_Org_Cooldown;
+        _colMaxCompanions.HeaderText = Strings.Col_Org_MaxCompanions;
+        _colGiftEnabled.HeaderText = Strings.Col_Org_GiftEnabled;
+        _colGiftValue.HeaderText = Strings.Col_Org_GiftValue;
+        _colGiftInterval.HeaderText = Strings.Col_Org_GiftInterval;
         _colDefault.HeaderText = Strings.Col_Org_Default;
         _colStatus.HeaderText = Strings.Col_Org_Status;
     }
@@ -132,6 +136,20 @@ public partial class OrganizationsForm : RtlFormBase
                 ? $"{org.CooldownMinutes.Value / 60} ساعة"
                 : "افتراضي";
 
+            var maxCompanionsText = org.MaxFreeCompanions.HasValue
+                ? org.MaxFreeCompanions.Value.ToString()
+                : "-";
+
+            var giftEnabledText = org.GiftEnabled ? "مفعلة" : "معطلة";
+
+            var giftValueText = org.GiftEnabled
+                ? $"{org.GiftValue:0.###} {Strings.Unit_Currency}"
+                : "-";
+
+            var giftIntervalText = org.GiftEnabled
+                ? $"{org.GiftIntervalDays} {Strings.Unit_Days}"
+                : "-";
+
             var defaultText = org.IsDefault ? "نعم" : "لا";
             var statusText = org.IsActive ? Strings.Status_Active : Strings.Status_Inactive;
 
@@ -139,6 +157,10 @@ public partial class OrganizationsForm : RtlFormBase
                 org.Code,
                 org.NameAr,
                 cooldownText,
+                maxCompanionsText,
+                giftEnabledText,
+                giftValueText,
+                giftIntervalText,
                 defaultText,
                 statusText);
 

@@ -1,4 +1,4 @@
-namespace ParkGate.Domain.Entities;
+﻿namespace ParkGate.Domain.Entities;
 
 /// <summary>
 /// Age category (الفئة العمرية) for visitors and companions.
@@ -13,6 +13,7 @@ public sealed class AgeCategory
     public string? DescriptionAr { get; private set; }
     public int SortOrder { get; private set; }
     public bool IsActive { get; private set; }
+    public bool IsCompanionLimitExempt { get; private set; }
 
     private AgeCategory() { }
 
@@ -40,6 +41,8 @@ public sealed class AgeCategory
     public void Activate() => IsActive = true;
 
     public void Deactivate() => IsActive = false;
+
+    public void SetCompanionLimitExempt(bool value) => IsCompanionLimitExempt = value;
 
     private static void ValidateName(string nameAr)
     {

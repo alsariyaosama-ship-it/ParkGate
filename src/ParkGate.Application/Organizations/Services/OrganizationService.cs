@@ -16,6 +16,7 @@ public sealed class OrganizationService : IOrganizationService
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<CreateOrganizationRequest> _createValidator;
     private readonly IValidator<UpdateOrganizationRequest> _updateValidator;
+    private readonly IValidator<SetOrganizationPolicyRequest> _policyValidator;
 
     public OrganizationService(
         IUnitOfWorkFactory uowFactory,
@@ -23,7 +24,8 @@ public sealed class OrganizationService : IOrganizationService
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<CreateOrganizationRequest> createValidator,
-        IValidator<UpdateOrganizationRequest> updateValidator)
+        IValidator<UpdateOrganizationRequest> updateValidator,
+        IValidator<SetOrganizationPolicyRequest> policyValidator)
     {
         _uowFactory = uowFactory;
         _auditWriter = auditWriter;
@@ -31,6 +33,7 @@ public sealed class OrganizationService : IOrganizationService
         _currentWorkstation = currentWorkstation;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
+        _policyValidator = policyValidator;
     }
 
     public async Task<IReadOnlyList<OrganizationDto>> GetAllAsync(bool activeOnly = false, CancellationToken cancellationToken = default)
@@ -70,13 +73,17 @@ public sealed class OrganizationService : IOrganizationService
         var existingCode = await uow.Organizations.GetByCodeAsync(request.Code, cancellationToken);
         if (existingCode is not null)
         {
-            return Errors.Organization.CodeAlreadyExists;
+            return !existingCode.IsActive
+                ? Errors.Organization.CodeAlreadyExistsInactive
+                : Errors.Organization.CodeAlreadyExists;
         }
 
         var existingName = await uow.Organizations.GetByNameAsync(request.NameAr, cancellationToken);
         if (existingName is not null)
         {
-            return Errors.Organization.NameAlreadyExists;
+            return !existingName.IsActive
+                ? Errors.Organization.NameAlreadyExistsInactive
+                : Errors.Organization.NameAlreadyExists;
         }
 
         var org = new Organization(
@@ -178,6 +185,55 @@ public sealed class OrganizationService : IOrganizationService
             cancellationToken: cancellationToken);
 
         return Result.Success();
+    }
+
+    public async Task<Result<OrganizationDto>> SetPolicyAsync(SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default)
+    {
+        if (!_currentUser.Has(Permission.ManageOrganizations))
+        {
+            return Errors.General.Forbidden;
+        }
+
+        var validation = await _policyValidator.ValidateAsync(request, cancellationToken);
+        if (!validation.IsValid)
+        {
+            return validation.ToError();
+        }
+
+        await using var uow = _uowFactory.Create();
+        var org = await uow.Organizations.GetByIdAsync(request.OrganizationId, cancellationToken);
+        if (org is null)
+        {
+            return Errors.Organization.NotFound;
+        }
+
+        var oldCompanions = org.MaxFreeCompanions;
+        var oldGiftEnabled = org.GiftEnabled;
+        var oldGiftValue = org.GiftValue;
+        var oldInterval = org.GiftIntervalDays;
+
+        try
+        {
+            org.SetMaxFreeCompanions(request.MaxFreeCompanions);
+            org.ConfigureGift(request.GiftEnabled, request.GiftValue, request.GiftIntervalDays);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            return new Error("Gift.InvalidPolicy", ex.Message);
+        }
+
+        await uow.SaveChangesAsync(cancellationToken);
+
+        await _auditWriter.WriteAsync(
+            action: "Organization.PolicyChanged",
+            userId: _currentUser.UserId,
+            workstationId: _currentWorkstation.WorkstationId,
+            entityName: nameof(Organization),
+            entityId: org.Id.ToString(),
+            detailsJson: $"{{\"MaxFreeCompanions\":{(request.MaxFreeCompanions.HasValue ? request.MaxFreeCompanions.ToString() : "null")},\"GiftEnabled\":{request.GiftEnabled.ToString().ToLowerInvariant()},\"GiftValue\":{request.GiftValue},\"GiftIntervalDays\":{request.GiftIntervalDays}}}",
+            cancellationToken: cancellationToken);
+
+        return org.ToDto();
     }
 
     public async Task<Result> ReactivateAsync(int id, CancellationToken cancellationToken = default)

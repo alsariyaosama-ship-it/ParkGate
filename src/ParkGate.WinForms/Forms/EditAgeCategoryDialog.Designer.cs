@@ -28,6 +28,7 @@ partial class EditAgeCategoryDialog
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
     private System.Windows.Forms.Button _btnSave;
     private System.Windows.Forms.Button _btnCancel;
+    private System.Windows.Forms.CheckBox _chkIsCompanionLimitExempt;
 
     private void InitializeComponent()
     {
@@ -44,6 +45,7 @@ partial class EditAgeCategoryDialog
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
         this._btnSave = new System.Windows.Forms.Button();
         this._btnCancel = new System.Windows.Forms.Button();
+        this._chkIsCompanionLimitExempt = new System.Windows.Forms.CheckBox();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._numSortOrder)).BeginInit();
@@ -99,11 +101,13 @@ partial class EditAgeCategoryDialog
         this._tblLayout.Controls.Add(this._txtDescriptionAr, 1, 1);
         this._tblLayout.Controls.Add(this._lblSortOrder, 0, 2);
         this._tblLayout.Controls.Add(this._numSortOrder, 1, 2);
+        this._tblLayout.Controls.Add(this._chkIsCompanionLimitExempt, 1, 3);
         this._tblLayout.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblLayout.Location = new System.Drawing.Point(0, 64);
         this._tblLayout.Name = "_tblLayout";
         this._tblLayout.Padding = new System.Windows.Forms.Padding(20, 16, 20, 16);
-        this._tblLayout.RowCount = 3;
+        this._tblLayout.RowCount = 4;
+        this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
@@ -177,6 +181,19 @@ partial class EditAgeCategoryDialog
         this._numSortOrder.TabIndex = 5;
         this._numSortOrder.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
         // 
+        // _chkIsCompanionLimitExempt
+        // 
+        this._chkIsCompanionLimitExempt.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this._chkIsCompanionLimitExempt.AutoSize = true;
+        this._chkIsCompanionLimitExempt.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._chkIsCompanionLimitExempt.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._chkIsCompanionLimitExempt.Location = new System.Drawing.Point(23, 162);
+        this._chkIsCompanionLimitExempt.Name = "_chkIsCompanionLimitExempt";
+        this._chkIsCompanionLimitExempt.Size = new System.Drawing.Size(324, 28);
+        this._chkIsCompanionLimitExempt.TabIndex = 6;
+        this._chkIsCompanionLimitExempt.Text = "لا يُحتسب ضمن حد المرافقين (مجاني دائماً)";
+        this._chkIsCompanionLimitExempt.UseVisualStyleBackColor = true;
+        // 
         // _pnlButtons
         // 
         this._pnlButtons.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
@@ -230,7 +247,7 @@ partial class EditAgeCategoryDialog
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(500, 302);
+        this.ClientSize = new System.Drawing.Size(500, 348);
         this.Controls.Add(this._tblLayout);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);

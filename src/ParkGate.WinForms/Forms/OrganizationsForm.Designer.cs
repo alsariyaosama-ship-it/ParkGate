@@ -36,7 +36,12 @@ partial class OrganizationsForm
         this._colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colCooldown = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colDefault = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        this._colMaxCompanions = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        this._colGiftEnabled = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        this._colGiftValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        this._colGiftInterval = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyleCenter = new System.Windows.Forms.DataGridViewCellStyle();
         this._pnlFooter = new System.Windows.Forms.Panel();
         this._lblCount = new System.Windows.Forms.Label();
         this._btnClose = new System.Windows.Forms.Button();
@@ -55,7 +60,7 @@ partial class OrganizationsForm
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);
         this._pnlHeader.Margin = new System.Windows.Forms.Padding(0);
         this._pnlHeader.Name = "_pnlHeader";
-        this._pnlHeader.Size = new System.Drawing.Size(784, 72);
+        this._pnlHeader.Size = new System.Drawing.Size(920, 72);
         this._pnlHeader.TabIndex = 0;
         // 
         // _lblHeader
@@ -98,7 +103,7 @@ partial class OrganizationsForm
         this._pnlToolbar.Margin = new System.Windows.Forms.Padding(0);
         this._pnlToolbar.Name = "_pnlToolbar";
         this._pnlToolbar.Padding = new System.Windows.Forms.Padding(16, 10, 16, 10);
-        this._pnlToolbar.Size = new System.Drawing.Size(784, 56);
+        this._pnlToolbar.Size = new System.Drawing.Size(920, 56);
         this._pnlToolbar.TabIndex = 1;
         // 
         // _btnAdd
@@ -208,6 +213,10 @@ partial class OrganizationsForm
             this._colCode,
             this._colName,
             this._colCooldown,
+            this._colMaxCompanions,
+            this._colGiftEnabled,
+            this._colGiftValue,
+            this._colGiftInterval,
             this._colDefault,
             this._colStatus});
         dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -229,7 +238,7 @@ partial class OrganizationsForm
         this._gridOrganizations.RowHeadersVisible = false;
         this._gridOrganizations.RowTemplate.Height = 40;
         this._gridOrganizations.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-        this._gridOrganizations.Size = new System.Drawing.Size(784, 344);
+        this._gridOrganizations.Size = new System.Drawing.Size(920, 344);
         this._gridOrganizations.TabIndex = 2;
         // 
         // _colCode
@@ -255,6 +264,43 @@ partial class OrganizationsForm
         this._colCooldown.MinimumWidth = 100;
         this._colCooldown.Name = "_colCooldown";
         this._colCooldown.ReadOnly = true;
+        // 
+        // _colMaxCompanions
+        // 
+        dataGridViewCellStyleCenter.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+        this._colMaxCompanions.DefaultCellStyle = dataGridViewCellStyleCenter;
+        this._colMaxCompanions.FillWeight = 14F;
+        this._colMaxCompanions.HeaderText = "حد المرافقين";
+        this._colMaxCompanions.MinimumWidth = 85;
+        this._colMaxCompanions.Name = "_colMaxCompanions";
+        this._colMaxCompanions.ReadOnly = true;
+        // 
+        // _colGiftEnabled
+        // 
+        this._colGiftEnabled.DefaultCellStyle = dataGridViewCellStyleCenter;
+        this._colGiftEnabled.FillWeight = 12F;
+        this._colGiftEnabled.HeaderText = "الهدايا";
+        this._colGiftEnabled.MinimumWidth = 70;
+        this._colGiftEnabled.Name = "_colGiftEnabled";
+        this._colGiftEnabled.ReadOnly = true;
+        // 
+        // _colGiftValue
+        // 
+        this._colGiftValue.DefaultCellStyle = dataGridViewCellStyleCenter;
+        this._colGiftValue.FillWeight = 14F;
+        this._colGiftValue.HeaderText = "قيمة الهدية";
+        this._colGiftValue.MinimumWidth = 85;
+        this._colGiftValue.Name = "_colGiftValue";
+        this._colGiftValue.ReadOnly = true;
+        // 
+        // _colGiftInterval
+        // 
+        this._colGiftInterval.DefaultCellStyle = dataGridViewCellStyleCenter;
+        this._colGiftInterval.FillWeight = 14F;
+        this._colGiftInterval.HeaderText = "مدة الانتظار";
+        this._colGiftInterval.MinimumWidth = 85;
+        this._colGiftInterval.Name = "_colGiftInterval";
+        this._colGiftInterval.ReadOnly = true;
         // 
         // _colDefault
         // 
@@ -286,7 +332,7 @@ partial class OrganizationsForm
         this._pnlFooter.Margin = new System.Windows.Forms.Padding(0);
         this._pnlFooter.Name = "_pnlFooter";
         this._pnlFooter.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
-        this._pnlFooter.Size = new System.Drawing.Size(784, 48);
+        this._pnlFooter.Size = new System.Drawing.Size(920, 48);
         this._pnlFooter.TabIndex = 3;
         // 
         // _lblCount
@@ -323,7 +369,7 @@ partial class OrganizationsForm
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnClose;
-        this.ClientSize = new System.Drawing.Size(784, 520);
+        this.ClientSize = new System.Drawing.Size(920, 520);
         this.Controls.Add(this._gridOrganizations);
         this.Controls.Add(this._pnlFooter);
         this.Controls.Add(this._pnlToolbar);
@@ -359,6 +405,10 @@ partial class OrganizationsForm
     private System.Windows.Forms.DataGridViewTextBoxColumn _colName;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colCooldown;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colDefault;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _colMaxCompanions;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _colGiftEnabled;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _colGiftValue;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _colGiftInterval;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colStatus;
     private System.Windows.Forms.Panel _pnlFooter;
     private System.Windows.Forms.Label _lblCount;

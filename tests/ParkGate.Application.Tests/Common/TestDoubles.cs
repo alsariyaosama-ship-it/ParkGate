@@ -362,6 +362,48 @@ public sealed class FakeAgeCategoryRepository : IAgeCategoryRepository
     public void Update(AgeCategory category) { }
 }
 
+public sealed class FakeGiftVoucherRepository : IGiftVoucherRepository
+{
+    private readonly List<GiftVoucher> _vouchers = [];
+    private int _nextId = 1;
+
+    public IReadOnlyList<GiftVoucher> Vouchers => _vouchers.AsReadOnly();
+
+    public Task<GiftVoucher?> GetByIdAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(_vouchers.FirstOrDefault(v => v.Id == id));
+
+    public Task<GiftVoucher?> GetByTokenForUpdateAsync(Guid token, CancellationToken ct = default) =>
+        Task.FromResult(_vouchers.FirstOrDefault(v => v.Token == token));
+
+    public Task<DateTime?> GetLatestIssuedUtcAsync(Guid beneficiaryId, CancellationToken ct = default)
+    {
+        var latest = _vouchers
+            .Where(v => v.BeneficiaryId == beneficiaryId && v.Status != Domain.Enums.GiftVoucherStatus.Voided)
+            .OrderByDescending(v => v.IssuedAtUtc)
+            .FirstOrDefault();
+        return Task.FromResult(latest?.IssuedAtUtc);
+    }
+
+    public Task<IReadOnlyList<GiftVoucher>> GetRecentByBeneficiaryAsync(Guid beneficiaryId, int maxResults = 20, CancellationToken ct = default)
+    {
+        IReadOnlyList<GiftVoucher> result = _vouchers
+            .Where(v => v.BeneficiaryId == beneficiaryId)
+            .OrderByDescending(v => v.IssuedAtUtc)
+            .Take(maxResults)
+            .ToList();
+        return Task.FromResult(result);
+    }
+
+    public void Add(GiftVoucher voucher)
+    {
+        if (voucher.Id == 0)
+        {
+            typeof(GiftVoucher).GetProperty(nameof(GiftVoucher.Id))!.SetValue(voucher, _nextId++);
+        }
+        _vouchers.Add(voucher);
+    }
+}
+
 public sealed class FakeAuditLogRepository : IAuditLogRepository
 {
     private readonly List<AuditLog> _logs = [];
@@ -426,6 +468,7 @@ public sealed class FakeUnitOfWork : IUnitOfWork
     public IAgeCategoryRepository AgeCategories { get; }
     public IAuditLogRepository AuditLogs { get; }
     public ISyncOutboxRepository SyncOutboxes { get; }
+    public IGiftVoucherRepository GiftVouchers { get; }
 
     public DateTime CurrentDbTime { get; set; } = new(2026, 10, 5, 10, 0, 0, DateTimeKind.Utc);
     public int SaveChangesCalls { get; private set; }
@@ -437,7 +480,8 @@ public sealed class FakeUnitOfWork : IUnitOfWork
         List<Organization> organizations,
         List<Beneficiary> beneficiaries,
         List<EntryAttempt> attempts,
-        List<AgeCategory> categories)
+        List<AgeCategory> categories,
+        FakeGiftVoucherRepository? giftVouchers = null)
     {
         Users = new FakeUserRepository(users);
         Workstations = new FakeWorkstationRepository(workstations);
@@ -448,6 +492,7 @@ public sealed class FakeUnitOfWork : IUnitOfWork
         AgeCategories = new FakeAgeCategoryRepository(categories);
         AuditLogs = new FakeAuditLogRepository();
         SyncOutboxes = new FakeSyncOutboxRepository();
+        GiftVouchers = giftVouchers ?? new FakeGiftVoucherRepository();
     }
 
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
@@ -476,6 +521,7 @@ public sealed class FakeUnitOfWorkFactory : IUnitOfWorkFactory
     private readonly List<Beneficiary> _beneficiaries;
     private readonly List<EntryAttempt> _attempts;
     private readonly List<AgeCategory> _categories;
+    private readonly FakeGiftVoucherRepository _giftVouchers;
 
     public FakeUnitOfWork CurrentUow { get; }
 
@@ -486,7 +532,8 @@ public sealed class FakeUnitOfWorkFactory : IUnitOfWorkFactory
         List<Organization>? organizations = null,
         List<Beneficiary>? beneficiaries = null,
         List<EntryAttempt>? attempts = null,
-        List<AgeCategory>? categories = null)
+        List<AgeCategory>? categories = null,
+        FakeGiftVoucherRepository? giftVouchers = null)
     {
         _users = users ?? [];
         _workstations = workstations ?? [];
@@ -495,6 +542,7 @@ public sealed class FakeUnitOfWorkFactory : IUnitOfWorkFactory
         _beneficiaries = beneficiaries ?? [];
         _attempts = attempts ?? [];
         _categories = categories ?? [];
+        _giftVouchers = giftVouchers ?? new FakeGiftVoucherRepository();
 
         CurrentUow = new FakeUnitOfWork(
             _users,
@@ -503,7 +551,8 @@ public sealed class FakeUnitOfWorkFactory : IUnitOfWorkFactory
             _organizations,
             _beneficiaries,
             _attempts,
-            _categories);
+            _categories,
+            _giftVouchers);
     }
 
     public IUnitOfWork Create() => CurrentUow;

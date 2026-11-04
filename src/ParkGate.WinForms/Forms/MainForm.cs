@@ -79,6 +79,7 @@ public partial class MainForm : RtlFormBase
 
         _menuOperations.Text = Strings.Menu_Operations;
         _menuCheckIn.Text = Strings.Menu_CheckIn;
+        _menuGiftRedemption.Text = Strings.Menu_GiftRedemption;
 
         _menuManagement.Text = Strings.Menu_Management;
         _menuBeneficiaries.Text = Strings.Menu_Beneficiaries;
@@ -92,6 +93,7 @@ public partial class MainForm : RtlFormBase
         _menuReports.Text = Strings.Menu_Reports;
         _menuDailyReport.Text = Strings.Menu_DailyReport;
         _menuOrgStatistics.Text = Strings.Menu_OrgStatistics;
+        _menuGiftReceiptsReport.Text = Strings.Menu_GiftReceiptsReport;
 
         _menuHelp.Text = Strings.Menu_Help;
         _menuAbout.Text = Strings.Menu_About;
@@ -119,7 +121,9 @@ public partial class MainForm : RtlFormBase
         }
 
         // Operations
-        _menuOperations.Visible = _currentUser.Has(Permission.CheckIn);
+        _menuOperations.Visible = _currentUser.HasAny(Permission.CheckIn, Permission.RedeemGift);
+        _menuCheckIn.Visible = _currentUser.Has(Permission.CheckIn);
+        _menuGiftRedemption.Visible = _currentUser.Has(Permission.RedeemGift);
 
         // Management sub-items
         var canManageBeneficiaries = _currentUser.HasAny(Permission.EditBeneficiary, Permission.ChangeBeneficiaryStatus);
@@ -151,6 +155,7 @@ public partial class MainForm : RtlFormBase
         var canViewReports = _currentUser.Has(Permission.ViewReports);
         _menuDailyReport.Visible = canViewReports;
         _menuOrgStatistics.Visible = canViewReports;
+        _menuGiftReceiptsReport.Visible = canViewReports;
         _menuReports.Visible = canViewReports;
     }
 
@@ -176,6 +181,7 @@ public partial class MainForm : RtlFormBase
         _menuExit.Click += (_, _) => Close();
 
         _menuCheckIn.Click += (_, _) => ShowCheckInDesk();
+        _menuGiftRedemption.Click += (_, _) => ShowGiftRedeem();
         _menuBeneficiaries.Click += (_, _) => ShowBeneficiaries();
         _menuOrganizations.Click += (_, _) => ShowOrganizations();
         _menuAgeCategories.Click += (_, _) => ShowAgeCategories();
@@ -185,6 +191,7 @@ public partial class MainForm : RtlFormBase
         _menuBackupNow.Click += async (_, _) => await OnBackupNowClickedAsync();
         _menuDailyReport.Click += (_, _) => ShowReports(0);
         _menuOrgStatistics.Click += (_, _) => ShowReports(2);
+        _menuGiftReceiptsReport.Click += (_, _) => ShowGiftReceiptsReport();
 
         _menuAbout.Click += OnAboutClicked;
     }
@@ -192,6 +199,7 @@ public partial class MainForm : RtlFormBase
     private Controls.CheckInDeskControl? _checkInDeskControl;
     private Controls.BeneficiariesControl? _beneficiariesControl;
     private Controls.ReportsControl? _reportsControl;
+    private Controls.GiftRedeemControl? _giftRedeemControl;
 
     public void ShowCheckInDesk()
     {
@@ -224,6 +232,10 @@ public partial class MainForm : RtlFormBase
         if (_reportsControl != null)
         {
             _reportsControl.Visible = false;
+        }
+        if (_giftRedeemControl != null)
+        {
+            _giftRedeemControl.Visible = false;
         }
 
         _checkInDeskControl.Visible = true;
@@ -265,6 +277,10 @@ public partial class MainForm : RtlFormBase
         {
             _reportsControl.Visible = false;
         }
+        if (_giftRedeemControl != null)
+        {
+            _giftRedeemControl.Visible = false;
+        }
 
         _beneficiariesControl.Visible = true;
         _beneficiariesControl.BringToFront();
@@ -279,6 +295,44 @@ public partial class MainForm : RtlFormBase
             _ = _beneficiariesControl.EnsureLoadedAsync();
             _beneficiariesControl.FocusSearchBox();
         }
+    }
+
+    public void ShowGiftRedeem()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.RedeemGift))
+        {
+            return;
+        }
+
+        if (_giftRedeemControl == null)
+        {
+            _giftRedeemControl = _formFactory?.CreateControl<Controls.GiftRedeemControl>() ??
+                                 new Controls.GiftRedeemControl(
+                                     null, null, _currentUser, _currentWorkstation,
+                                     _settingsService, _notifyService, null);
+
+            _giftRedeemControl.Dock = DockStyle.Fill;
+            _mainContainer.Controls.Add(_giftRedeemControl);
+        }
+
+        _welcomeCard.Visible = false;
+        if (_checkInDeskControl != null)
+        {
+            _checkInDeskControl.Visible = false;
+        }
+        if (_beneficiariesControl != null)
+        {
+            _beneficiariesControl.Visible = false;
+        }
+        if (_reportsControl != null)
+        {
+            _reportsControl.Visible = false;
+        }
+
+        _giftRedeemControl.Visible = true;
+        _giftRedeemControl.BringToFront();
+        _ = _giftRedeemControl.OnControlShownAsync();
+        _giftRedeemControl.FocusScanBox();
     }
 
     public void ShowReports(int tabIndex = 0)
@@ -306,6 +360,10 @@ public partial class MainForm : RtlFormBase
         if (_beneficiariesControl != null)
         {
             _beneficiariesControl.Visible = false;
+        }
+        if (_giftRedeemControl != null)
+        {
+            _giftRedeemControl.Visible = false;
         }
 
         _reportsControl.Visible = true;
@@ -515,6 +573,20 @@ public partial class MainForm : RtlFormBase
         }
 
         var form = _formFactory?.Create<WorkstationsForm>() ?? new WorkstationsForm(null, _settingsService, _formFactory, _notifyService, null);
+        using (form)
+        {
+            form.ShowDialog(this);
+        }
+    }
+
+    public void ShowGiftReceiptsReport()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ViewReports))
+        {
+            return;
+        }
+
+        var form = _formFactory?.Create<GiftReceiptsForm>() ?? new GiftReceiptsForm(null, null, null, _settingsService, _notifyService, null);
         using (form)
         {
             form.ShowDialog(this);

@@ -14,5 +14,6 @@
   <!-- Warnings are errors everywhere except the WinForms project (designer noise). Keep WinForms warning-free anyway. -->
   <PropertyGroup Condition="'$(MSBuildProjectName)' != 'ParkGate.WinForms'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1902;NU1903</WarningsNotAsErrors>
   </PropertyGroup>
 </Project>

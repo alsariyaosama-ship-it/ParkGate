@@ -87,6 +87,131 @@ public sealed class ManagementFormsTests
         fakeService.DeactivatedIds.ShouldContain(1);
     }
 
+    [Fact]
+    public async Task EditOrganizationDialog_CreateAndSave_ShouldCallCreateAsyncThenSetPolicyAsync()
+    {
+        var fakeService = new FakeOrganizationService();
+        var fakeNotify = new FakeNotifyService();
+
+        using var dialog = new EditOrganizationDialog(fakeService, fakeNotify, null);
+
+        var txtCode = GetField<TextBox>(dialog, "_txtCode");
+        var txtName = GetField<TextBox>(dialog, "_txtNameAr");
+        var chkCustomCooldown = GetField<CheckBox>(dialog, "_chkCustomCooldown");
+        var numCooldown = GetField<NumericUpDown>(dialog, "_numCooldownHours");
+        var chkMaxCompanions = GetField<CheckBox>(dialog, "_chkMaxFreeCompanions");
+        var numMaxCompanions = GetField<NumericUpDown>(dialog, "_numMaxFreeCompanions");
+        var chkGiftEnabled = GetField<CheckBox>(dialog, "_chkGiftEnabled");
+        var numGiftValue = GetField<NumericUpDown>(dialog, "_numGiftValue");
+        var numGiftInterval = GetField<NumericUpDown>(dialog, "_numGiftIntervalDays");
+
+        txtCode.Text = "ORG1";
+        txtName.Text = "جهة التجربة الأولى";
+        chkCustomCooldown.Checked = true;
+        numCooldown.Value = 24;
+
+        chkMaxCompanions.Checked = true;
+        numMaxCompanions.Value = 4;
+
+        chkGiftEnabled.Checked = true;
+        numGiftValue.Value = 25.5m;
+        numGiftInterval.Value = 60;
+
+        await dialog.SaveAsync();
+
+        dialog.DialogResult.ShouldBe(DialogResult.OK);
+        dialog.SavedOrganization.ShouldNotBeNull();
+        dialog.SavedOrganization!.Code.ShouldBe("ORG1");
+        fakeService.Created.Count.ShouldBe(1);
+        fakeService.PoliciesSet.Count.ShouldBe(1);
+        fakeService.PoliciesSet[0].OrganizationId.ShouldBe(dialog.SavedOrganization.Id);
+        fakeService.PoliciesSet[0].MaxFreeCompanions.ShouldBe(4);
+        fakeService.PoliciesSet[0].GiftEnabled.ShouldBeTrue();
+        fakeService.PoliciesSet[0].GiftValue.ShouldBe(25.5m);
+        fakeService.PoliciesSet[0].GiftIntervalDays.ShouldBe(60);
+    }
+
+    [Fact]
+    public async Task EditOrganizationDialog_EditAndSave_ShouldCallUpdateAsyncThenSetPolicyAsync()
+    {
+        var existing = new OrganizationDto(5, "OLD", "القديمة", 360, false, true, MaxFreeCompanions: 2, GiftEnabled: false, GiftValue: 0m, GiftIntervalDays: 30);
+        var fakeService = new FakeOrganizationService([existing]);
+        var fakeNotify = new FakeNotifyService();
+
+        using var dialog = new EditOrganizationDialog(fakeService, fakeNotify, null);
+        dialog.SetOrganization(existing);
+
+        var txtName = GetField<TextBox>(dialog, "_txtNameAr");
+        var chkMaxCompanions = GetField<CheckBox>(dialog, "_chkMaxFreeCompanions");
+        var numMaxCompanions = GetField<NumericUpDown>(dialog, "_numMaxFreeCompanions");
+        var chkGiftEnabled = GetField<CheckBox>(dialog, "_chkGiftEnabled");
+        var numGiftValue = GetField<NumericUpDown>(dialog, "_numGiftValue");
+        var numGiftInterval = GetField<NumericUpDown>(dialog, "_numGiftIntervalDays");
+
+        txtName.Text = "الجهة المعدلة";
+        chkMaxCompanions.Checked = true;
+        numMaxCompanions.Value = 5;
+        chkGiftEnabled.Checked = true;
+        numGiftValue.Value = 15m;
+        numGiftInterval.Value = 40;
+
+        await dialog.SaveAsync();
+
+        dialog.DialogResult.ShouldBe(DialogResult.OK);
+        fakeService.Updated.Count.ShouldBe(1);
+        fakeService.Updated[0].Id.ShouldBe(5);
+        fakeService.Updated[0].NameAr.ShouldBe("الجهة المعدلة");
+
+        fakeService.PoliciesSet.Count.ShouldBe(1);
+        fakeService.PoliciesSet[0].OrganizationId.ShouldBe(5);
+        fakeService.PoliciesSet[0].MaxFreeCompanions.ShouldBe(5);
+        fakeService.PoliciesSet[0].GiftEnabled.ShouldBeTrue();
+        fakeService.PoliciesSet[0].GiftValue.ShouldBe(15m);
+        fakeService.PoliciesSet[0].GiftIntervalDays.ShouldBe(40);
+    }
+
+    [Fact]
+    public void EditOrganizationDialog_GiftControls_ShouldBeDisabledWhenGiftsOff()
+    {
+        using var dialog = new EditOrganizationDialog();
+
+        var chkGiftEnabled = GetField<CheckBox>(dialog, "_chkGiftEnabled");
+        var numGiftValue = GetField<NumericUpDown>(dialog, "_numGiftValue");
+        var numGiftInterval = GetField<NumericUpDown>(dialog, "_numGiftIntervalDays");
+
+        chkGiftEnabled.Checked.ShouldBeFalse();
+        numGiftValue.Enabled.ShouldBeFalse();
+        numGiftInterval.Enabled.ShouldBeFalse();
+
+        chkGiftEnabled.Checked = true;
+        numGiftValue.Enabled.ShouldBeTrue();
+        numGiftInterval.Enabled.ShouldBeTrue();
+
+        chkGiftEnabled.Checked = false;
+        numGiftValue.Enabled.ShouldBeFalse();
+        numGiftInterval.Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task OrganizationsForm_PopulateGrid_ShouldDisplayGiftAndCompanionPolicyColumns()
+    {
+        var org = new OrganizationDto(1, "ORG_POLICY", "جهة السياسة", 720, false, true, MaxFreeCompanions: 3, GiftEnabled: true, GiftValue: 12.5m, GiftIntervalDays: 14);
+        var fakeService = new FakeOrganizationService([org]);
+
+        using var form = new OrganizationsForm(fakeService, null, null, null);
+        await form.LoadOrganizationsAsync();
+
+        var grid = GetField<DataGridView>(form, "_gridOrganizations");
+        grid.Rows.Count.ShouldBe(1);
+        var row = grid.Rows[0];
+        row.Cells[3].Value.ShouldBe("3");
+        row.Cells[4].Value.ShouldBe("مفعلة");
+        row.Cells[5].Value.ShouldNotBeNull();
+        row.Cells[5].Value!.ToString()!.ShouldContain("12.5");
+        row.Cells[6].Value.ShouldNotBeNull();
+        row.Cells[6].Value!.ToString()!.ShouldContain("14");
+    }
+
     #endregion
 
     #region AgeCategories Tests
@@ -140,6 +265,61 @@ public sealed class ManagementFormsTests
         await form.ToggleActiveAsync();
 
         fakeService.DeactivatedIds.ShouldContain(1);
+    }
+
+    [Fact]
+    public async Task EditAgeCategoryDialog_ExemptCheckbox_ShouldFlowIntoRequests()
+    {
+        var fakeService = new FakeAgeCategoryService();
+        var fakeNotify = new FakeNotifyService();
+
+        // 1. Create with exempt = true
+        using (var createDialog = new EditAgeCategoryDialog(fakeService, fakeNotify, null))
+        {
+            var txtName = GetField<TextBox>(createDialog, "_txtNameAr");
+            var chkExempt = GetField<CheckBox>(createDialog, "_chkIsCompanionLimitExempt");
+
+            txtName.Text = "رضيع تجريبي";
+            chkExempt.Checked = true;
+
+            await createDialog.SaveAsync();
+            createDialog.DialogResult.ShouldBe(DialogResult.OK);
+            fakeService.Created.Count.ShouldBe(1);
+            fakeService.Created[0].IsCompanionLimitExempt.ShouldBeTrue();
+        }
+
+        // 2. Edit with exempt = false
+        var existing = new AgeCategoryDto(1, "طفل", "من 2 إلى 12", 2, true, IsCompanionLimitExempt: true);
+        fakeService = new FakeAgeCategoryService([existing]);
+        using (var editDialog = new EditAgeCategoryDialog(fakeService, fakeNotify, null))
+        {
+            editDialog.SetAgeCategory(existing);
+            var chkExempt = GetField<CheckBox>(editDialog, "_chkIsCompanionLimitExempt");
+            chkExempt.Checked.ShouldBeTrue();
+
+            chkExempt.Checked = false;
+            await editDialog.SaveAsync();
+            editDialog.DialogResult.ShouldBe(DialogResult.OK);
+
+            fakeService.Updated.Count.ShouldBe(1);
+            fakeService.Updated[0].IsCompanionLimitExempt.ShouldBeFalse();
+        }
+    }
+
+    [Fact]
+    public async Task AgeCategoriesForm_PopulateGrid_ShouldDisplayExemptColumn()
+    {
+        var catExempt = new AgeCategoryDto(1, "رضيع", "أقل من سنتين", 1, true, IsCompanionLimitExempt: true);
+        var catNonExempt = new AgeCategoryDto(2, "بالغ", "أكبر من 18 سنة", 2, true, IsCompanionLimitExempt: false);
+        var fakeService = new FakeAgeCategoryService([catExempt, catNonExempt]);
+
+        using var form = new AgeCategoriesForm(fakeService, null, null, null);
+        await form.LoadAgeCategoriesAsync();
+
+        var grid = GetField<DataGridView>(form, "_gridAgeCategories");
+        grid.Rows.Count.ShouldBe(2);
+        grid.Rows[0].Cells[3].Value.ShouldBe("نعم");
+        grid.Rows[1].Cells[3].Value.ShouldBe("لا");
     }
 
     #endregion
@@ -366,6 +546,8 @@ public sealed class ManagementFormsTests
     {
         private readonly List<OrganizationDto> _orgs;
         public List<CreateOrganizationRequest> Created { get; } = [];
+        public List<UpdateOrganizationRequest> Updated { get; } = [];
+        public List<SetOrganizationPolicyRequest> PoliciesSet { get; } = [];
         public List<int> DeactivatedIds { get; } = [];
 
         public FakeOrganizationService(IEnumerable<OrganizationDto>? orgs = null)
@@ -389,6 +571,7 @@ public sealed class ManagementFormsTests
 
         public Task<Result<OrganizationDto>> UpdateAsync(UpdateOrganizationRequest request, CancellationToken cancellationToken = default)
         {
+            Updated.Add(request);
             var match = _orgs.First(o => o.Id == request.Id);
             var updated = match with
             {
@@ -408,12 +591,27 @@ public sealed class ManagementFormsTests
 
         public Task<Result> ReactivateAsync(int id, CancellationToken cancellationToken = default)
             => Task.FromResult(Result.Success());
+
+        public Task<Result<OrganizationDto>> SetPolicyAsync(SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default)
+        {
+            PoliciesSet.Add(request);
+            var match = _orgs.First(o => o.Id == request.OrganizationId);
+            var updated = match with
+            {
+                MaxFreeCompanions = request.MaxFreeCompanions,
+                GiftEnabled = request.GiftEnabled,
+                GiftValue = request.GiftValue,
+                GiftIntervalDays = request.GiftIntervalDays
+            };
+            return Task.FromResult(Result<OrganizationDto>.Success(updated));
+        }
     }
 
     private sealed class FakeAgeCategoryService : IAgeCategoryService
     {
         private readonly List<AgeCategoryDto> _categories;
         public List<CreateAgeCategoryRequest> Created { get; } = [];
+        public List<UpdateAgeCategoryRequest> Updated { get; } = [];
         public List<int> DeactivatedIds { get; } = [];
 
         public FakeAgeCategoryService(IEnumerable<AgeCategoryDto>? cats = null)
@@ -433,19 +631,21 @@ public sealed class ManagementFormsTests
         public Task<Result<AgeCategoryDto>> CreateAsync(CreateAgeCategoryRequest request, CancellationToken cancellationToken = default)
         {
             Created.Add(request);
-            var created = new AgeCategoryDto(_categories.Count + 1, request.NameAr, request.DescriptionAr, request.SortOrder, true);
+            var created = new AgeCategoryDto(_categories.Count + 1, request.NameAr, request.DescriptionAr, request.SortOrder, true, request.IsCompanionLimitExempt);
             _categories.Add(created);
             return Task.FromResult(Result<AgeCategoryDto>.Success(created));
         }
 
         public Task<Result<AgeCategoryDto>> UpdateAsync(UpdateAgeCategoryRequest request, CancellationToken cancellationToken = default)
         {
+            Updated.Add(request);
             var match = _categories.First(c => c.Id == request.Id);
             var updated = match with
             {
                 NameAr = request.NameAr,
                 DescriptionAr = request.DescriptionAr,
-                SortOrder = request.SortOrder
+                SortOrder = request.SortOrder,
+                IsCompanionLimitExempt = request.IsCompanionLimitExempt
             };
             return Task.FromResult(Result<AgeCategoryDto>.Success(updated));
         }

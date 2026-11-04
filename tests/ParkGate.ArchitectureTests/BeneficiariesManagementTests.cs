@@ -507,6 +507,7 @@ public sealed class BeneficiariesManagementTests
         public Task<Result<OrganizationDto>> UpdateAsync(UpdateOrganizationRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public Task<Result> DeactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public Task<Result> ReactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Result<OrganizationDto>> SetPolicyAsync(SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     private sealed class FakeCurrentUser : ICurrentUser

@@ -1,32 +1,8 @@
-using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ParkGate.Application.AgeCategories.DTOs;
-using ParkGate.Application.AgeCategories.Services;
-using ParkGate.Application.AgeCategories.Validators;
-using ParkGate.Application.Auth.DTOs;
-using ParkGate.Application.Auth.Services;
-using ParkGate.Application.Auth.Validators;
-using ParkGate.Application.Beneficiaries.DTOs;
-using ParkGate.Application.Beneficiaries.Services;
-using ParkGate.Application.Beneficiaries.Validators;
-using ParkGate.Application.CheckIn.DTOs;
-using ParkGate.Application.CheckIn.Services;
-using ParkGate.Application.CheckIn.Validators;
-using ParkGate.Application.Organizations.DTOs;
-using ParkGate.Application.Organizations.Services;
-using ParkGate.Application.Organizations.Validators;
-using ParkGate.Application.Security;
-using ParkGate.Application.Settings.Models;
-using ParkGate.Application.Settings.Services;
-using ParkGate.Application.Settings.Validators;
-using ParkGate.Application.Users.DTOs;
-using ParkGate.Application.Users.Services;
-using ParkGate.Application.Users.Validators;
-using ParkGate.Application.Workstations.DTOs;
-using ParkGate.Application.Workstations.Services;
-using ParkGate.Application.Workstations.Validators;
-using ParkGate.Domain.Policies;
+using ParkGate.Application;
+using ParkGate.Application.EntryCards;
+using ParkGate.Application.Ports.EntryCards;
 using ParkGate.Infrastructure;
 using ParkGate.WinForms.Forms;
 using ParkGate.WinForms.Services;
@@ -40,63 +16,19 @@ public static class DependencyInjection
         // 1. Infrastructure layer
         services.AddInfrastructure(configuration);
 
-        // 2. Domain policies
-        services.AddSingleton<IEntryEligibilityPolicy, RollingWindowEligibilityPolicy>();
+        // 2. Application layer (Domain policies, security contexts, use cases, validators)
+        services.AddApplication();
 
-        // 3. Security contexts (Singletons)
-        var userContext = new CurrentUserContext();
-        services.AddSingleton<CurrentUserContext>(userContext);
-        services.AddSingleton<ICurrentUser>(userContext);
-        services.AddSingleton<ICurrentUserSession>(userContext);
-
-        var workstationContext = new CurrentWorkstationContext();
-        services.AddSingleton<CurrentWorkstationContext>(workstationContext);
-        services.AddSingleton<ICurrentWorkstation>(workstationContext);
-        services.AddSingleton<ICurrentWorkstationSession>(workstationContext);
-
-        // 4. Application services (AGENTS.md §4.5)
-        services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddTransient<IAuthService, AuthService>();
-        services.AddTransient<IBeneficiaryService, BeneficiaryService>();
-        services.AddTransient<ICheckInService, CheckInService>();
-        services.AddTransient<IOrganizationService, OrganizationService>();
-        services.AddTransient<IAgeCategoryService, AgeCategoryService>();
-        services.AddTransient<IUserService, UserService>();
-        services.AddTransient<IWorkstationService, WorkstationService>();
-        services.AddTransient<ParkGate.Application.Reports.Services.IReportService, ParkGate.Application.Reports.Services.ReportService>();
-
-        // EntryCards
+        // 3. EntryCards runtime infrastructure & asynchronously initialized QR crypto provider
         services.AddSingleton(TimeProvider.System);
-        services.AddSingleton(new ParkGate.Application.EntryCards.GateStation(Environment.MachineName));
-        services.AddSingleton(new ParkGate.Application.EntryCards.EntryCardOptions { ValidityDays = 365 });
-        services.AddSingleton(sp => new ParkGate.Application.EntryCards.QrTokenVerifier(
-            Task.Run(() => sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>().GetTrustedKeysAsync()).GetAwaiter().GetResult()));
-        services.AddTransient<ParkGate.Application.EntryCards.CardScanService>();
-        
-        services.AddSingleton(sp => 
-            Task.Run(() => ParkGate.Infrastructure.EntryCards.QrSigningBootstrap.CreateSignerAsync(
-                sp.GetRequiredService<ParkGate.Application.EntryCards.IQrKeyRepository>(), Environment.MachineName)).GetAwaiter().GetResult());
-        services.AddTransient<ParkGate.Application.EntryCards.EntryCardIssuer>();
+        services.AddSingleton(new GateStation(Environment.MachineName));
+        services.AddSingleton(new EntryCardOptions { ValidityDays = 365 });
+        services.AddSingleton(sp => sp.GetRequiredService<IQrCryptoProvider>().Verifier
+            ?? throw new InvalidOperationException("QrTokenVerifier is not initialized. Ensure StartupCoordinator has executed."));
+        services.AddSingleton(sp => sp.GetRequiredService<IQrCryptoProvider>().Signer
+            ?? throw new InvalidOperationException("QrTokenSigner is not initialized. Ensure StartupCoordinator has executed."));
 
-        // 5. FluentValidation validators
-        services.AddTransient<IValidator<FirstRunAdminRequest>, FirstRunAdminRequestValidator>();
-        services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
-        services.AddTransient<IValidator<ChangePasswordRequest>, ChangePasswordRequestValidator>();
-        services.AddTransient<IValidator<RegisterBeneficiaryRequest>, RegisterBeneficiaryRequestValidator>();
-        services.AddTransient<IValidator<UpdateBeneficiaryRequest>, UpdateBeneficiaryRequestValidator>();
-        services.AddTransient<IValidator<ChangeBeneficiaryStatusRequest>, ChangeBeneficiaryStatusRequestValidator>();
-        services.AddTransient<IValidator<RecordEntryRequest>, RecordEntryRequestValidator>();
-        services.AddTransient<IValidator<OverrideEntryRequest>, OverrideEntryRequestValidator>();
-        services.AddTransient<IValidator<VoidEntryRequest>, VoidEntryRequestValidator>();
-        services.AddTransient<IValidator<CreateOrganizationRequest>, CreateOrganizationRequestValidator>();
-        services.AddTransient<IValidator<UpdateOrganizationRequest>, UpdateOrganizationRequestValidator>();
-        services.AddTransient<IValidator<CreateAgeCategoryRequest>, CreateAgeCategoryRequestValidator>();
-        services.AddTransient<IValidator<UpdateAgeCategoryRequest>, UpdateAgeCategoryRequestValidator>();
-        services.AddTransient<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
-        services.AddTransient<IValidator<UpdateWorkstationRequest>, UpdateWorkstationRequestValidator>();
-        services.AddTransient<IValidator<UpdateSettingsRequest>, UpdateSettingsRequestValidator>();
-
-        // 6. WinForms presentation services & forms (Transient per AGENTS.md §4.5)
+        // 4. WinForms presentation services & forms (Transient per AGENTS.md §4.5)
         services.AddSingleton<INotifyService, NotifyService>();
         services.AddSingleton<IFormFactory, FormFactory>();
         services.AddTransient<IStartupCoordinator, StartupCoordinator>();
@@ -125,6 +57,10 @@ public static class DependencyInjection
         services.AddTransient<SettingsForm>();
         services.AddTransient<Controls.ReportsControl>();
         services.AddTransient<Forms.IssueQrDialog>();
+        services.AddTransient<Controls.GiftOfferPanel>();
+        services.AddTransient<GiftQrDialog>();
+        services.AddTransient<Controls.GiftRedeemControl>();
+        services.AddTransient<GiftReceiptsForm>();
 
         return services;
     }

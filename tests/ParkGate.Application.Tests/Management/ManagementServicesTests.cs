@@ -110,7 +110,8 @@ public sealed class ManagementServicesTests
             _currentUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
-            new UpdateOrganizationRequestValidator());
+            new UpdateOrganizationRequestValidator(),
+            new SetOrganizationPolicyRequestValidator());
 
         var result = await sut.DeactivateAsync(1);
 
@@ -127,7 +128,8 @@ public sealed class ManagementServicesTests
             _currentUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
-            new UpdateOrganizationRequestValidator());
+            new UpdateOrganizationRequestValidator(),
+            new SetOrganizationPolicyRequestValidator());
 
         var createResult = await sut.CreateAsync(new CreateOrganizationRequest("EDU", "وزارة التعليم", 360));
         createResult.IsSuccess.ShouldBeTrue();

@@ -76,7 +76,9 @@ public sealed class AgeCategoryService : IAgeCategoryService
         var existing = await uow.AgeCategories.GetByNameAsync(request.NameAr, cancellationToken);
         if (existing is not null)
         {
-            return Errors.AgeCategory.NameAlreadyExists;
+            return !existing.IsActive
+                ? Errors.AgeCategory.NameAlreadyExistsInactive
+                : Errors.AgeCategory.NameAlreadyExists;
         }
 
         var category = new AgeCategory(
@@ -84,6 +86,8 @@ public sealed class AgeCategoryService : IAgeCategoryService
             request.DescriptionAr,
             request.SortOrder,
             isActive: true);
+
+        category.SetCompanionLimitExempt(request.IsCompanionLimitExempt);
 
         uow.AgeCategories.Add(category);
         await uow.SaveChangesAsync(cancellationToken);
@@ -126,6 +130,7 @@ public sealed class AgeCategoryService : IAgeCategoryService
         }
 
         category.Update(request.NameAr, request.DescriptionAr, request.SortOrder);
+        category.SetCompanionLimitExempt(request.IsCompanionLimitExempt);
         await uow.SaveChangesAsync(cancellationToken);
 
         await _auditWriter.WriteAsync(

@@ -31,15 +31,8 @@ public static class DependencyInjection
             return new AppConnectionStringProvider(store, configuration);
         });
 
-        // 2. DbContextFactory (ADR-003)
-        services.AddDbContextFactory<ParkGateDbContext>((sp, options) =>
-        {
-            var connectionProvider = sp.GetRequiredService<IAppConnectionStringProvider>();
-            options.UseSqlServer(connectionProvider.CurrentConnectionString, sql =>
-            {
-                sql.MigrationsAssembly(typeof(ParkGateDbContext).Assembly.FullName);
-            });
-        });
+        // 2. Dynamic DbContextFactory (ADR-003, supports runtime connection updates)
+        services.AddSingleton<IDbContextFactory<ParkGateDbContext>, DynamicParkGateDbContextFactory>();
 
         // 3. Infrastructure singletons & services
         services.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>();
@@ -49,14 +42,19 @@ public static class DependencyInjection
         services.AddTransient<IDatabaseStartupService, DatabaseStartupService>();
         services.AddTransient<ParkGate.Application.Ports.Persistence.IDatabaseBackupService, ParkGate.Infrastructure.Data.DatabaseBackupService>();
         services.AddTransient<ParkGate.Application.Ports.Reports.IReportQueries, ParkGate.Infrastructure.Reports.ReportQueries>();
+        services.AddTransient<ParkGate.Application.Ports.Reports.IGiftReportQueries, ParkGate.Infrastructure.Reports.GiftReportQueries>();
         services.AddTransient<ParkGate.Application.Ports.Reports.IExcelExportService, ParkGate.Infrastructure.Reports.ClosedXmlExcelExportService>();
+        services.AddTransient<ParkGate.Application.Ports.Reports.IGiftExcelExportService, ParkGate.Infrastructure.Reports.ClosedXmlGiftExcelExportService>();
 
-        services.AddTransient<ParkGate.Application.EntryCards.IEntryCardRepository, ParkGate.Infrastructure.EntryCards.EntryCardRepository>();
-        services.AddTransient<ParkGate.Application.EntryCards.IQrKeyRepository, ParkGate.Infrastructure.EntryCards.QrKeyRepository>();
-        services.AddTransient<ParkGate.Application.EntryCards.ICardScanLog, ParkGate.Infrastructure.EntryCards.CardScanLogRepository>();
+        services.AddTransient<ParkGate.Application.Ports.EntryCards.IEntryCardRepository, ParkGate.Infrastructure.EntryCards.EntryCardRepository>();
+        services.AddTransient<ParkGate.Application.Ports.EntryCards.IQrKeyRepository, ParkGate.Infrastructure.EntryCards.QrKeyRepository>();
+        services.AddTransient<ParkGate.Application.Ports.EntryCards.ICardScanLog, ParkGate.Infrastructure.EntryCards.CardScanLogRepository>();
 
         services.AddTransient<ParkGate.Application.Ports.Sync.IPayloadEncryptionService, ParkGate.Infrastructure.Sync.PayloadEncryptionService>();
         services.AddTransient<ParkGate.Application.Ports.Sync.ICloudPushService, ParkGate.Infrastructure.Sync.CloudPushService>();
+
+        services.AddSingleton<ParkGate.Application.Ports.EntryCards.IQrCryptoProvider, ParkGate.Infrastructure.EntryCards.QrCryptoProvider>();
+        services.AddSingleton<ParkGate.Application.Ports.EntryCards.IQrImageRenderer, ParkGate.Infrastructure.EntryCards.QrImageRendererAdapter>();
 
         return services;
     }

@@ -1,0 +1,96 @@
+services:
+  # ----------------------------------------------------------------------------
+  # Laravel PHP-FPM Application
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: parkgate-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    volumes:
+      - storage-data:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+      - web-proxy
+
+  # ----------------------------------------------------------------------------
+  # Nginx Internal Web Server for Laravel
+  # ----------------------------------------------------------------------------
+  web:
+    image: nginx:alpine
+    container_name: parkgate-web
+    restart: unless-stopped
+    volumes_from:
+      - app:ro
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      # Bound to localhost only. The host reverse proxy forwards public traffic here.
+      - "127.0.0.1:${APP_PORT:-8080}:80"
+    depends_on:
+      - app
+    networks:
+      - internal
+      - web-proxy
+
+  # ----------------------------------------------------------------------------
+  # MySQL 8.0 Database Service
+  # ----------------------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: parkgate-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-parkgate_prod}
+      MYSQL_USER: ${DB_USERNAME:-parkgate_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ----------------------------------------------------------------------------
+  # Queue Worker
+  # ----------------------------------------------------------------------------
+  queue:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: parkgate-queue
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3
+    env_file: .env
+    volumes:
+      - storage-data:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+volumes:
+  db-data:
+    driver: local
+  storage-data:
+    driver: local
+
+networks:
+  internal:
+    driver: bridge
+  web-proxy:
+    name: web-proxy
+    external: true

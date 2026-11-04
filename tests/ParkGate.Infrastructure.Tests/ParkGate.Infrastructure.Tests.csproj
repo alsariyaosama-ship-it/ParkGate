@@ -9,6 +9,7 @@
     <ProjectReference Include="..\..\src\ParkGate.Domain\ParkGate.Domain.csproj" />
     <ProjectReference Include="..\..\src\ParkGate.Application\ParkGate.Application.csproj" />
     <ProjectReference Include="..\..\src\ParkGate.Infrastructure\ParkGate.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\ParkGate.SyncAgent\ParkGate.SyncAgent.csproj" />
   </ItemGroup>
 
   <ItemGroup>

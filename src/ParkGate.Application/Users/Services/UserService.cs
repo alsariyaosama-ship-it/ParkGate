@@ -72,7 +72,9 @@ public sealed class UserService : IUserService
         var existing = await uow.Users.GetByUserNameAsync(normalizedUserName, cancellationToken);
         if (existing is not null)
         {
-            return Errors.User.UsernameAlreadyExists;
+            return !existing.IsActive
+                ? Errors.User.UsernameAlreadyExistsInactive
+                : Errors.User.UsernameAlreadyExists;
         }
 
         var passwordHash = _passwordHasher.HashPassword(request.Password);

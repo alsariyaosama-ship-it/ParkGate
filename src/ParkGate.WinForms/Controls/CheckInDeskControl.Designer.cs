@@ -63,6 +63,7 @@ partial class CheckInDeskControl
         this._lblHolderStatus = new System.Windows.Forms.Label();
         this._grpCompanions = new System.Windows.Forms.GroupBox();
         this._pnlCompanionsTotal = new System.Windows.Forms.Panel();
+        this._lblFreeCompanions = new System.Windows.Forms.Label();
         this._lblCompanionsNotice = new System.Windows.Forms.Label();
         this._lblTotalPersons = new System.Windows.Forms.Label();
         this._flowCounters = new System.Windows.Forms.FlowLayoutPanel();
@@ -72,6 +73,7 @@ partial class CheckInDeskControl
         this._btnOverride = new System.Windows.Forms.Button();
         this._btnNewHolder = new System.Windows.Forms.Button();
         this._btnClear = new System.Windows.Forms.Button();
+        this._giftPanel = new ParkGate.WinForms.Controls.GiftOfferPanel();
         this._grpToday = new System.Windows.Forms.GroupBox();
         this._gridToday = new System.Windows.Forms.DataGridView();
         this._colTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -108,16 +110,18 @@ partial class CheckInDeskControl
         this._mainLayout.Controls.Add(this._statusBanner, 0, 1);
         this._mainLayout.Controls.Add(this._splitMiddle, 0, 2);
         this._mainLayout.Controls.Add(this._pnlActions, 0, 3);
-        this._mainLayout.Controls.Add(this._grpToday, 0, 4);
+        this._mainLayout.Controls.Add(this._giftPanel, 0, 4);
+        this._mainLayout.Controls.Add(this._grpToday, 0, 5);
         this._mainLayout.Dock = System.Windows.Forms.DockStyle.Fill;
         this._mainLayout.Location = new System.Drawing.Point(10, 10);
         this._mainLayout.Margin = new System.Windows.Forms.Padding(0);
         this._mainLayout.Name = "_mainLayout";
-        this._mainLayout.RowCount = 5;
+        this._mainLayout.RowCount = 6;
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 76F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 55F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 45F));
         this._mainLayout.Size = new System.Drawing.Size(988, 641);
         this._mainLayout.TabIndex = 0;
@@ -751,6 +755,7 @@ partial class CheckInDeskControl
         // 
         this._pnlCompanionsTotal.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(253)))), ((int)(((byte)(244)))));
         this._pnlCompanionsTotal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+        this._pnlCompanionsTotal.Controls.Add(this._lblFreeCompanions);
         this._pnlCompanionsTotal.Controls.Add(this._lblTotalPersons);
         this._pnlCompanionsTotal.Controls.Add(this._lblCompanionsNotice);
         this._pnlCompanionsTotal.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -775,6 +780,19 @@ partial class CheckInDeskControl
         this._lblTotalPersons.Text = "الإجمالي مع الزبون: 1 فرد";
         this._lblTotalPersons.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
         // 
+        // _lblFreeCompanions
+        // 
+        this._lblFreeCompanions.AutoSize = true;
+        this._lblFreeCompanions.Dock = System.Windows.Forms.DockStyle.Right;
+        this._lblFreeCompanions.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblFreeCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
+        this._lblFreeCompanions.Location = new System.Drawing.Point(80, 2);
+        this._lblFreeCompanions.Name = "_lblFreeCompanions";
+        this._lblFreeCompanions.Size = new System.Drawing.Size(0, 38);
+        this._lblFreeCompanions.TabIndex = 2;
+        this._lblFreeCompanions.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+        this._lblFreeCompanions.Visible = false;
+        // 
         // _lblCompanionsNotice
         // 
         this._lblCompanionsNotice.AutoSize = true;
@@ -787,6 +805,16 @@ partial class CheckInDeskControl
         this._lblCompanionsNotice.TabIndex = 1;
         this._lblCompanionsNotice.Text = "(الزبون محتسب تلقائياً +1 فرد)";
         this._lblCompanionsNotice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+        // 
+        // _giftPanel
+        // 
+        this._giftPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._giftPanel.Location = new System.Drawing.Point(0, 428);
+        this._giftPanel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
+        this._giftPanel.Name = "_giftPanel";
+        this._giftPanel.Size = new System.Drawing.Size(988, 70);
+        this._giftPanel.TabIndex = 4;
+        this._giftPanel.Visible = false;
         // 
         // _grpToday
         // 
@@ -993,6 +1021,8 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Panel _pnlCompanionsTotal;
     private System.Windows.Forms.Label _lblTotalPersons;
     private System.Windows.Forms.Label _lblCompanionsNotice;
+    private System.Windows.Forms.Label _lblFreeCompanions;
+    private ParkGate.WinForms.Controls.GiftOfferPanel _giftPanel;
     private System.Windows.Forms.TableLayoutPanel _pnlActions;
     private System.Windows.Forms.FlowLayoutPanel _flowActions;
     private System.Windows.Forms.Button _btnRecordEntry;

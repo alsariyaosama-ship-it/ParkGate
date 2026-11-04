@@ -1,6 +1,7 @@
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using ParkGate.Application.Auth.Services;
+using ParkGate.Application.Ports.EntryCards;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Forms;
@@ -19,19 +20,22 @@ public sealed class StartupCoordinator : IStartupCoordinator
     private readonly IFormFactory _formFactory;
     private readonly INotifyService _notifyService;
     private readonly ILogger<StartupCoordinator> _logger;
+    private readonly IQrCryptoProvider? _qrCryptoProvider;
 
     public StartupCoordinator(
         IDatabaseStartupService startupService,
         IAuthService authService,
         IFormFactory formFactory,
         INotifyService notifyService,
-        ILogger<StartupCoordinator> logger)
+        ILogger<StartupCoordinator> logger,
+        IQrCryptoProvider? qrCryptoProvider = null)
     {
         _startupService = startupService;
         _authService = authService;
         _formFactory = formFactory;
         _notifyService = notifyService;
         _logger = logger;
+        _qrCryptoProvider = qrCryptoProvider;
     }
 
     public async Task<StartupStatus> RunStartupSequenceAsync(CancellationToken cancellationToken = default)
@@ -69,8 +73,12 @@ public sealed class StartupCoordinator : IStartupCoordinator
 
         _logger.LogInformation("Database schema verified up-to-date (no pending migrations).");
 
-        // Step 2b: Ensure EntryCards schema exists
+        // Step 2b: Ensure EntryCards schema exists & initialize QR crypto
         await _startupService.EnsureEntryCardsSchemaAsync(cancellationToken);
+        if (_qrCryptoProvider != null)
+        {
+            await _qrCryptoProvider.InitializeAsync(cancellationToken);
+        }
 
         // Step 3: Workstation auto-registration (FR-AUTH-05)
         var wsResult = await _authService.EnsureWorkstationRegisteredAsync(Environment.MachineName, cancellationToken);

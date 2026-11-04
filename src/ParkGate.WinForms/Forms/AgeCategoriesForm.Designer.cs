@@ -34,7 +34,9 @@ partial class AgeCategoriesForm
         this._colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colSortOrder = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        this._colIsExempt = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyleExempt = new System.Windows.Forms.DataGridViewCellStyle();
         this._pnlFooter = new System.Windows.Forms.Panel();
         this._lblCount = new System.Windows.Forms.Label();
         this._btnClose = new System.Windows.Forms.Button();
@@ -190,6 +192,7 @@ partial class AgeCategoriesForm
             this._colName,
             this._colDescription,
             this._colSortOrder,
+            this._colIsExempt,
             this._colStatus});
         dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
         dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
@@ -238,6 +241,16 @@ partial class AgeCategoriesForm
         this._colSortOrder.MinimumWidth = 80;
         this._colSortOrder.Name = "_colSortOrder";
         this._colSortOrder.ReadOnly = true;
+        // 
+        // _colIsExempt
+        // 
+        dataGridViewCellStyleExempt.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+        this._colIsExempt.DefaultCellStyle = dataGridViewCellStyleExempt;
+        this._colIsExempt.FillWeight = 15F;
+        this._colIsExempt.HeaderText = "إعفاء المرافقين";
+        this._colIsExempt.MinimumWidth = 90;
+        this._colIsExempt.Name = "_colIsExempt";
+        this._colIsExempt.ReadOnly = true;
         // 
         // _colStatus
         // 
@@ -329,6 +342,7 @@ partial class AgeCategoriesForm
     private System.Windows.Forms.DataGridViewTextBoxColumn _colName;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colDescription;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colSortOrder;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _colIsExempt;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colStatus;
     private System.Windows.Forms.Panel _pnlFooter;
     private System.Windows.Forms.Label _lblCount;

@@ -61,24 +61,24 @@ internal class Strings
     }
 
     /// <summary>
-    ///   Looks up a localized string similar to منظومة بوابة الحديقة — ParkGate.
+    ///   Looks up a localized string similar to بوابة منتزه المرح العائلي.
     /// </summary>
     internal static string App_Title
     {
         get
         {
-            return ResourceManager.GetString("App_Title", resourceCulture) ?? "منظومة بوابة الحديقة — ParkGate";
+            return ResourceManager.GetString("App_Title", resourceCulture) ?? "بوابة منتزه المرح العائلي";
         }
     }
 
     /// <summary>
-    ///   Looks up a localized string similar to ParkGate.
+    ///   Looks up a localized string similar to بوابة منتزه المرح العائلي.
     /// </summary>
     internal static string App_Name
     {
         get
         {
-            return ResourceManager.GetString("App_Name", resourceCulture) ?? "ParkGate";
+            return ResourceManager.GetString("App_Name", resourceCulture) ?? "بوابة منتزه المرح العائلي";
         }
     }
 
@@ -545,6 +545,84 @@ internal class Strings
     internal static string Msg_BackupSuccess => GetString(nameof(Msg_BackupSuccess));
     internal static string Msg_BackupFailed => GetString(nameof(Msg_BackupFailed));
 
+    internal static string Grp_Org_Policy => GetString(nameof(Grp_Org_Policy));
+    internal static string Label_Org_MaxFreeCompanions => GetString(nameof(Label_Org_MaxFreeCompanions));
+    internal static string Label_Org_GiftEnabled => GetString(nameof(Label_Org_GiftEnabled));
+    internal static string Label_Org_GiftValue => GetString(nameof(Label_Org_GiftValue));
+    internal static string Label_Org_GiftInterval => GetString(nameof(Label_Org_GiftInterval));
+    internal static string Label_Age_IsCompanionLimitExempt => GetString(nameof(Label_Age_IsCompanionLimitExempt));
+    internal static string Col_Org_MaxCompanions => GetString(nameof(Col_Org_MaxCompanions));
+    internal static string Col_Org_GiftEnabled => GetString(nameof(Col_Org_GiftEnabled));
+    internal static string Col_Org_GiftValue => GetString(nameof(Col_Org_GiftValue));
+    internal static string Col_Org_GiftInterval => GetString(nameof(Col_Org_GiftInterval));
+    internal static string Col_Age_IsExempt => GetString(nameof(Col_Age_IsExempt));
+    internal static string Unit_Days => GetString(nameof(Unit_Days));
+    internal static string Unit_Currency => GetString(nameof(Unit_Currency));
+    internal static string Val_MaxFreeCompanionsOutOfRange => GetString(nameof(Val_MaxFreeCompanionsOutOfRange));
+    internal static string Val_GiftIntervalOutOfRange => GetString(nameof(Val_GiftIntervalOutOfRange));
+    internal static string Val_GiftValueRequired => GetString(nameof(Val_GiftValueRequired));
+    internal static string Val_GiftValueNegative => GetString(nameof(Val_GiftValueNegative));
+    internal static string Error_CheckIn_ExceedsFreeCompanionLimit => GetString(nameof(Error_CheckIn_ExceedsFreeCompanionLimit));
+    internal static string Error_Gift_OrganizationInactive => GetString(nameof(Error_Gift_OrganizationInactive));
+    internal static string Error_Gift_NotEnabled => GetString(nameof(Error_Gift_NotEnabled));
+    internal static string Error_Gift_HolderBlocked => GetString(nameof(Error_Gift_HolderBlocked));
+    internal static string Error_Gift_HolderSuspended => GetString(nameof(Error_Gift_HolderSuspended));
+    internal static string Error_Gift_IntervalNotElapsed => GetString(nameof(Error_Gift_IntervalNotElapsed));
+    internal static string Error_Gift_OverrideReasonRequired => GetString(nameof(Error_Gift_OverrideReasonRequired));
+    internal static string Error_Gift_OverrideNotAllowed => GetString(nameof(Error_Gift_OverrideNotAllowed));
+    internal static string Error_Gift_NotFound => GetString(nameof(Error_Gift_NotFound));
+    internal static string Error_Gift_AlreadyRedeemed => GetString(nameof(Error_Gift_AlreadyRedeemed));
+    internal static string Error_Gift_Voided => GetString(nameof(Error_Gift_Voided));
+    internal static string Error_Gift_Expired => GetString(nameof(Error_Gift_Expired));
+    internal static string Error_Gift_InvalidCode => GetString(nameof(Error_Gift_InvalidCode));
+    internal static string Error_Gift_Forged => GetString(nameof(Error_Gift_Forged));
+    internal static string Error_Gift_CannotVoidRedeemed => GetString(nameof(Error_Gift_CannotVoidRedeemed));
+    internal static string Error_Gift_VoidReasonRequired => GetString(nameof(Error_Gift_VoidReasonRequired));
+    internal static string Error_Gift_InvalidPolicy => GetString(nameof(Error_Gift_InvalidPolicy));
+
+    internal static string Title_GiftOffer => GetString(nameof(Title_GiftOffer));
+    internal static string Label_GiftEligible => GetString(nameof(Label_GiftEligible));
+    internal static string Label_GiftNotEligible => GetString(nameof(Label_GiftNotEligible));
+    internal static string Label_GiftNextEligible => GetString(nameof(Label_GiftNextEligible));
+    internal static string Btn_IssueGift => GetString(nameof(Btn_IssueGift));
+    internal static string Btn_IssueGiftOverride => GetString(nameof(Btn_IssueGiftOverride));
+    internal static string Msg_IssueGiftSuccess => GetString(nameof(Msg_IssueGiftSuccess));
+    internal static string Title_GiftQrDialog => GetString(nameof(Title_GiftQrDialog));
+    internal static string Header_GiftVoucher => GetString(nameof(Header_GiftVoucher));
+    internal static string Label_ReceiptNo => GetString(nameof(Label_ReceiptNo));
+    internal static string Label_GiftValueDisplay => GetString(nameof(Label_GiftValueDisplay));
+    internal static string Label_GiftExpiresOn => GetString(nameof(Label_GiftExpiresOn));
+    internal static string Label_GiftOverrideBadge => GetString(nameof(Label_GiftOverrideBadge));
+    internal static string Btn_SaveImage => GetString(nameof(Btn_SaveImage));
+    internal static string Filter_PngImages => GetString(nameof(Filter_PngImages));
+    internal static string Msg_SaveImageSuccess => GetString(nameof(Msg_SaveImageSuccess));
+    internal static string Label_FreeCompanionsCount => GetString(nameof(Label_FreeCompanionsCount));
+    internal static string Label_FreeCompanionsExceeded => GetString(nameof(Label_FreeCompanionsExceeded));
+    internal static string Error_FreeCompanionsExceededBanner => GetString(nameof(Error_FreeCompanionsExceededBanner));
+    internal static string Msg_NoQrImageAvailable => GetString(nameof(Msg_NoQrImageAvailable));
+    internal static string Msg_PrintFailed => GetString(nameof(Msg_PrintFailed));
+    internal static string Btn_Print => GetString(nameof(Btn_Print));
+    internal static string Menu_GiftRedemption => GetString(nameof(Menu_GiftRedemption));
+    internal static string Title_GiftRedeem => GetString(nameof(Title_GiftRedeem));
+    internal static string Label_ScanGiftQr => GetString(nameof(Label_ScanGiftQr));
+    internal static string Watermark_ScanGiftQr => GetString(nameof(Watermark_ScanGiftQr));
+    internal static string Btn_RedeemGift => GetString(nameof(Btn_RedeemGift));
+    internal static string Banner_GiftRedeemedSuccess => GetString(nameof(Banner_GiftRedeemedSuccess));
+    internal static string Banner_ScanReady => GetString(nameof(Banner_ScanReady));
+    internal static string Banner_ScanReadyDetails => GetString(nameof(Banner_ScanReadyDetails));
+    internal static string Group_RedeemedVoucherDetails => GetString(nameof(Group_RedeemedVoucherDetails));
+    internal static string Group_TodayRedemptions => GetString(nameof(Group_TodayRedemptions));
+    internal static string Label_TodayRedemptionsSummary => GetString(nameof(Label_TodayRedemptionsSummary));
+    internal static string Col_RedeemedTime => GetString(nameof(Col_RedeemedTime));
+    internal static string Msg_GiftInputEmpty => GetString(nameof(Msg_GiftInputEmpty));
+    internal static string Label_ReceiptNoTitle => GetString(nameof(Label_ReceiptNoTitle));
+    internal static string Label_ValueTitle => GetString(nameof(Label_ValueTitle));
+    internal static string Col_ReceiptNo => GetString(nameof(Col_ReceiptNo));
+    internal static string Col_Value => GetString(nameof(Col_Value));
+    internal static string Label_CardNumberTitle => GetString(nameof(Label_CardNumberTitle));
+    internal static string Label_OrganizationTitle => GetString(nameof(Label_OrganizationTitle));
+    internal static string Label_HolderNameTitle => GetString(nameof(Label_HolderNameTitle));
+
     internal static string GetString(string name)
     {
         return ResourceManager.GetString(name, resourceCulture) ?? name;
@@ -554,4 +632,29 @@ internal class Strings
     {
         return ResourceManager.GetString(name, resourceCulture);
     }
+    internal static string Menu_GiftReceiptsReport => GetString(nameof(Menu_GiftReceiptsReport));
+    internal static string Title_GiftReceipts => GetString(nameof(Title_GiftReceipts));
+    internal static string Label_DateFrom => GetString(nameof(Label_DateFrom));
+    internal static string Label_DateTo => GetString(nameof(Label_DateTo));
+    internal static string Label_FilterStatus => GetString(nameof(Label_FilterStatus));
+    internal static string Status_All => GetString(nameof(Status_All));
+    internal static string Status_IssuedVoucher => GetString(nameof(Status_IssuedVoucher));
+    internal static string Status_RedeemedVoucher => GetString(nameof(Status_RedeemedVoucher));
+    internal static string Status_VoidedVoucher => GetString(nameof(Status_VoidedVoucher));
+    internal static string Summary_GiftReceipts => GetString(nameof(Summary_GiftReceipts));
+    internal static string Col_Gift_ReceiptNo => GetString(nameof(Col_Gift_ReceiptNo));
+    internal static string Col_Gift_HolderName => GetString(nameof(Col_Gift_HolderName));
+    internal static string Col_Gift_CardNumber => GetString(nameof(Col_Gift_CardNumber));
+    internal static string Col_Gift_Organization => GetString(nameof(Col_Gift_Organization));
+    internal static string Col_Gift_Value => GetString(nameof(Col_Gift_Value));
+    internal static string Col_Gift_Status => GetString(nameof(Col_Gift_Status));
+    internal static string Col_Gift_IssuedAt => GetString(nameof(Col_Gift_IssuedAt));
+    internal static string Col_Gift_IssuedBy => GetString(nameof(Col_Gift_IssuedBy));
+    internal static string Col_Gift_RedeemedAt => GetString(nameof(Col_Gift_RedeemedAt));
+    internal static string Col_Gift_RedeemedBy => GetString(nameof(Col_Gift_RedeemedBy));
+    internal static string Col_Gift_RedeemedWs => GetString(nameof(Col_Gift_RedeemedWs));
+    internal static string Col_Gift_IsOverride => GetString(nameof(Col_Gift_IsOverride));
+    internal static string Col_Gift_Reason => GetString(nameof(Col_Gift_Reason));
+    internal static string Msg_ExportExcelSuccess => GetString(nameof(Msg_ExportExcelSuccess));
+    internal static string Msg_NoGiftReceiptsFound => GetString(nameof(Msg_NoGiftReceiptsFound));
 }

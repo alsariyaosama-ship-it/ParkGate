@@ -7,18 +7,21 @@ public sealed record AgeCategoryDto(
     string NameAr,
     string? DescriptionAr,
     int SortOrder,
-    bool IsActive);
+    bool IsActive,
+    bool IsCompanionLimitExempt = false);
 
 public sealed record CreateAgeCategoryRequest(
     string NameAr,
     string? DescriptionAr,
-    int SortOrder);
+    int SortOrder,
+    bool IsCompanionLimitExempt = false);
 
 public sealed record UpdateAgeCategoryRequest(
     int Id,
     string NameAr,
     string? DescriptionAr,
-    int SortOrder);
+    int SortOrder,
+    bool IsCompanionLimitExempt = false);
 
 public static class AgeCategoryMappingExtensions
 {
@@ -28,5 +31,6 @@ public static class AgeCategoryMappingExtensions
             category.NameAr,
             category.DescriptionAr,
             category.SortOrder,
-            category.IsActive);
+            category.IsActive,
+            category.IsCompanionLimitExempt);
 }

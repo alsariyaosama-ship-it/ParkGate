@@ -54,13 +54,36 @@ public static class Errors
         public static readonly Error CannotVoidDeniedAttempt = new("CheckIn.CannotVoidDeniedAttempt", "Denied entry attempts cannot be voided.");
         public static readonly Error AlreadyVoided = new("CheckIn.AlreadyVoided", "Entry attempt is already voided.");
         public static readonly Error VoidReasonRequired = new("CheckIn.VoidReasonRequired", "A reason of at least 5 characters is required to void an entry.");
+        public static readonly Error ExceedsFreeCompanionLimit = new("CheckIn.ExceedsFreeCompanionLimit", "Number of companions exceeds organization free companion limit.");
+    }
+
+    public static class Gift
+    {
+        public static readonly Error OrganizationInactive = new("Gift.OrganizationInactive", "Organization is inactive.");
+        public static readonly Error NotEnabled = new("Gift.NotEnabled", "Gift vouchers are not enabled for this organization.");
+        public static readonly Error HolderBlocked = new("Gift.HolderBlocked", "Holder is blocked from receiving gifts.");
+        public static readonly Error HolderSuspended = new("Gift.HolderSuspended", "Holder is suspended from receiving gifts.");
+        public static readonly Error IntervalNotElapsed = new("Gift.IntervalNotElapsed", "Gift interval period has not yet elapsed.");
+        public static readonly Error OverrideReasonRequired = new("Gift.OverrideReasonRequired", "A reason of at least 5 characters is required for gift interval override.");
+        public static readonly Error OverrideNotAllowed = new("Gift.OverrideNotAllowed", "Override is not permitted for this denial reason.");
+        public static readonly Error NotFound = new("Gift.NotFound", "Gift voucher not found.");
+        public static readonly Error AlreadyRedeemed = new("Gift.AlreadyRedeemed", "Gift voucher has already been redeemed.");
+        public static readonly Error Voided = new("Gift.Voided", "Gift voucher has been voided.");
+        public static readonly Error Expired = new("Gift.Expired", "Gift voucher has expired.");
+        public static readonly Error InvalidCode = new("Gift.InvalidCode", "Invalid gift QR code format or unknown signing key.");
+        public static readonly Error Forged = new("Gift.Forged", "Gift voucher signature verification failed or token mismatch.");
+        public static readonly Error CannotVoidRedeemed = new("Gift.CannotVoidRedeemed", "Redeemed gift vouchers cannot be voided.");
+        public static readonly Error VoidReasonRequired = new("Gift.VoidReasonRequired", "A reason of at least 5 characters is required to void a voucher.");
+        public static readonly Error InvalidPolicy = new("Gift.InvalidPolicy", "Gift policy configuration is invalid.");
     }
 
     public static class Organization
     {
         public static readonly Error NotFound = new("Organization.NotFound", "Organization not found.");
         public static readonly Error CodeAlreadyExists = new("Organization.CodeAlreadyExists", "Organization code already exists.");
+        public static readonly Error CodeAlreadyExistsInactive = new("Organization.CodeAlreadyExistsInactive", "Organization code already exists for an inactive organization.");
         public static readonly Error NameAlreadyExists = new("Organization.NameAlreadyExists", "Organization name already exists.");
+        public static readonly Error NameAlreadyExistsInactive = new("Organization.NameAlreadyExistsInactive", "Organization name already exists for an inactive organization.");
         public static readonly Error CannotDeactivateDefault = new("Organization.CannotDeactivateDefault", "Default organization cannot be deactivated.");
     }
 
@@ -68,12 +91,14 @@ public static class Errors
     {
         public static readonly Error NotFound = new("AgeCategory.NotFound", "Age category not found.");
         public static readonly Error NameAlreadyExists = new("AgeCategory.NameAlreadyExists", "Age category name already exists.");
+        public static readonly Error NameAlreadyExistsInactive = new("AgeCategory.NameAlreadyExistsInactive", "Age category name already exists for an inactive category.");
     }
 
     public static class User
     {
         public static readonly Error NotFound = new("User.NotFound", "User not found.");
         public static readonly Error UsernameAlreadyExists = new("User.UsernameAlreadyExists", "Username is already taken.");
+        public static readonly Error UsernameAlreadyExistsInactive = new("User.UsernameAlreadyExistsInactive", "Username is already taken by an inactive user.");
         public static readonly Error CannotDeactivateSelf = new("User.CannotDeactivateSelf", "You cannot deactivate your own account.");
         public static readonly Error CannotChangeOwnRole = new("User.CannotChangeOwnRole", "You cannot change your own role.");
     }

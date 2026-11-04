@@ -237,7 +237,8 @@ public sealed class AuditLoggingTests
             _currentUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
-            new UpdateOrganizationRequestValidator());
+            new UpdateOrganizationRequestValidator(),
+            new SetOrganizationPolicyRequestValidator());
 
         var org = await orgService.CreateAsync(new CreateOrganizationRequest("MOH", "وزارة الصحة", 720));
         org.IsSuccess.ShouldBeTrue();

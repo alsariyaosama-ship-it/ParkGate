@@ -11,6 +11,9 @@ public sealed class OrganizationConfiguration : IEntityTypeConfiguration<Organiz
         builder.ToTable("Organizations", t =>
         {
             t.HasCheckConstraint("CK_Organizations_CooldownMinutes", "[CooldownMinutes] IS NULL OR ([CooldownMinutes] >= 1 AND [CooldownMinutes] <= 10080)");
+            t.HasCheckConstraint("CK_Organizations_MaxFreeCompanions", "[MaxFreeCompanions] IS NULL OR ([MaxFreeCompanions] >= 0 AND [MaxFreeCompanions] <= 50)");
+            t.HasCheckConstraint("CK_Organizations_GiftIntervalDays", "[GiftIntervalDays] >= 1 AND [GiftIntervalDays] <= 365");
+            t.HasCheckConstraint("CK_Organizations_GiftValue", "[GiftEnabled] = 0 OR [GiftValue] > 0");
         });
 
         builder.HasKey(x => x.Id);
@@ -29,6 +32,21 @@ public sealed class OrganizationConfiguration : IEntityTypeConfiguration<Organiz
             .IsRequired();
 
         builder.Property(x => x.CooldownMinutes);
+
+        builder.Property(x => x.MaxFreeCompanions);
+
+        builder.Property(x => x.GiftEnabled)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(x => x.GiftValue)
+            .HasPrecision(10, 3)
+            .IsRequired()
+            .HasDefaultValue(0m);
+
+        builder.Property(x => x.GiftIntervalDays)
+            .IsRequired()
+            .HasDefaultValue(Organization.DefaultGiftIntervalDays);
 
         builder.Property(x => x.IsDefault)
             .IsRequired();

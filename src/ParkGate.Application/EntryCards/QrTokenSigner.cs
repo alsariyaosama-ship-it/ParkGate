@@ -4,7 +4,7 @@ using ParkGate.Domain.EntryCards;
 namespace ParkGate.Application.EntryCards;
 
 /// <summary>
-/// يوقّع رموز البطاقات. يُستخدم على جهاز الإصدار فقط — المفتاح الخاص لا يوجد على أجهزة البوابة.
+/// يوقّع رموز البطاقات والشهادات (الهدايا). يُستخدم على جهاز الإصدار فقط — المفتاح الخاص لا يوجد على أجهزة البوابة.
 /// </summary>
 public sealed class QrTokenSigner : IDisposable
 {
@@ -25,14 +25,14 @@ public sealed class QrTokenSigner : IDisposable
         KeyId = keyId;
     }
 
-    public string Encode(Guid cardId, DateOnly expiresOn)
+    public string Encode(Guid cardId, DateOnly expiresOn, QrPurpose purpose = QrPurpose.EntryCard)
     {
         Span<byte> raw = stackalloc byte[QrTokenFormat.TotalLength];
         Span<byte> body = raw[..QrTokenFormat.BodyLength];
         Span<byte> signature = raw[QrTokenFormat.BodyLength..];
 
         QrTokenFormat.WriteBody(body, KeyId, cardId, expiresOn);
-        byte[] message = QrTokenFormat.MessageToSign(body);
+        byte[] message = QrTokenFormat.MessageToSign(body, purpose);
 
         bool ok;
         int written;

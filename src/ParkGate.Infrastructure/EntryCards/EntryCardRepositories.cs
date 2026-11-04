@@ -1,6 +1,6 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
-using ParkGate.Application.EntryCards;
+using ParkGate.Application.Ports.EntryCards;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Domain.EntryCards;

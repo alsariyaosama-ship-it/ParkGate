@@ -1,0 +1,54 @@
+name: Deploy Web Application to VPS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to Production VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -e
+            echo "🚀 Starting deployment on VPS..."
+
+            # Ensure web-proxy network exists
+            docker network inspect web-proxy >/dev/null 2>&1 || docker network create web-proxy
+
+            APP_DIR="${{ secrets.VPS_APP_DIR || '/var/www/parkgate' }}"
+            cd "$APP_DIR"
+
+            echo "📦 Pulling latest changes from repository..."
+            git pull origin main
+
+            cd web
+
+            echo "🐳 Building and starting containers..."
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            echo "⚡ Running migrations and optimizations..."
+            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+            docker compose -f docker-compose.prod.yml exec -T app php artisan optimize:clear
+            docker compose -f docker-compose.prod.yml exec -T app php artisan optimize
+
+            echo "✅ Deployment completed successfully!"

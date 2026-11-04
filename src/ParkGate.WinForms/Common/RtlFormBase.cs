@@ -21,5 +21,9 @@ public class RtlFormBase : Form
         Font = AppFont.CreateFont(10F, FontStyle.Regular);
         KeyPreview = true;
         StartPosition = FormStartPosition.CenterScreen;
+        if (AppIcon.Current != null)
+        {
+            Icon = AppIcon.Current;
+        }
     }
 }

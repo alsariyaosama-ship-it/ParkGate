@@ -93,7 +93,10 @@ public static class Program
                 services.Configure<SyncOptions>(context.Configuration.GetSection("SyncOptions"));
                 services.Configure<CloudApiOptions>(context.Configuration.GetSection("CloudApi"));
 
-                services.AddHttpClient<ICloudPushService, CloudPushService>();
+                services.AddHttpClient<ICloudPushService, CloudPushService>(client =>
+                {
+                    client.Timeout = TimeSpan.FromSeconds(20);
+                });
 
                 services.AddHostedService<OutboxProcessorWorker>();
                 services.AddHostedService<HeartbeatWorker>();

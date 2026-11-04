@@ -27,6 +27,9 @@ DenialReason      : 1 CooldownActive, 2 HolderSuspended, 3 HolderBlocked,
 EntryChannel      : 1 Desk, 2 QrDesk (F1), 3 Gate (F2)
 UserRole          : 1 Operator, 2 Supervisor, 3 Admin
 WorkstationType   : 1 Desk, 2 Gate (F2)
+GiftVoucherStatus : 1 Issued, 2 Redeemed, 3 Voided
+GiftDenialReason  : 1 OrganizationInactive, 2 GiftsNotEnabled, 3 HolderBlocked,
+                    4 HolderSuspended, 5 IntervalNotElapsed
 ```
 
 ## 3. Tables
@@ -40,6 +43,10 @@ WorkstationType   : 1 Desk, 2 Gate (F2)
 | CooldownMinutes | int NULL | NULL = use default setting. CHECK 1..10080 |
 | IsDefault | bit NOT NULL | Exactly one default (filtered unique index on `IsDefault = 1`) |
 | IsActive | bit NOT NULL | |
+| MaxFreeCompanions | int NULL | F5. NULL = no org-specific limit. CHECK 0..50 (`CK_Organizations_MaxFreeCompanions`) |
+| GiftEnabled | bit NOT NULL | F5. Default 0 |
+| GiftValue | decimal(10,3) NOT NULL | F5. Default 0. CHECK `GiftEnabled = 0 OR GiftValue > 0` (`CK_Organizations_GiftValue`) |
+| GiftIntervalDays | int NOT NULL | F5. Default 30. CHECK 1..365 (`CK_Organizations_GiftIntervalDays`) |
 | audit columns, RowVersion | | |
 
 ### 3.2 `Beneficiaries` — حاملو البطاقات
@@ -68,6 +75,7 @@ Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_
 | DescriptionAr | nvarchar(100) NULL | e.g. «من 3 إلى 12 سنة» |
 | SortOrder | int NOT NULL | Display order |
 | IsActive | bit NOT NULL | |
+| IsCompanionLimitExempt | bit NOT NULL | F5. Default 0. Exempt categories («رضيع») never count toward `Organizations.MaxFreeCompanions` (BR-26) |
 
 ### 3.4 `EntryAttempts` — محاولات الدخول
 | Column | Type | Notes |
@@ -169,6 +177,47 @@ Index: `IX_SyncOutboxes_Pending (IsProcessed, RetryCount, CreatedAtUtc)`.
 - **F1 `AccessCredentials`**: Id, BeneficiaryId, Type (QR), TokenHash (binary(32), unique), IssuedAtUtc, IssuedByUserId, RevokedAtUtc, RevokedByUserId, RevokeReason. One active QR per holder (filtered unique on `RevokedAtUtc IS NULL`).
 - **F2** `Dependents` (if Option B) and gate event log.
 
+> F1 shipped as raw-SQL tables (`docs/ENTRY_CARDS.md`): `EntryCards`, `QrSigningKeys`. They are **not** EF-managed and are created by `EntryCardSchemaInitializer`, not by migrations.
+
+### 3.12 `GiftVouchers` — قسائم الهدايا (F5)
+
+EF-managed table created by migration `AddGiftVouchersAndCompanionLimit`. `Id` is the printed receipt number (رقم الوصل).
+
+| Column | Type | Notes |
+|---|---|---|
+| Id | int IDENTITY PK | Receipt number |
+| Token | uniqueidentifier NOT NULL | Random 128-bit; the value inside the signed QR. Unique `UX_GiftVouchers_Token` |
+| KeyId | tinyint NOT NULL | Signing key id used (no FK — `QrSigningKeys` is raw SQL) |
+| BeneficiaryId | uniqueidentifier FK → Beneficiaries | Restrict |
+| OrganizationId | int FK → Organizations | Restrict. Snapshot at issue |
+| Value | decimal(10,3) NOT NULL | Snapshot at issue. CHECK `Value > 0` |
+| IssuedAtUtc | datetime2(3) NOT NULL | DB time |
+| BusinessDate | date NOT NULL | Park-local date of issue |
+| ExpiresOn | date NOT NULL | = `BusinessDate` (valid to end of the issue day) |
+| Status | tinyint NOT NULL | `GiftVoucherStatus` |
+| IssuedByUserId | int FK → Users | Restrict |
+| IssuedWorkstationId | int FK → Workstations | Restrict |
+| IsOverride | bit NOT NULL | Default 0 |
+| OverrideByUserId | int NULL FK → Users | Required when `IsOverride = 1` |
+| OverrideReason | nvarchar(250) NULL | Required when `IsOverride = 1` |
+| RedeemedAtUtc | datetime2(3) NULL | |
+| RedeemedBusinessDate | date NULL | |
+| RedeemedByUserId | int NULL FK → Users | |
+| RedeemedWorkstationId | int NULL FK → Workstations | |
+| VoidedAtUtc | datetime2(3) NULL | |
+| VoidedByUserId | int NULL FK → Users | |
+| VoidReason | nvarchar(250) NULL | |
+| RowVersion | rowversion | |
+
+CHECK constraints:
+- `CK_GiftVouchers_Override`: override columns are all NULL or all set.
+- `CK_GiftVouchers_Status`: `Issued` ⇒ no redeemed/voided columns; `Redeemed` ⇒ redeemer, workstation and business date set and no void; `Voided` ⇒ voider and reason set and no redemption.
+- `CK_GiftVouchers_Value`: `[Value] > 0`.
+
+Indexes: `UX_GiftVouchers_Token (Token)` unique · `IX_GiftVouchers_Beneficiary_Time (BeneficiaryId, IssuedAtUtc DESC)` · `IX_GiftVouchers_BusinessDate (BusinessDate) INCLUDE (Status, Value, OrganizationId)` · `IX_GiftVouchers_RedeemedBusinessDate (RedeemedBusinessDate) INCLUDE (Value, OrganizationId, RedeemedWorkstationId) WHERE [RedeemedBusinessDate] IS NOT NULL`.
+
+`GiftVoucher` is **not** synced to the cloud (ADR-020 §5): it is not in `OutboxEntityExtractor.SyncableTypes`.
+
 ## 4. Atomic check-in (BR-12, ADR-005)
 
 All steps run in **one transaction** inside a single unit of work:
@@ -222,7 +271,7 @@ Settings are read through a typed `ISettingsService` in Application (no raw key 
 ## 6. Seed data (InitialCreate migration)
 
 - Organization: `SSF` — «صندوق التضامن الاجتماعي», `IsDefault = 1`, `IsActive = 1`, `CooldownMinutes = NULL`.
-- Age categories: «بالغ» («13 سنة فأكثر», 1) · «طفل» («من 3 إلى 12 سنة», 2) · «رضيع» («أقل من 3 سنوات», 3). Age ranges are display text only (editable).
+- Age categories: «بالغ» («13 سنة فأكثر», 1) · «طفل» («من 3 إلى 12 سنة», 2) · «رضيع» («أقل من 3 سنوات», 3). Age ranges are display text only (editable). «رضيع» is seeded with `IsCompanionLimitExempt = 1` (BR-26); the `AddGiftVouchersAndCompanionLimit` migration also applies that flag by name to databases created earlier.
 - All settings in §5.
 - **No users** — first-run wizard creates the Admin (ADR-012).
 

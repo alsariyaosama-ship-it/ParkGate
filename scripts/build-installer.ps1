@@ -31,9 +31,35 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "Client binaries published successfully." -ForegroundColor Green
 
-# 2. Check for Inno Setup compiler (ISCC.exe)
+$clientAppSettings = Join-Path $publishDir "appsettings.json"
+if (Test-Path $clientAppSettings) {
+    $json = Get-Content $clientAppSettings -Raw | ConvertFrom-Json
+    $json.ConnectionStrings.DefaultConnection = "Server=.\\SQLEXPRESS;Database=ParkGate;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+    $json | ConvertTo-Json -Depth 10 | Set-Content $clientAppSettings -Encoding UTF8
+    Write-Host "Configured dist/client appsettings.json for SQLEXPRESS." -ForegroundColor Green
+}
+
+# 2. Package database migration bundle for server mode
+$dbOutputDir = Join-Path $repoRoot "dist\database"
+if (-not (Test-Path $dbOutputDir)) {
+    New-Item -ItemType Directory -Path $dbOutputDir -Force | Out-Null
+}
+$migrationBundleDst = Join-Path $dbOutputDir "ParkGate.Migrations.exe"
+$existingBundle = Join-Path $repoRoot "artifacts\production\database\ParkGate.Migrations.exe"
+
+if (Test-Path $existingBundle) {
+    Write-Host "`n2. Using existing migration bundle from $existingBundle..." -ForegroundColor Cyan
+    Copy-Item $existingBundle $migrationBundleDst -Force
+} else {
+    Write-Host "`n2. Building self-contained EF Core migration bundle..." -ForegroundColor Yellow
+    $infraProject = Join-Path $repoRoot "src\ParkGate.Infrastructure\ParkGate.Infrastructure.csproj"
+    dotnet ef migrations bundle --self-contained --runtime win-x64 --context ParkGateDbContext --configuration $Configuration --project $infraProject --startup-project $infraProject --output $migrationBundleDst
+}
+
+# 3. Check for Inno Setup compiler (ISCC.exe)
 $isccPaths = @(
     "ISCC.exe",
+    "${env:LOCALAPPDATA}\Programs\Inno Setup 6\ISCC.exe",
     "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
     "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
 )

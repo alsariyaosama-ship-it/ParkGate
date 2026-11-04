@@ -109,6 +109,38 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 **Done when:** Standalone SyncAgent runs, processes outbox batches, pushes to cloud endpoint, prunes successfully synced rows, and all unit/architecture tests pass with zero warnings.
 
+---
+
+## Phase F4 — Cloud Web App & Dashboard (Laravel + Inertia) · branch `phase/f4-cloud-dashboard`
+- [x] TF4.1 Scaffold Laravel application with Breeze (Inertia.js + Vue 3) in `web/` directory.
+- [x] TF4.2 Design and migrate database schema matching sync entity model (Organizations, AgeCategories, Beneficiaries, EntryAttempts, Companions, SyncBatches).
+- [x] TF4.3 Implement Sync API endpoint (`POST /api/sync/push`) with API Key authentication, AES-256 decryption, and atomic batch ingestion.
+- [x] TF4.4 Implement Heartbeat API endpoint (`POST /api/sync/heartbeat`) and park status indicator.
+- [x] TF4.5 Implement Web Dashboard (Arabic RTL, Live Stats, Today's Admissions, Organizations Summary, Charts).
+- [x] TF4.6 Implement Cloud Reports and Beneficiary Search views with Inertia.
+
+**Done when:** Laravel web application ingests sync payloads pushed by `ParkGate.SyncAgent`, stores records, and presents live dashboard and reports in Arabic RTL.
+
+---
+
+## Phase F5 — Gift Vouchers (QR) and Free-Companion Limit · branch `phase/f5-gift-vouchers`
+- [x] T-G0 Preconditions, branch, documentation
+- [x] T-G1 Domain model and policy
+- [x] T-G2 Application plumbing: permissions, errors, QR purpose
+- [x] T-G3 Free-companion limit (BR-25/26) end to end in Application
+- [x] T-G4 Gift voucher use cases (Application)
+- [x] T-G5 Infrastructure persistence + migration
+- [x] T-G6 Infrastructure: report queries, QR image adapter, DI
+- [x] T-G7 WinForms: organization policy and age-category flag screens
+- [x] T-G8 WinForms: desk integration (companion limit + gift panel + QR dialog)
+- [x] T-G9 WinForms: Gift redemption screen (rides window)
+- [x] T-G10 WinForms: gift receipts report + Excel export
+- [x] T-G11 Hardening, docs, handoff
+
+**Done when:** full gift voucher flow (issue → redeem → report) works end-to-end; companion limit enforced; all tests green.
+
+---
+
 ## Future (do not start without explicit approval)
 - **F2 Electronic gate** — deferred by the client; decide Q11 when scheduled; `IGateController`; `ParkGate.GateService` host. (SPEC §9 F2)
 

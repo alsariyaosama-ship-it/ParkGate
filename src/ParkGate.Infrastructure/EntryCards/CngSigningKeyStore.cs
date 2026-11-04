@@ -1,6 +1,7 @@
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using ParkGate.Application.EntryCards;
+using ParkGate.Application.Ports.EntryCards;
 
 namespace ParkGate.Infrastructure.EntryCards;
 

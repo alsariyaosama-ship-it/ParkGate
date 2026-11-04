@@ -1,3 +1,5 @@
+using ParkGate.Application.Ports.EntryCards;
+
 namespace ParkGate.Application.EntryCards;
 
 /// <summary>

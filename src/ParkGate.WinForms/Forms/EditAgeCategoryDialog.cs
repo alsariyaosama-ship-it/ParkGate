@@ -48,6 +48,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
         _lblNameAr.Text = Strings.Label_Age_Name;
         _lblDescriptionAr.Text = Strings.Label_Age_Description;
         _lblSortOrder.Text = Strings.Label_Age_SortOrder;
+        _chkIsCompanionLimitExempt.Text = Strings.Label_Age_IsCompanionLimitExempt;
         _btnSave.Text = Strings.Btn_Save;
         _btnCancel.Text = Strings.Btn_Cancel;
     }
@@ -68,6 +69,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
         _txtNameAr.Text = category.NameAr;
         _txtDescriptionAr.Text = category.DescriptionAr ?? string.Empty;
         _numSortOrder.Value = Math.Max(0, Math.Min(100, category.SortOrder));
+        _chkIsCompanionLimitExempt.Checked = category.IsCompanionLimitExempt;
     }
 
     public async Task SaveAsync()
@@ -94,9 +96,10 @@ public partial class EditAgeCategoryDialog : RtlFormBase
         {
             try
             {
+                var isExempt = _chkIsCompanionLimitExempt.Checked;
                 if (_existingCategory == null)
                 {
-                    var request = new CreateAgeCategoryRequest(nameAr, descriptionAr, sortOrder);
+                    var request = new CreateAgeCategoryRequest(nameAr, descriptionAr, sortOrder, isExempt);
                     var result = await _ageCategoryService.CreateAsync(request);
                     if (result.IsSuccess)
                     {
@@ -112,7 +115,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
                 }
                 else
                 {
-                    var request = new UpdateAgeCategoryRequest(_existingCategory.Id, nameAr, descriptionAr, sortOrder);
+                    var request = new UpdateAgeCategoryRequest(_existingCategory.Id, nameAr, descriptionAr, sortOrder, isExempt);
                     var result = await _ageCategoryService.UpdateAsync(request);
                     if (result.IsSuccess)
                     {

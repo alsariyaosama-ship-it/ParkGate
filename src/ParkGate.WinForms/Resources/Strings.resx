@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -59,10 +59,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="App_Title" xml:space="preserve">
-    <value>منظومة بوابة الحديقة — ParkGate</value>
+    <value>بوابة منتزه المرح العائلي</value>
   </data>
   <data name="App_Name" xml:space="preserve">
-    <value>ParkGate</value>
+    <value>بوابة منتزه المرح العائلي</value>
   </data>
   <data name="Title_Info" xml:space="preserve">
     <value>معلومات</value>
@@ -1300,5 +1300,320 @@
   </data>
   <data name="Msg_BackupFailed" xml:space="preserve">
     <value>فشل إنشاء النسخة الاحتياطية لقاعدة البيانات: {0}</value>
+  </data>
+  <data name="Error_Organization_CodeAlreadyExistsInactive" xml:space="preserve">
+    <value>رمز الجهة مسجل مسبقاً لجهة غير مفعلة، يمكنك إعادة تفعيلها.</value>
+  </data>
+  <data name="Error_Organization_NameAlreadyExistsInactive" xml:space="preserve">
+    <value>اسم الجهة مسجل مسبقاً لجهة غير مفعلة، يمكنك إعادة تفعيلها.</value>
+  </data>
+  <data name="Error_AgeCategory_NameAlreadyExistsInactive" xml:space="preserve">
+    <value>اسم الفئة العمرية مسجل مسبقاً لفئة غير مفعلة، يمكنك إعادة تفعيلها.</value>
+  </data>
+  <data name="Error_User_UsernameAlreadyExistsInactive" xml:space="preserve">
+    <value>اسم المستخدم مسجل مسبقاً لحساب غير مفعل، يمكنك إعادة تفعيله.</value>
+  </data>
+  <data name="Grp_Org_Policy" xml:space="preserve">
+    <value>سياسة الهدايا والمرافقين</value>
+  </data>
+  <data name="Label_Org_MaxFreeCompanions" xml:space="preserve">
+    <value>تحديد حد للمرافقين المجانيين:</value>
+  </data>
+  <data name="Label_Org_GiftEnabled" xml:space="preserve">
+    <value>تفعيل هدايا الألعاب</value>
+  </data>
+  <data name="Label_Org_GiftValue" xml:space="preserve">
+    <value>قيمة الهدية:</value>
+  </data>
+  <data name="Label_Org_GiftInterval" xml:space="preserve">
+    <value>مدة الانتظار بين هديتين (أيام):</value>
+  </data>
+  <data name="Label_Age_IsCompanionLimitExempt" xml:space="preserve">
+    <value>لا يُحتسب ضمن حد المرافقين (مجاني دائماً)</value>
+  </data>
+  <data name="Col_Org_MaxCompanions" xml:space="preserve">
+    <value>حد المرافقين</value>
+  </data>
+  <data name="Col_Org_GiftEnabled" xml:space="preserve">
+    <value>الهدايا</value>
+  </data>
+  <data name="Col_Org_GiftValue" xml:space="preserve">
+    <value>قيمة الهدية</value>
+  </data>
+  <data name="Col_Org_GiftInterval" xml:space="preserve">
+    <value>مدة الانتظار</value>
+  </data>
+  <data name="Col_Age_IsExempt" xml:space="preserve">
+    <value>إعفاء المرافقين</value>
+  </data>
+  <data name="Unit_Days" xml:space="preserve">
+    <value>يوم</value>
+  </data>
+  <data name="Unit_Currency" xml:space="preserve">
+    <value>د.ل</value>
+  </data>
+  <data name="Val_MaxFreeCompanionsOutOfRange" xml:space="preserve">
+    <value>يجب أن يكون حد المرافقين المجانيين بين 0 و 50 مرافقاً.</value>
+  </data>
+  <data name="Val_GiftIntervalOutOfRange" xml:space="preserve">
+    <value>مدة الانتظار بين هديتين يجب أن تتراوح بين 1 و 365 يوماً.</value>
+  </data>
+  <data name="Val_GiftValueRequired" xml:space="preserve">
+    <value>يجب تحديد قيمة للهدية أكبر من الصفر عند تفعيل الهدايا.</value>
+  </data>
+  <data name="Val_GiftValueNegative" xml:space="preserve">
+    <value>قيمة الهدية لا يمكن أن تكون سالبة.</value>
+  </data>
+  <data name="Error_CheckIn_ExceedsFreeCompanionLimit" xml:space="preserve">
+    <value>يتجاوز عدد المرافقين الحد الأقصى المسموح به للدخول المجاني لهذه الجهة.</value>
+  </data>
+  <data name="Error_Gift_OrganizationInactive" xml:space="preserve">
+    <value>الجهة التابع لها الزبون معطلة، لا يمكن إصدار هدية.</value>
+  </data>
+  <data name="Error_Gift_NotEnabled" xml:space="preserve">
+    <value>هدايا الألعاب غير مفعلة للجهة التابع لها هذا الزبون.</value>
+  </data>
+  <data name="Error_Gift_HolderBlocked" xml:space="preserve">
+    <value>حساب الزبون محظور، لا يمكن إصدار هدية.</value>
+  </data>
+  <data name="Error_Gift_HolderSuspended" xml:space="preserve">
+    <value>حساب الزبون موقوف مؤقتاً، لا يمكن إصدار هدية.</value>
+  </data>
+  <data name="Error_Gift_IntervalNotElapsed" xml:space="preserve">
+    <value>لم تنتهِ فترة الانتظار المقررة منذ آخر هدية مستلمة لهذا الزبون.</value>
+  </data>
+  <data name="Error_Gift_OverrideReasonRequired" xml:space="preserve">
+    <value>سبب تجاوز مدة الانتظار مطلوب (5 أحرف على الأقل).</value>
+  </data>
+  <data name="Error_Gift_OverrideNotAllowed" xml:space="preserve">
+    <value>لا يُسمح بتجاوز سبب المنع الحالي لإصدار الهدية.</value>
+  </data>
+  <data name="Error_Gift_NotFound" xml:space="preserve">
+    <value>لم يتم العثور على قسيمة الهدية المطلوبة.</value>
+  </data>
+  <data name="Error_Gift_AlreadyRedeemed" xml:space="preserve">
+    <value>تم صرف قسيمة الهدية هذه واستبدالها بوصل مسبقاً.</value>
+  </data>
+  <data name="Error_Gift_Voided" xml:space="preserve">
+    <value>تم إلغاء قسيمة الهدية هذه.</value>
+  </data>
+  <data name="Error_Gift_Expired" xml:space="preserve">
+    <value>صلاحية قسيمة الهدية منتهية (صلاحيتها تنتهي بنهاية يوم إصدارها).</value>
+  </data>
+  <data name="Error_Gift_InvalidCode" xml:space="preserve">
+    <value>رمز QR الخاص بالهدية غير صالح أو تم توقيعه بمفتاح غير معروف.</value>
+  </data>
+  <data name="Error_Gift_Forged" xml:space="preserve">
+    <value>فشل التحقق من التوقيع الرقمي للهدية أو الرمز غير مطابق.</value>
+  </data>
+  <data name="Error_Gift_CannotVoidRedeemed" xml:space="preserve">
+    <value>لا يمكن إلغاء قسيمة هدية تم صرفها واستبدالها بالفعل.</value>
+  </data>
+  <data name="Error_Gift_VoidReasonRequired" xml:space="preserve">
+    <value>سبب إلغاء الهدية مطلوب (5 أحرف على الأقل).</value>
+  </data>
+  <data name="Error_Gift_InvalidPolicy" xml:space="preserve">
+    <value>إعدادات سياسة الهدايا للجهة غير صالحة.</value>
+  </data>
+  <data name="Title_GiftOffer" xml:space="preserve">
+    <value>قسيمة هدية الألعاب</value>
+  </data>
+  <data name="Label_GiftEligible" xml:space="preserve">
+    <value>الزبون مؤهل لاستلام قسيمة هدية ألعاب بقيمة {0} {1}</value>
+  </data>
+  <data name="Label_GiftNotEligible" xml:space="preserve">
+    <value>الزبون غير مؤهل لاستلام قسيمة هدية: {0}</value>
+  </data>
+  <data name="Label_GiftNextEligible" xml:space="preserve">
+    <value>(موعد الاستحقاق القادم: {0})</value>
+  </data>
+  <data name="Btn_IssueGift" xml:space="preserve">
+    <value>إصدار QR الهدية (F6)</value>
+  </data>
+  <data name="Btn_IssueGiftOverride" xml:space="preserve">
+    <value>إصدار بمدة مبكرة — مشرف (F7)</value>
+  </data>
+  <data name="Msg_IssueGiftSuccess" xml:space="preserve">
+    <value>تم إصدار قسيمة الهدية بنجاح.</value>
+  </data>
+  <data name="Title_GiftQrDialog" xml:space="preserve">
+    <value>قسيمة هدية الألعاب</value>
+  </data>
+  <data name="Header_GiftVoucher" xml:space="preserve">
+    <value>وصل قسيمة ألعاب الأطفال</value>
+  </data>
+  <data name="Label_ReceiptNo" xml:space="preserve">
+    <value>رقم الوصل: {0}</value>
+  </data>
+  <data name="Label_GiftValueDisplay" xml:space="preserve">
+    <value>قيمة القسيمة: {0:0.###} {1}</value>
+  </data>
+  <data name="Label_GiftExpiresOn" xml:space="preserve">
+    <value>صالحة حتى نهاية اليوم ({0:dd/MM/yyyy})</value>
+  </data>
+  <data name="Label_GiftOverrideBadge" xml:space="preserve">
+    <value>(إصدار استثنائي بموافقة المشرف)</value>
+  </data>
+  <data name="Btn_SaveImage" xml:space="preserve">
+    <value>حفظ كصورة...</value>
+  </data>
+  <data name="Filter_PngImages" xml:space="preserve">
+    <value>صور PNG (*.png)|*.png</value>
+  </data>
+  <data name="Msg_SaveImageSuccess" xml:space="preserve">
+    <value>تم حفظ صورة رمز الهدية بنجاح.</value>
+  </data>
+  <data name="Label_FreeCompanionsCount" xml:space="preserve">
+    <value>المرافقون المجانيون: {0} من {1}</value>
+  </data>
+  <data name="Label_FreeCompanionsExceeded" xml:space="preserve">
+    <value>المرافقون: {0} من {1} (تجاوز الحد المجاني)</value>
+  </data>
+  <data name="Error_FreeCompanionsExceededBanner" xml:space="preserve">
+    <value>تجاوز حد المرافقين المجانيين ({0} أفراد) — يرجى تخفيض العدد أو دفع التذاكر خارج المنظومة</value>
+  </data>
+  <data name="Msg_NoQrImageAvailable" xml:space="preserve">
+    <value>لا توجد صورة رمز QR متاحة للحفظ أو الطباعة.</value>
+  </data>
+  <data name="Msg_PrintFailed" xml:space="preserve">
+    <value>تعذر إرسال أمر الطباعة: {0}</value>
+  </data>
+  <data name="Btn_Print" xml:space="preserve">
+    <value>طباعة</value>
+  </data>
+  <data name="Menu_GiftRedemption" xml:space="preserve">
+    <value>شباك الألعاب – صرف الهدايا</value>
+  </data>
+  <data name="Title_GiftRedeem" xml:space="preserve">
+    <value>شباك الألعاب – صرف قسائم الهدايا</value>
+  </data>
+  <data name="Label_ScanGiftQr" xml:space="preserve">
+    <value>امسح رمز QR الخاص بالهدية أو أدخل رقم الوصل:</value>
+  </data>
+  <data name="Watermark_ScanGiftQr" xml:space="preserve">
+    <value>امسح الكيوركود هنا أو أدخل رقم الوصل ثم اضغط Enter...</value>
+  </data>
+  <data name="Btn_RedeemGift" xml:space="preserve">
+    <value>صرف الهدية (Enter)</value>
+  </data>
+  <data name="Banner_GiftRedeemedSuccess" xml:space="preserve">
+    <value>هدية صالحة — قيمتها {0:0.###} {1} — سلّم الكوبون للزبون</value>
+  </data>
+  <data name="Banner_ScanReady" xml:space="preserve">
+    <value>جاهز لمسح قسيمة الهدية</value>
+  </data>
+  <data name="Banner_ScanReadyDetails" xml:space="preserve">
+    <value>قم بمسح رمز الاستجابة السريعة (QR) أو إدخال رقم الوصل</value>
+  </data>
+  <data name="Group_RedeemedVoucherDetails" xml:space="preserve">
+    <value>تفاصيل القسيمة المصروفة</value>
+  </data>
+  <data name="Group_TodayRedemptions" xml:space="preserve">
+    <value>سجل الهدايا المصروفة اليوم بهذا الشباك (آخر 20 قسيمة)</value>
+  </data>
+  <data name="Label_TodayRedemptionsSummary" xml:space="preserve">
+    <value>إجمالي المصروف اليوم: {0} قسيمة بقيمة {1:0.###} {2}</value>
+  </data>
+  <data name="Col_RedeemedTime" xml:space="preserve">
+    <value>وقت الصرف</value>
+  </data>
+  <data name="Msg_GiftInputEmpty" xml:space="preserve">
+    <value>يرجى مسح رمز الهدية أو إدخال رقم الوصل أولاً.</value>
+  </data>
+  <data name="Label_ReceiptNoTitle" xml:space="preserve">
+    <value>رقم الوصل:</value>
+  </data>
+  <data name="Label_ValueTitle" xml:space="preserve">
+    <value>قيمة القسيمة:</value>
+  </data>
+  <data name="Col_ReceiptNo" xml:space="preserve">
+    <value>رقم الوصل</value>
+  </data>
+  <data name="Col_Value" xml:space="preserve">
+    <value>القيمة (د.ل)</value>
+  </data>
+  <data name="Label_CardNumberTitle" xml:space="preserve">
+    <value>رقم البطاقة:</value>
+  </data>
+  <data name="Label_OrganizationTitle" xml:space="preserve">
+    <value>الجهة:</value>
+  </data>
+  <data name="Label_HolderNameTitle" xml:space="preserve">
+    <value>اسم المستفيد:</value>
+  </data>
+  <data name="Menu_GiftReceiptsReport" xml:space="preserve">
+    <value>تقرير قسائم الهدايا</value>
+  </data>
+  <data name="Title_GiftReceipts" xml:space="preserve">
+    <value>تقرير قسائم ووصولات الهدايا</value>
+  </data>
+  <data name="Label_DateFrom" xml:space="preserve">
+    <value>من تاريخ:</value>
+  </data>
+  <data name="Label_DateTo" xml:space="preserve">
+    <value>إلى تاريخ:</value>
+  </data>
+  <data name="Label_FilterStatus" xml:space="preserve">
+    <value>تصفية الحالة:</value>
+  </data>
+  <data name="Status_All" xml:space="preserve">
+    <value>الكل</value>
+  </data>
+  <data name="Status_IssuedVoucher" xml:space="preserve">
+    <value>صادرة (نشطة)</value>
+  </data>
+  <data name="Status_RedeemedVoucher" xml:space="preserve">
+    <value>تم الصرف</value>
+  </data>
+  <data name="Status_VoidedVoucher" xml:space="preserve">
+    <value>ملغاة</value>
+  </data>
+  <data name="Summary_GiftReceipts" xml:space="preserve">
+    <value>إجمالي القسائم: {0} | القيمة الإجمالية: {1:N3} د.ل (مصروفة: {2} بقيمة {3:N3} د.ل | نشطة: {4} بقيمة {5:N3} د.ل | ملغاة: {6} بقيمة {7:N3} د.ل)</value>
+  </data>
+  <data name="Col_Gift_ReceiptNo" xml:space="preserve">
+    <value>رقم الإيصال</value>
+  </data>
+  <data name="Col_Gift_HolderName" xml:space="preserve">
+    <value>اسم المستفيد</value>
+  </data>
+  <data name="Col_Gift_CardNumber" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="Col_Gift_Organization" xml:space="preserve">
+    <value>الجهة</value>
+  </data>
+  <data name="Col_Gift_Value" xml:space="preserve">
+    <value>القيمة (د.ل)</value>
+  </data>
+  <data name="Col_Gift_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_Gift_IssuedAt" xml:space="preserve">
+    <value>وقت الإصدار</value>
+  </data>
+  <data name="Col_Gift_IssuedBy" xml:space="preserve">
+    <value>المُصدِر</value>
+  </data>
+  <data name="Col_Gift_RedeemedAt" xml:space="preserve">
+    <value>وقت الصرف</value>
+  </data>
+  <data name="Col_Gift_RedeemedBy" xml:space="preserve">
+    <value>موظف الصرف</value>
+  </data>
+  <data name="Col_Gift_RedeemedWs" xml:space="preserve">
+    <value>نقطة الصرف</value>
+  </data>
+  <data name="Col_Gift_IsOverride" xml:space="preserve">
+    <value>استثناء؟</value>
+  </data>
+  <data name="Col_Gift_Reason" xml:space="preserve">
+    <value>السبب</value>
+  </data>
+  <data name="Msg_ExportExcelSuccess" xml:space="preserve">
+    <value>تم تصدير التقرير إلى Excel بنجاح.</value>
+  </data>
+  <data name="Msg_NoGiftReceiptsFound" xml:space="preserve">
+    <value>لا توجد قسائم تطابق معايير البحث المحددة.</value>
   </data>
 </root>

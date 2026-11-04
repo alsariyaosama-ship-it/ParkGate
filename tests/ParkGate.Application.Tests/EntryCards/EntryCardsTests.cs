@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using ParkGate.Application.EntryCards;
+using ParkGate.Application.Ports.EntryCards;
 using ParkGate.Domain.EntryCards;
 using Shouldly;
 

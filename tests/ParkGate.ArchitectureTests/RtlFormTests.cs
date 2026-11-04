@@ -42,7 +42,7 @@ public sealed class RtlFormTests
         form.RightToLeft.ShouldBe(RightToLeft.Yes);
         form.RightToLeftLayout.ShouldBeTrue();
         form.Text.ShouldBe(Strings.App_Title);
-        form.Text.ShouldContain("ParkGate");
+        form.Text.ShouldContain("منتزه المرح العائلي");
     }
 
     [Theory]

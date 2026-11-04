@@ -33,56 +33,134 @@ public sealed class DatabaseBackupService : IDatabaseBackupService
                 dbName = "ParkGate";
             }
 
-            // Determine target backup path on the SQL Server machine
-            string folder = targetFolder?.Trim() ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(folder))
+            // Determine SQL Server's guaranteed accessible backup directory
+            var serverGuaranteedFolder = await GetDefaultBackupDirectoryAsync(context, cancellationToken);
+            if (string.IsNullOrWhiteSpace(serverGuaranteedFolder))
             {
-                // Query SQL Server instance default backup directory
-                folder = await GetDefaultBackupDirectoryAsync(context, cancellationToken);
+                serverGuaranteedFolder = @"C:\ParkGate_Backups";
             }
 
-            if (string.IsNullOrWhiteSpace(folder))
-            {
-                folder = @"C:\ParkGate_Backups";
-            }
-
-            // Ensure directory exists if we are running locally on the same server
+            // Ensure directory exists if on the same local machine
             try
             {
-                if (!Directory.Exists(folder))
+                if (!Directory.Exists(serverGuaranteedFolder))
                 {
-                    Directory.CreateDirectory(folder);
+                    Directory.CreateDirectory(serverGuaranteedFolder);
                 }
             }
             catch
             {
-                // Directory creation might be on remote server, proceed with T-SQL
+                // Might be on remote machine or restricted; SQL Server engine may create file or fail gracefully
             }
 
             var fileName = $"{dbName}_Backup_{DateTime.UtcNow:yyyyMMdd_HHmmss}.bak";
-            var fullPath = Path.Combine(folder, fileName).Replace("/", "\\");
+            var sqlFullPath = Path.Combine(serverGuaranteedFolder, fileName).Replace("/", "\\");
+
+            // Check if SQL Server edition supports BACKUP WITH COMPRESSION (SQL Express throws error if COMPRESSION is used)
+            var supportsCompression = await SupportsBackupCompressionAsync(context, cancellationToken);
+            var compressionClause = supportsCompression ? "COMPRESSION, " : string.Empty;
 
             var backupSql = $@"
                 BACKUP DATABASE [{dbName}] 
                 TO DISK = @path 
-                WITH FORMAT, INIT, CHECKSUM, COMPRESSION, 
+                WITH FORMAT, INIT, CHECKSUM, {compressionClause}
                 NAME = @backupName;
             ";
 
-            var pathParam = new SqlParameter("@path", SqlDbType.NVarChar, 500) { Value = fullPath };
+            var pathParam = new SqlParameter("@path", SqlDbType.NVarChar, 500) { Value = sqlFullPath };
             var nameParam = new SqlParameter("@backupName", SqlDbType.NVarChar, 100) { Value = $"{dbName} Manual Backup" };
 
-            _logger.LogInformation("Starting database backup for {Database} to {Path}...", dbName, fullPath);
+            _logger.LogInformation(
+                "Starting database backup for {Database} to SQL Server path {Path} (Compression={SupportsCompression})...",
+                dbName, sqlFullPath, supportsCompression);
 
             await context.Database.ExecuteSqlRawAsync(backupSql, [pathParam, nameParam], cancellationToken);
 
-            _logger.LogInformation("Database backup completed successfully: {Path}", fullPath);
-            return Result.Success(fullPath);
+            _logger.LogInformation("Database backup command executed successfully on server: {Path}", sqlFullPath);
+
+            // If a custom target folder was requested (e.g. user selected Desktop/Documents or USB drive),
+            // copy the file using application process privileges to prevent SQL Server 'Operating system error 5 (Access is denied)'.
+            var customFolder = targetFolder?.Trim();
+            if (!string.IsNullOrWhiteSpace(customFolder))
+            {
+                var isDifferent = true;
+                try
+                {
+                    var normCustom = Path.GetFullPath(customFolder).TrimEnd('\\');
+                    var normServer = Path.GetFullPath(serverGuaranteedFolder).TrimEnd('\\');
+                    isDifferent = !string.Equals(normCustom, normServer, StringComparison.OrdinalIgnoreCase);
+                }
+                catch
+                {
+                    // Ignore path normalization errors
+                }
+
+                if (isDifferent)
+                {
+                    try
+                    {
+                        if (!Directory.Exists(customFolder))
+                        {
+                            Directory.CreateDirectory(customFolder);
+                        }
+
+                        var destinationPath = Path.Combine(customFolder, fileName).Replace("/", "\\");
+
+                        if (File.Exists(sqlFullPath))
+                        {
+                            _logger.LogInformation("Copying backup from {Source} to target folder {Destination}...", sqlFullPath, destinationPath);
+                            File.Copy(sqlFullPath, destinationPath, overwrite: true);
+
+                            try
+                            {
+                                File.Delete(sqlFullPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogWarning(ex, "Could not remove temporary backup file at {Path}", sqlFullPath);
+                            }
+
+                            return Result.Success(destinationPath);
+                        }
+                        else
+                        {
+                            _logger.LogWarning(
+                                "Database backup file was created on remote server at {ServerPath}. Cannot access it via local filesystem.",
+                                sqlFullPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to copy backup file to custom folder {Folder}. Returning server path.", customFolder);
+                    }
+                }
+            }
+
+            return Result.Success(sqlFullPath);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to execute database backup.");
             return Result.Failure<string>(new Error("Database.BackupFailed", $"فشل النسخ الاحتياطي لقاعدة البيانات: {ex.Message}"));
+        }
+    }
+
+    private static async Task<bool> SupportsBackupCompressionAsync(ParkGateDbContext context, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // EngineEdition:
+            // 2 = Standard, 3 = Enterprise, 8 = Managed Instance
+            // 4 = Express (SQL Server Express does not support BACKUP DATABASE WITH COMPRESSION)
+            var edition = await context.Database
+                .SqlQueryRaw<int>("SELECT CAST(SERVERPROPERTY('EngineEdition') AS INT) AS Value")
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return edition is 2 or 3 or 8;
+        }
+        catch
+        {
+            return false;
         }
     }
 
@@ -94,11 +172,38 @@ public sealed class DatabaseBackupService : IDatabaseBackupService
                 .SqlQueryRaw<string>("SELECT CAST(SERVERPROPERTY('InstanceDefaultBackupPath') AS NVARCHAR(500)) AS Value")
                 .FirstOrDefaultAsync(cancellationToken);
 
-            return result ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                return result;
+            }
         }
         catch
         {
-            return string.Empty;
+            // Fall back to querying data files directory
         }
+
+        try
+        {
+            // Query the directory containing the primary database data file (.mdf).
+            // The SQL Server service account is guaranteed to have write permission here.
+            var mdfPath = await context.Database
+                .SqlQueryRaw<string>("SELECT TOP (1) CAST(physical_name AS NVARCHAR(500)) AS Value FROM sys.database_files WHERE type = 0")
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(mdfPath))
+            {
+                var dir = Path.GetDirectoryName(mdfPath);
+                if (!string.IsNullOrWhiteSpace(dir))
+                {
+                    return dir;
+                }
+            }
+        }
+        catch
+        {
+            // Ignore
+        }
+
+        return string.Empty;
     }
 }

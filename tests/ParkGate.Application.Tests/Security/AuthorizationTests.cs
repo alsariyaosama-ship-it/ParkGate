@@ -7,12 +7,14 @@ namespace ParkGate.Application.Tests.Security;
 public sealed class AuthorizationTests
 {
     [Fact]
-    public void Operator_ShouldHaveDeskPermissionsOnly()
+    public void Operator_ShouldHaveDeskAndGiftIssueRedeemPermissions()
     {
         var role = UserRole.Operator;
 
         RolePermissions.HasPermission(role, Permission.CheckIn).ShouldBeTrue();
         RolePermissions.HasPermission(role, Permission.ViewTodayDeskEntries).ShouldBeTrue();
+        RolePermissions.HasPermission(role, Permission.IssueGift).ShouldBeTrue();
+        RolePermissions.HasPermission(role, Permission.RedeemGift).ShouldBeTrue();
 
         RolePermissions.HasPermission(role, Permission.EditBeneficiary).ShouldBeFalse();
         RolePermissions.HasPermission(role, Permission.ChangeBeneficiaryStatus).ShouldBeFalse();
@@ -25,10 +27,12 @@ public sealed class AuthorizationTests
         RolePermissions.HasPermission(role, Permission.ManageUsers).ShouldBeFalse();
         RolePermissions.HasPermission(role, Permission.ManageWorkstations).ShouldBeFalse();
         RolePermissions.HasPermission(role, Permission.TriggerBackup).ShouldBeFalse();
+        RolePermissions.HasPermission(role, Permission.OverrideGiftInterval).ShouldBeFalse();
+        RolePermissions.HasPermission(role, Permission.VoidGift).ShouldBeFalse();
     }
 
     [Fact]
-    public void Supervisor_ShouldHaveDeskAndSupervisorPermissions_ButNotAdmin()
+    public void Supervisor_ShouldHaveDeskAndSupervisorPermissions_IncludingGiftOverrideAndVoid_ButNotAdmin()
     {
         var role = UserRole.Supervisor;
 
@@ -39,6 +43,10 @@ public sealed class AuthorizationTests
         RolePermissions.HasPermission(role, Permission.OverrideDenial).ShouldBeTrue();
         RolePermissions.HasPermission(role, Permission.VoidEntry).ShouldBeTrue();
         RolePermissions.HasPermission(role, Permission.ViewReports).ShouldBeTrue();
+        RolePermissions.HasPermission(role, Permission.IssueGift).ShouldBeTrue();
+        RolePermissions.HasPermission(role, Permission.RedeemGift).ShouldBeTrue();
+        RolePermissions.HasPermission(role, Permission.OverrideGiftInterval).ShouldBeTrue();
+        RolePermissions.HasPermission(role, Permission.VoidGift).ShouldBeTrue();
 
         RolePermissions.HasPermission(role, Permission.ManageOrganizations).ShouldBeFalse();
         RolePermissions.HasPermission(role, Permission.ManageAgeCategories).ShouldBeFalse();
@@ -87,6 +95,7 @@ public sealed class AuthorizationTests
         context.Role.ShouldBe(UserRole.Supervisor);
         context.IsInRole(UserRole.Supervisor).ShouldBeTrue();
         context.Has(Permission.OverrideDenial).ShouldBeTrue();
+        context.Has(Permission.OverrideGiftInterval).ShouldBeTrue();
         context.Has(Permission.ManageUsers).ShouldBeFalse();
 
         context.Clear();
