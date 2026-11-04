@@ -580,6 +580,29 @@ internal class Strings
     internal static string Error_Gift_VoidReasonRequired => GetString(nameof(Error_Gift_VoidReasonRequired));
     internal static string Error_Gift_InvalidPolicy => GetString(nameof(Error_Gift_InvalidPolicy));
 
+    internal static string Title_GiftOffer => GetString(nameof(Title_GiftOffer));
+    internal static string Label_GiftEligible => GetString(nameof(Label_GiftEligible));
+    internal static string Label_GiftNotEligible => GetString(nameof(Label_GiftNotEligible));
+    internal static string Label_GiftNextEligible => GetString(nameof(Label_GiftNextEligible));
+    internal static string Btn_IssueGift => GetString(nameof(Btn_IssueGift));
+    internal static string Btn_IssueGiftOverride => GetString(nameof(Btn_IssueGiftOverride));
+    internal static string Msg_IssueGiftSuccess => GetString(nameof(Msg_IssueGiftSuccess));
+    internal static string Title_GiftQrDialog => GetString(nameof(Title_GiftQrDialog));
+    internal static string Header_GiftVoucher => GetString(nameof(Header_GiftVoucher));
+    internal static string Label_ReceiptNo => GetString(nameof(Label_ReceiptNo));
+    internal static string Label_GiftValueDisplay => GetString(nameof(Label_GiftValueDisplay));
+    internal static string Label_GiftExpiresOn => GetString(nameof(Label_GiftExpiresOn));
+    internal static string Label_GiftOverrideBadge => GetString(nameof(Label_GiftOverrideBadge));
+    internal static string Btn_SaveImage => GetString(nameof(Btn_SaveImage));
+    internal static string Filter_PngImages => GetString(nameof(Filter_PngImages));
+    internal static string Msg_SaveImageSuccess => GetString(nameof(Msg_SaveImageSuccess));
+    internal static string Label_FreeCompanionsCount => GetString(nameof(Label_FreeCompanionsCount));
+    internal static string Label_FreeCompanionsExceeded => GetString(nameof(Label_FreeCompanionsExceeded));
+    internal static string Error_FreeCompanionsExceededBanner => GetString(nameof(Error_FreeCompanionsExceededBanner));
+    internal static string Msg_NoQrImageAvailable => GetString(nameof(Msg_NoQrImageAvailable));
+    internal static string Msg_PrintFailed => GetString(nameof(Msg_PrintFailed));
+    internal static string Btn_Print => GetString(nameof(Btn_Print));
+
     internal static string GetString(string name)
     {
         return ResourceManager.GetString(name, resourceCulture) ?? name;

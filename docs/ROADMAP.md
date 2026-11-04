@@ -132,7 +132,7 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 - [x] T-G5 Infrastructure persistence + migration
 - [x] T-G6 Infrastructure: report queries, QR image adapter, DI
 - [x] T-G7 WinForms: organization policy and age-category flag screens
-- [ ] T-G8 WinForms: desk integration (companion limit + gift panel + QR dialog)
+- [x] T-G8 WinForms: desk integration (companion limit + gift panel + QR dialog)
 - [ ] T-G9 WinForms: Gift redemption screen (rides window)
 - [ ] T-G10 WinForms: gift receipts report + Excel export
 - [ ] T-G11 Hardening, docs, handoff

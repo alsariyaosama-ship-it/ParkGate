@@ -1415,4 +1415,70 @@
   <data name="Error_Gift_InvalidPolicy" xml:space="preserve">
     <value>إعدادات سياسة الهدايا للجهة غير صالحة.</value>
   </data>
+  <data name="Title_GiftOffer" xml:space="preserve">
+    <value>قسيمة هدية الألعاب</value>
+  </data>
+  <data name="Label_GiftEligible" xml:space="preserve">
+    <value>الزبون مؤهل لاستلام قسيمة هدية ألعاب بقيمة {0} {1}</value>
+  </data>
+  <data name="Label_GiftNotEligible" xml:space="preserve">
+    <value>الزبون غير مؤهل لاستلام قسيمة هدية: {0}</value>
+  </data>
+  <data name="Label_GiftNextEligible" xml:space="preserve">
+    <value>(موعد الاستحقاق القادم: {0})</value>
+  </data>
+  <data name="Btn_IssueGift" xml:space="preserve">
+    <value>إصدار QR الهدية (F6)</value>
+  </data>
+  <data name="Btn_IssueGiftOverride" xml:space="preserve">
+    <value>إصدار بمدة مبكرة — مشرف (F7)</value>
+  </data>
+  <data name="Msg_IssueGiftSuccess" xml:space="preserve">
+    <value>تم إصدار قسيمة الهدية بنجاح.</value>
+  </data>
+  <data name="Title_GiftQrDialog" xml:space="preserve">
+    <value>قسيمة هدية الألعاب</value>
+  </data>
+  <data name="Header_GiftVoucher" xml:space="preserve">
+    <value>وصل قسيمة ألعاب الأطفال</value>
+  </data>
+  <data name="Label_ReceiptNo" xml:space="preserve">
+    <value>رقم الوصل: {0}</value>
+  </data>
+  <data name="Label_GiftValueDisplay" xml:space="preserve">
+    <value>قيمة القسيمة: {0:0.###} {1}</value>
+  </data>
+  <data name="Label_GiftExpiresOn" xml:space="preserve">
+    <value>صالحة حتى نهاية اليوم ({0:dd/MM/yyyy})</value>
+  </data>
+  <data name="Label_GiftOverrideBadge" xml:space="preserve">
+    <value>(إصدار استثنائي بموافقة المشرف)</value>
+  </data>
+  <data name="Btn_SaveImage" xml:space="preserve">
+    <value>حفظ كصورة...</value>
+  </data>
+  <data name="Filter_PngImages" xml:space="preserve">
+    <value>صور PNG (*.png)|*.png</value>
+  </data>
+  <data name="Msg_SaveImageSuccess" xml:space="preserve">
+    <value>تم حفظ صورة رمز الهدية بنجاح.</value>
+  </data>
+  <data name="Label_FreeCompanionsCount" xml:space="preserve">
+    <value>المرافقون المجانيون: {0} من {1}</value>
+  </data>
+  <data name="Label_FreeCompanionsExceeded" xml:space="preserve">
+    <value>المرافقون: {0} من {1} (تجاوز الحد المجاني)</value>
+  </data>
+  <data name="Error_FreeCompanionsExceededBanner" xml:space="preserve">
+    <value>تجاوز حد المرافقين المجانيين ({0} أفراد) — يرجى تخفيض العدد أو دفع التذاكر خارج المنظومة</value>
+  </data>
+  <data name="Msg_NoQrImageAvailable" xml:space="preserve">
+    <value>لا توجد صورة رمز QR متاحة للحفظ أو الطباعة.</value>
+  </data>
+  <data name="Msg_PrintFailed" xml:space="preserve">
+    <value>تعذر إرسال أمر الطباعة: {0}</value>
+  </data>
+  <data name="Btn_Print" xml:space="preserve">
+    <value>طباعة</value>
+  </data>
 </root>

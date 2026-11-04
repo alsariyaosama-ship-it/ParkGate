@@ -6,6 +6,7 @@ using ParkGate.Application.AgeCategories.DTOs;
 using ParkGate.Application.AgeCategories.Services;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.Beneficiaries.Services;
+using ParkGate.Application.GiftVouchers.Services;
 using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Application.CheckIn.Services;
 using ParkGate.Application.Organizations.DTOs;
@@ -37,8 +38,11 @@ public partial class CheckInDeskControl : UserControl
     private readonly INotifyService? _notifyService;
     private readonly ILogger<CheckInDeskControl>? _logger;
     private readonly ParkGate.Application.EntryCards.CardScanService? _cardScanService;
+    private readonly IGiftVoucherService? _giftVoucherService;
 
     private readonly List<CounterInput> _counterInputs = [];
+    private readonly List<OrganizationDto> _organizations = [];
+    private readonly List<AgeCategoryDto> _ageCategories = [];
     private readonly ContextMenuStrip _todayContextMenu = new();
     private readonly ToolStripMenuItem _menuVoidToday = new();
     private BeneficiaryDto? _activeHolder;
@@ -53,7 +57,7 @@ public partial class CheckInDeskControl : UserControl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int AutoResetDelayMs { get; set; } = 1200;
 
-    public CheckInDeskControl() : this(null, null, null, null, null, null, null, null, null, null, null)
+    public CheckInDeskControl() : this(null, null, null, null, null, null, null, null, null, null, null, null)
     {
     }
 
@@ -68,7 +72,8 @@ public partial class CheckInDeskControl : UserControl
         IFormFactory? formFactory,
         INotifyService? notifyService,
         ILogger<CheckInDeskControl>? logger,
-        ParkGate.Application.EntryCards.CardScanService? cardScanService = null)
+        ParkGate.Application.EntryCards.CardScanService? cardScanService = null,
+        IGiftVoucherService? giftVoucherService = null)
     {
         InitializeComponent();
 
@@ -83,6 +88,15 @@ public partial class CheckInDeskControl : UserControl
         _notifyService = notifyService;
         _logger = logger;
         _cardScanService = cardScanService;
+        _giftVoucherService = giftVoucherService;
+
+        _giftPanel.InitializeServices(
+            _giftVoucherService,
+            _currentUser,
+            _formFactory,
+            _notifyService,
+            null,
+            _timeZoneId);
 
         InitializeControlText();
         Theme.ApplyGridStyle(_gridToday);
@@ -248,6 +262,22 @@ public partial class CheckInDeskControl : UserControl
                 StartManualRegistration();
                 return true;
 
+            case Keys.F6:
+                if (_giftPanel.CanIssue)
+                {
+                    _ = _giftPanel.IssueAsync();
+                    return true;
+                }
+                break;
+
+            case Keys.F7:
+                if (_giftPanel.CanIssueOverride)
+                {
+                    _ = _giftPanel.IssueOverrideAsync();
+                    return true;
+                }
+                break;
+
             case Keys.Escape:
                 ResetDesk();
                 return true;
@@ -286,6 +316,7 @@ public partial class CheckInDeskControl : UserControl
             _prefillFromLastVisit = settings.PrefillCompanionsFromLastVisit;
             _denialSoundEnabled = settings.DenialSoundEnabled;
             _timeZoneId = settings.TimeZoneId;
+            _giftPanel.SetTimeZone(_timeZoneId);
         }
         catch (Exception ex)
         {
@@ -303,6 +334,8 @@ public partial class CheckInDeskControl : UserControl
         try
         {
             var orgs = await _orgService.GetAllAsync(activeOnly: true);
+            _organizations.Clear();
+            _organizations.AddRange(orgs);
 
             _cmbOrganization.Items.Clear();
             _cmbOrganization.Items.Add(new OrgComboItem(null, Strings.Filter_AllOrganizations));
@@ -353,12 +386,15 @@ public partial class CheckInDeskControl : UserControl
         [
             new AgeCategoryDto(1, "بالغ", "12 سنة فما فوق", 1, true),
             new AgeCategoryDto(2, "طفل", "من 3 إلى 12 سنة", 2, true),
-            new AgeCategoryDto(3, "رضيع", "أقل من 3 سنوات", 3, true)
+            new AgeCategoryDto(3, "رضيع", "أقل من 3 سنوات", 3, true, IsCompanionLimitExempt: true)
         ]);
     }
 
     public void PopulateAgeCategories(IReadOnlyList<AgeCategoryDto> categories)
     {
+        _ageCategories.Clear();
+        _ageCategories.AddRange(categories);
+
         _flowCounters.SuspendLayout();
         _flowCounters.Controls.Clear();
         _counterInputs.Clear();
@@ -393,15 +429,78 @@ public partial class CheckInDeskControl : UserControl
 
         _lblTotalPersons.Text = string.Format(Strings.Label_TotalPersons, totalPersons);
 
+        var limitExceeded = false;
+        var maxFreeLimit = 0;
+        if (_activeHolder != null)
+        {
+            var org = _organizations.FirstOrDefault(o => o.Id == _activeHolder.OrganizationId);
+            if (org?.MaxFreeCompanions.HasValue == true)
+            {
+                maxFreeLimit = org.MaxFreeCompanions.Value;
+                var nonExemptCompanions = 0;
+                foreach (var counter in _counterInputs)
+                {
+                    if (counter.Tag is int catId)
+                    {
+                        var cat = _ageCategories.FirstOrDefault(c => c.Id == catId);
+                        if (cat == null || !cat.IsCompanionLimitExempt)
+                        {
+                            nonExemptCompanions += counter.Value;
+                        }
+                    }
+                    else
+                    {
+                        nonExemptCompanions += counter.Value;
+                    }
+                }
+
+                _lblFreeCompanions.Visible = true;
+                if (nonExemptCompanions > maxFreeLimit)
+                {
+                    limitExceeded = true;
+                    _lblFreeCompanions.Text = string.Format(Strings.Label_FreeCompanionsExceeded, nonExemptCompanions, maxFreeLimit);
+                    _lblFreeCompanions.ForeColor = StatusBanner.ColorDenied;
+                    _pnlCompanionsTotal.BackColor = Color.FromArgb(254, 242, 242);
+                }
+                else
+                {
+                    _lblFreeCompanions.Text = string.Format(Strings.Label_FreeCompanionsCount, nonExemptCompanions, maxFreeLimit);
+                    _lblFreeCompanions.ForeColor = StatusBanner.ColorNeutral;
+                    _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+                }
+            }
+            else
+            {
+                _lblFreeCompanions.Visible = false;
+                _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+            }
+        }
+        else
+        {
+            _lblFreeCompanions.Visible = false;
+            _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+        }
+
         if (totalPersons > _maxGroupSize)
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorDenied;
             _btnRecordEntry.Enabled = false;
+            _btnOverride.Enabled = false;
+        }
+        else if (limitExceeded)
+        {
+            _lblTotalPersons.ForeColor = StatusBanner.ColorDenied;
+            _btnRecordEntry.Enabled = false;
+            _btnOverride.Enabled = false;
+            _statusBanner.SetWarning(
+                string.Format(Strings.Error_FreeCompanionsExceededBanner, maxFreeLimit),
+                Strings.Error_CheckIn_ExceedsFreeCompanionLimit);
         }
         else
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorGranted;
             _btnRecordEntry.Enabled = _activeHolder != null && (_activeEligibility?.IsEligible ?? false);
+            _btnOverride.Enabled = _activeHolder != null && (_activeEligibility != null && !_activeEligibility.IsEligible && _activeEligibility.CanBeOverridden);
         }
     }
 
@@ -420,6 +519,7 @@ public partial class CheckInDeskControl : UserControl
 
         ClearHolderInfo();
         HideInlineRegistration();
+        _giftPanel.Clear();
 
         _txtRegFullName.Clear();
         _txtRegPhone.Clear();
@@ -546,6 +646,7 @@ public partial class CheckInDeskControl : UserControl
         }
 
         UpdateLiveTotalPersons();
+        _ = _giftPanel.LoadAsync(holder.Id);
     }
 
     public void ShowInlineRegistration(string cardNumber, int? orgId = null)
