@@ -93,6 +93,7 @@ public partial class MainForm : RtlFormBase
         _menuReports.Text = Strings.Menu_Reports;
         _menuDailyReport.Text = Strings.Menu_DailyReport;
         _menuOrgStatistics.Text = Strings.Menu_OrgStatistics;
+        _menuGiftReceiptsReport.Text = Strings.Menu_GiftReceiptsReport;
 
         _menuHelp.Text = Strings.Menu_Help;
         _menuAbout.Text = Strings.Menu_About;
@@ -154,6 +155,7 @@ public partial class MainForm : RtlFormBase
         var canViewReports = _currentUser.Has(Permission.ViewReports);
         _menuDailyReport.Visible = canViewReports;
         _menuOrgStatistics.Visible = canViewReports;
+        _menuGiftReceiptsReport.Visible = canViewReports;
         _menuReports.Visible = canViewReports;
     }
 
@@ -189,6 +191,7 @@ public partial class MainForm : RtlFormBase
         _menuBackupNow.Click += async (_, _) => await OnBackupNowClickedAsync();
         _menuDailyReport.Click += (_, _) => ShowReports(0);
         _menuOrgStatistics.Click += (_, _) => ShowReports(2);
+        _menuGiftReceiptsReport.Click += (_, _) => ShowGiftReceiptsReport();
 
         _menuAbout.Click += OnAboutClicked;
     }
@@ -570,6 +573,20 @@ public partial class MainForm : RtlFormBase
         }
 
         var form = _formFactory?.Create<WorkstationsForm>() ?? new WorkstationsForm(null, _settingsService, _formFactory, _notifyService, null);
+        using (form)
+        {
+            form.ShowDialog(this);
+        }
+    }
+
+    public void ShowGiftReceiptsReport()
+    {
+        if (_currentUser != null && !_currentUser.Has(Permission.ViewReports))
+        {
+            return;
+        }
+
+        var form = _formFactory?.Create<GiftReceiptsForm>() ?? new GiftReceiptsForm(null, null, null, _settingsService, _notifyService, null);
         using (form)
         {
             form.ShowDialog(this);

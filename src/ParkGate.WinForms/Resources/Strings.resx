@@ -1541,4 +1541,79 @@
   <data name="Label_HolderNameTitle" xml:space="preserve">
     <value>اسم المستفيد:</value>
   </data>
+  <data name="Menu_GiftReceiptsReport" xml:space="preserve">
+    <value>تقرير قسائم الهدايا</value>
+  </data>
+  <data name="Title_GiftReceipts" xml:space="preserve">
+    <value>تقرير قسائم ووصولات الهدايا</value>
+  </data>
+  <data name="Label_DateFrom" xml:space="preserve">
+    <value>من تاريخ:</value>
+  </data>
+  <data name="Label_DateTo" xml:space="preserve">
+    <value>إلى تاريخ:</value>
+  </data>
+  <data name="Label_FilterStatus" xml:space="preserve">
+    <value>تصفية الحالة:</value>
+  </data>
+  <data name="Status_All" xml:space="preserve">
+    <value>الكل</value>
+  </data>
+  <data name="Status_IssuedVoucher" xml:space="preserve">
+    <value>صادرة (نشطة)</value>
+  </data>
+  <data name="Status_RedeemedVoucher" xml:space="preserve">
+    <value>تم الصرف</value>
+  </data>
+  <data name="Status_VoidedVoucher" xml:space="preserve">
+    <value>ملغاة</value>
+  </data>
+  <data name="Summary_GiftReceipts" xml:space="preserve">
+    <value>إجمالي القسائم: {0} | القيمة الإجمالية: {1:N3} د.ل (مصروفة: {2} بقيمة {3:N3} د.ل | نشطة: {4} بقيمة {5:N3} د.ل | ملغاة: {6} بقيمة {7:N3} د.ل)</value>
+  </data>
+  <data name="Col_Gift_ReceiptNo" xml:space="preserve">
+    <value>رقم الإيصال</value>
+  </data>
+  <data name="Col_Gift_HolderName" xml:space="preserve">
+    <value>اسم المستفيد</value>
+  </data>
+  <data name="Col_Gift_CardNumber" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="Col_Gift_Organization" xml:space="preserve">
+    <value>الجهة</value>
+  </data>
+  <data name="Col_Gift_Value" xml:space="preserve">
+    <value>القيمة (د.ل)</value>
+  </data>
+  <data name="Col_Gift_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="Col_Gift_IssuedAt" xml:space="preserve">
+    <value>وقت الإصدار</value>
+  </data>
+  <data name="Col_Gift_IssuedBy" xml:space="preserve">
+    <value>المُصدِر</value>
+  </data>
+  <data name="Col_Gift_RedeemedAt" xml:space="preserve">
+    <value>وقت الصرف</value>
+  </data>
+  <data name="Col_Gift_RedeemedBy" xml:space="preserve">
+    <value>موظف الصرف</value>
+  </data>
+  <data name="Col_Gift_RedeemedWs" xml:space="preserve">
+    <value>نقطة الصرف</value>
+  </data>
+  <data name="Col_Gift_IsOverride" xml:space="preserve">
+    <value>استثناء؟</value>
+  </data>
+  <data name="Col_Gift_Reason" xml:space="preserve">
+    <value>السبب</value>
+  </data>
+  <data name="Msg_ExportExcelSuccess" xml:space="preserve">
+    <value>تم تصدير التقرير إلى Excel بنجاح.</value>
+  </data>
+  <data name="Msg_NoGiftReceiptsFound" xml:space="preserve">
+    <value>لا توجد قسائم تطابق معايير البحث المحددة.</value>
+  </data>
 </root>

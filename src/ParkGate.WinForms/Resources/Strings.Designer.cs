@@ -632,4 +632,29 @@ internal class Strings
     {
         return ResourceManager.GetString(name, resourceCulture);
     }
+    internal static string Menu_GiftReceiptsReport => GetString(nameof(Menu_GiftReceiptsReport));
+    internal static string Title_GiftReceipts => GetString(nameof(Title_GiftReceipts));
+    internal static string Label_DateFrom => GetString(nameof(Label_DateFrom));
+    internal static string Label_DateTo => GetString(nameof(Label_DateTo));
+    internal static string Label_FilterStatus => GetString(nameof(Label_FilterStatus));
+    internal static string Status_All => GetString(nameof(Status_All));
+    internal static string Status_IssuedVoucher => GetString(nameof(Status_IssuedVoucher));
+    internal static string Status_RedeemedVoucher => GetString(nameof(Status_RedeemedVoucher));
+    internal static string Status_VoidedVoucher => GetString(nameof(Status_VoidedVoucher));
+    internal static string Summary_GiftReceipts => GetString(nameof(Summary_GiftReceipts));
+    internal static string Col_Gift_ReceiptNo => GetString(nameof(Col_Gift_ReceiptNo));
+    internal static string Col_Gift_HolderName => GetString(nameof(Col_Gift_HolderName));
+    internal static string Col_Gift_CardNumber => GetString(nameof(Col_Gift_CardNumber));
+    internal static string Col_Gift_Organization => GetString(nameof(Col_Gift_Organization));
+    internal static string Col_Gift_Value => GetString(nameof(Col_Gift_Value));
+    internal static string Col_Gift_Status => GetString(nameof(Col_Gift_Status));
+    internal static string Col_Gift_IssuedAt => GetString(nameof(Col_Gift_IssuedAt));
+    internal static string Col_Gift_IssuedBy => GetString(nameof(Col_Gift_IssuedBy));
+    internal static string Col_Gift_RedeemedAt => GetString(nameof(Col_Gift_RedeemedAt));
+    internal static string Col_Gift_RedeemedBy => GetString(nameof(Col_Gift_RedeemedBy));
+    internal static string Col_Gift_RedeemedWs => GetString(nameof(Col_Gift_RedeemedWs));
+    internal static string Col_Gift_IsOverride => GetString(nameof(Col_Gift_IsOverride));
+    internal static string Col_Gift_Reason => GetString(nameof(Col_Gift_Reason));
+    internal static string Msg_ExportExcelSuccess => GetString(nameof(Msg_ExportExcelSuccess));
+    internal static string Msg_NoGiftReceiptsFound => GetString(nameof(Msg_NoGiftReceiptsFound));
 }
