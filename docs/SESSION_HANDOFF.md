@@ -9,14 +9,14 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-11-02 |
-| Last session | S20 — Phase F5: Gift voucher use cases, persistence and migration |
+| Last updated | 2026-11-04 |
+| Last session | S21 — Phase F5: Gift voucher report queries, service, QR adapter, and integration tests [T-G6] |
 | Current phase | Phase F5 — Gift Vouchers (QR) and Free-Companion Limit |
-| Working branch | `phase/f5-gift-vouchers` (no upstream yet; push with `-u`) |
+| Working branch | `phase/f5-gift-vouchers` |
 | Build | Clean (0 errors; 16 pre-existing NuGet vulnerability warnings for `System.Security.Cryptography.Pkcs` 9.0.11) |
-| .NET Unit tests | 541 passed (202 domain + 166 application + 110 architecture + 63 infrastructure) |
-| .NET Integration tests | 33 passed on LocalDB |
-| Total tests | 574 passed |
+| .NET Unit tests | 544 passed (202 domain + 169 application + 110 architecture + 63 infrastructure) |
+| .NET Integration tests | 34 passed on LocalDB |
+| Total tests | 578 passed |
 | Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` (not applied to production yet) |
 
 ## State of the work
@@ -34,12 +34,14 @@
   4 new `Organizations` columns + `AgeCategories.IsCompanionLimitExempt`, migration
   `AddGiftVouchersAndCompanionLimit` (also flags the existing «رضيع» row), 16 integration tests
   including two 20-run parallel issue/redeem tests.
+- T-G6 Infrastructure & Application reports: `GiftReportDtos`, `IGiftReportQueries`, `GiftReportQueries`,
+  `IGiftReportService`, `GiftReportService`, `QrImageRendererAdapter`, DI registrations, 3 unit tests,
+  1 multi-scenario integration test on LocalDB.
 
 **In progress**
-- Nothing — the tree is clean at `40dbc2f`.
+- Nothing.
 
 **Not started (Phase F5)**
-- T-G6 Infrastructure: `IGiftReportQueries` + `GiftReportQueries`, `QrImageRendererAdapter`, DI.
 - T-G7 WinForms: organization gift policy + age-category exempt flag screens.
 - T-G8 WinForms: desk companion limit + gift panel + gift QR dialog.
 - T-G9 WinForms: gift redemption screen (rides window).
@@ -49,9 +51,9 @@
 ## Next session — start here
 
 1. `dotnet build ParkGate.sln -c Debug` and
-   `dotnet test ParkGate.sln --filter "Category!=Integration"` — expect 541 green.
-2. Implement **T-G6** (`docs/F5_GIFT_VOUCHERS_PLAN.md` §T-G6, lines 400-412), commit, then continue with
-   T-G7 → T-G10 (UI) and finish with T-G11.
+   `dotnet test ParkGate.sln --filter "Category!=Integration"` — expect 544 green.
+2. Implement **T-G7** (`docs/F5_GIFT_VOUCHERS_PLAN.md` §T-G7), commit, then continue with
+   T-G8 → T-G10 (UI) and finish with T-G11.
 
 ## Blockers / waiting on the user
 
@@ -82,6 +84,12 @@
 ---
 
 ## Session log (newest first, max 10)
+
+### S21 — 2026-11-04 — Phase F5: Gift voucher report queries, service, QR adapter, and tests
+- Tasks: T-G6.
+- Commits: `feat(gift): gift report queries, service and qr image adapter [T-G6]`.
+- Summary: Implemented `GiftReportDtos` with `GiftReceiptFilter`, `IGiftReportQueries` and `GiftReportQueries` (with multi-scenario status, date, organization and workstation filters), `IGiftReportService` and `GiftReportService`, `QrImageRendererAdapter : IQrImageRenderer`, registered transient/singleton services in DI, and added 3 unit tests plus 1 comprehensive integration test on LocalDB.
+- Test count: 578 total (544 unit/architecture + 34 LocalDB integration), zero errors.
 
 ### S20 — 2026-11-02 — Phase F5: Application use cases, persistence and migration
 - Tasks: T-G4, T-G5 (T-G0..T-G3 were committed in the previous session; ROADMAP now reflects T-G0..T-G5 done).

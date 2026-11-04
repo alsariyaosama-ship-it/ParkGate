@@ -42,6 +42,7 @@ public static class DependencyInjection
         services.AddTransient<IDatabaseStartupService, DatabaseStartupService>();
         services.AddTransient<ParkGate.Application.Ports.Persistence.IDatabaseBackupService, ParkGate.Infrastructure.Data.DatabaseBackupService>();
         services.AddTransient<ParkGate.Application.Ports.Reports.IReportQueries, ParkGate.Infrastructure.Reports.ReportQueries>();
+        services.AddTransient<ParkGate.Application.Ports.Reports.IGiftReportQueries, ParkGate.Infrastructure.Reports.GiftReportQueries>();
         services.AddTransient<ParkGate.Application.Ports.Reports.IExcelExportService, ParkGate.Infrastructure.Reports.ClosedXmlExcelExportService>();
 
         services.AddTransient<ParkGate.Application.Ports.EntryCards.IEntryCardRepository, ParkGate.Infrastructure.EntryCards.EntryCardRepository>();
@@ -52,6 +53,7 @@ public static class DependencyInjection
         services.AddTransient<ParkGate.Application.Ports.Sync.ICloudPushService, ParkGate.Infrastructure.Sync.CloudPushService>();
 
         services.AddSingleton<ParkGate.Application.Ports.EntryCards.IQrCryptoProvider, ParkGate.Infrastructure.EntryCards.QrCryptoProvider>();
+        services.AddSingleton<ParkGate.Application.Ports.EntryCards.IQrImageRenderer, ParkGate.Infrastructure.EntryCards.QrImageRendererAdapter>();
 
         return services;
     }

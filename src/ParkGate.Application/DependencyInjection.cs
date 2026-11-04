@@ -44,6 +44,7 @@ public static class DependencyInjection
         services.AddTransient<IWorkstationService, WorkstationService>();
         services.AddTransient<IReportService, ReportService>();
         services.AddTransient<IGiftVoucherService, GiftVoucherService>();
+        services.AddTransient<IGiftReportService, GiftReportService>();
 
         // 4. EntryCards services
         services.AddTransient<CardScanService>();
