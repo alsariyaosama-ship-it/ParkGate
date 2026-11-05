@@ -10,7 +10,7 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-05 |
-| Last session | S24 — Bugfix: Database migration on SQLEXPRESS & Beneficiaries window data loading & actions |
+| Last session | S25 — Bugfix: PrintDialog COM crash & GDI+ Font rendering on QR card print |
 | Current phase | Maintenance & Bugfix on `main` |
 | Working branch | `main` |
 | Build | Clean (0 errors; 16 pre-existing NuGet vulnerability warnings for `System.Security.Cryptography.Pkcs` 9.0.11) |
@@ -21,15 +21,15 @@
 
 ## State of the work
 
-**Completed in this session (S24):**
-1. **Database Pending Migration:** Applied pending migration `20261102125339_AddGiftVouchersAndCompanionLimit` on the actual local `SQLEXPRESS` instance configured in `%ProgramData%\ParkGate\connection.dat`. Verified 0 pending migrations remain.
-2. **Beneficiaries Screen Issue:** Diagnosed and resolved the issue where customer data did not show up in the details panel and action buttons (`_btnEdit`, `_btnChangeStatus`, `_btnCheckInDirect`, `_btnIssueQr`) remained disabled:
-   - Fixed DataGridView row creation: row `Tag` is now attached to `DataGridViewRow` prior to adding to `_gridBeneficiaries.Rows`, preventing `SelectionChanged` from firing with a null `Tag`.
-   - Guaranteed automatic selection and detail population: `PopulateBeneficiariesGridAsync` clears selection and explicitly selects row 0 and awaits `OnBeneficiarySelectionChangedAsync()`.
-   - Wired `_gridBeneficiaries.CellClick` in addition to `SelectionChanged` so clicking any cell in an already selected row reliably refreshes details and buttons.
-   - Fixed action buttons panel layout: enabled `AutoSize = true` and `AutoSizeMode = GrowAndShrink` on `_pnlDetailsActions` and adjusted bottom splitter distance to prevent buttons from being clipped.
-   - Refreshed child control permissions on `MainForm.ApplyPermissions()`.
-   - Added automated unit test `BeneficiariesControl_EnsureLoadedAsync_ShouldPopulateFirstRowAndEnableActions`.
+**Completed in this session (S25):**
+1. **PrintDialog Crash Fix (`0xc000041d` in `combase.dll`):**
+   - Diagnosed crash event log where `PrintDialog.UseEXDialog = true` under an RTL-mirrored modal owner (`WS_EX_LAYOUTRTL`) caused `combase.dll` to throw fatal `STATUS_FATAL_USER_CALLBACK_EXCEPTION` inside `PrintDlgExW`.
+   - Set `UseEXDialog = false` and avoided passing the RTL modal owner to use the stable Win32 `PrintDlgW`.
+2. **Printer GDI+ Font Safety:**
+   - In `IssueQrDialog.cs`, replaced `AppFont.CreateFont` (which created fonts from private font collection) with standard `new Font("Cairo", ...)` to avoid printer DC driver spooler incompatibilities.
+3. **Printer Hardware Guard & Fallback:**
+   - Added pre-flight check in `IssueQrDialog.cs` and `GiftQrDialog.cs` for `PrinterSettings.InstalledPrinters.Count == 0`, displaying friendly warning `Msg_NoPrinterInstalled`.
+   - Added automatic fallback to the first installed printer if the default printer settings are invalid, preventing `InvalidPrinterException`.
 
 **In progress**
 - None.
@@ -39,8 +39,8 @@
 
 ## Next session — start here
 
-1. Verify app startup and customers window on the developer machine (`dotnet run --project src/ParkGate.WinForms`).
-2. Confirm with Osama that customer details and action buttons respond properly.
+1. Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF".
+2. Confirm with Osama that customer and gift QR printing works smoothly without closing the app.
 
 ## Blockers / waiting on the user
 
@@ -49,6 +49,15 @@
 ---
 
 ## Session Log (last 10 sessions)
+
+### S25 — 2026-11-05 — Bugfix: PrintDialog COM crash & GDI+ Font rendering on QR card print
+- Fixed `IssueQrDialog` and `GiftQrDialog` print crash (`0xc000041d` in `combase.dll`) by disabling `UseEXDialog`.
+- Replaced private font collection usage in printer graphics with standard font constructor.
+- Added printer count pre-check and invalid printer fallback.
+- Added `Msg_NoPrinterInstalled` to `Strings.resx`.
+- Commits:
+  - `fix(winforms): fix print dialog combase crash and font rendering on qr card print`
+- All 588 unit/arch tests pass (100% green).
 
 ### S24 — 2026-11-05 — Database migration on SQLEXPRESS & Beneficiaries Window Fix
 - Applied pending migration `20261102125339_AddGiftVouchersAndCompanionLimit` on SQLEXPRESS instance.

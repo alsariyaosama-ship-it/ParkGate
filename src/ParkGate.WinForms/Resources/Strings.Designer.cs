@@ -600,6 +600,7 @@ internal class Strings
     internal static string Label_FreeCompanionsExceeded => GetString(nameof(Label_FreeCompanionsExceeded));
     internal static string Error_FreeCompanionsExceededBanner => GetString(nameof(Error_FreeCompanionsExceededBanner));
     internal static string Msg_NoQrImageAvailable => GetString(nameof(Msg_NoQrImageAvailable));
+    internal static string Msg_NoPrinterInstalled => GetString(nameof(Msg_NoPrinterInstalled));
     internal static string Msg_PrintFailed => GetString(nameof(Msg_PrintFailed));
     internal static string Btn_Print => GetString(nameof(Btn_Print));
     internal static string Menu_GiftRedemption => GetString(nameof(Menu_GiftRedemption));

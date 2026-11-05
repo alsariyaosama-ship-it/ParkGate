@@ -5,6 +5,7 @@ using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.EntryCards;
 using ParkGate.Infrastructure.EntryCards;
 using ParkGate.WinForms.Common;
+using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
 
 namespace ParkGate.WinForms.Forms;
@@ -110,7 +111,18 @@ public partial class IssueQrDialog : RtlFormBase
 
         try
         {
+            if (System.Drawing.Printing.PrinterSettings.InstalledPrinters.Count == 0)
+            {
+                _notifyService?.Warning(Strings.Msg_NoPrinterInstalled, Strings.Title_Warning);
+                return;
+            }
+
             using var doc = new System.Drawing.Printing.PrintDocument();
+            if (!doc.PrinterSettings.IsValid && System.Drawing.Printing.PrinterSettings.InstalledPrinters.Count > 0)
+            {
+                doc.PrinterSettings.PrinterName = System.Drawing.Printing.PrinterSettings.InstalledPrinters[0];
+            }
+
             doc.PrintPage += (s, e) =>
             {
                 var g = e.Graphics;
@@ -119,9 +131,9 @@ public partial class IssueQrDialog : RtlFormBase
                     return;
                 }
 
-                using var subFont = AppFont.CreateFont(10F, FontStyle.Bold);
-                using var regFont = AppFont.CreateFont(9F, FontStyle.Regular);
-                using var smallFont = AppFont.CreateFont(8F, FontStyle.Regular);
+                using var subFont = new Font("Cairo", 10F, FontStyle.Bold);
+                using var regFont = new Font("Cairo", 9F, FontStyle.Regular);
+                using var smallFont = new Font("Cairo", 8F, FontStyle.Regular);
 
                 // Draw card frame (85mm x 54mm approx in 100dpi is ~320x200)
                 var cardRect = new Rectangle(50, 50, 320, 190);
@@ -160,8 +172,15 @@ public partial class IssueQrDialog : RtlFormBase
                 g.DrawImage(_picQrCode.Image, qrRect);
             };
 
-            using var dlg = new PrintDialog { Document = doc, UseEXDialog = true };
-            if (dlg.ShowDialog(this) == DialogResult.OK)
+            using var dlg = new PrintDialog
+            {
+                Document = doc,
+                UseEXDialog = false,
+                AllowSomePages = false,
+                AllowSelection = false
+            };
+
+            if (dlg.ShowDialog() == DialogResult.OK)
             {
                 doc.Print();
             }

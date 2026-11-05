@@ -129,7 +129,17 @@ public partial class GiftQrDialog : RtlFormBase
 
         try
         {
+            if (PrinterSettings.InstalledPrinters.Count == 0)
+            {
+                _notifyService?.Warning(Strings.Msg_NoPrinterInstalled, Strings.Title_Warning);
+                return;
+            }
+
             using var doc = new PrintDocument();
+            if (!doc.PrinterSettings.IsValid && PrinterSettings.InstalledPrinters.Count > 0)
+            {
+                doc.PrinterSettings.PrinterName = PrinterSettings.InstalledPrinters[0];
+            }
             doc.PrintPage += (s, e) =>
             {
                 var g = e.Graphics;
@@ -198,8 +208,14 @@ public partial class GiftQrDialog : RtlFormBase
                 g.DrawImage(_picQr.Image, qrRect);
             };
 
-            using var dlg = new PrintDialog { Document = doc, UseEXDialog = true };
-            if (dlg.ShowDialog(this) == DialogResult.OK)
+            using var dlg = new PrintDialog
+            {
+                Document = doc,
+                UseEXDialog = false,
+                AllowSomePages = false,
+                AllowSelection = false
+            };
+            if (dlg.ShowDialog() == DialogResult.OK)
             {
                 doc.Print();
             }
