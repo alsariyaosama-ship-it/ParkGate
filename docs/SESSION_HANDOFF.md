@@ -9,51 +9,53 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-11-04 |
-| Last session | S23 — Phase F5: Gift Vouchers QR & Free-Companion Limit [T-G8..T-G11 Complete] |
-| Current phase | Phase F5 — Gift Vouchers (QR) and Free-Companion Limit (COMPLETED) |
-| Working branch | `phase/f5-gift-vouchers` |
+| Last updated | 2026-11-05 |
+| Last session | S24 — Bugfix: Database migration on SQLEXPRESS & Beneficiaries window data loading & actions |
+| Current phase | Maintenance & Bugfix on `main` |
+| Working branch | `main` |
 | Build | Clean (0 errors; 16 pre-existing NuGet vulnerability warnings for `System.Security.Cryptography.Pkcs` 9.0.11) |
-| .NET Unit tests | 587 passed (202 domain + 169 application + 153 architecture + 63 infrastructure) |
+| .NET Unit tests | 588 passed (202 domain + 169 application + 154 architecture + 63 infrastructure) |
 | .NET Integration tests | 34 passed on LocalDB |
-| Total tests | 621 passed (100% green) |
-| Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` |
+| Total tests | 622 passed (100% green) |
+| Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` (Applied on SQLEXPRESS and LocalDB) |
 
 ## State of the work
 
-**Done (Phase F5 — All Tasks T-G0 through T-G11 Complete):**
-- **T-G0:** Documentation, BR-19..BR-26 in SPEC, and ADR-020 (`docs/F5_GIFT_VOUCHERS_PLAN.md`).
-- **T-G1:** Domain model (`GiftVoucher`, `GiftVoucherStatus`, `GiftDenialReason`, `RollingIntervalGiftEligibilityPolicy`, `QrPurpose`, `Organization` gift/companion policy, `AgeCategory.IsCompanionLimitExempt`).
-- **T-G2:** Application plumbing: permissions (`IssueGift`, `RedeemGift`, `OverrideGiftInterval`, `VoidGift`), typed errors, QR purpose payload differentiation.
-- **T-G3:** Free-companion limit (BR-25/26) end to end in `CheckInService`.
-- **T-G4:** Application use cases: `GiftVoucherService` (eligibility, issue, override, redeem, void) + validators + unit tests.
-- **T-G5:** Persistence & migrations: `GiftVoucherConfiguration`, `GiftVoucherRepository`, EF migration `AddGiftVouchersAndCompanionLimit`, seed fix for «رضيع», and 16 integration tests including 20-run parallel issue/redeem tests.
-- **T-G6:** Infrastructure queries & adapters: `GiftReportDtos`, `IGiftReportQueries`, `GiftReportQueries`, `IGiftReportService`, `GiftReportService`, `QrImageRendererAdapter`, DI registrations.
-- **T-G7:** WinForms settings: `EditOrganizationDialog`, `EditAgeCategoryDialog`, grids, resx resources, `ErrorMessages`, architecture tests.
-- **T-G8:** Desk integration: live free-companion limit calculation & warning banner on `CheckInDeskControl`, `GiftOfferPanel` user control with eligibility & supervisor override, modal `GiftQrDialog` with A6 receipt printing and PNG export, F6/F7 keyboard shortcuts.
-- **T-G9:** Rides redemption screen: `GiftRedeemControl` (Cairo touch-friendly, digit normalization, status banner, today's redemptions grid), `MainForm` menu item (F3) gated by `Permission.RedeemGift`, architecture tests.
-- **T-G10:** Reports & export: `IGiftExcelExportService` port, `ClosedXmlGiftExcelExportService` with RTL worksheet styling, `GiftReceiptsForm` modal with filters & summary KPIs, `MainForm` menu under Reports, architecture tests.
-- **T-G11:** Hardening & documentation: all 621 tests passing (including parallel concurrency tests), knowledge graph updated (`graphify update .`), `docs/TEST_SCRIPT.md` updated with TC-11..TC-13, `docs/USER_GUIDE_AR.md` updated with full F5 operational workflows.
+**Completed in this session (S24):**
+1. **Database Pending Migration:** Applied pending migration `20261102125339_AddGiftVouchersAndCompanionLimit` on the actual local `SQLEXPRESS` instance configured in `%ProgramData%\ParkGate\connection.dat`. Verified 0 pending migrations remain.
+2. **Beneficiaries Screen Issue:** Diagnosed and resolved the issue where customer data did not show up in the details panel and action buttons (`_btnEdit`, `_btnChangeStatus`, `_btnCheckInDirect`, `_btnIssueQr`) remained disabled:
+   - Fixed DataGridView row creation: row `Tag` is now attached to `DataGridViewRow` prior to adding to `_gridBeneficiaries.Rows`, preventing `SelectionChanged` from firing with a null `Tag`.
+   - Guaranteed automatic selection and detail population: `PopulateBeneficiariesGridAsync` clears selection and explicitly selects row 0 and awaits `OnBeneficiarySelectionChangedAsync()`.
+   - Wired `_gridBeneficiaries.CellClick` in addition to `SelectionChanged` so clicking any cell in an already selected row reliably refreshes details and buttons.
+   - Fixed action buttons panel layout: enabled `AutoSize = true` and `AutoSizeMode = GrowAndShrink` on `_pnlDetailsActions` and adjusted bottom splitter distance to prevent buttons from being clipped.
+   - Refreshed child control permissions on `MainForm.ApplyPermissions()`.
+   - Added automated unit test `BeneficiariesControl_EnsureLoadedAsync_ShouldPopulateFirstRowAndEnableActions`.
 
 **In progress**
-- None. Ready for review and PR merge into `main`.
+- None.
 
 **Not started / Future**
 - F2 Electronic gate (deferred by client; SPEC §9 F2).
 
 ## Next session — start here
 
-1. Review and merge Pull Request for `phase/f5-gift-vouchers` into `main`.
-2. Tag release `v0.5.0` or deploy migration `AddGiftVouchersAndCompanionLimit` to testing/staging environment.
-3. Conduct client walkthrough using `docs/TEST_SCRIPT.md` (TC-11, TC-12, TC-13).
+1. Verify app startup and customers window on the developer machine (`dotnet run --project src/ParkGate.WinForms`).
+2. Confirm with Osama that customer details and action buttons respond properly.
 
 ## Blockers / waiting on the user
 
-- Osama's review and approval to merge PR `phase/f5-gift-vouchers` into `main`.
+- None.
 
 ---
 
 ## Session Log (last 10 sessions)
+
+### S24 — 2026-11-05 — Database migration on SQLEXPRESS & Beneficiaries Window Fix
+- Applied pending migration `20261102125339_AddGiftVouchersAndCompanionLimit` on SQLEXPRESS instance.
+- Fixed `BeneficiariesControl` row tag lifecycle and selection event handling to ensure customer details populate and buttons enable.
+- Commits:
+  - `fix(winforms): ensure beneficiary details populate and buttons enable on grid load`
+- All 588 unit/arch tests and 34 integration tests pass (100% green).
 
 ### S23 — 2026-11-04 — Phase F5 Completion (T-G8..T-G11)
 - Tasks: T-G8, T-G9, T-G10, T-G11 completed on `phase/f5-gift-vouchers`.
@@ -78,23 +80,3 @@
 
 ### S20 — 2026-11-02 — Persistence & Migrations [T-G5]
 - Tasks: T-G5 completed on `phase/f5-gift-vouchers`.
-- Commits: `feat(gift): ef persistence, migration and integration tests [T-G5]`.
-
-### S19 — 2026-11-02 — Application plumbing & gift voucher use cases [T-G1..T-G4]
-- Tasks: T-G1..T-G4 completed on `phase/f5-gift-vouchers`.
-- Commits: `feat(gift): domain model, application plumbing and use cases [T-G1..T-G4]`.
-
-### S18 — 2026-10-14 — Cloud Web App & Dashboard (Phase F4)
-- Tasks: TF4.1..TF4.6 completed on `phase/f4-cloud-dashboard`. Merged Phase F3 into `main`. Registered ADR-019.
-
-### S17 — 2026-10-13 — Standalone Cloud Sync Agent (Phase F3)
-- Tasks: TF3.1..TF3.6 completed on `phase/f3-sync-agent`.
-
-### S16 — 2026-10-10 — System-wide Audit & Hardening
-- Tasks: Complete audit across architecture, code logic, performance, and UX.
-
-### S15 — 2026-10-08 — Fix QR Issue Deadlock and Loop
-- Tasks: Diagnosed and resolved UI freeze / infinite loop when issuing QR cards.
-
-### S13 — 2026-10-08 — QR Credentials (F1)
-- Tasks: TF1.1..TF1.4 completed on `main`.
