@@ -157,6 +157,8 @@ public partial class MainForm : RtlFormBase
         _menuOrgStatistics.Visible = canViewReports;
         _menuGiftReceiptsReport.Visible = canViewReports;
         _menuReports.Visible = canViewReports;
+
+        _beneficiariesControl?.ApplyPermissions();
     }
 
     private static string GetRoleArabicName(UserRole? role) => role switch
@@ -284,6 +286,7 @@ public partial class MainForm : RtlFormBase
 
         _beneficiariesControl.Visible = true;
         _beneficiariesControl.BringToFront();
+        _beneficiariesControl.ApplyPermissions();
 
         if (!string.IsNullOrWhiteSpace(initialSearchTerm))
         {

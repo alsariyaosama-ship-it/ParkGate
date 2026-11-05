@@ -140,9 +140,65 @@ public sealed class BeneficiariesManagementTests
         btnEdit.Enabled.ShouldBeTrue();
         btnChangeStatus.Enabled.ShouldBeTrue();
 
+        var btnCheckIn = GetField<Button>(control, "_btnCheckInDirect");
+        var btnIssueQr = GetField<Button>(control, "_btnIssueQr");
+        btnCheckIn.Enabled.ShouldBeTrue();
+        btnIssueQr.Enabled.ShouldBeTrue();
+
         gridHist.Rows.Count.ShouldBe(1);
         gridHist.Rows[0].Cells[3].Value.ShouldBe(Strings.Result_Allowed);
         gridHist.Rows[0].Cells[4].Value.ShouldBe(3);
+    }
+
+        [Fact]
+    public async Task BeneficiariesControl_EnsureLoadedAsync_ShouldPopulateFirstRowAndEnableActions()
+    {
+        var testHolderId = Guid.NewGuid();
+        var fakeHolder = new BeneficiaryDto(
+            Id: testHolderId,
+            OrganizationId: 1,
+            OrganizationName: "الضمان الاجتماعي",
+            CardNumber: "555",
+            FullName: "محمد علي",
+            Phone: "0912345678",
+            NationalId: "119850123456",
+            CardExpiryDate: new DateOnly(2027, 12, 31),
+            Status: BeneficiaryStatus.Active,
+            StatusReason: null,
+            LastGrantedEntryUtc: null,
+            Notes: null,
+            CreatedAtUtc: DateTime.UtcNow);
+
+        var fakeBenService = new FakeBeneficiaryService([fakeHolder], []);
+        var currentUser = new FakeCurrentUser(1, "admin", "Admin User", UserRole.Admin);
+
+        using var control = new BeneficiariesControl(
+            fakeBenService,
+            null,
+            null,
+            currentUser,
+            null,
+            null,
+            null,
+            null);
+
+        await control.EnsureLoadedAsync();
+
+        var gridBen = GetField<DataGridView>(control, "_gridBeneficiaries");
+        var lblName = GetField<Label>(control, "_lblDetailName");
+        var lblCard = GetField<Label>(control, "_lblDetailCard");
+        var btnEdit = GetField<Button>(control, "_btnEdit");
+        var btnChangeStatus = GetField<Button>(control, "_btnChangeStatus");
+        var btnCheckIn = GetField<Button>(control, "_btnCheckInDirect");
+        var btnIssueQr = GetField<Button>(control, "_btnIssueQr");
+
+        gridBen.Rows.Count.ShouldBe(1);
+        lblName.Text.ShouldBe("محمد علي");
+        lblCard.Text.ShouldBe("555");
+        btnEdit.Enabled.ShouldBeTrue();
+        btnChangeStatus.Enabled.ShouldBeTrue();
+        btnCheckIn.Enabled.ShouldBeTrue();
+        btnIssueQr.Enabled.ShouldBeTrue();
     }
 
     [Fact]

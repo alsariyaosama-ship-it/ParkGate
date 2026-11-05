@@ -306,7 +306,7 @@ partial class BeneficiariesControl
         this._splitBottom.Panel2.Controls.Add(this._grpHistory);
         this._splitBottom.Panel2.Padding = new System.Windows.Forms.Padding(4, 0, 0, 0);
         this._splitBottom.Size = new System.Drawing.Size(984, 332);
-        this._splitBottom.SplitterDistance = 380;
+        this._splitBottom.SplitterDistance = 450;
         this._splitBottom.TabIndex = 0;
         // 
         // _grpHolderDetails
@@ -542,11 +542,14 @@ partial class BeneficiariesControl
         this._pnlDetailsActions.Controls.Add(this._btnChangeStatus);
         this._pnlDetailsActions.Controls.Add(this._btnCheckInDirect);
         this._pnlDetailsActions.Controls.Add(this._btnIssueQr);
+        this._pnlDetailsActions.AutoSize = true;
+        this._pnlDetailsActions.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
         this._pnlDetailsActions.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._pnlDetailsActions.Location = new System.Drawing.Point(6, 281);
+        this._pnlDetailsActions.MinimumSize = new System.Drawing.Size(0, 45);
         this._pnlDetailsActions.Name = "_pnlDetailsActions";
         this._pnlDetailsActions.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-        this._pnlDetailsActions.Size = new System.Drawing.Size(364, 45);
+        this._pnlDetailsActions.Size = new System.Drawing.Size(434, 45);
         this._pnlDetailsActions.TabIndex = 1;
         // 
         // _btnEdit

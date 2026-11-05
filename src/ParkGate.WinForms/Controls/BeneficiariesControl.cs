@@ -158,6 +158,7 @@ public partial class BeneficiariesControl : UserControl
         };
 
         _gridBeneficiaries.SelectionChanged += async (_, _) => await OnBeneficiarySelectionChangedAsync();
+        _gridBeneficiaries.CellClick += async (_, _) => await OnBeneficiarySelectionChangedAsync();
 
         _btnEdit.Click += async (_, _) => await OpenEditDialogAsync();
         _btnChangeStatus.Click += async (_, _) => await OpenChangeStatusDialogAsync();
@@ -222,6 +223,7 @@ public partial class BeneficiariesControl : UserControl
     {
         if (_beneficiaryService == null)
         {
+            _logger?.LogWarning("PerformSearchAsync called but _beneficiaryService is null.");
             return;
         }
 
@@ -238,7 +240,7 @@ public partial class BeneficiariesControl : UserControl
                     _loadedBeneficiaries.Clear();
                     _loadedBeneficiaries.AddRange(result.Value);
 
-                    PopulateBeneficiariesGrid(_loadedBeneficiaries);
+                    await PopulateBeneficiariesGridAsync(_loadedBeneficiaries);
                     _lblSearchResultCount.Text = string.IsNullOrWhiteSpace(term)
                         ? $"إجمالي المستفيدين: {_loadedBeneficiaries.Count}"
                         : string.Format(Strings.Summary_SearchResults, _loadedBeneficiaries.Count);
@@ -271,53 +273,66 @@ public partial class BeneficiariesControl : UserControl
 
     private void PopulateBeneficiariesGrid(IReadOnlyList<BeneficiaryDto> beneficiaries)
     {
+        _ = PopulateBeneficiariesGridAsync(beneficiaries);
+    }
+
+    private async Task PopulateBeneficiariesGridAsync(IReadOnlyList<BeneficiaryDto> beneficiaries)
+    {
         _gridBeneficiaries.SuspendLayout();
-        _gridBeneficiaries.Rows.Clear();
-
-        var isOperator = _currentUser?.IsInRole(UserRole.Operator) ?? false;
-
-        foreach (var b in beneficiaries)
+        try
         {
-            var displayNid = FormatNationalId(b.NationalId, isOperator);
-            var statusText = GetStatusArabic(b.Status);
-            var expiryText = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? "-";
-            var lastEntryText = b.LastGrantedEntryUtc.HasValue
-                ? DateTimeDisplayHelper.FormatDateTime(DateTimeDisplayHelper.ToParkLocalTime(b.LastGrantedEntryUtc.Value, _timeZoneId))
-                : "-";
+            _gridBeneficiaries.Rows.Clear();
 
-            var rowIndex = _gridBeneficiaries.Rows.Add(
-                b.CardNumber,
-                b.OrganizationName,
-                b.FullName,
-                b.Phone,
-                displayNid,
-                statusText,
-                lastEntryText,
-                expiryText);
+            var isOperator = _currentUser?.IsInRole(UserRole.Operator) ?? false;
 
-            var row = _gridBeneficiaries.Rows[rowIndex];
-            row.Tag = b;
+            foreach (var b in beneficiaries)
+            {
+                var displayNid = FormatNationalId(b.NationalId, isOperator);
+                var statusText = GetStatusArabic(b.Status);
+                var expiryText = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? "-";
+                var lastEntryText = b.LastGrantedEntryUtc.HasValue
+                    ? DateTimeDisplayHelper.FormatDateTime(DateTimeDisplayHelper.ToParkLocalTime(b.LastGrantedEntryUtc.Value, _timeZoneId))
+                    : "-";
 
-            // Color status
-            if (b.Status == BeneficiaryStatus.Active)
-            {
-                row.Cells[_colStatus.Index].Style.ForeColor = StatusBanner.ColorGranted;
-            }
-            else if (b.Status == BeneficiaryStatus.Suspended)
-            {
-                row.Cells[_colStatus.Index].Style.ForeColor = StatusBanner.ColorWarning;
-            }
-            else if (b.Status == BeneficiaryStatus.Blocked)
-            {
-                row.Cells[_colStatus.Index].Style.ForeColor = StatusBanner.ColorDenied;
+                var row = new DataGridViewRow();
+                row.CreateCells(_gridBeneficiaries,
+                    b.CardNumber,
+                    b.OrganizationName,
+                    b.FullName,
+                    b.Phone,
+                    displayNid,
+                    statusText,
+                    lastEntryText,
+                    expiryText);
+                row.Tag = b;
+
+                // Color status
+                if (b.Status == BeneficiaryStatus.Active)
+                {
+                    row.Cells[_colStatus.Index].Style.ForeColor = StatusBanner.ColorGranted;
+                }
+                else if (b.Status == BeneficiaryStatus.Suspended)
+                {
+                    row.Cells[_colStatus.Index].Style.ForeColor = StatusBanner.ColorWarning;
+                }
+                else if (b.Status == BeneficiaryStatus.Blocked)
+                {
+                    row.Cells[_colStatus.Index].Style.ForeColor = StatusBanner.ColorDenied;
+                }
+
+                _gridBeneficiaries.Rows.Add(row);
             }
         }
-
-        _gridBeneficiaries.ResumeLayout(true);
+        finally
+        {
+            _gridBeneficiaries.ResumeLayout(true);
+        }
 
         if (_gridBeneficiaries.Rows.Count > 0)
         {
+            _gridBeneficiaries.ClearSelection();
             _gridBeneficiaries.Rows[0].Selected = true;
+            await OnBeneficiarySelectionChangedAsync();
         }
         else
         {
@@ -343,16 +358,22 @@ public partial class BeneficiariesControl : UserControl
 
     private async Task OnBeneficiarySelectionChangedAsync()
     {
-        if (_gridBeneficiaries.SelectedRows.Count == 0)
+        DataGridViewRow? selectedRow = _gridBeneficiaries.SelectedRows.Count > 0
+            ? _gridBeneficiaries.SelectedRows[0]
+            : _gridBeneficiaries.CurrentRow;
+
+        if (selectedRow == null)
         {
             ClearBeneficiaryDetails();
             ClearHistoryGrid();
             return;
         }
 
-        var b = _gridBeneficiaries.SelectedRows[0].Tag as BeneficiaryDto;
+        var b = selectedRow.Tag as BeneficiaryDto;
         if (b == null)
         {
+            ClearBeneficiaryDetails();
+            ClearHistoryGrid();
             return;
         }
 
