@@ -10,65 +10,30 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-13 |
-| Last session | S26 — Phase R0 (partial, cloud session, no shell): git baseline by static analysis, roadmap Phase R, web CI + baseline script staged |
-| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 in progress: R0.1 and R0.3 done, R0.4 drafted, R0.2 pending |
-| Working branch | `main` (dirty) → `phase/r0-baseline` still to be created |
-| Build | Not re-verified in S26 (no shell). Last known: clean, 0 errors; 16 pre-existing NuGet vulnerability warnings for `System.Security.Cryptography.Pkcs` 9.0.11 |
-| .NET Unit tests | 588 passed as of S25 (202 domain + 169 application + 154 architecture + 63 infrastructure); not re-run in S26 |
-| .NET Integration tests | 34 passed on LocalDB as of S25; not re-run in S26 |
-| Total tests | 622 as of S25. **`php artisan test` in `web/` has never been baselined — R0.2** |
+| Last session | S27 — Phase R0 completed locally: baseline recorded (R0.2), web CI placed (R0.4), PR opened |
+| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 done, awaiting PR review; next R1 |
+| Working branch | `phase/r0-baseline` (PR to `main`, not merged) |
+| Build | `dotnet build ParkGate.sln -c Debug` (S27): 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
+| .NET Unit tests | 588 passed (S27): 202 domain + 169 application + 63 infrastructure + 154 architecture |
+| .NET Integration tests | 34 passed on LocalDB (S27) |
+| Web tests | `php artisan test` (PHP 8.4.0 local, SQLite): 33 passed, 82 assertions (S27) — first web baseline |
+| Total tests | 655 (622 .NET + 33 web), all green |
 | Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` (Applied on SQLEXPRESS and LocalDB) |
 
 ## State of the work
 
-**Completed in this session (S26):**
+**Completed in this session (S27, local):**
 
-1. **R0.1 — baseline git state (done, by static analysis).** The cloud session had no shell on the dev
-   machine, so `git` could not be run. Instead `.git/index`, `.git/refs` and `.git/logs/HEAD` were read
-   directly and all 566 tracked files were compared against their recorded blob (size, mtime, then SHA-1
-   for every candidate). Result:
-   - `main` = `13ec3c60dbd10f996b31b4e8b1a11e48ac8b7b32`, identical to `origin/main` as last fetched
-     2026-11-05 — **nothing unpushed**.
-   - Modified, not staged: `docs/SESSION_HANDOFF.md` only.
-   - Untracked: `docs/REMEDIATION_PLAN.md` only. Everything else untracked is git-ignored
-     (`artifacts/`, `dist/`, `graphify-out/`, `.vs/`).
-   - **Correction to REMEDIATION_PLAN.md §1:** the plan expects uncommitted S25 changes in
-     `IssueQrDialog.cs`, `GiftQrDialog.cs` and `Strings.resx`. They are **not** modified. Their mtimes are
-     24 minutes newer than the commit, but their contents are byte-identical to the committed blobs (a
-     build/restore touched them). The same holds for `Strings.Designer.cs`. All S25 work is committed and
-     pushed in `13ec3c6`.
-   - Caveat: `origin/main` is the last-fetched value; no `git fetch` was possible. Confirm with a fetch.
-   - Osama's decision: commit `docs/SESSION_HANDOFF.md` and `docs/REMEDIATION_PLAN.md` on
-     `phase/r0-baseline`, not on `main`.
-2. **R0.3 — Phase R added to `docs/ROADMAP.md`** (R0–R9, all tasks, R6.7 struck through as cancelled by
-   Q-R5). The plan's §2.2 questions were put to Osama; the plan's documented defaults apply to any he
-   leaves unanswered.
-3. **R0.4 — `web/` CI workflow written**, but parked at `docs/_R0.4-web-workflow.yml` because
-   `.github/workflows/` is write-protected for remote file tools. It is a separate `web.yml` (ubuntu-latest,
-   PHP 8.3 with pdo_sqlite, composer install with a vendor cache, `npm ci && npm run build` so Inertia
-   feature tests resolve the Vite manifest, `php artisan test`, Laravel logs uploaded on failure). It
-   skips cleanly if `web/composer.json` is absent, mirroring `build.yml`'s solution check.
-   **First action next session:** `git mv`/move it to `.github/workflows/web.yml` and delete the parked copy.
-4. **Convenience script `scripts/r0-baseline.ps1`** — runs the whole AGENTS.md §1.1 step 3 sequence
-   (fetch, status, log, build, unit tests, integration tests, `php artisan test`) and writes everything to
-   `docs/_r0-baseline.log` (git-ignored by `*.log`). Read-only; it commits nothing. Keep it if useful,
-   delete it otherwise — it is not referenced by any doc.
+1. R0.1 confirmed by a real `git fetch`: `main` == `origin/main` == `13ec3c6`.
+2. R0.2 baseline recorded in the Snapshot (655 tests green, 16 known NuGet audit warnings).
+3. R0.3 (done in S26) and the plan/handoff committed on `phase/r0-baseline`.
+4. R0.4 `.github/workflows/web.yml` added. Its first CI run is on the PR.
+5. PR `phase/r0-baseline` → `main` opened. Osama reviews and merges.
 
-**Uncommitted state of the tree as S26 ended** (nothing was committed; `main` is still at `13ec3c6`):
-
-| File | State | From |
-|---|---|---|
-| `docs/REMEDIATION_PLAN.md` | untracked | review session 2026-11-12 |
-| `docs/SESSION_HANDOFF.md` | modified | review session + S26 |
-| `docs/ROADMAP.md` | modified | S26 — Phase R task list (R0.3) |
-| `docs/_R0.4-web-workflow.yml` | untracked | S26 — move to `.github/workflows/web.yml` (R0.4) |
-| `scripts/r0-baseline.ps1` | untracked | S26 — optional helper |
-
-Osama approved committing these on `phase/r0-baseline`, **not** on `main`.
+S26 (cloud, no shell) did R0.1 by static analysis and R0.3; see the S26 log entry.
 
 **In progress**
-- R0 is not finished. Outstanding: R0.2 (needs a shell), R0.4 file placement, the commit, and the PR.
-
+- None. R0 is complete pending PR review and green CI on both workflows.
 **Not started / Future**
 - F2 Electronic gate (deferred by client; SPEC §9 F2).
 
@@ -79,21 +44,11 @@ A cloud session reaches the folder through the desktop app's file tools only: it
 or `php`, and the platform grants terminals in click-only mode, so it cannot drive one through computer use
 either. `.github/` is write-protected for remote tools as well. S26 hit all three limits.
 
-Finish R0, in this order:
-
-1. `git fetch origin` and confirm `main` still equals `origin/main` (S26 could not fetch).
-2. `git checkout -b phase/r0-baseline`, then commit the two files Osama approved:
-   `docs/SESSION_HANDOFF.md`, `docs/REMEDIATION_PLAN.md`, plus `docs/ROADMAP.md` (changed in S26).
-   Suggested subject: `docs: add remediation plan and phase R roadmap [R0.1][R0.3]`.
-3. **R0.2** — record the real baseline in the Snapshot table above:
-   `dotnet build ParkGate.sln -c Debug`, `dotnet test ParkGate.sln --filter "Category!=Integration"`,
-   `dotnet test ParkGate.sln --filter "Category=Integration"`, and `cd web && php artisan test`.
-   The web suite has never been baselined; if it is red, fix it before R1 (AGENTS.md §1.1.3).
-4. **R0.4** — move `docs/_R0.4-web-workflow.yml` to `.github/workflows/web.yml` (delete the parked copy),
-   then confirm both workflows go green on the branch. If the web suite needs no built assets, the
-   Node and "Build assets" steps can be dropped to save about a minute per run.
-5. Open the PR for `phase/r0-baseline` → `main` using `.github/pull_request_template.md`. Do not merge.
-6. Then R1 (web security) on `phase/r1-web-security`.
+1. Check the R0 PR: both `build` and `web` workflows green. If `web` is red, fix it on `phase/r0-baseline`.
+   If the web suite needs no built assets, the Node and "Build assets" steps can be dropped.
+2. After Osama merges R0: R1 (web security) on `phase/r1-web-security`, starting with R1.1.
+3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
+   dedicated `chore` commit, or do it in R9.
 
 Carried over from S25 (do it when a printer is available; it does not block Phase R):
 - Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
@@ -101,7 +56,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **R0.2 and every commit/PR in Phase R need a shell on the dev machine.** Run Phase R sessions locally.
+- R0 PR review and merge (Osama).
+- Untracked `Claude outputs/web.yml` (duplicate) and `scripts/r0-baseline.ps1`: delete or keep?
 - Open confirmations (the plan's documented defaults apply if unanswered): §2.2 — Q-R3 (who creates web
   dashboard users), Q-R4b (remaining glossary terms), Q-R6 (desk PC count, workgroup vs domain),
   Q-R7 (lowest desk resolution). None of them block R0; they block R1.1, R7.1, R6.5 and R5.8.
@@ -111,6 +67,26 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S27 — 2026-11-13 — Phase R0 completed (local session)
+- `git fetch origin`: `main` == `origin/main` == `13ec3c6`, nothing unpushed. S26's static result confirmed.
+- Created `phase/r0-baseline`; committed the remediation plan, roadmap Phase R and handoff [R0.1][R0.3].
+- R0.2 baseline (all green): build 0 errors / 16 NU190x warnings; 588 unit + 34 integration; web 33.
+- R0.4: moved `docs/_R0.4-web-workflow.yml` to `.github/workflows/web.yml` (the parked file was untracked,
+  so a plain move + `git add`, not `git mv`).
+- **Line-ending trap for manual verification.** `GiftQrDialog.cs`, `IssueQrDialog.cs`, `Strings.resx` and
+  `Strings.Designer.cs` have the same content as their blobs, but SHA-1 over the raw bytes shows a false
+  difference in three of them. Cause: `.gitattributes` sets `*.cs`/`*.resx` `text eol=crlf`, so the blob
+  is normalized to LF while the working file is CRLF, and the index records the working-file size, not the
+  blob size. Any future manual hash check must normalize CRLF→LF before hashing (or use
+  `git hash-object`, which applies the filters).
+- `git ls-files --eol` (S27) shows more than S26 assumed: `IssueQrDialog.cs` is `w/lf` (pure LF, 193 lines)
+  despite `eol=crlf`; `GiftQrDialog.cs` (16 LF), `Strings.resx` (3 LF) and `Strings.Designer.cs` (1 LF)
+  are `w/mixed`. Git reports them clean now, but the first save from Visual Studio will likely show a
+  whole-file diff for `IssueQrDialog.cs`. Fix: `git rm --cached` + `git checkout` of these files (or
+  `git add --renormalize .`) in a dedicated commit; added to R9 if not done earlier.
+- Untracked, left out of the commit: `Claude outputs/web.yml` (byte-identical duplicate of the workflow)
+  and `scripts/r0-baseline.ps1` (optional helper). Osama to decide: delete or keep.
 
 ### S26 — 2026-11-13 — Phase R0 (partial): git baseline, roadmap, web CI
 - No shell available (cloud session). Derived `git status` from `.git/index` + SHA-1 of all 566 tracked

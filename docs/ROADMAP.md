@@ -147,10 +147,10 @@ Source: full code review 2026-11-12. Work R0 → R9 in order, one phase per bran
 Task detail, findings and the test-first requirement for each task live in `docs/REMEDIATION_PLAN.md` — this list is only the tracker.
 
 ### R0 — Baseline and safety net · branch `phase/r0-baseline`
-- [ ] R0.1 `git status` / `git log origin/main..main`; report uncommitted or unpushed work and stop for a decision
-- [ ] R0.2 Record the baseline (`dotnet build`, unit tests, LocalDB integration tests, `php artisan test`) in `SESSION_HANDOFF.md`
-- [ ] R0.3 Add Phase R to this roadmap; ask the open questions in the plan's §2.2
-- [ ] R0.4 CI job for `web/` (`composer install`, `php artisan test`)
+- [x] R0.1 `git status` / `git log origin/main..main`; report uncommitted or unpushed work and stop for a decision
+- [x] R0.2 Record the baseline (`dotnet build`, unit tests, LocalDB integration tests, `php artisan test`) in `SESSION_HANDOFF.md`
+- [x] R0.3 Add Phase R to this roadmap; ask the open questions in the plan's §2.2
+- [x] R0.4 CI job for `web/` (`composer install`, `php artisan test`)
 
 ### R1 — Web security (critical) · branch `phase/r1-web-security`
 - [ ] R1.1 Remove public self-registration; add admin-only user creation command
