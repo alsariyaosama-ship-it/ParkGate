@@ -57,7 +57,10 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ## Blockers / waiting on the user
 
 - R0 PR review and merge (Osama).
-- Untracked `Claude outputs/web.yml` (duplicate) and `scripts/r0-baseline.ps1`: delete or keep?
+- Untracked `scripts/r0-baseline.ps1`: delete or keep? (The duplicate `Claude outputs/web.yml` was deleted.)
+- **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
+  while `composer.json` still says `^8.3`. CI now uses PHP 8.4. Confirm the cPanel host offers PHP 8.4
+  before R8.5, and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
 - Open confirmations (the plan's documented defaults apply if unanswered): §2.2 — Q-R3 (who creates web
   dashboard users), Q-R4b (remaining glossary terms), Q-R6 (desk PC count, workgroup vs domain),
   Q-R7 (lowest desk resolution). None of them block R0; they block R1.1, R7.1, R6.5 and R5.8.
