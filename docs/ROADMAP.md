@@ -141,6 +141,111 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 ---
 
+## Phase R — Remediation · see `docs/REMEDIATION_PLAN.md`
+
+Source: full code review 2026-11-12. Work R0 → R9 in order, one phase per branch and PR.
+Task detail, findings and the test-first requirement for each task live in `docs/REMEDIATION_PLAN.md` — this list is only the tracker.
+
+### R0 — Baseline and safety net · branch `phase/r0-baseline`
+- [ ] R0.1 `git status` / `git log origin/main..main`; report uncommitted or unpushed work and stop for a decision
+- [ ] R0.2 Record the baseline (`dotnet build`, unit tests, LocalDB integration tests, `php artisan test`) in `SESSION_HANDOFF.md`
+- [ ] R0.3 Add Phase R to this roadmap; ask the open questions in the plan's §2.2
+- [ ] R0.4 CI job for `web/` (`composer install`, `php artisan test`)
+
+### R1 — Web security (critical) · branch `phase/r1-web-security`
+- [ ] R1.1 Remove public self-registration; add admin-only user creation command
+- [ ] R1.2 Remove the hardcoded default sync API key; add a key-generation command
+- [ ] R1.3 Remove the committed `APP_KEY` from `.env.production.example`
+- [ ] R1.4 Guard the seeder's default admin to local/testing environments
+- [ ] R1.5 Remove `web/fix-permissions.php` and its references
+- [ ] R1.6 Sync API: no internals in responses, no personal data in logs, throttle, payload validation
+- [ ] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
+- [ ] R1.8 Test that no web response, view or model exposes `phone` or `national_id`
+
+### R2 — Sync correctness · branch `phase/r2-sync`
+- [ ] R2.6 Phone and national ID never leave the park (do this task first in R2)
+- [ ] R2.1 Fix double encryption after a failed push; make the outbox payload immutable
+- [ ] R2.2 Order and deduplicate the outbox by a DB `Sequence`, not client clocks
+- [ ] R2.3 Last-line guard in `CloudPushService` against sensitive fields and non-HTTPS base URLs
+- [ ] R2.4 Sort cloud ingestion records by dependency (parent before child)
+- [ ] R2.5 Report poison outbox rows in the heartbeat, dashboard and desk status bar
+- [ ] R2.7 Sync gift vouchers and the new organization / age-category fields
+- [ ] R2.8 Fix dashboard counts (timezone, Overridden, voided, aggregate in SQL)
+- [ ] R2.9 MySQL parity: CI run against MySQL 8; generate `mysql_schema.sql` from the migrations
+
+### R3 — Desktop Application and Infrastructure · branch `phase/r3-application`
+- [ ] R3.1 Today's totals must not be capped at 50 attempts — add an aggregate query
+- [ ] R3.2 Replace trusted `SupervisorUserId` with short-lived single-use approval tokens
+- [ ] R3.3 Remove the silent `?? 1` / `?? 0` user and workstation id fallbacks
+- [ ] R3.4 Serialize audit JSON with `System.Text.Json`, not string interpolation
+- [ ] R3.5 Write audit rows inside the same unit of work, before commit
+- [ ] R3.6 Use the cached `ISettingsService` instead of four queries inside the locked transaction
+- [ ] R3.7 Card expiry from the DB clock, not the client clock (BR-05)
+- [ ] R3.8 Card lookup across organizations with a flag, instead of "not registered"
+- [ ] R3.9 Return `NextEligibleAtUtc` and remaining minutes instead of integer-divided hours
+
+### R4 — Desk UI defects · branch `phase/r4-desk-ui`
+- [ ] R4.1 `BusyScope` must restore each control's previous `Enabled` state
+- [ ] R4.2 Do not lose a scan during the success delay; queue lookups instead of dropping them
+- [ ] R4.3 Organization combo in the inline registration panel (required)
+- [ ] R4.4 Amber banner when the card is registered under another organization
+- [ ] R4.5 Confirm before Esc discards a half-filled registration form
+- [ ] R4.6 Designer-backed `SelectOrganizationDialog` with Accept/Cancel buttons
+- [ ] R4.7 No raw exception text in front of the operator (11 places)
+- [ ] R4.8 Move the 94 hardcoded Arabic literals to `Strings.resx`; add an architecture test
+- [ ] R4.9 Remove the fallback age categories with invented ids
+- [ ] R4.10 Warn once when the Cairo font family is not installed system-wide
+
+### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
+- [ ] R5.1 Show the remaining time on denial (SPEC A3)
+- [ ] R5.2 Banner instead of a message box after registration
+- [ ] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
+- [ ] R5.4 Keyboard access to the companion counters
+- [ ] R5.5 Mark companion counts prefilled from the last visit
+- [ ] R5.6 Visible «إلغاء العملية…» button above the today grid
+- [ ] R5.7 Distinct success and denial sounds, with separate settings
+- [ ] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
+- [ ] R5.9 Fix amber banner contrast (below 4.5:1)
+- [ ] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
+
+### R6 — Database design · branch `phase/r6-database`
+- [ ] R6.1 Bring the entry-card tables under EF migrations; remove the runtime initializer
+- [ ] R6.2 Fix convention drift in those tables (`WorkstationId` FK, `IX_CardScanLog_CardId`)
+- [ ] R6.3 Audit columns from the database clock, not the client clock (BR-05)
+- [ ] R6.4 Bring `DATABASE.md` up to the model; test the documented table list against it
+- [ ] R6.5 Least-privilege `parkgate_app` login; restrict the firewall rules — blocked on Q-R6
+- [ ] R6.6 Re-measure the `LIKE '%term%'` name search at 100 000 holders
+- [ ] R6.7 ~~Business-day cutoff~~ — cancelled (Q-R5): the park closes at midnight
+- [ ] R6.8 Database size warning on the Admin backup screen; propose a retention policy
+- [ ] R6.9 ACL-restricted backup folder; document an encrypted off-site copy
+- [ ] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
+
+### R7 — Wording and visual consistency · branch `phase/r7-consistency`
+- [ ] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b
+- [ ] R7.2 One type scale mapped to `Theme` (Caption 9, Body 10, Section 12, Title 14, Banner 20)
+- [ ] R7.3 One neutral palette; test against `Color.FromArgb` literals outside `Theme.cs`
+- [ ] R7.4 Dialog conventions: `AcceptButton`, `CancelButton`, tab order, `Theme` button styles
+- [ ] R7.5 Web UI: same glossary, park-local times, empty states, no phone or national ID
+
+### R8 — Build, packaging and deployment · branch `phase/r8-release`
+- [ ] R8.1 Fix the doubled backslash in the published `appsettings.json` server path
+- [ ] R8.2 Re-enable the NuGet vulnerability audit; pin `System.Security.Cryptography.Pkcs`
+- [ ] R8.3 Store the Sync Agent cloud API key DPAPI-protected, with a CLI switch to set it
+- [ ] R8.4 Rebuild the release as `v1.1.0`; delete the stale `artifacts/efbundle.exe`
+- [ ] R8.5 cPanel as the only web deployment path; write `docs/DEPLOYMENT_WEB_CPANEL.md` (Q-R1)
+- [ ] R8.6 "Upgrade from 1.0.0" section in `docs/DEPLOYMENT.md`
+
+### R9 — Documentation sync · branch `phase/r9-docs`
+- [ ] R9.1 `SPEC.md`: F1 as built, F3/F4/F5 rules, the A5/BR-11 mismatch, close answered questions
+- [ ] R9.2 `DECISIONS.md`: supersede ADR-013; new ADRs for R2.1, R2.2, R3.2, R6.1, R6.5
+- [ ] R9.3 `AGENTS.md` (needs Osama's approval): project count, web test command, UI test location
+- [ ] R9.4 `USER_GUIDE_AR.md` and `TEST_SCRIPT.md`: new shortcuts, registration, void button, glossary
+- [ ] R9.5 `SESSION_HANDOFF.md`: final state, known issues, next steps
+
+**Done when:** R0–R9 are ticked, every phase PR is merged, and the acceptance line at the end of each phase in `docs/REMEDIATION_PLAN.md` holds.
+
+---
+
 ## Future (do not start without explicit approval)
 - **F2 Electronic gate** — deferred by the client; decide Q11 when scheduled; `IGateController`; `ParkGate.GateService` host. (SPEC §9 F2)
 
