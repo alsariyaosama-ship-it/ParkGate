@@ -314,7 +314,6 @@ partial class AgeCategoriesForm
         this.Controls.Add(this._pnlFooter);
         this.Controls.Add(this._pnlToolbar);
         this.Controls.Add(this._pnlHeader);
-        this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.MinimumSize = new System.Drawing.Size(700, 420);
         this.Name = "AgeCategoriesForm";
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
