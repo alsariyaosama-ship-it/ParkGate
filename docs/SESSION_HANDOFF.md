@@ -51,7 +51,7 @@
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
 1. Check the R1 PR: `build` and `web` green. After Osama merges, start R2 on `phase/r2-sync`.
-2. R2 order: **R2.6 first** (needs Q-R2b answered: keep `Notes`/`StatusReason` local?), then **R1.8**
+2. R2 order: **R2.6 first** (Q-R2b: `Notes`/`StatusReason` keep syncing), then **R1.8**
    (the exposure test), then R2.1 onward.
 3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
    dedicated `chore` commit, or do it in R9.
@@ -63,7 +63,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ## Blockers / waiting on the user
 
 - R1 PR review and merge (Osama).
-- **Q-R2b** — keep `Notes` and `StatusReason` local too (recommended: yes). Blocks R2.6.
+- Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
+  and `NationalId`. R2.6 is unblocked.
 - Q-R3 answered 2026-11-13: users are created with `parkgate:create-user` from the cPanel Terminal.
 - Osama's local `web/.env` still holds the old default sync key and the `APP_KEY` that was published in
   `.env.production.example` (R1.3). Harmless for dev; regenerate both (`key:generate`,
