@@ -15,7 +15,7 @@ class SyncApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected string $apiKey = 'parkgate-cloud-secret-key-2026';
+    protected string $apiKey = 'test-sync-api-key';
     // 32-byte key in Base64: 32 bytes of 'k'
     protected string $aesKey = 'a2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2s=';
 

@@ -154,7 +154,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 
 ### R1 — Web security (critical) · branch `phase/r1-web-security`
 - [x] R1.1 Remove public self-registration; add admin-only user creation command
-- [ ] R1.2 Remove the hardcoded default sync API key; add a key-generation command
+- [x] R1.2 Remove the hardcoded default sync API key; add a key-generation command
 - [ ] R1.3 Remove the committed `APP_KEY` from `.env.production.example`
 - [ ] R1.4 Guard the seeder's default admin to local/testing environments
 - [ ] R1.5 Remove `web/fix-permissions.php` and its references

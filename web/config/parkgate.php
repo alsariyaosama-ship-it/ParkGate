@@ -1,6 +1,8 @@
 <?php
 
 return [
-    'api_key' => env('PARKGATE_API_KEY', 'parkgate-cloud-secret-key-2026'),
+    // R1.2: no default. VerifySyncApiKey rejects every request when this is empty.
+    // Generate a value with `php artisan parkgate:generate-key`.
+    'api_key' => env('PARKGATE_API_KEY'),
     'aes_key' => env('PARKGATE_AES_KEY', null),
 ];
