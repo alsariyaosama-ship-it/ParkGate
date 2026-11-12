@@ -56,7 +56,10 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- R0 PR review and merge (Osama).
+- Q-R3 / R1.1 hosting (answered 2026-11-13): the cPanel host has a Terminal, so
+  `php artisan parkgate:create-user` is the only way to create users. No one-time setup route is needed.
+- Osama's local `web/.env` still holds the old default sync key (30 chars). This is harmless for dev,
+  but replace it with `php artisan parkgate:generate-key` and the matching Sync Agent `CloudApi:ApiKey`.
 - Untracked `scripts/r0-baseline.ps1`: delete or keep? (The duplicate `Claude outputs/web.yml` was deleted.)
 - **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
   while `composer.json` still says `^8.3`. CI now uses PHP 8.4. Confirm the cPanel host offers PHP 8.4
