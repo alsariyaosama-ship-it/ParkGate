@@ -159,7 +159,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R1.4 Guard the seeder's default admin to local/testing environments
 - [x] R1.5 Remove `web/fix-permissions.php` and its references
 - [x] R1.6 Sync API: no internals in responses, no personal data in logs, throttle, payload validation
-- [ ] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
+- [x] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
 - [ ] R1.8 Test that no web response, view or model exposes `phone` or `national_id`
 
 ### R2 — Sync correctness · branch `phase/r2-sync`
