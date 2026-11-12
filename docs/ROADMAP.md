@@ -156,7 +156,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R1.1 Remove public self-registration; add admin-only user creation command
 - [x] R1.2 Remove the hardcoded default sync API key; add a key-generation command
 - [x] R1.3 Remove the committed `APP_KEY` from `.env.production.example`
-- [ ] R1.4 Guard the seeder's default admin to local/testing environments
+- [x] R1.4 Guard the seeder's default admin to local/testing environments
 - [ ] R1.5 Remove `web/fix-permissions.php` and its references
 - [ ] R1.6 Sync API: no internals in responses, no personal data in logs, throttle, payload validation
 - [ ] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
