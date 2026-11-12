@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\SyncItemException;
 use App\Models\AgeCategory;
 use App\Models\Beneficiary;
 use App\Models\EntryAttempt;
@@ -76,8 +77,13 @@ class SyncIngestionService
                     $processed++;
                 } catch (\Throwable $e) {
                     $failed++;
-                    Log::error("Failed to ingest sync item: {$e->getMessage()}", ['item' => $item]);
-                    throw $e; // rollback transaction on batch failure
+                    // R1.6: never log the item; it holds personal data. The caller logs
+                    // the entity type/id with an error id. Rethrow to roll back the batch.
+                    throw new SyncItemException(
+                        (string) ($item['entityType'] ?? 'unknown'),
+                        (string) ($item['entityId'] ?? 'unknown'),
+                        $e,
+                    );
                 }
             }
         });
