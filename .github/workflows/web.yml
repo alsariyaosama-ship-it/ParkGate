@@ -1,0 +1,91 @@
+name: web
+
+on:
+  push:
+    branches: [ main, 'phase/**', 'fix/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: web
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect web app
+        id: web
+        working-directory: .
+        run: |
+          if [ -f web/composer.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo 'web/composer.json not found - skipping web tests.'
+          fi
+
+      - name: Setup PHP
+        if: steps.web.outputs.exists == 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, fileinfo, intl, bcmath, pdo_sqlite, sqlite3
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        if: steps.web.outputs.exists == 'true'
+        uses: actions/cache@v4
+        with:
+          path: web/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('web/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install PHP dependencies
+        if: steps.web.outputs.exists == 'true'
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        if: steps.web.outputs.exists == 'true'
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # Feature tests render the Inertia root view, which resolves the Vite
+      # manifest. Build the assets so those tests do not fail on a missing
+      # manifest. Assets are not committed (web/public/build is git-ignored).
+      - name: Setup Node
+        if: steps.web.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build assets
+        if: steps.web.outputs.exists == 'true'
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+
+      - name: Test
+        if: steps.web.outputs.exists == 'true'
+        run: php artisan test
+
+      - name: Upload Laravel logs on failure
+        if: failure() && steps.web.outputs.exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: laravel-logs
+          path: web/storage/logs
+          if-no-files-found: ignore
