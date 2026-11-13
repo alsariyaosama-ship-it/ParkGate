@@ -9,6 +9,7 @@ use App\Models\EntryAttempt;
 use App\Models\EntryAttemptCompanion;
 use App\Models\GiftVoucher;
 use App\Models\Organization;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -167,8 +168,8 @@ class SyncIngestionService
                 'gift_enabled' => (bool) ($data['GiftEnabled'] ?? false),
                 'gift_value' => $data['GiftValue'] ?? 0,
                 'gift_interval_days' => $data['GiftIntervalDays'] ?? 30,
-                'created_at_utc' => $data['CreatedAtUtc'] ?? null,
-                'updated_at_utc' => $data['UpdatedAtUtc'] ?? null,
+                'created_at_utc' => self::utc($data['CreatedAtUtc'] ?? null),
+                'updated_at_utc' => self::utc($data['UpdatedAtUtc'] ?? null),
             ]
         );
     }
@@ -222,9 +223,9 @@ class SyncIngestionService
                 'status' => $data['Status'] ?? 1,
                 'status_reason' => $data['StatusReason'] ?? null,
                 'notes' => $data['Notes'] ?? null,
-                'last_granted_entry_utc' => $data['LastGrantedEntryUtc'] ?? null,
-                'created_at_utc' => $data['CreatedAtUtc'] ?? null,
-                'updated_at_utc' => $data['UpdatedAtUtc'] ?? null,
+                'last_granted_entry_utc' => self::utc($data['LastGrantedEntryUtc'] ?? null),
+                'created_at_utc' => self::utc($data['CreatedAtUtc'] ?? null),
+                'updated_at_utc' => self::utc($data['UpdatedAtUtc'] ?? null),
             ]
         );
     }
@@ -247,12 +248,12 @@ class SyncIngestionService
             [
                 'beneficiary_id' => $data['BeneficiaryId'] ?? null,
                 'organization_id' => $data['OrganizationId'] ?? null,
-                'attempted_at_utc' => $data['AttemptedAtUtc'] ?? now(),
+                'attempted_at_utc' => self::utc($data['AttemptedAtUtc'] ?? null) ?? now(),
                 'business_date' => $data['BusinessDate'] ?? now()->toDateString(),
                 'result' => $data['Result'] ?? 1,
                 'denial_reason' => $data['DenialReason'] ?? null,
                 'cooldown_minutes_applied' => $data['CooldownMinutesApplied'] ?? 0,
-                'next_eligible_at_utc' => $data['NextEligibleAtUtc'] ?? null,
+                'next_eligible_at_utc' => self::utc($data['NextEligibleAtUtc'] ?? null),
                 'total_persons' => $data['TotalPersons'] ?? 1,
                 'channel' => $data['Channel'] ?? 1,
                 'workstation_id' => $data['WorkstationId'] ?? null,
@@ -260,10 +261,10 @@ class SyncIngestionService
                 'override_by_user_id' => $data['OverrideByUserId'] ?? null,
                 'override_reason' => $data['OverrideReason'] ?? null,
                 'is_voided' => (bool) ($data['IsVoided'] ?? false),
-                'voided_at_utc' => $data['VoidedAtUtc'] ?? null,
+                'voided_at_utc' => self::utc($data['VoidedAtUtc'] ?? null),
                 'voided_by_user_id' => $data['VoidedByUserId'] ?? null,
                 'void_reason' => $data['VoidReason'] ?? null,
-                'created_at_utc' => $data['CreatedAtUtc'] ?? null,
+                'created_at_utc' => self::utc($data['CreatedAtUtc'] ?? null),
             ]
         );
     }
@@ -315,7 +316,7 @@ class SyncIngestionService
                 'beneficiary_id' => $data['BeneficiaryId'] ?? null,
                 'organization_id' => $data['OrganizationId'] ?? null,
                 'value' => $data['Value'] ?? 0,
-                'issued_at_utc' => $data['IssuedAtUtc'] ?? null,
+                'issued_at_utc' => self::utc($data['IssuedAtUtc'] ?? null),
                 'business_date' => $data['BusinessDate'] ?? now()->toDateString(),
                 'expires_on' => $data['ExpiresOn'] ?? ($data['BusinessDate'] ?? now()->toDateString()),
                 'status' => $data['Status'] ?? 1,
@@ -324,14 +325,28 @@ class SyncIngestionService
                 'is_override' => (bool) ($data['IsOverride'] ?? false),
                 'override_by_user_id' => $data['OverrideByUserId'] ?? null,
                 'override_reason' => $data['OverrideReason'] ?? null,
-                'redeemed_at_utc' => $data['RedeemedAtUtc'] ?? null,
+                'redeemed_at_utc' => self::utc($data['RedeemedAtUtc'] ?? null),
                 'redeemed_business_date' => $data['RedeemedBusinessDate'] ?? null,
                 'redeemed_by_user_id' => $data['RedeemedByUserId'] ?? null,
                 'redeemed_workstation_id' => $data['RedeemedWorkstationId'] ?? null,
-                'voided_at_utc' => $data['VoidedAtUtc'] ?? null,
+                'voided_at_utc' => self::utc($data['VoidedAtUtc'] ?? null),
                 'voided_by_user_id' => $data['VoidedByUserId'] ?? null,
                 'void_reason' => $data['VoidReason'] ?? null,
             ]
         );
+    }
+
+    /**
+     * Normalizes an ISO-8601 instant from the agent ("...T10:15:30.1234567Z" or with an offset)
+     * to UTC, so MySQL strict mode accepts it and an offset is never read as UTC wall time (R2.9).
+     * An unparseable value throws, which rejects the batch like any other malformed item.
+     */
+    private static function utc(mixed $value): ?CarbonImmutable
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return CarbonImmutable::parse((string) $value)->utc();
     }
 }
