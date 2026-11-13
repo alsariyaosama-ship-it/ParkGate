@@ -92,7 +92,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 
 ## Phase R2 — Sync correctness · branch `phase/r2-sync`
 
-- [ ] **R2.1 [Verified] Double encryption after a failed push.**
+- [x] **R2.1 [Verified] Double encryption after a failed push.**
   `OutboxProcessorWorker.ProcessBatchAsync` calls `record.UpdatePayload(encryptedPayload)` on tracked entities (`SyncOutboxRepository.GetPendingBatchAsync` does not use `AsNoTracking`). On `PayloadRejected` or `ServerError` the method ends with `SaveChangesAsync`, which persists the encrypted payload. The next cycle encrypts the fields again.
   Fix: R2.6 removes field encryption altogether (Q-R2). Do R2.6 first, then make the outbox payload immutable: remove `SyncOutbox.UpdatePayload` and send `PayloadJson` as stored.
   Test first (`OutboxProcessorWorkerTests`): push fails with 500 once, then succeeds; the stored `PayloadJson` is byte-identical before and after the failure and equals what the second request sent.

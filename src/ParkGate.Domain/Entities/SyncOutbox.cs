@@ -81,10 +81,4 @@ public sealed class SyncOutbox
             ? error[..MaxLastErrorLength]
             : error;
     }
-
-    public void UpdatePayload(string newPayloadJson)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(newPayloadJson);
-        PayloadJson = newPayloadJson;
-    }
 }

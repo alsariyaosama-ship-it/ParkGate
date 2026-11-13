@@ -270,4 +270,35 @@ public sealed class OutboxProcessorWorkerTests
 
         await _uow.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task ProcessBatchAsync_AfterServerErrorThenSuccess_SendsTheStoredPayloadUnchangedBothTimes()
+    {
+        const string storedPayload = "{\"Id\":\"A\",\"FullName\":\"سالم\",\"Status\":1}";
+        var record = SyncOutbox.Create("Beneficiary", "ID-1", "Insert", storedPayload, DateTime.UtcNow);
+
+        _outboxRepo.GetPendingBatchAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SyncOutbox> { record });
+
+        var sentPayloads = new List<string>();
+        _pushService.PushBatchAsync(Arg.Do<IReadOnlyList<SyncOutbox>>(b => sentPayloads.Add(b[0].PayloadJson)), Arg.Any<CancellationToken>())
+            .Returns(
+                PushBatchResult.Failure(PushFailureKind.ServerError, "500 Server Error"),
+                PushBatchResult.Success());
+
+        var worker = new OutboxProcessorWorker(
+            _uowFactory,
+            _pushService,
+            _optionsMonitor,
+            NullLogger<OutboxProcessorWorker>.Instance);
+
+        await worker.ProcessBatchAsync(_optionsMonitor.CurrentValue, CancellationToken.None);
+        var storedAfterFailure = record.PayloadJson;
+        await worker.ProcessBatchAsync(_optionsMonitor.CurrentValue, CancellationToken.None);
+
+        storedAfterFailure.ShouldBe(storedPayload);
+        sentPayloads.Count.ShouldBe(2);
+        sentPayloads.ShouldAllBe(p => p == storedPayload);
+        record.RetryCount.ShouldBe(1);
+    }
 }

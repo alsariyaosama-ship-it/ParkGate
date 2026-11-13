@@ -62,12 +62,11 @@ public sealed class SyncOutboxTests
     }
 
     [Fact]
-    public void UpdatePayload_WithValidJson_UpdatesPayload()
+    public void PayloadJson_HasNoPublicWayToChangeItAfterCreation()
     {
-        var outbox = SyncOutbox.Create("Beneficiary", "1", "Update", "{\"a\":1}", DateTime.UtcNow);
-        outbox.UpdatePayload("{\"a\":2}");
-
-        outbox.PayloadJson.ShouldBe("{\"a\":2}");
+        // R2.1: the payload is sent exactly as stored, so a retry can never double-transform it.
+        typeof(SyncOutbox).GetProperty(nameof(SyncOutbox.PayloadJson))!.SetMethod!.IsPublic.ShouldBeFalse();
+        typeof(SyncOutbox).GetMethods().ShouldNotContain(m => m.Name == "UpdatePayload");
     }
 
     [Theory]
