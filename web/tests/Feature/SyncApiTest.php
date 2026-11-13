@@ -16,14 +16,11 @@ class SyncApiTest extends TestCase
     use RefreshDatabase;
 
     protected string $apiKey = 'test-sync-api-key';
-    // 32-byte key in Base64: 32 bytes of 'k'
-    protected string $aesKey = 'a2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2s=';
 
     protected function setUp(): void
     {
         parent::setUp();
         config(['parkgate.api_key' => $this->apiKey]);
-        config(['parkgate.aes_key' => $this->aesKey]);
     }
 
     public function test_push_requires_api_key(): void
@@ -49,12 +46,6 @@ class SyncApiTest extends TestCase
 
     public function test_push_ingests_organization_and_beneficiary(): void
     {
-        // Encrypt phone '0912345678' with AES-256-CBC matching AesHelper format
-        $keyBytes = base64_decode($this->aesKey);
-        $iv = random_bytes(16);
-        $cipher = openssl_encrypt('0912345678', 'AES-256-CBC', $keyBytes, OPENSSL_RAW_DATA, $iv);
-        $encryptedPhone = base64_encode($iv . $cipher);
-
         $records = [
             [
                 'id' => 1,
@@ -93,8 +84,6 @@ class SyncApiTest extends TestCase
                     'OrganizationId' => 10,
                     'CardNumber' => 'CARD-1234',
                     'FullName' => 'محمد أحمد علي',
-                    'Phone' => $encryptedPhone,
-                    'NationalId' => null,
                     'Status' => 1,
                 ]),
             ],
@@ -136,12 +125,11 @@ class SyncApiTest extends TestCase
             'name_ar' => 'أطفال',
         ]);
 
-        // Beneficiary should exist with phone decrypted
+        // Beneficiary should exist (phone and national ID are never stored: Q-R2)
         $this->assertDatabaseHas('beneficiaries', [
             'id' => '99999999-9999-9999-9999-999999999999',
             'card_number' => 'CARD-1234',
             'full_name' => 'محمد أحمد علي',
-            'phone' => '0912345678',
         ]);
 
         $this->assertDatabaseHas('entry_attempts', [
@@ -153,7 +141,7 @@ class SyncApiTest extends TestCase
         $this->assertDatabaseCount('sync_batches', 1);
     }
 
-    public function test_push_with_corrupt_encrypted_field_returns_422(): void
+    public function test_push_with_non_object_payload_returns_422(): void
     {
         $records = [
             [
@@ -161,12 +149,8 @@ class SyncApiTest extends TestCase
                 'entityType' => 'Beneficiary',
                 'entityId' => '99999999-9999-9999-9999-999999999999',
                 'operationType' => 'Insert',
-                'payloadJson' => json_encode([
-                    'Id' => '99999999-9999-9999-9999-999999999999',
-                    'CardNumber' => 'CARD-BAD',
-                    'FullName' => 'فاسد التشفير',
-                    'Phone' => 'not-valid-base64-ciphertext-!!!',
-                ]),
+                // Valid JSON, but not an object: the item is rejected (422), never silently skipped.
+                'payloadJson' => json_encode('not an object'),
             ],
         ];
 

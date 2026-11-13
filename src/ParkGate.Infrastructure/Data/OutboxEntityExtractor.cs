@@ -19,6 +19,19 @@ public static class OutboxEntityExtractor
         nameof(AgeCategory)
     };
 
+    /// <summary>
+    /// Properties that must never leave the park (Q-R2). The cloud does not store phone numbers
+    /// or national IDs, so they are excluded from the payload instead of being encrypted.
+    /// </summary>
+    private static readonly Dictionary<string, HashSet<string>> ExcludedProperties = new(StringComparer.Ordinal)
+    {
+        [nameof(Beneficiary)] = new(StringComparer.Ordinal)
+        {
+            nameof(Beneficiary.Phone),
+            nameof(Beneficiary.NationalId)
+        }
+    };
+
     public static bool IsSyncable(string entityTypeName) => SyncableTypes.Contains(entityTypeName);
 
     public static string ExtractEntityId(EntityEntry entry)
@@ -44,9 +57,11 @@ public static class OutboxEntityExtractor
     public static string SerializePayload(EntityEntry entry)
     {
         var dict = new Dictionary<string, object?>(StringComparer.Ordinal);
+        ExcludedProperties.TryGetValue(entry.Metadata.ClrType.Name, out var excluded);
+
         foreach (var prop in entry.Properties)
         {
-            if (prop.Metadata.IsShadowProperty())
+            if (prop.Metadata.IsShadowProperty() || (excluded?.Contains(prop.Metadata.Name) ?? false))
             {
                 continue;
             }

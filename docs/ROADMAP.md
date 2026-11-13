@@ -163,7 +163,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R1.8 Test that no web response, view or model exposes `phone` or `national_id` — **deferred: do it right after R2.6** (the web still stores and shows both fields until R2.6 removes them)
 
 ### R2 — Sync correctness · branch `phase/r2-sync`
-- [ ] R2.6 Phone and national ID never leave the park (do this task first in R2)
+- [x] R2.6 Phone and national ID never leave the park (do this task first in R2)
 - [ ] R2.1 Fix double encryption after a failed push; make the outbox payload immutable
 - [ ] R2.2 Order and deduplicate the outbox by a DB `Sequence`, not client clocks
 - [ ] R2.3 Last-line guard in `CloudPushService` against sensitive fields and non-HTTPS base URLs

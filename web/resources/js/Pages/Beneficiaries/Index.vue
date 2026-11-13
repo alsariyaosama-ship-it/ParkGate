@@ -94,8 +94,6 @@ const resetFilters = () => {
                             <th class="p-4">رقم البطاقة</th>
                             <th class="p-4">الاسم الكامل</th>
                             <th class="p-4">الجهة الراعية</th>
-                            <th class="p-4">رقم الهاتف</th>
-                            <th class="p-4">الرقم الوطني</th>
                             <th class="p-4 text-center">الحالة</th>
                             <th class="p-4">آخر دخول</th>
                         </tr>
@@ -105,8 +103,6 @@ const resetFilters = () => {
                             <td class="p-4 font-mono font-bold text-slate-800 dark:text-slate-200">{{ b.card_number }}</td>
                             <td class="p-4 font-bold text-slate-900 dark:text-white">{{ b.full_name }}</td>
                             <td class="p-4 text-slate-600 dark:text-slate-300">{{ b.organization_name }}</td>
-                            <td class="p-4 font-mono text-slate-600 dark:text-slate-400">{{ b.phone ?? '—' }}</td>
-                            <td class="p-4 font-mono text-slate-600 dark:text-slate-400">{{ b.national_id ?? '—' }}</td>
                             <td class="p-4 text-center">
                                 <span v-if="b.status === 1" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">نشط</span>
                                 <span v-else-if="b.status === 2" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">موقوف</span>
@@ -115,7 +111,7 @@ const resetFilters = () => {
                             <td class="p-4 font-mono text-slate-500">{{ b.last_entry ?? 'لم يدخل بعد' }}</td>
                         </tr>
                         <tr v-if="beneficiaries.data.length === 0">
-                            <td colspan="7" class="p-8 text-center text-slate-400 text-xs">لا توجد بيانات مطابقة لخيارات البحث.</td>
+                            <td colspan="5" class="p-8 text-center text-slate-400 text-xs">لا توجد بيانات مطابقة لخيارات البحث.</td>
                         </tr>
                     </tbody>
                 </table>

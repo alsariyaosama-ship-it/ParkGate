@@ -16,15 +16,12 @@ public sealed class OutboxProcessorWorkerTests
     private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
     private readonly ISyncOutboxRepository _outboxRepo = Substitute.For<ISyncOutboxRepository>();
     private readonly ICloudPushService _pushService = Substitute.For<ICloudPushService>();
-    private readonly IPayloadEncryptionService _encryptionService = Substitute.For<IPayloadEncryptionService>();
     private readonly IOptionsMonitor<SyncOptions> _optionsMonitor = Substitute.For<IOptionsMonitor<SyncOptions>>();
 
     public OutboxProcessorWorkerTests()
     {
         _uow.SyncOutboxes.Returns(_outboxRepo);
         _uowFactory.Create().Returns(_uow);
-        _encryptionService.EncryptSensitiveFields(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(x => (string)x[1]);
         _optionsMonitor.CurrentValue.Returns(new SyncOptions
         {
             Enabled = true,
@@ -52,7 +49,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -80,7 +76,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -115,7 +110,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -153,7 +147,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -202,7 +195,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -236,7 +228,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -262,7 +253,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 

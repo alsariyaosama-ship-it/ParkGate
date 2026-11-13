@@ -36,8 +36,6 @@ return new class extends Migration
             $table->unsignedInteger('organization_id')->nullable()->index();
             $table->string('card_number', 50)->index();
             $table->string('full_name', 150)->index();
-            $table->string('phone', 255)->nullable();
-            $table->string('national_id', 255)->nullable();
             $table->date('card_expiry_date')->nullable();
             $table->unsignedTinyInteger('status')->default(1)->index();
             $table->string('status_reason', 250)->nullable();

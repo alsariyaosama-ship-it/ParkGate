@@ -50,7 +50,6 @@ public static class DependencyInjection
         services.AddTransient<ParkGate.Application.Ports.EntryCards.IQrKeyRepository, ParkGate.Infrastructure.EntryCards.QrKeyRepository>();
         services.AddTransient<ParkGate.Application.Ports.EntryCards.ICardScanLog, ParkGate.Infrastructure.EntryCards.CardScanLogRepository>();
 
-        services.AddTransient<ParkGate.Application.Ports.Sync.IPayloadEncryptionService, ParkGate.Infrastructure.Sync.PayloadEncryptionService>();
         services.AddTransient<ParkGate.Application.Ports.Sync.ICloudPushService, ParkGate.Infrastructure.Sync.CloudPushService>();
 
         services.AddSingleton<ParkGate.Application.Ports.EntryCards.IQrCryptoProvider, ParkGate.Infrastructure.EntryCards.QrCryptoProvider>();

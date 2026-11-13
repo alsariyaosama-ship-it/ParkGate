@@ -79,8 +79,33 @@ public sealed class OutboxCaptureTests
         var json = OutboxEntityExtractor.SerializePayload(entry);
         json.ShouldContain("\"CardNumber\":\"CARD-999\"");
         json.ShouldContain("\"FullName\":\"أسامة علي\"");
-        json.ShouldContain("\"Phone\":\"0912345678\"");
-        json.ShouldContain("\"NationalId\":\"119901234567\"");
         json.ShouldContain("\"CardExpiryDate\":\"2027-12-31\"");
+    }
+
+    [Fact]
+    public void SerializePayload_OnBeneficiary_OmitsPhoneAndNationalId()
+    {
+        using var context = CreateContext();
+        var beneficiary = new Beneficiary(
+            id: Guid.NewGuid(),
+            organizationId: 1,
+            cardNumber: CardNumber.Create("CARD-999"),
+            fullName: "أسامة علي",
+            phone: PhoneNumber.Create("0912345678"),
+            nationalId: NationalId.Create("119901234567"),
+            cardExpiryDate: new DateOnly(2027, 12, 31),
+            notes: "ملاحظة");
+
+        var entry = context.Beneficiaries.Add(beneficiary);
+
+        var json = OutboxEntityExtractor.SerializePayload(entry);
+
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        doc.RootElement.TryGetProperty("Phone", out _).ShouldBeFalse();
+        doc.RootElement.TryGetProperty("NationalId", out _).ShouldBeFalse();
+        json.ShouldNotContain("0912345678");
+        json.ShouldNotContain("119901234567");
+        // Q-R2b: notes and status reason keep syncing.
+        doc.RootElement.GetProperty("Notes").GetString().ShouldBe("ملاحظة");
     }
 }

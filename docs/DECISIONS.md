@@ -106,14 +106,14 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 ### ADR-018 — Standalone Sync Agent Service Project (`ParkGate.SyncAgent`)
 - **Status:** Accepted
 - **Context:** Cloud dashboard synchronization (Phase F3) requires a robust background worker that pushes outbox events to the cloud API without impacting desk operator responsiveness. The user decided to adopt a standalone service application model matching the proven `HRSys.SyncAgent` pattern.
-- **Decision:** Introduce a standalone Worker Service project `src/ParkGate.SyncAgent` targeting `net10.0`. It runs as a Windows Service (via `Microsoft.Extensions.Hosting.WindowsServices`) or interactive console, reads DB connection from `%ProgramData%\ParkGate\connection.dat` (DPAPI), processes the transactional outbox table in batches, deduplicates mutations (Last-Write-Wins), encrypts sensitive beneficiary fields (AES), and pushes batches to the cloud endpoint with immediate pruning of successful records.
+- **Decision:** Introduce a standalone Worker Service project `src/ParkGate.SyncAgent` targeting `net10.0`. It runs as a Windows Service (via `Microsoft.Extensions.Hosting.WindowsServices`) or interactive console, reads DB connection from `%ProgramData%\ParkGate\connection.dat` (DPAPI), processes the transactional outbox table in batches, deduplicates mutations (Last-Write-Wins), ~~encrypts sensitive beneficiary fields (AES)~~ *(superseded by ADR-021: phone and national ID are not synced at all)*, and pushes batches to the cloud endpoint with immediate pruning of successful records.
 - **Consequences:** Increases approved production projects from 4 to 5. Decouples synchronization resilience and execution lifecycle from desk user logins.
 
 ### ADR-019 — Laravel for Cloud Web Application and Dashboard
 - **Status:** Accepted
 - **Context:** Cloud dashboard (Phase F3 / Cloud Reporting) requires a server-side web application and REST API endpoint to ingest the SyncAgent's push payload (`/api/sync/push`) and display cloud dashboards and management reports.
 - **Decision:** Use **Laravel** (PHP) as the framework for the cloud web application, API, and control panel.
-- **Consequences:** SyncAgent will post JSON batches to Laravel API endpoints; Laravel will authenticate via API key, receive AES-256 encrypted fields, process/store synchronization data, and render the web dashboard.
+- **Consequences:** SyncAgent will post JSON batches to Laravel API endpoints; Laravel will authenticate via API key, ~~receive AES-256 encrypted fields~~ *(superseded by ADR-021)*, process/store synchronization data, and render the web dashboard.
 
 ---
 
@@ -131,6 +131,14 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 
 ---
 
+### ADR-021 — Phone and national ID never leave the park
+- **Status:** Accepted (Osama, Q-R2, 2026-11-12; Q-R2b, 2026-11-13)
+- **Context:** The cloud only needs aggregates and holder names. Field-level AES encryption (ADR-018/019) added a shared key to distribute, a double-encryption bug after a failed push (R2.1), and still put personal data on a shared host.
+- **Decision:** `Phone` and `NationalId` are excluded from the `Beneficiary` outbox payload by an explicit per-entity exclusion list in `OutboxEntityExtractor`. The cloud has no columns for them. `PayloadEncryptionService`, `AesHelper`, `CloudApiOptions.AesKey` and `PARKGATE_AES_KEY` are removed. `Notes` and `StatusReason` keep syncing (Q-R2b). Migration `PurgeSensitiveBeneficiaryOutbox` deletes pending Beneficiary rows and re-queues one clean row per holder. The cloud rejects a payload that is not a JSON object (422) instead of skipping it.
+- **Consequences:** No key management between the park and the host. Old cloud rows are not migrated: the web schema is unreleased and is edited in place (R2.6).
+
+---
+
 <!-- Template for new ADRs:
 ### ADR-0XX — Title
 - **Status:** Proposed | Accepted | Superseded by ADR-0YY
@@ -138,4 +146,3 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Decision:**
 - **Consequences:**
 -->
-

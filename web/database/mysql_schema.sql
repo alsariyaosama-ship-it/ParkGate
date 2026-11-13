@@ -138,8 +138,6 @@ CREATE TABLE `beneficiaries` (
   `organization_id` int unsigned DEFAULT NULL,
   `card_number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `full_name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `national_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `card_expiry_date` date DEFAULT NULL,
   `status` tinyint unsigned NOT NULL DEFAULT '1',
   `status_reason` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

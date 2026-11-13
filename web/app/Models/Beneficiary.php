@@ -17,8 +17,6 @@ class Beneficiary extends Model
         'organization_id',
         'card_number',
         'full_name',
-        'phone',
-        'national_id',
         'card_expiry_date',
         'status',
         'status_reason',

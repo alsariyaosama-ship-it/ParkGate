@@ -29,7 +29,6 @@ class SyncApiHardeningTest extends TestCase
     {
         parent::setUp();
         config(['parkgate.api_key' => self::API_KEY]);
-        config(['parkgate.aes_key' => 'a2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2s=']);
         Event::listen(MessageLogged::class, fn (MessageLogged $e) => $this->logged[] = $e);
     }
 
@@ -50,7 +49,7 @@ class SyncApiHardeningTest extends TestCase
 
     public function test_unknown_operation_type_returns_422(): void
     {
-        $record = $this->beneficiaryRecord('Phone', 'x');
+        $record = $this->beneficiaryRecord();
         $record['operationType'] = 'Truncate';
 
         $this->push(['records' => [$record]])->assertJsonValidationErrors('records.0.operationType');
@@ -58,14 +57,18 @@ class SyncApiHardeningTest extends TestCase
 
     public function test_batch_larger_than_limit_returns_422(): void
     {
-        $records = array_fill(0, 501, $this->beneficiaryRecord('Phone', null));
+        $records = array_fill(0, 501, $this->beneficiaryRecord());
 
         $this->push(['records' => $records])->assertJsonValidationErrors('records');
     }
 
     public function test_rejected_item_returns_generic_422_without_exception_text_or_payload_in_log(): void
     {
-        $response = $this->push(['records' => [$this->beneficiaryRecord('Phone', 'not-valid-base64-ciphertext-!!!')]]);
+        $record = $this->beneficiaryRecord();
+        // Valid JSON but not an object, and it holds personal data: rejected, never logged.
+        $record['payloadJson'] = json_encode(self::SECRET_CARD.' '.self::SECRET_NAME);
+
+        $response = $this->push(['records' => [$record]]);
 
         $response->assertStatus(422)->assertJson(['success' => false]);
         $errorId = $response->json('error_id');
@@ -83,7 +86,7 @@ class SyncApiHardeningTest extends TestCase
             ->shouldReceive('ingestBatch')
             ->andThrow(new \RuntimeException('SQLSTATE[23000]: insert values ('.self::SECRET_NAME.', '.self::SECRET_CARD.')'));
 
-        $response = $this->push(['records' => [$this->beneficiaryRecord('Phone', null)]]);
+        $response = $this->push(['records' => [$this->beneficiaryRecord()]]);
 
         $response->assertStatus(500)->assertJson(['success' => false]);
         $this->assertResponseHidesInternals($response->getContent());
@@ -105,7 +108,7 @@ class SyncApiHardeningTest extends TestCase
         return $this->withHeaders(['X-Api-Key' => self::API_KEY])->postJson('/api/sync/push', $body);
     }
 
-    private function beneficiaryRecord(string $field, ?string $value): array
+    private function beneficiaryRecord(array $extra = []): array
     {
         return [
             'id' => 1,
@@ -116,14 +119,14 @@ class SyncApiHardeningTest extends TestCase
                 'Id' => '99999999-9999-9999-9999-999999999999',
                 'CardNumber' => self::SECRET_CARD,
                 'FullName' => self::SECRET_NAME,
-                $field => $value,
+                ...$extra,
             ]),
         ];
     }
 
     private function assertResponseHidesInternals(string $body): void
     {
-        foreach (['SQLSTATE', 'Decryption', 'AES', 'ciphertext', self::SECRET_CARD] as $needle) {
+        foreach (['SQLSTATE', 'payloadJson is not', self::SECRET_CARD] as $needle) {
             $this->assertStringNotContainsString($needle, $body);
         }
         $this->assertStringNotContainsString(self::SECRET_NAME, json_decode($body, true)['message'] ?? '');

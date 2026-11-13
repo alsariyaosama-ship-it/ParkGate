@@ -198,8 +198,7 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
    },
    "CloudApi": {
      "BaseUrl": "https://api.yourpark.ly/",
-     "ApiKey": "YOUR_CLOUD_API_KEY",
-     "AesKey": "YOUR_AES_256_BASE64_KEY"
+     "ApiKey": "YOUR_CLOUD_API_KEY"
    }
    ```
    قيمة `ApiKey` هي نفس قيمة `PARKGATE_API_KEY` في ملف `.env` على الاستضافة.

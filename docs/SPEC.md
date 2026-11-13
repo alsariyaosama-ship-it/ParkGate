@@ -205,7 +205,7 @@ The MVP data model and abstractions must make these additive, not rewrites.
 
 ### F3 — Cloud read-only dashboard (hybrid)
 - One-way push from the local DB (source of truth) to a cloud store; the cloud never writes back.
-- Push only what dashboards need; personal data minimized or excluded (Q12).
+- Push only what dashboards need. **Phone and national ID are never pushed** (ADR-021); notes and status reason are (Q-R2b).
 - Change tracking via `rowversion` / `CreatedAtUtc` watermark; a background sync worker with retry; works when internet is intermittent.
 
 ## 10. Data retention and privacy (MVP)
@@ -229,4 +229,4 @@ Defaults below are applied until the user answers. An agent must not change a de
 | Q9 | Must card validity be checked against the fund's own database? | No integration | — |
 | Q10 | Operating hours — any rule tied to closing time? | None | — |
 | Q11 | Gate group handling: Option A, B or C (§9 F2)? | **Deferred by the client** until F2 is scheduled | F2 |
-| Q12 | Which data may go to the cloud? | Aggregates only | F3 |
+| Q12 | Which data may go to the cloud? | Answered (Q-R2/Q-R2b): everything except phone and national ID | F3 |

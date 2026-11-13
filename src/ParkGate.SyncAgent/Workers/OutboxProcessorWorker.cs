@@ -12,20 +12,17 @@ public sealed class OutboxProcessorWorker : BackgroundService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly ICloudPushService _pushService;
-    private readonly IPayloadEncryptionService _encryptionService;
     private readonly IOptionsMonitor<SyncOptions> _syncOptions;
     private readonly ILogger<OutboxProcessorWorker> _logger;
 
     public OutboxProcessorWorker(
         IUnitOfWorkFactory uowFactory,
         ICloudPushService pushService,
-        IPayloadEncryptionService encryptionService,
         IOptionsMonitor<SyncOptions> syncOptions,
         ILogger<OutboxProcessorWorker> logger)
     {
         _uowFactory = uowFactory;
         _pushService = pushService;
-        _encryptionService = encryptionService;
         _syncOptions = syncOptions;
         _logger = logger;
     }
@@ -99,33 +96,12 @@ public sealed class OutboxProcessorWorker : BackgroundService
             await uow.SaveChangesAsync(cancellationToken);
         }
 
-        // 2. Encrypt sensitive fields
-        var validRecords = new List<SyncOutbox>(deduplicated.Count);
-        foreach (var record in deduplicated)
-        {
-            try
-            {
-                var encryptedPayload = _encryptionService.EncryptSensitiveFields(record.EntityType, record.PayloadJson);
-                record.UpdatePayload(encryptedPayload);
-                validRecords.Add(record);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Encryption error on outbox record {Id}. Skipping this cycle.", record.Id);
-                record.RecordFailure($"Encryption error: {ex.Message}");
-            }
-        }
-
-        if (validRecords.Count == 0)
-        {
-            await uow.SaveChangesAsync(cancellationToken);
-            return;
-        }
-
-        // 3. Push batch to cloud
+        // 2. Push batch to cloud. The payload is sent exactly as stored (it never contains
+        // phone or national ID: see OutboxEntityExtractor).
+        var validRecords = deduplicated;
         var pushResult = await _pushService.PushBatchAsync(validRecords, cancellationToken);
 
-        // 4. Update status or prune upon success
+        // 3. Update status or prune upon success
         if (pushResult.IsSuccess)
         {
             _logger.LogInformation(

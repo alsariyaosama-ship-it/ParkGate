@@ -14,38 +14,6 @@ use Illuminate\Support\Facades\Log;
 class SyncIngestionService
 {
     /**
-     * Decrypt AES-256-CBC encrypted payload value.
-     * C# payload format: Base64(16-byte IV + CipherText).
-     */
-    public static function decrypt(?string $cipherTextBase64, ?string $base64Key): ?string
-    {
-        if ($cipherTextBase64 === null || $cipherTextBase64 === '') {
-            return null;
-        }
-
-        if (empty($base64Key)) {
-            throw new \RuntimeException("Encryption key parkgate.aes_key is not configured on web server.");
-        }
-
-        $raw = base64_decode($cipherTextBase64, true);
-        $key = base64_decode($base64Key, true);
-
-        if ($raw === false || $key === false || strlen($key) !== 32 || strlen($raw) < 16) {
-            throw new \InvalidArgumentException("Invalid AES key or malformed ciphertext payload.");
-        }
-
-        $iv = substr($raw, 0, 16);
-        $cipher = substr($raw, 16);
-
-        $decrypted = openssl_decrypt($cipher, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
-        if ($decrypted === false) {
-            throw new \InvalidArgumentException("Decryption failed: possible key mismatch or corrupted ciphertext.");
-        }
-
-        return $decrypted;
-    }
-
-    /**
      * Ingests a batch of outbox records sent by ParkGate.SyncAgent.
      *
      * @param array $records
@@ -53,11 +21,10 @@ class SyncIngestionService
      */
     public function ingestBatch(array $records): array
     {
-        $aesKey = config('parkgate.aes_key');
         $processed = 0;
         $failed = 0;
 
-        DB::transaction(function () use ($records, $aesKey, &$processed, &$failed) {
+        DB::transaction(function () use ($records, &$processed, &$failed) {
             foreach ($records as $item) {
                 try {
                     $entityType = $item['entityType'] ?? null;
@@ -70,10 +37,11 @@ class SyncIngestionService
 
                     $data = json_decode($payloadRaw, true);
                     if (!is_array($data)) {
-                        continue;
+                        // Rejected, not skipped: the agent must not delete a record we did not store.
+                        throw new \InvalidArgumentException('payloadJson is not a JSON object.');
                     }
 
-                    $this->processEntity($entityType, $opType, $data, $aesKey);
+                    $this->processEntity($entityType, $opType, $data);
                     $processed++;
                 } catch (\Throwable $e) {
                     $failed++;
@@ -94,7 +62,7 @@ class SyncIngestionService
         ];
     }
 
-    private function processEntity(string $entityType, string $opType, array $data, ?string $aesKey): void
+    private function processEntity(string $entityType, string $opType, array $data): void
     {
         switch ($entityType) {
             case 'Organization':
@@ -106,7 +74,7 @@ class SyncIngestionService
                 break;
 
             case 'Beneficiary':
-                $this->upsertBeneficiary($opType, $data, $aesKey);
+                $this->upsertBeneficiary($opType, $data);
                 break;
 
             case 'EntryAttempt':
@@ -168,7 +136,7 @@ class SyncIngestionService
         );
     }
 
-    private function upsertBeneficiary(string $opType, array $data, ?string $aesKey): void
+    private function upsertBeneficiary(string $opType, array $data): void
     {
         $id = $data['Id'] ?? null;
         if (!$id) return;
@@ -178,24 +146,13 @@ class SyncIngestionService
             return;
         }
 
-        $phone = $data['Phone'] ?? null;
-        if ($phone !== null && $phone !== '') {
-            $phone = self::decrypt($phone, $aesKey);
-        }
-
-        $nationalId = $data['NationalId'] ?? null;
-        if ($nationalId !== null && $nationalId !== '') {
-            $nationalId = self::decrypt($nationalId, $aesKey);
-        }
-
+        // Phone and NationalId are deliberately never read (Q-R2): they stay in the park.
         Beneficiary::updateOrCreate(
             ['id' => $id],
             [
                 'organization_id' => $data['OrganizationId'] ?? null,
                 'card_number' => $data['CardNumber'] ?? '',
                 'full_name' => $data['FullName'] ?? '',
-                'phone' => $phone,
-                'national_id' => $nationalId,
                 'card_expiry_date' => $data['CardExpiryDate'] ?? null,
                 'status' => $data['Status'] ?? 1,
                 'status_reason' => $data['StatusReason'] ?? null,

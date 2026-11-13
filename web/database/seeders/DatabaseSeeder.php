@@ -84,16 +84,16 @@ class DatabaseSeeder extends Seeder
 
         // 4. Beneficiaries
         $sampleBeneficiaries = [
-            ['name' => 'محمد أحمد الصادق', 'card' => 'CRD-1001', 'phone' => '0912345678', 'nid' => '119900112233', 'org_id' => 1, 'status' => 1],
-            ['name' => 'سالم عبد الله الورفلي', 'card' => 'CRD-1002', 'phone' => '0923456789', 'nid' => '119850223344', 'org_id' => 1, 'status' => 1],
-            ['name' => 'فرج عمر الترهوني', 'card' => 'CRD-1003', 'phone' => '0914567890', 'nid' => '119920334455', 'org_id' => 1, 'status' => 1],
-            ['name' => 'خالد إبراهيم القماطي', 'card' => 'CRD-2001', 'phone' => '0945678901', 'nid' => '119880445566', 'org_id' => 2, 'status' => 1],
-            ['name' => 'طارق مصطفى البوعيشي', 'card' => 'CRD-2002', 'phone' => '0916789012', 'nid' => '119950556677', 'org_id' => 2, 'status' => 1],
-            ['name' => 'محمود علي السويحلي', 'card' => 'CRD-3001', 'phone' => '0927890123', 'nid' => '119870667788', 'org_id' => 3, 'status' => 1],
-            ['name' => 'عثمان خليفة الفيتوري', 'card' => 'CRD-3002', 'phone' => '0918901234', 'nid' => '119930778899', 'org_id' => 3, 'status' => 2, 'reason' => 'إيقاف مؤقت لمراجعة الصندوق'],
-            ['name' => 'عبد السلام حسن الزنتاني', 'card' => 'CRD-1004', 'phone' => '0929012345', 'nid' => '119890889900', 'org_id' => 1, 'status' => 3, 'reason' => 'محظور بسبب سوء استخدام البطاقة'],
-            ['name' => 'أسامة نوري التاجوري', 'card' => 'CRD-1005', 'phone' => '0910123456', 'nid' => '119910990011', 'org_id' => 1, 'status' => 1],
-            ['name' => 'يوسف عبد الرحمن الككلي', 'card' => 'CRD-2003', 'phone' => '0921234567', 'nid' => '119940112244', 'org_id' => 2, 'status' => 1],
+            ['name' => 'محمد أحمد الصادق', 'card' => 'CRD-1001', 'org_id' => 1, 'status' => 1],
+            ['name' => 'سالم عبد الله الورفلي', 'card' => 'CRD-1002', 'org_id' => 1, 'status' => 1],
+            ['name' => 'فرج عمر الترهوني', 'card' => 'CRD-1003', 'org_id' => 1, 'status' => 1],
+            ['name' => 'خالد إبراهيم القماطي', 'card' => 'CRD-2001', 'org_id' => 2, 'status' => 1],
+            ['name' => 'طارق مصطفى البوعيشي', 'card' => 'CRD-2002', 'org_id' => 2, 'status' => 1],
+            ['name' => 'محمود علي السويحلي', 'card' => 'CRD-3001', 'org_id' => 3, 'status' => 1],
+            ['name' => 'عثمان خليفة الفيتوري', 'card' => 'CRD-3002', 'org_id' => 3, 'status' => 2, 'reason' => 'إيقاف مؤقت لمراجعة الصندوق'],
+            ['name' => 'عبد السلام حسن الزنتاني', 'card' => 'CRD-1004', 'org_id' => 1, 'status' => 3, 'reason' => 'محظور بسبب سوء استخدام البطاقة'],
+            ['name' => 'أسامة نوري التاجوري', 'card' => 'CRD-1005', 'org_id' => 1, 'status' => 1],
+            ['name' => 'يوسف عبد الرحمن الككلي', 'card' => 'CRD-2003', 'org_id' => 2, 'status' => 1],
         ];
 
         $createdBeneficiaries = [];
@@ -104,8 +104,6 @@ class DatabaseSeeder extends Seeder
                     'id' => Str::uuid()->toString(),
                     'organization_id' => $sb['org_id'],
                     'full_name' => $sb['name'],
-                    'phone' => $sb['phone'],
-                    'national_id' => $sb['nid'],
                     'status' => $sb['status'],
                     'status_reason' => $sb['reason'] ?? null,
                     'created_at_utc' => Carbon::now()->subDays(rand(10, 60)),
