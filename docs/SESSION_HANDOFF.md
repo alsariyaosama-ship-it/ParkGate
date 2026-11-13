@@ -10,17 +10,33 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-13 |
-| Last session | S30 — Phase R2: R2.7 gift vouchers sync done; R2.9 and the end-to-end test left |
+| Last session | S31 — Phase R2 complete: R2.9 MySQL parity and the end-to-end sync test done; R2 PR next |
 | Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 merged (PR #12). R2 in progress |
 | Working branch | `phase/r2-sync` (main already merged into it after PR #12) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
 | .NET Unit tests | 620 passed: 202 domain + 177 application + 87 infrastructure + 154 architecture |
-| .NET Integration tests | 39 passed on LocalDB (S30) |
-| Web tests | `php artisan test` (PHP 8.4, SQLite): 89 passed (S30; 79 at the end of S29) |
-| Total tests | 748 (659 .NET + 89 web), all green |
-| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (S30). Applied on LocalDB by the tests; **not yet applied on SQLEXPRESS** (see Blockers) |
+| .NET Integration tests | 40 passed on LocalDB (S31) |
+| Web tests | `php artisan test` (PHP 8.4): 96 passed on SQLite and on MySQL 8 strict mode (S31; 89 at the end of S30) |
+| Total tests | 756 (660 .NET + 96 web), all green |
+| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (S30, no .NET migration in S31). Applied on LocalDB by the tests; **not yet applied on SQLEXPRESS** (see Blockers) |
 
 ## State of the work
+
+**Completed in S31 (on `phase/r2-sync`):**
+
+- R2.9 MySQL parity. Ingestion converts every ISO-8601 instant to UTC `Y-m-d H:i:s` (`SyncIngestionService::utc`);
+  offsets used to be stored as UTC wall time. `php artisan parkgate:generate-mysql-schema` writes
+  `web/database/mysql_schema.sql` from the migrations in pretend mode, with no database server
+  (`App\Support\MysqlSchemaGenerator`); `MysqlSchemaTest` fails if the committed file drifts; `scripts/package-cpanel.ps1`
+  runs the generator first. New CI job `test-mysql` in `.github/workflows/web.yml` loads the schema into MySQL 8 and runs
+  the suite in strict mode (green on GitHub). It found one test-data bug (a 37-character id that SQLite accepted).
+- **Seed rows removed from `mysql_schema.sql`.** The old hand-written file inserted three organizations and three age
+  categories. Ingestion upserts by `id`, so a seeded row with another id and the same `code` would have broken the unique
+  index. The park sends the real rows through the sync (R2.7 re-queues them). Osama: confirm this is acceptable.
+- R2 "Done when" end-to-end test: `SyncEndToEndTests` (LocalDB) runs the real outbox, worker and `CloudPushService`
+  against an in-process cloud that drops the connection, then answers 503 four times, then recovers. It checks that
+  nothing is lost or consumed while failing, that the cloud ends with the local data, and that no request, failed ones
+  included, carries phone, national ID, voucher token or key id. Mutation check: re-including `GiftVoucher.Token` made it fail.
 
 **Completed in S30 (on `phase/r2-sync`):**
 
@@ -59,10 +75,7 @@
 - None.
 
 **Left in Phase R2**
-- R2.9 MySQL parity (CI job against MySQL 8, ISO-8601 timestamps with 7 fractional digits and `Z` in strict mode,
-  generate `mysql_schema.sql` from the migrations). Note: `mysql_schema.sql` was hand-edited in S29 (R2.6, R2.5) until
-  R2.9 generates it.
-- End-to-end test from the plan's "Done when" (failing-then-recovering cloud endpoint).
+- Open the R2 pull request (below). Nothing else is left in the phase.
 
 **Not started / Future**
 - F2 Electronic gate (deferred by client; SPEC §9 F2).
@@ -72,8 +85,9 @@
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
 1. PR #12 (R1) is merged into `main`. Continue on `phase/r2-sync`.
-2. Finish R2: R2.9 (MySQL parity), then the end-to-end test from the plan's "Done when". Then open the R2 PR.
-   Ask Osama to approve ADR-022 (token excluded from the cloud).
+2. R2 is complete. Open the R2 PR to `main` with `.github/pull_request_template.md` (Osama reviews and merges).
+   In the PR, ask Osama to approve ADR-022 (token excluded from the cloud) and to confirm that the seed rows were
+   dropped from `mysql_schema.sql`. Then start R3 on `phase/r3-application`.
 3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
    dedicated `chore` commit, or do it in R9. Tip: Python on Windows writes CRLF; edit with `newline=''`.
 
@@ -84,7 +98,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ## Blockers / waiting on the user
 
 - **Apply the three new migrations on SQLEXPRESS** (`PurgeSensitiveBeneficiaryOutbox`, `AddSyncOutboxSequence`, `RequeueGiftAndPolicyOutbox`) before running the new SyncAgent there. Existing pending outbox rows get their sequence numbers in physical order.
-- **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, drop and recreate `organizations`, `age_categories`, `beneficiaries`, `park_heartbeats` and create `gift_vouchers` (unreleased schema) or re-import `mysql_schema.sql`, then let the agent re-queue.
+- **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, re-import `web/database/mysql_schema.sql` (it is generated now and drops and recreates every table, so it also wipes `users`: create the user again with `parkgate:create-user`), then let the agent re-queue.
 - Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
 - Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
   and `NationalId`. R2.6 is unblocked.
@@ -103,6 +117,16 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Session Log (last 10 sessions)
 
+### S31 — 2026-11-13 — Phase R2: R2.9 and the end-to-end test
+- Baseline was green (620 unit, 87 infra, 154 architecture; web 89). Did R2.9 test-first in two commits, then the end-to-end test.
+- `phpunit.xml` does not force the SQLite values, so the MySQL job only sets `DB_*` env vars; no change to the default run.
+- The generator cannot open a connection: it uses an anonymous `MySqlConnection` subclass that pins `isMaria()` to false and
+  `getServerVersion()` to 8.0.36, because the grammar asks the server for both when it builds `uuid` and `date` columns.
+- The generated file uses lower-case SQL from Laravel's grammar and now includes `jobs`, `job_batches`, `failed_jobs`
+  (they were missing from the hand-written file).
+- The plan asked for a PHP and .NET end-to-end run; the test is .NET-only (the web ingestion side has its own tests, and
+  the whole web suite runs on MySQL). A single run across both stacks would need a running web server in CI.
+- Test counts: .NET integration 39 → 40, web 89 → 96. Pushed; GitHub `web` (both jobs) green.
 ### S30 — 2026-11-13 — Phase R2: R2.7
 - Did R2.7 test-first: extractor + exclusion list, data migration, web ingestion/model/summary/Vue, ADR-022.
 - Osama approved `laravel/boost` (dev only). Installed v2.10 with `boost:install --guidelines` only; no MCP server and no
@@ -191,14 +215,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
   - Zero warnings, 621 tests passing (587 unit/arch + 34 LocalDB integration).
   - Documentation and test script updated.
 
-### S22 — 2026-11-04 — Organization gift policy & companion limit WinForms screens [T-G7]
-- Tasks: T-G7 completed on `phase/f5-gift-vouchers`.
-- Commits: `feat(gift): organization gift policy and age category exempt winforms screens [T-G7]`.
-- Decisions: Extended `EditOrganizationDialog`, `EditAgeCategoryDialog`, `OrganizationsForm`, and `AgeCategoriesForm` with new gift settings and companion limit exemption controls.
-
-### S21 — 2026-11-04 — Gift report queries, QR image adapter, DI [T-G6]
-- Tasks: T-G6 completed on `phase/f5-gift-vouchers`.
-- Commits: `feat(gift): report queries, QR image adapter and DI registrations [T-G6]`.
-
-### S20 — 2026-11-02 — Persistence & Migrations [T-G5]
-- Tasks: T-G5 completed on `phase/f5-gift-vouchers`.
