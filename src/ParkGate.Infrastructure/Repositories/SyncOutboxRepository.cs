@@ -21,7 +21,7 @@ public sealed class SyncOutboxRepository : ISyncOutboxRepository
     {
         return await _context.SyncOutboxes
             .Where(x => !x.IsProcessed && x.RetryCount < maxRetries)
-            .OrderBy(x => x.CreatedAtUtc)
+            .OrderBy(x => x.Sequence)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }

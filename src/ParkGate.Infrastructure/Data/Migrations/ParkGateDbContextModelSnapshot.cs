@@ -691,8 +691,10 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
                         .HasPrecision(3)
-                        .HasColumnType("datetime2(3)");
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.Property<string>("EntityId")
                         .IsRequired()
@@ -730,9 +732,15 @@ namespace ParkGate.Infrastructure.Data.Migrations
                     b.Property<int>("SchemaVersion")
                         .HasColumnType("int");
 
+                    b.Property<long>("Sequence")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Sequence"));
+
                     b.HasKey("Id");
 
-                    b.HasIndex("IsProcessed", "RetryCount", "CreatedAtUtc")
+                    b.HasIndex("IsProcessed", "RetryCount", "Sequence")
                         .HasDatabaseName("IX_SyncOutboxes_Pending");
 
                     b.ToTable("SyncOutboxes", (string)null);
