@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using ParkGate.Application.EntryCards;
+using ParkGate.Application.Common;
 using ParkGate.Application.Ports.EntryCards;
+using ParkGate.Application.Tests.Common;
 using ParkGate.Domain.EntryCards;
 using Shouldly;
 
@@ -206,7 +208,9 @@ public sealed class EntryCardsTests
         var station = new GateStation("GATE-1");
 
         var issuer = new EntryCardIssuer(signer, repo, clock, new EntryCardOptions { ValidityDays = 365 });
-        var scanner = new CardScanService(verifier, repo, log, clock, station);
+        var uowFactory = new FakeUnitOfWorkFactory();
+        uowFactory.CurrentUow.CurrentDbTime = new DateTime(2026, 10, 8, 19, 0, 0, DateTimeKind.Utc);
+        var scanner = new CardScanService(verifier, repo, log, new ParkClock(uowFactory, new StubSettingsService()), station);
 
         var beneficiaryId = Guid.NewGuid();
 
@@ -237,6 +241,29 @@ public sealed class EntryCardsTests
 
         // 7. Verify audit logs were recorded
         log.Entries.Count.ShouldBe(4);
+    }
+
+    // ── R3.7: expiry is checked against the park's business date from the database clock ──
+
+    [Theory]
+    [InlineData("2026-11-13T21:30:00Z", CardScanStatus.Accepted)] // 23:30 in Tripoli: still the 13th
+    [InlineData("2026-11-13T22:30:00Z", CardScanStatus.Expired)]  // 00:30 in Tripoli: already the 14th
+    public async Task ScanAsync_CardExpiringOnThe13th_UsesTheDatabaseClockInTheParkTimeZone(string dbUtcNow, CardScanStatus expected)
+    {
+        using var signer = new QrTokenSigner(ECDsa.Create(_issuingKey.ExportParameters(true)), KeyId);
+        using var verifier = new QrTokenVerifier([new QrPublicKey(KeyId, _issuingKey.ExportSubjectPublicKeyInfo())]);
+        var repo = new FakeEntryCardRepository();
+        var cardId = QrTokenSigner.NewCardId();
+        await repo.ReplaceActiveCardAsync(Guid.NewGuid(), cardId, KeyId, new DateOnly(2026, 11, 13));
+
+        var uowFactory = new FakeUnitOfWorkFactory();
+        uowFactory.CurrentUow.CurrentDbTime = DateTime.Parse(dbUtcNow, null, System.Globalization.DateTimeStyles.AdjustToUniversal);
+        var parkClock = new ParkClock(uowFactory, new StubSettingsService());
+        var scanner = new CardScanService(verifier, repo, new FakeCardScanLog(), parkClock, new GateStation("GATE-1"));
+
+        var result = await scanner.ScanAsync(signer.Encode(cardId, new DateOnly(2026, 11, 13)));
+
+        result.Status.ShouldBe(expected);
     }
 
     private sealed class FakeTimeProvider(DateTimeOffset now) : TimeProvider

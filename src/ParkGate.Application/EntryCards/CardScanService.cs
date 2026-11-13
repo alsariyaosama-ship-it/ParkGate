@@ -1,3 +1,4 @@
+using ParkGate.Application.Common;
 using ParkGate.Application.Ports.EntryCards;
 using ParkGate.Domain.EntryCards;
 
@@ -18,16 +19,16 @@ public sealed class CardScanService
     private readonly QrTokenVerifier _verifier;
     private readonly IEntryCardRepository _cards;
     private readonly ICardScanLog _log;
-    private readonly TimeProvider _clock;
+    private readonly ParkClock _parkClock;
     private readonly GateStation _station;
 
     public CardScanService(QrTokenVerifier verifier, IEntryCardRepository cards, ICardScanLog log,
-        TimeProvider clock, GateStation station)
+        ParkClock parkClock, GateStation station)
     {
         _verifier = verifier;
         _cards = cards;
         _log = log;
-        _clock = clock;
+        _parkClock = parkClock;
         _station = station;
     }
 
@@ -51,7 +52,7 @@ public sealed class CardScanService
 
     private async Task<CardScanResult> CheckCardAsync(EntryCardToken token, CancellationToken ct)
     {
-        var today = DateOnly.FromDateTime(_clock.GetLocalNow().DateTime);
+        var today = await _parkClock.GetBusinessDateAsync(ct);
         if (token.ExpiresOn < today)
         {
             return new(CardScanStatus.Expired, null);
