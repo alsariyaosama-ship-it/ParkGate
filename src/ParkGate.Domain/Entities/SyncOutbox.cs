@@ -11,6 +11,12 @@ public sealed class SyncOutbox
     public const int MaxLastErrorLength = 500;
 
     public Guid Id { get; private set; }
+
+    /// <summary>
+    /// Database IDENTITY value: the only trustworthy order across desks, whose clocks can be skewed (R2.2).
+    /// Zero until the row is saved.
+    /// </summary>
+    public long Sequence { get; private set; }
     public string EntityType { get; private set; } = null!;
     public string EntityId { get; private set; } = null!;
     public string OperationType { get; private set; } = null!;
@@ -80,11 +86,5 @@ public sealed class SyncOutbox
         LastError = error.Length > MaxLastErrorLength
             ? error[..MaxLastErrorLength]
             : error;
-    }
-
-    public void UpdatePayload(string newPayloadJson)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(newPayloadJson);
-        PayloadJson = newPayloadJson;
     }
 }

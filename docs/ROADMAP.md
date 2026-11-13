@@ -160,18 +160,19 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R1.5 Remove `web/fix-permissions.php` and its references
 - [x] R1.6 Sync API: no internals in responses, no personal data in logs, throttle, payload validation
 - [x] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
-- [ ] R1.8 Test that no web response, view or model exposes `phone` or `national_id` — **deferred: do it right after R2.6** (the web still stores and shows both fields until R2.6 removes them)
+- [x] R1.8 Test that no web response, view or model exposes `phone` or `national_id` — **deferred: do it right after R2.6** (the web still stores and shows both fields until R2.6 removes them)
 
 ### R2 — Sync correctness · branch `phase/r2-sync`
-- [ ] R2.6 Phone and national ID never leave the park (do this task first in R2)
-- [ ] R2.1 Fix double encryption after a failed push; make the outbox payload immutable
-- [ ] R2.2 Order and deduplicate the outbox by a DB `Sequence`, not client clocks
-- [ ] R2.3 Last-line guard in `CloudPushService` against sensitive fields and non-HTTPS base URLs
-- [ ] R2.4 Sort cloud ingestion records by dependency (parent before child)
-- [ ] R2.5 Report poison outbox rows in the heartbeat, dashboard and desk status bar
-- [ ] R2.7 Sync gift vouchers and the new organization / age-category fields
-- [ ] R2.8 Fix dashboard counts (timezone, Overridden, voided, aggregate in SQL)
-- [ ] R2.9 MySQL parity: CI run against MySQL 8; generate `mysql_schema.sql` from the migrations
+- [x] R2.6 Phone and national ID never leave the park (do this task first in R2)
+- [x] R2.1 Fix double encryption after a failed push; make the outbox payload immutable
+- [x] R2.2 Order and deduplicate the outbox by a DB `Sequence`, not client clocks
+- [x] R2.3 Last-line guard in `CloudPushService` against sensitive fields and non-HTTPS base URLs
+- [x] R2.4 Sort cloud ingestion records by dependency (parent before child)
+- [x] R2.5 Report poison outbox rows in the heartbeat, dashboard and desk status bar
+- [x] R2.7 Sync gift vouchers and the new organization / age-category fields
+- [x] R2.8 Fix dashboard counts (timezone, Overridden, voided, aggregate in SQL)
+- [x] R2.9 MySQL parity: CI run against MySQL 8; generate `mysql_schema.sql` from the migrations
+- [x] R2.10 End-to-end sync test: failing-then-recovering cloud, cloud data equals local data minus excluded fields (R2 "Done when")
 
 ### R3 — Desktop Application and Infrastructure · branch `phase/r3-application`
 - [ ] R3.1 Today's totals must not be capped at 50 attempts — add an aggregate query
@@ -241,6 +242,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R9.3 `AGENTS.md` (needs Osama's approval): project count, web test command, UI test location
 - [ ] R9.4 `USER_GUIDE_AR.md` and `TEST_SCRIPT.md`: new shortcuts, registration, void button, glossary
 - [ ] R9.5 `SESSION_HANDOFF.md`: final state, known issues, next steps
+- [x] R9.6 Format all web PHP with Pint (done early in S30, in its own `style` commit; run `vendor/bin/pint --dirty --format agent` after each PHP change)
 
 **Done when:** R0–R9 are ticked, every phase PR is merged, and the acceptance line at the end of each phase in `docs/REMEDIATION_PLAN.md` holds.
 

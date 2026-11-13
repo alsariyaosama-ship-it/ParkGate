@@ -56,6 +56,7 @@ partial class MainForm
         _statusWorkstation = new ToolStripStatusLabel();
         _statusServerTime = new ToolStripStatusLabel();
         _statusConnection = new ToolStripStatusLabel();
+        _statusSync = new ToolStripStatusLabel();
         _mainContainer = new Panel();
         _welcomeCard = new Panel();
         _lblQuickInfo = new Label();
@@ -235,7 +236,7 @@ partial class MainForm
         // 
         _statusStrip.Font = new Font("Cairo", 9.5F);
         _statusStrip.ImageScalingSize = new Size(20, 20);
-        _statusStrip.Items.AddRange(new ToolStripItem[] { _statusUser, _statusWorkstation, _statusServerTime, _statusConnection });
+        _statusStrip.Items.AddRange(new ToolStripItem[] { _statusUser, _statusWorkstation, _statusServerTime, _statusConnection, _statusSync });
         _statusStrip.Location = new Point(0, 852);
         _statusStrip.Name = "_statusStrip";
         _statusStrip.Padding = new Padding(18, 2, 1, 2);
@@ -280,6 +281,15 @@ partial class MainForm
         _statusConnection.Padding = new Padding(10, 2, 10, 2);
         _statusConnection.Size = new Size(127, 38);
         _statusConnection.Text = "متصل بالخادم";
+        // 
+        // _statusSync
+        // 
+        _statusSync.BorderSides = ToolStripStatusLabelBorderSides.Left;
+        _statusSync.BorderStyle = Border3DStyle.Etched;
+        _statusSync.Name = "_statusSync";
+        _statusSync.Padding = new Padding(10, 2, 10, 2);
+        _statusSync.Size = new Size(0, 38);
+        _statusSync.Visible = false;
         // 
         // _mainContainer
         // 
@@ -412,6 +422,7 @@ partial class MainForm
     private System.Windows.Forms.ToolStripStatusLabel _statusWorkstation;
     private System.Windows.Forms.ToolStripStatusLabel _statusServerTime;
     private System.Windows.Forms.ToolStripStatusLabel _statusConnection;
+    private System.Windows.Forms.ToolStripStatusLabel _statusSync;
     private System.Windows.Forms.Panel _mainContainer;
     private System.Windows.Forms.Panel _welcomeCard;
     private System.Windows.Forms.Label _lblWelcomeParkName;

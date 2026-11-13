@@ -17,7 +17,7 @@ class VerifySyncApiKey
         $expectedKey = config('parkgate.api_key');
         $providedKey = $request->header('X-Api-Key');
 
-        if (empty($expectedKey) || empty($providedKey) || !hash_equals($expectedKey, $providedKey)) {
+        if (empty($expectedKey) || empty($providedKey) || ! hash_equals($expectedKey, $providedKey)) {
             return response()->json([
                 'message' => 'Unauthorized: Invalid or missing API key.',
             ], 401);

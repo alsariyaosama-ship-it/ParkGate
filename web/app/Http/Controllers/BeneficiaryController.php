@@ -18,21 +18,19 @@ class BeneficiaryController extends Controller
 
         $query = Beneficiary::with('organization');
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('full_name', 'like', "%{$search}%")
-                  ->orWhere('card_number', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('national_id', 'like', "%{$search}%");
+                    ->orWhere('card_number', 'like', "%{$search}%");
             });
         }
 
-        if (!empty($orgId)) {
+        if (! empty($orgId)) {
             $query->where('organization_id', $orgId);
         }
 
-        if (!empty($status)) {
-            $query->where('status', (int)$status);
+        if (! empty($status)) {
+            $query->where('status', (int) $status);
         }
 
         $beneficiaries = $query->latest('created_at_utc')
@@ -43,8 +41,6 @@ class BeneficiaryController extends Controller
                     'id' => $b->id,
                     'full_name' => $b->full_name,
                     'card_number' => $b->card_number,
-                    'phone' => $b->phone,
-                    'national_id' => $b->national_id,
                     'organization_name' => $b->organization?->name_ar ?? '—',
                     'status' => $b->status,
                     'last_entry' => $b->last_granted_entry_utc ? $b->last_granted_entry_utc->format('Y-m-d H:i') : null,

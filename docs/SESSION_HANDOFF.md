@@ -10,39 +10,73 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-13 |
-| Last session | S28 — Phase R1 web security: R1.1–R1.7 done, R1.8 deferred to after R2.6, PR opened |
-| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 awaiting PR review |
-| Working branch | `phase/r1-web-security` (PR to `main`, not merged) |
+| Last session | S31 — Phase R2 complete: R2.9 MySQL parity and the end-to-end sync test done; R2 PR next |
+| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 merged (PR #12). R2 in progress |
+| Working branch | `phase/r2-sync` (main already merged into it after PR #12) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
-| .NET Unit tests | 588 passed: 202 domain + 169 application + 63 infrastructure + 154 architecture. CI `build` green since PR #11 |
-| .NET Integration tests | 34 passed on LocalDB (S27) |
-| Web tests | `php artisan test` (PHP 8.4, SQLite): 58 passed (S28; 33 at the R0 baseline) |
-| Total tests | 680 (622 .NET + 58 web), all green |
-| Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` (Applied on SQLEXPRESS and LocalDB) |
+| .NET Unit tests | 620 passed: 202 domain + 177 application + 87 infrastructure + 154 architecture |
+| .NET Integration tests | 40 passed on LocalDB (S31) |
+| Web tests | `php artisan test` (PHP 8.4): 96 passed on SQLite and on MySQL 8 strict mode (S31; 89 at the end of S30) |
+| Total tests | 756 (660 .NET + 96 web), all green |
+| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (S30, no .NET migration in S31). Applied on LocalDB by the tests; **not yet applied on SQLEXPRESS** (see Blockers) |
 
 ## State of the work
 
-**Completed in S28 (local), on `phase/r1-web-security`, one commit per task, each test-first:**
+**Completed in S31 (on `phase/r2-sync`):**
 
-- R1.1 `/register` and the email password-reset routes removed (mail is not configured), with the unused
-  Breeze `Welcome.vue`. New `php artisan parkgate:create-user {name} {email} [--reset-password]`
-  (prompted password, min 12 chars, user created verified).
-- R1.2 `PARKGATE_API_KEY` has no default; the env example ships it empty; `php artisan parkgate:generate-key`
-  prints 64 hex chars. `DEPLOYMENT.md` §8.1 says the agent's `CloudApi:ApiKey` must match.
-- R1.3 `APP_KEY` emptied in `.env.production.example`.
-- R1.4 `DatabaseSeeder` runs only in `local`/`testing`; `mysql_schema.sql` no longer inserts
-  `admin@parkgate.ly`.
-- R1.5 `web/fix-permissions.php` deleted (it was never in the cPanel zip; the packager uses an allowlist).
-- R1.6 Sync API: generic message + `error_id` on failure (422 rejected item / 500 server fault); log and
-  `sync_batches.error_message` hold only error id, entity type/id, exception class. `SyncPushRequest`
-  validates the batch (max 500 records). `/api/sync/*` throttled 60/min before the key check.
-- R1.7 `URL::forceScheme('https')` in production, `SESSION_SECURE_COOKIE=true` in the example; Breeze's
-  5-attempt login lock and `APP_DEBUG=false` now covered by tests.
-- R1.8 **deferred** (roadmap updated): the web still stores and shows `phone`/`national_id` until R2.6
-  removes them, so the "nothing exposes them" test can only pass after R2.6.
+- R2.9 MySQL parity. Ingestion converts every ISO-8601 instant to UTC `Y-m-d H:i:s` (`SyncIngestionService::utc`);
+  offsets used to be stored as UTC wall time. `php artisan parkgate:generate-mysql-schema` writes
+  `web/database/mysql_schema.sql` from the migrations in pretend mode, with no database server
+  (`App\Support\MysqlSchemaGenerator`); `MysqlSchemaTest` fails if the committed file drifts; `scripts/package-cpanel.ps1`
+  runs the generator first. New CI job `test-mysql` in `.github/workflows/web.yml` loads the schema into MySQL 8 and runs
+  the suite in strict mode (green on GitHub). It found one test-data bug (a 37-character id that SQLite accepted).
+- **Seed rows removed from `mysql_schema.sql`.** The old hand-written file inserted three organizations and three age
+  categories. Ingestion upserts by `id`, so a seeded row with another id and the same `code` would have broken the unique
+  index. The park sends the real rows through the sync (R2.7 re-queues them). Osama: confirm this is acceptable.
+- R2 "Done when" end-to-end test: `SyncEndToEndTests` (LocalDB) runs the real outbox, worker and `CloudPushService`
+  against an in-process cloud that drops the connection, then answers 503 four times, then recovers. It checks that
+  nothing is lost or consumed while failing, that the cloud ends with the local data, and that no request, failed ones
+  included, carries phone, national ID, voucher token or key id. Mutation check: re-including `GiftVoucher.Token` made it fail.
+
+**Completed in S30 (on `phase/r2-sync`):**
+
+- R2.7 Gift vouchers sync (ADR-022, Proposed). `GiftVoucher` is in `SyncableTypes`; `Token` and `KeyId` are excluded
+  from its payload (the token is the redeemable QR secret). Organization gift policy / `MaxFreeCompanions` and
+  `AgeCategory.IsCompanionLimitExempt` were already serialized; the web now stores them. Migration
+  `RequeueGiftAndPolicyOutbox` queues one row per existing organization, age category and voucher. Web: `gift_vouchers`
+  table (existing migration edited in place), `GiftVoucher` model, ingestion (after `Beneficiary`),
+  `GiftSummaryService` (SQL aggregation by issue business date) feeding a `gifts` prop on the dashboard and reports,
+  shared `GiftSummary.vue`. `mysql_schema.sql` hand-edited again (R2.9 will generate it).
+
+**Completed in S29 (pushed on `phase/r2-sync`), one commit per task, each test-first:**
+
+- R2.6 Phone and national ID never leave the park (ADR-021). `OutboxEntityExtractor` has an explicit exclusion
+  list; `PayloadEncryptionService`, `AesHelper`, `AesKey` and `PARKGATE_AES_KEY` are gone. Migration
+  `PurgeSensitiveBeneficiaryOutbox` deletes pending Beneficiary rows and re-queues one clean row per holder.
+  Web: columns, model, search, Vue columns and seeder data removed. Ingestion now rejects a payload that is not a
+  JSON object (422) instead of skipping it.
+- R1.8 Web tests that nothing serves `phone` or `national_id`.
+- R2.1 `SyncOutbox.UpdatePayload` removed; payload is sent exactly as stored.
+- R2.2 `SyncOutboxes.Sequence` (bigint IDENTITY, migration `AddSyncOutboxSequence`); ordering and dedupe use it.
+- R2.3 `CloudPushService` refuses sensitive keys at any depth and non-HTTPS `BaseUrl`
+  (`CloudApi:AllowInsecureHttp` for local dev). New `PushFailureKind.Misconfigured` aborts the cycle without
+  burning retries.
+- R2.4 Web ingestion sorts a batch parent-first (deletes last, child-first).
+- R2.5 **Finding:** the agent never sent a cloud heartbeat (only a local setting), so the dashboard could not show
+  the park online. `HeartbeatWorker` now counts pending/failed rows, stores them in AppSettings and posts them to
+  `/api/sync/heartbeat`. Web stores and shows them. Desk: admins (ManageSettings) get a sync line in the status
+  bar (`SyncStatusService`), hidden until the agent has reported.
+- R2.8 Dashboard: "today" follows `PARKGATE_TIMEZONE` (default Africa/Tripoli); entries/persons count granted and
+  overridden, exclude voided; totals aggregated in SQL; hourly chart in park-local hours.
+  Deviation from the plan text: the app timezone stays UTC (changing it would make every `*_utc` column be read as
+  Tripoli time); the park zone is a separate config value.
 
 **In progress**
-- None. R1 awaits PR review.
+- None.
+
+**Left in Phase R2**
+- Open the R2 pull request (below). Nothing else is left in the phase.
+
 **Not started / Future**
 - F2 Electronic gate (deferred by client; SPEC §9 F2).
 
@@ -50,11 +84,12 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. Check the R1 PR: `build` and `web` green. After Osama merges, start R2 on `phase/r2-sync`.
-2. R2 order: **R2.6 first** (Q-R2b: `Notes`/`StatusReason` keep syncing), then **R1.8**
-   (the exposure test), then R2.1 onward.
+1. PR #12 (R1) is merged into `main`. Continue on `phase/r2-sync`.
+2. R2 is complete. Open the R2 PR to `main` with `.github/pull_request_template.md` (Osama reviews and merges).
+   In the PR, ask Osama to approve ADR-022 (token excluded from the cloud) and to confirm that the seed rows were
+   dropped from `mysql_schema.sql`. Then start R3 on `phase/r3-application`.
 3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
-   dedicated `chore` commit, or do it in R9.
+   dedicated `chore` commit, or do it in R9. Tip: Python on Windows writes CRLF; edit with `newline=''`.
 
 Carried over from S25 (do it when a printer is available; it does not block Phase R):
 - Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
@@ -62,25 +97,53 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- R1 PR review and merge (Osama).
+- **Apply the three new migrations on SQLEXPRESS** (`PurgeSensitiveBeneficiaryOutbox`, `AddSyncOutboxSequence`, `RequeueGiftAndPolicyOutbox`) before running the new SyncAgent there. Existing pending outbox rows get their sequence numbers in physical order.
+- **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, re-import `web/database/mysql_schema.sql` (it is generated now and drops and recreates every table, so it also wipes `users`: create the user again with `parkgate:create-user`), then let the agent re-queue.
+- Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
 - Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
   and `NationalId`. R2.6 is unblocked.
 - Q-R3 answered 2026-11-13: users are created with `parkgate:create-user` from the cPanel Terminal.
 - Osama's local `web/.env` still holds the old default sync key and the `APP_KEY` that was published in
   `.env.production.example` (R1.3). Harmless for dev; regenerate both (`key:generate`,
   `parkgate:generate-key`) and set the agent's `CloudApi:ApiKey` to match.
-- Untracked `scripts/r0-baseline.ps1`: delete or keep?
 - **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
   while `composer.json` still says `^8.3`. CI uses PHP 8.4. Confirm the host offers PHP 8.4 before R8.5,
   and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
 - Still open (the plan's defaults apply if unanswered): Q-R4b (glossary, R7.1), Q-R6 (desk PCs and
   workgroup/domain, R6.5), Q-R7 (lowest desk resolution, R5.8).
-- `web/CLAUDE.md` asks agents to install `laravel/boost`. Not installed: new packages need Osama's approval.- Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
+- Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
 
 ---
 
 ## Session Log (last 10 sessions)
 
+### S31 — 2026-11-13 — Phase R2: R2.9 and the end-to-end test
+- Baseline was green (620 unit, 87 infra, 154 architecture; web 89). Did R2.9 test-first in two commits, then the end-to-end test.
+- `phpunit.xml` does not force the SQLite values, so the MySQL job only sets `DB_*` env vars; no change to the default run.
+- The generator cannot open a connection: it uses an anonymous `MySqlConnection` subclass that pins `isMaria()` to false and
+  `getServerVersion()` to 8.0.36, because the grammar asks the server for both when it builds `uuid` and `date` columns.
+- The generated file uses lower-case SQL from Laravel's grammar and now includes `jobs`, `job_batches`, `failed_jobs`
+  (they were missing from the hand-written file).
+- The plan asked for a PHP and .NET end-to-end run; the test is .NET-only (the web ingestion side has its own tests, and
+  the whole web suite runs on MySQL). A single run across both stacks would need a running web server in CI.
+- Test counts: .NET integration 39 → 40, web 89 → 96. Pushed; GitHub `web` (both jobs) green.
+### S30 — 2026-11-13 — Phase R2: R2.7
+- Did R2.7 test-first: extractor + exclusion list, data migration, web ingestion/model/summary/Vue, ADR-022.
+- Osama approved `laravel/boost` (dev only). Installed v2.10 with `boost:install --guidelines` only; no MCP server and no
+  skills (its docs search calls an external service). It rewrote `web/AGENTS.md` and `web/CLAUDE.md`. Composer is not on the
+  Bash PATH here; run it from PowerShell. Root `AGENTS.md` §2 still lists the approved packages: add Boost there when you approve.
+- `dotnet ef` needs `--project src/ParkGate.Infrastructure` only (the design-time factory lives there); the WinForms
+  project is not a valid startup project.
+- Ran Pint over all web PHP in a separate `style` commit (R9.6, 14 files, tests still 89 green). New web PHP must pass
+  `vendor/bin/pint --dirty --format agent`.
+- Test counts: .NET unit 617 → 620, integration 38 → 39, web 79 → 89.
+### S29 — 2026-11-13 — Phase R2: R2.1–R2.6, R2.8, R1.8
+- Created `phase/r2-sync` from `phase/r1-web-security` (PR #12 still open) and pushed it.
+- Did R2.6 → R1.8 → R2.1 → R2.2 → R2.3 → R2.4 → R2.5 → R2.8, one commit each, test-first. Left R2.7, R2.9.
+- Found that nothing sent a cloud heartbeat; added it inside R2.5 (see State of the work).
+- Web `date` casts changed to `date:Y-m-d`: SQLite stored `2026-11-13 00:00:00`, MySQL `2026-11-13`, which hid a
+  date-comparison bug from the tests (relevant to R2.9).
+- Test counts: .NET unit 588 → 617, integration 34 → 38, web 58 → 79.
 ### S28 — 2026-11-13 — Phase R1 web security (R1.1–R1.7)
 - Merged PR #11 (R0) at Osama's request after CI went green; `main` = `6a3201e`.
 - R1.1–R1.7 done test-first on `phase/r1-web-security`; web tests 33 → 58. R1.8 deferred to after R2.6.
@@ -152,14 +215,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
   - Zero warnings, 621 tests passing (587 unit/arch + 34 LocalDB integration).
   - Documentation and test script updated.
 
-### S22 — 2026-11-04 — Organization gift policy & companion limit WinForms screens [T-G7]
-- Tasks: T-G7 completed on `phase/f5-gift-vouchers`.
-- Commits: `feat(gift): organization gift policy and age category exempt winforms screens [T-G7]`.
-- Decisions: Extended `EditOrganizationDialog`, `EditAgeCategoryDialog`, `OrganizationsForm`, and `AgeCategoriesForm` with new gift settings and companion limit exemption controls.
-
-### S21 — 2026-11-04 — Gift report queries, QR image adapter, DI [T-G6]
-- Tasks: T-G6 completed on `phase/f5-gift-vouchers`.
-- Commits: `feat(gift): report queries, QR image adapter and DI registrations [T-G6]`.
-
-### S20 — 2026-11-02 — Persistence & Migrations [T-G5]
-- Tasks: T-G5 completed on `phase/f5-gift-vouchers`.

@@ -21,7 +21,7 @@ public sealed class SyncOutboxRepository : ISyncOutboxRepository
     {
         return await _context.SyncOutboxes
             .Where(x => !x.IsProcessed && x.RetryCount < maxRetries)
-            .OrderBy(x => x.CreatedAtUtc)
+            .OrderBy(x => x.Sequence)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }
@@ -47,5 +47,17 @@ public sealed class SyncOutboxRepository : ISyncOutboxRepository
         return await _context.SyncOutboxes
             .Where(x => !x.IsProcessed)
             .CountAsync(cancellationToken);
+    }
+
+    public async Task<(int Pending, int Failed)> GetPendingAndFailedCountsAsync(
+        int maxRetries,
+        CancellationToken cancellationToken = default)
+    {
+        var failed = await _context.SyncOutboxes
+            .CountAsync(x => !x.IsProcessed && x.RetryCount >= maxRetries, cancellationToken);
+        var pending = await _context.SyncOutboxes
+            .CountAsync(x => !x.IsProcessed && x.RetryCount < maxRetries, cancellationToken);
+
+        return (pending, failed);
     }
 }

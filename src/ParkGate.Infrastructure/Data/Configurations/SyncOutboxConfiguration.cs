@@ -12,6 +12,10 @@ public sealed class SyncOutboxConfiguration : IEntityTypeConfiguration<SyncOutbo
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Sequence)
+            .UseIdentityColumn()
+            .ValueGeneratedOnAdd();
+
         builder.Property(x => x.EntityType)
             .HasMaxLength(SyncOutbox.MaxEntityTypeLength)
             .IsRequired();
@@ -42,12 +46,13 @@ public sealed class SyncOutboxConfiguration : IEntityTypeConfiguration<SyncOutbo
 
         builder.Property(x => x.CreatedAtUtc)
             .HasPrecision(3)
-            .IsRequired();
+            .IsRequired()
+            .HasDefaultValueSql("SYSUTCDATETIME()");
 
         builder.Property(x => x.ProcessedAtUtc)
             .HasPrecision(3);
 
-        builder.HasIndex(x => new { x.IsProcessed, x.RetryCount, x.CreatedAtUtc })
+        builder.HasIndex(x => new { x.IsProcessed, x.RetryCount, x.Sequence })
             .HasDatabaseName("IX_SyncOutboxes_Pending");
     }
 }

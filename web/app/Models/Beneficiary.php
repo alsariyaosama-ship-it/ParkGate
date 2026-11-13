@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Beneficiary extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -17,8 +19,6 @@ class Beneficiary extends Model
         'organization_id',
         'card_number',
         'full_name',
-        'phone',
-        'national_id',
         'card_expiry_date',
         'status',
         'status_reason',
@@ -29,7 +29,7 @@ class Beneficiary extends Model
     ];
 
     protected $casts = [
-        'card_expiry_date' => 'date',
+        'card_expiry_date' => 'date:Y-m-d',
         'status' => 'integer',
         'last_granted_entry_utc' => 'datetime',
         'created_at_utc' => 'datetime',

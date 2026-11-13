@@ -26,6 +26,17 @@ Write-Host "==========================================================" -Foregro
 Write-Host "   ParkGate Laravel cPanel Packaging (Libyan Spider)     " -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
+# 1. Regenerate mysql_schema.sql from the migrations (R2.9). The file is never edited by hand;
+#    a web test fails if the committed file and the migrations disagree.
+Write-Host "`n[0/4] Generating mysql_schema.sql from the migrations..." -ForegroundColor Yellow
+Push-Location $WebDir
+try {
+    php artisan parkgate:generate-mysql-schema
+    if ($LASTEXITCODE -ne 0) { throw "Schema generation failed." }
+} finally {
+    Pop-Location
+}
+
 # 2. Build Frontend Assets
 Write-Host "`n[1/4] Building frontend assets (npm run build)..." -ForegroundColor Yellow
 Push-Location $WebDir

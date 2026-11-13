@@ -16,7 +16,28 @@ public static class OutboxEntityExtractor
         nameof(EntryAttempt),
         nameof(EntryAttemptCompanion),
         nameof(Organization),
-        nameof(AgeCategory)
+        nameof(AgeCategory),
+        nameof(GiftVoucher)
+    };
+
+    /// <summary>
+    /// Properties that must never leave the park. The cloud does not store phone numbers or national
+    /// IDs (Q-R2) nor gift voucher tokens (R2.7), so they are excluded instead of being encrypted.
+    /// </summary>
+    private static readonly Dictionary<string, HashSet<string>> ExcludedProperties = new(StringComparer.Ordinal)
+    {
+        [nameof(Beneficiary)] = new(StringComparer.Ordinal)
+        {
+            nameof(Beneficiary.Phone),
+            nameof(Beneficiary.NationalId)
+        },
+        // The token is the bearer credential printed on the QR card (ADR-020). The cloud only
+        // reports on vouchers, so it never needs the secret or the signing key id (R2.7).
+        [nameof(GiftVoucher)] = new(StringComparer.Ordinal)
+        {
+            nameof(GiftVoucher.Token),
+            nameof(GiftVoucher.KeyId)
+        }
     };
 
     public static bool IsSyncable(string entityTypeName) => SyncableTypes.Contains(entityTypeName);
@@ -44,9 +65,11 @@ public static class OutboxEntityExtractor
     public static string SerializePayload(EntityEntry entry)
     {
         var dict = new Dictionary<string, object?>(StringComparer.Ordinal);
+        ExcludedProperties.TryGetValue(entry.Metadata.ClrType.Name, out var excluded);
+
         foreach (var prop in entry.Properties)
         {
-            if (prop.Metadata.IsShadowProperty())
+            if (prop.Metadata.IsShadowProperty() || (excluded?.Contains(prop.Metadata.Name) ?? false))
             {
                 continue;
             }

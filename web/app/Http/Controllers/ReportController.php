@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EntryAttempt;
 use App\Models\Organization;
+use App\Services\GiftSummaryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,7 +12,7 @@ use Inertia\Response;
 
 class ReportController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, GiftSummaryService $gifts): Response
     {
         $startDate = $request->input('start_date', Carbon::today()->toDateString());
         $endDate = $request->input('end_date', Carbon::today()->toDateString());
@@ -21,12 +22,12 @@ class ReportController extends Controller
         $query = EntryAttempt::with(['beneficiary', 'organization'])
             ->whereBetween('business_date', [$startDate, $endDate]);
 
-        if (!empty($orgId)) {
+        if (! empty($orgId)) {
             $query->where('organization_id', $orgId);
         }
 
-        if (!empty($result)) {
-            $query->where('result', (int)$result);
+        if (! empty($result)) {
+            $query->where('result', (int) $result);
         }
 
         $totals = [
@@ -61,6 +62,7 @@ class ReportController extends Controller
         return Inertia::render('Reports/Index', [
             'attempts' => $attempts,
             'totals' => $totals,
+            'gifts' => $gifts->summarize($startDate, $endDate, $orgId ? (int) $orgId : null),
             'organizations' => $organizations,
             'filters' => [
                 'start_date' => $startDate,

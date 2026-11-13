@@ -7,6 +7,7 @@ use App\Models\EntryAttempt;
 use App\Models\Organization;
 use App\Models\ParkHeartbeat;
 use App\Models\SyncBatch;
+use App\Services\GiftSummaryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,9 +15,15 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): Response
+    /** Granted and supervisor-overridden attempts both let people in. */
+    private const ENTRY_RESULTS = [1, 3];
+
+    public function index(Request $request, GiftSummaryService $gifts): Response
     {
-        $today = Carbon::today()->toDateString();
+        // business_date is the park's local date, so "today" is too (R2.8). The app timezone stays UTC
+        // because every *_utc column is stored and read as UTC.
+        $parkNow = Carbon::now(config('parkgate.timezone'));
+        $today = $parkNow->toDateString();
 
         // 1. Park Connection Status
         $latestHeartbeat = ParkHeartbeat::latest('last_heartbeat_at')->first();
@@ -31,47 +38,53 @@ class DashboardController extends Controller
 
         $latestSync = SyncBatch::latest('created_at')->first();
 
-        // 2. Summary KPI Metrics
-        $todayAttempts = EntryAttempt::where('business_date', $today)->get();
+        // 2. Summary KPI Metrics. An entry is a granted (1) or overridden (3) attempt that was not voided.
+        $entries = EntryAttempt::where('business_date', $today)
+            ->whereIn('result', self::ENTRY_RESULTS)
+            ->where('is_voided', false);
 
-        $todayAllowed = $todayAttempts->where('result', 1)->count();
-        $todayDenied = $todayAttempts->where('result', 2)->count();
-        $todayOverridden = $todayAttempts->where('result', 3)->count();
-        $todayPersons = $todayAttempts->where('result', 1)->sum('total_persons');
+        $entryTotals = (clone $entries)
+            ->selectRaw('COUNT(*) as entries, COALESCE(SUM(total_persons), 0) as persons')
+            ->first();
+        $todayEntries = (int) $entryTotals->entries;
+        $todayPersons = (int) $entryTotals->persons;
+
+        $todayOverridden = (clone $entries)->where('result', 3)->count();
+        $todayDenied = EntryAttempt::where('business_date', $today)->where('result', 2)->count();
 
         $totalBeneficiaries = Beneficiary::count();
         $activeBeneficiaries = Beneficiary::where('status', 1)->count();
 
-        // 3. Organization Breakdown (Today)
-        $orgBreakdown = Organization::withCount(['entryAttempts as today_entries' => function ($q) use ($today) {
-            $q->where('business_date', $today)->where('result', 1);
-        }, 'entryAttempts as today_persons' => function ($q) use ($today) {
-            $q->where('business_date', $today)->where('result', 1)->selectRaw('COALESCE(SUM(total_persons), 0)');
-        }])->get()->map(function ($org) {
-            return [
-                'id' => $org->id,
-                'name_ar' => $org->name_ar,
-                'code' => $org->code,
-                'today_entries' => $org->today_entries ?? 0,
-                'today_persons' => (int)($org->today_persons ?? 0),
-            ];
-        });
+        // 3. Organization Breakdown (Today), aggregated in SQL
+        $perOrganization = (clone $entries)
+            ->selectRaw('organization_id, COUNT(*) as entries, COALESCE(SUM(total_persons), 0) as persons')
+            ->groupBy('organization_id')
+            ->get()
+            ->keyBy('organization_id');
 
-        // 4. Hourly Distribution (Today)
+        $orgBreakdown = Organization::all()->map(fn ($org) => [
+            'id' => $org->id,
+            'name_ar' => $org->name_ar,
+            'code' => $org->code,
+            'today_entries' => (int) ($perOrganization[$org->id]->entries ?? 0),
+            'today_persons' => (int) ($perOrganization[$org->id]->persons ?? 0),
+        ]);
+
+        // 4. Hourly Distribution (Today, park-local hours). Only two columns are read; converting hours
+        // in SQL would need MySQL time-zone tables, which shared hosting often lacks.
         $hourlyData = [];
         for ($h = 8; $h <= 23; $h++) {
-            $hourLabel = sprintf('%02d:00', $h);
-            $hourlyData[$hourLabel] = 0;
+            $hourlyData[sprintf('%02d:00', $h)] = 0;
         }
 
-        foreach ($todayAttempts as $att) {
-            if ($att->result === 1 && $att->attempted_at_utc) {
-                // assume UTC to park local time approx
-                $hour = (int)$att->attempted_at_utc->format('H');
-                $key = sprintf('%02d:00', $hour);
-                if (isset($hourlyData[$key])) {
-                    $hourlyData[$key] += $att->total_persons;
-                }
+        foreach ((clone $entries)->get(['attempted_at_utc', 'total_persons']) as $att) {
+            if (! $att->attempted_at_utc) {
+                continue;
+            }
+
+            $key = sprintf('%02d:00', $att->attempted_at_utc->copy()->setTimezone(config('parkgate.timezone'))->hour);
+            if (isset($hourlyData[$key])) {
+                $hourlyData[$key] += $att->total_persons;
             }
         }
 
@@ -96,11 +109,13 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'status' => [
                 'is_online' => $isOnline,
+                'pending_count' => $latestHeartbeat?->pending_count ?? 0,
+                'failed_count' => $latestHeartbeat?->failed_count ?? 0,
                 'last_heartbeat' => $lastHeartbeatDiff,
                 'last_sync' => $latestSync?->created_at?->diffForHumans() ?? '—',
             ],
             'kpis' => [
-                'today_allowed' => $todayAllowed,
+                'today_entries' => $todayEntries,
                 'today_denied' => $todayDenied,
                 'today_overridden' => $todayOverridden,
                 'today_persons' => $todayPersons,
@@ -108,6 +123,7 @@ class DashboardController extends Controller
                 'active_beneficiaries' => $activeBeneficiaries,
             ],
             'org_breakdown' => $orgBreakdown,
+            'gifts' => $gifts->summarize($today, $today),
             'hourly_stats' => $hourlyData,
             'recent_entries' => $recentEntries,
         ]);

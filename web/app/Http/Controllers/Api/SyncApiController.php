@@ -63,8 +63,16 @@ class SyncApiController extends Controller
      */
     public function heartbeat(Request $request): JsonResponse
     {
+        // R2.5: how many outbox rows wait to be sent, and how many gave up (retry limit reached).
+        $counts = $request->validate([
+            'pendingCount' => ['nullable', 'integer', 'min:0', 'max:4294967295'],
+            'failedCount' => ['nullable', 'integer', 'min:0', 'max:4294967295'],
+        ]);
+
         ParkHeartbeat::create([
             'last_heartbeat_at' => now(),
+            'pending_count' => $counts['pendingCount'] ?? 0,
+            'failed_count' => $counts['failedCount'] ?? 0,
             'ip_address' => $request->ip(),
             'created_at' => now(),
         ]);

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using ParkGate.Application.Sync;
 using ParkGate.Domain.Entities;
 using ParkGate.Domain.ValueObjects;
-using ParkGate.Infrastructure.Security;
 using ParkGate.Infrastructure.Sync;
 using Shouldly;
 
@@ -69,12 +68,7 @@ public sealed class SyncOutboxIntegrationTests : IClassFixture<LocalDbTestFixtur
         var deduplicated = OutboxDeduplicator.Deduplicate(outboxRecords);
         deduplicated.Count.ShouldBe(1);
 
-        // 4. Test Encryption
-        var aesKey = AesHelper.GenerateKey();
-        var encryptionService = new PayloadEncryptionService(aesKey, NullLogger<PayloadEncryptionService>.Instance);
-        var encryptedPayload = encryptionService.EncryptSensitiveFields(record.EntityType, record.PayloadJson);
-        record.UpdatePayload(encryptedPayload);
-
+        // 4. Phone and national ID never reach the outbox (Q-R2)
         record.PayloadJson.ShouldNotContain("119951234567");
         record.PayloadJson.ShouldNotContain("0923456789");
 

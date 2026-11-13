@@ -1,11 +1,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import GiftSummary from '@/Components/GiftSummary.vue';
 import { Head, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({
     attempts: Object,
     totals: Object,
+    gifts: Object,
     organizations: Array,
     filters: Object,
 });
@@ -132,6 +134,8 @@ const printReport = () => {
                 <p class="text-xl font-extrabold text-amber-600 dark:text-amber-400 mt-1">{{ totals.total_overridden }}</p>
             </div>
         </div>
+
+        <GiftSummary :gifts="gifts" title="ملخص قسائم الهدايا" subtitle="القسائم الصادرة في الفترة المحددة وحالتها حسب الجهة" />
 
         <!-- Report Table -->
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden mb-6">

@@ -89,3 +89,81 @@ jobs:
           name: laravel-logs
           path: web/storage/logs
           if-no-files-found: ignore
+
+  # R2.9: production is MySQL 8 in strict mode, the default test run is SQLite. This job loads the
+  # generated mysql_schema.sql into a real server (proves the file is valid SQL) and then runs the
+  # whole suite against MySQL. phpunit.xml does not force the SQLite values, so these env vars win.
+  test-mysql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: parkgate_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: parkgate_test
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, intl, bcmath, pdo_mysql
+          coverage: none
+          tools: composer:v2
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build assets
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+
+      - name: Load mysql_schema.sql into a clean database
+        working-directory: .
+        run: |
+          mysql -h127.0.0.1 -uroot -proot -e 'CREATE DATABASE parkgate_schema CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+          mysql -h127.0.0.1 -uroot -proot parkgate_schema < web/database/mysql_schema.sql
+          mysql -h127.0.0.1 -uroot -proot -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'parkgate_schema'"
+
+      - name: Test (MySQL 8, strict mode)
+        run: php artisan test
+
+      - name: Upload Laravel logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: laravel-logs-mysql
+          path: web/storage/logs
+          if-no-files-found: ignore

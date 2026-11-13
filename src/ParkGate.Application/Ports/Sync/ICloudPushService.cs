@@ -8,7 +8,10 @@ public enum PushFailureKind
     NetworkOrTimeout = 1,
     Unauthorized = 2,
     ServerError = 3,
-    PayloadRejected = 4
+    PayloadRejected = 4,
+
+    /// <summary>The agent itself is configured wrongly (for example a non-HTTPS base URL). Records are not at fault.</summary>
+    Misconfigured = 5
 }
 
 public sealed record PushBatchResult(
@@ -23,4 +26,7 @@ public sealed record PushBatchResult(
 public interface ICloudPushService
 {
     Task<PushBatchResult> PushBatchAsync(IReadOnlyList<SyncOutbox> batch, CancellationToken cancellationToken = default);
+
+    /// <summary>Tells the cloud the agent is alive and how many outbox rows are waiting or stuck (R2.5).</summary>
+    Task<PushBatchResult> SendHeartbeatAsync(int pendingCount, int failedCount, CancellationToken cancellationToken = default);
 }

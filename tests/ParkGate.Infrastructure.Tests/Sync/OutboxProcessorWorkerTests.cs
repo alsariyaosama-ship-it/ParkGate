@@ -16,15 +16,12 @@ public sealed class OutboxProcessorWorkerTests
     private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
     private readonly ISyncOutboxRepository _outboxRepo = Substitute.For<ISyncOutboxRepository>();
     private readonly ICloudPushService _pushService = Substitute.For<ICloudPushService>();
-    private readonly IPayloadEncryptionService _encryptionService = Substitute.For<IPayloadEncryptionService>();
     private readonly IOptionsMonitor<SyncOptions> _optionsMonitor = Substitute.For<IOptionsMonitor<SyncOptions>>();
 
     public OutboxProcessorWorkerTests()
     {
         _uow.SyncOutboxes.Returns(_outboxRepo);
         _uowFactory.Create().Returns(_uow);
-        _encryptionService.EncryptSensitiveFields(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(x => (string)x[1]);
         _optionsMonitor.CurrentValue.Returns(new SyncOptions
         {
             Enabled = true,
@@ -52,7 +49,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -80,7 +76,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -115,13 +110,38 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
         await worker.ProcessBatchAsync(_optionsMonitor.CurrentValue, CancellationToken.None);
 
         r1.RetryCount.ShouldBe(0);
+        await _pushService.Received(1).PushBatchAsync(Arg.Any<IReadOnlyList<SyncOutbox>>(), Arg.Any<CancellationToken>());
+        await _uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ProcessBatchAsync_WhenPushIsMisconfigured_DoesNotIncrementRetryCountOrSave()
+    {
+        var r1 = SyncOutbox.Create("Beneficiary", "ID-1", "Insert", "{\"name\":\"1\"}", DateTime.UtcNow);
+        var r2 = SyncOutbox.Create("Beneficiary", "ID-2", "Insert", "{\"name\":\"2\"}", DateTime.UtcNow);
+
+        _outboxRepo.GetPendingBatchAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SyncOutbox> { r1, r2 });
+
+        _pushService.PushBatchAsync(Arg.Any<IReadOnlyList<SyncOutbox>>(), Arg.Any<CancellationToken>())
+            .Returns(PushBatchResult.Failure(PushFailureKind.Misconfigured, "BaseUrl must be https"));
+
+        var worker = new OutboxProcessorWorker(
+            _uowFactory,
+            _pushService,
+            _optionsMonitor,
+            NullLogger<OutboxProcessorWorker>.Instance);
+
+        await worker.ProcessBatchAsync(_optionsMonitor.CurrentValue, CancellationToken.None);
+
+        r1.RetryCount.ShouldBe(0);
+        r2.RetryCount.ShouldBe(0);
         await _pushService.Received(1).PushBatchAsync(Arg.Any<IReadOnlyList<SyncOutbox>>(), Arg.Any<CancellationToken>());
         await _uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -153,7 +173,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -202,7 +221,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -236,7 +254,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -262,7 +279,6 @@ public sealed class OutboxProcessorWorkerTests
         var worker = new OutboxProcessorWorker(
             _uowFactory,
             _pushService,
-            _encryptionService,
             _optionsMonitor,
             NullLogger<OutboxProcessorWorker>.Instance);
 
@@ -279,5 +295,36 @@ public sealed class OutboxProcessorWorkerTests
         await _pushService.Received(1).PushBatchAsync(Arg.Any<IReadOnlyList<SyncOutbox>>(), Arg.Any<CancellationToken>());
 
         await _uow.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ProcessBatchAsync_AfterServerErrorThenSuccess_SendsTheStoredPayloadUnchangedBothTimes()
+    {
+        const string storedPayload = "{\"Id\":\"A\",\"FullName\":\"سالم\",\"Status\":1}";
+        var record = SyncOutbox.Create("Beneficiary", "ID-1", "Insert", storedPayload, DateTime.UtcNow);
+
+        _outboxRepo.GetPendingBatchAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SyncOutbox> { record });
+
+        var sentPayloads = new List<string>();
+        _pushService.PushBatchAsync(Arg.Do<IReadOnlyList<SyncOutbox>>(b => sentPayloads.Add(b[0].PayloadJson)), Arg.Any<CancellationToken>())
+            .Returns(
+                PushBatchResult.Failure(PushFailureKind.ServerError, "500 Server Error"),
+                PushBatchResult.Success());
+
+        var worker = new OutboxProcessorWorker(
+            _uowFactory,
+            _pushService,
+            _optionsMonitor,
+            NullLogger<OutboxProcessorWorker>.Instance);
+
+        await worker.ProcessBatchAsync(_optionsMonitor.CurrentValue, CancellationToken.None);
+        var storedAfterFailure = record.PayloadJson;
+        await worker.ProcessBatchAsync(_optionsMonitor.CurrentValue, CancellationToken.None);
+
+        storedAfterFailure.ShouldBe(storedPayload);
+        sentPayloads.Count.ShouldBe(2);
+        sentPayloads.ShouldAllBe(p => p == storedPayload);
+        record.RetryCount.ShouldBe(1);
     }
 }

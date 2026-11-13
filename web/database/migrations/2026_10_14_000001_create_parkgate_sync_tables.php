@@ -18,6 +18,10 @@ return new class extends Migration
             $table->integer('cooldown_minutes')->nullable();
             $table->boolean('is_default')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->unsignedInteger('max_free_companions')->nullable();
+            $table->boolean('gift_enabled')->default(false);
+            $table->decimal('gift_value', 10, 3)->default(0);
+            $table->unsignedInteger('gift_interval_days')->default(30);
             $table->timestamp('created_at_utc')->nullable();
             $table->timestamp('updated_at_utc')->nullable();
         });
@@ -28,6 +32,7 @@ return new class extends Migration
             $table->string('description_ar', 100)->nullable();
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_companion_limit_exempt')->default(false);
             $table->timestamps();
         });
 
@@ -36,8 +41,6 @@ return new class extends Migration
             $table->unsignedInteger('organization_id')->nullable()->index();
             $table->string('card_number', 50)->index();
             $table->string('full_name', 150)->index();
-            $table->string('phone', 255)->nullable();
-            $table->string('national_id', 255)->nullable();
             $table->date('card_expiry_date')->nullable();
             $table->unsignedTinyInteger('status')->default(1)->index();
             $table->string('status_reason', 250)->nullable();
@@ -85,6 +88,34 @@ return new class extends Migration
             $table->foreign('age_category_id')->references('id')->on('age_categories')->cascadeOnDelete();
         });
 
+        // The voucher token (the secret printed on the QR card) is never synced, so it has no column here.
+        Schema::create('gift_vouchers', function (Blueprint $table) {
+            $table->unsignedInteger('id')->primary();
+            $table->uuid('beneficiary_id')->nullable()->index();
+            $table->unsignedInteger('organization_id')->nullable();
+            $table->decimal('value', 10, 3);
+            $table->timestamp('issued_at_utc')->nullable();
+            $table->date('business_date');
+            $table->date('expires_on');
+            $table->unsignedTinyInteger('status')->default(1);
+            $table->unsignedInteger('issued_by_user_id')->nullable();
+            $table->unsignedInteger('issued_workstation_id')->nullable();
+            $table->boolean('is_override')->default(false);
+            $table->unsignedInteger('override_by_user_id')->nullable();
+            $table->string('override_reason', 250)->nullable();
+            $table->timestamp('redeemed_at_utc')->nullable();
+            $table->date('redeemed_business_date')->nullable();
+            $table->unsignedInteger('redeemed_by_user_id')->nullable();
+            $table->unsignedInteger('redeemed_workstation_id')->nullable();
+            $table->timestamp('voided_at_utc')->nullable();
+            $table->unsignedInteger('voided_by_user_id')->nullable();
+            $table->string('void_reason', 250)->nullable();
+
+            $table->index(['business_date', 'status']);
+            $table->foreign('beneficiary_id')->references('id')->on('beneficiaries')->nullOnDelete();
+            $table->foreign('organization_id')->references('id')->on('organizations')->nullOnDelete();
+        });
+
         Schema::create('sync_batches', function (Blueprint $table) {
             $table->id();
             $table->integer('records_count')->default(0);
@@ -97,6 +128,8 @@ return new class extends Migration
         Schema::create('park_heartbeats', function (Blueprint $table) {
             $table->id();
             $table->timestamp('last_heartbeat_at');
+            $table->unsignedInteger('pending_count')->default(0);
+            $table->unsignedInteger('failed_count')->default(0);
             $table->string('ip_address', 45)->nullable();
             $table->timestamp('created_at')->useCurrent();
         });
@@ -109,6 +142,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('park_heartbeats');
         Schema::dropIfExists('sync_batches');
+        Schema::dropIfExists('gift_vouchers');
         Schema::dropIfExists('entry_attempt_companions');
         Schema::dropIfExists('entry_attempts');
         Schema::dropIfExists('beneficiaries');

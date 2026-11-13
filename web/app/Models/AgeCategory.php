@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class AgeCategory extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -16,10 +17,12 @@ class AgeCategory extends Model
         'description_ar',
         'sort_order',
         'is_active',
+        'is_companion_limit_exempt',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_companion_limit_exempt' => 'boolean',
     ];
 
     public function companions(): HasMany

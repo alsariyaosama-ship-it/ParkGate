@@ -10,6 +10,8 @@ class ParkHeartbeat extends Model
 
     protected $fillable = [
         'last_heartbeat_at',
+        'pending_count',
+        'failed_count',
         'ip_address',
         'created_at',
     ];
@@ -17,5 +19,7 @@ class ParkHeartbeat extends Model
     protected $casts = [
         'last_heartbeat_at' => 'datetime',
         'created_at' => 'datetime',
+        'pending_count' => 'integer',
+        'failed_count' => 'integer',
     ];
 }

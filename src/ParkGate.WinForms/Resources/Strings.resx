@@ -274,6 +274,15 @@
   <data name="Status_Disconnected" xml:space="preserve">
     <value>غير متصل</value>
   </data>
+  <data name="Status_Sync_Ok" xml:space="preserve">
+    <value>المزامنة: سليمة ({0} بانتظار الإرسال)</value>
+  </data>
+  <data name="Status_Sync_Failed" xml:space="preserve">
+    <value>المزامنة: {0} سجلات متوقفة عن الإرسال</value>
+  </data>
+  <data name="Status_Sync_AgentStopped" xml:space="preserve">
+    <value>المزامنة: خدمة المزامنة متوقفة</value>
+  </data>
   <data name="Error_General_NotFound" xml:space="preserve">
     <value>السجل المطلوب غير موجود.</value>
   </data>

@@ -1,11 +1,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import GiftSummary from '@/Components/GiftSummary.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
     status: Object,
     kpis: Object,
     org_breakdown: Array,
+    gifts: Object,
     hourly_stats: Object,
     recent_entries: Array,
 });
@@ -28,6 +30,12 @@ defineProps({
                     </h2>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         آخر مزامنة: {{ status.last_sync }} &bull; آخر نبضة اتصال: {{ status.last_heartbeat ?? 'لا يوجد' }}
+                    </p>
+                    <p class="text-xs mt-1 text-slate-500 dark:text-slate-400" data-testid="sync-backlog">
+                        بانتظار الإرسال: <span class="font-mono font-semibold">{{ status.pending_count }}</span>
+                        <template v-if="status.failed_count > 0">
+                            &bull; <span class="font-semibold text-rose-700 dark:text-rose-300">سجلات متوقفة عن الإرسال: {{ status.failed_count }}</span>
+                        </template>
                     </p>
                 </div>
 
@@ -74,11 +82,11 @@ defineProps({
                     </div>
                 </div>
                 <div class="mt-3 flex items-baseline gap-2">
-                    <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ kpis.today_allowed.toLocaleString() }}</span>
+                    <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ kpis.today_entries.toLocaleString() }}</span>
                     <span class="text-xs text-slate-500 dark:text-slate-400">حركة</span>
                 </div>
                 <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
-                    <span>استثناءات المشرف: {{ kpis.today_overridden }}</span>
+                    <span>منها باستثناء المشرف: {{ kpis.today_overridden }}</span>
                 </div>
             </div>
 
@@ -169,6 +177,8 @@ defineProps({
                 </div>
             </div>
         </div>
+
+        <GiftSummary :gifts="gifts" title="قسائم الهدايا اليوم" subtitle="القسائم الصادرة اليوم وحالتها حسب الجهة" />
 
         <!-- Recent Synced Admissions Table -->
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">

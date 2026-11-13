@@ -210,6 +210,9 @@ internal class Strings
     internal static string Status_ServerTime => GetString(nameof(Status_ServerTime));
     internal static string Status_Connected => GetString(nameof(Status_Connected));
     internal static string Status_Disconnected => GetString(nameof(Status_Disconnected));
+    internal static string Status_Sync_Ok => GetString(nameof(Status_Sync_Ok));
+    internal static string Status_Sync_Failed => GetString(nameof(Status_Sync_Failed));
+    internal static string Status_Sync_AgentStopped => GetString(nameof(Status_Sync_AgentStopped));
 
     internal static string Error_General_NotFound => GetString(nameof(Error_General_NotFound));
     internal static string Error_General_Unauthorized => GetString(nameof(Error_General_Unauthorized));
