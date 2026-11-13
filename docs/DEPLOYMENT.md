@@ -204,6 +204,7 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
    قيمة `ApiKey` هي نفس قيمة `PARKGATE_API_KEY` في ملف `.env` على الاستضافة.
    ولّدها مرة واحدة على السيرفر بالأمر `php artisan parkgate:generate-key`.
    إذا كانت `PARKGATE_API_KEY` فارغة فالسحابة ترفض كل طلبات المزامنة.
+   يجب أن يبدأ `BaseUrl` بـ `https://`. الوكيل يرفض أي عنوان آخر ولا يرسل شيئاً، إلا إذا ضبطت `AllowInsecureHttp` على `true` (للتطوير المحلي فقط).
 
 ### 8.2 التثبيت كخدمة ويندوز (Windows Service)
 لتشغيل الووركر كخدمة تبدأ تلقائياً مع إقلاع السيرفر:

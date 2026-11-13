@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ParkGate.Application.Ports.Sync;
@@ -10,6 +12,9 @@ namespace ParkGate.Infrastructure.Sync;
 
 public sealed class CloudPushService : ICloudPushService
 {
+    /// <summary>Keys that must never reach the cloud (Q-R2, ADR-021). Last line of defence behind the extractor.</summary>
+    private static readonly string[] ForbiddenKeys = ["Phone", "NationalId"];
+
     private readonly HttpClient _httpClient;
     private readonly CloudApiOptions _options;
     private readonly ILogger<CloudPushService> _logger;
@@ -23,9 +28,11 @@ public sealed class CloudPushService : ICloudPushService
         _options = options.Value;
         _logger = logger;
 
-        if (!string.IsNullOrEmpty(_options.BaseUrl) && _httpClient.BaseAddress == null)
+        // A malformed URL is reported by IsBaseUrlAllowed() at push time, not by throwing here.
+        if (_httpClient.BaseAddress == null
+            && Uri.TryCreate(_options.BaseUrl.EndsWith('/') ? _options.BaseUrl : _options.BaseUrl + "/", UriKind.Absolute, out var baseAddress))
         {
-            _httpClient.BaseAddress = new Uri(_options.BaseUrl.EndsWith('/') ? _options.BaseUrl : _options.BaseUrl + "/");
+            _httpClient.BaseAddress = baseAddress;
         }
 
         if (!string.IsNullOrEmpty(_options.ApiKey) && !_httpClient.DefaultRequestHeaders.Contains("X-Api-Key"))
@@ -49,6 +56,25 @@ public sealed class CloudPushService : ICloudPushService
         if (batch.Count == 0)
         {
             return PushBatchResult.Success();
+        }
+
+        if (!IsBaseUrlAllowed())
+        {
+            _logger.LogError("CloudApi:BaseUrl must be an https:// address. Nothing was pushed.");
+            return PushBatchResult.Failure(PushFailureKind.Misconfigured, "CloudApi:BaseUrl must be an https:// address.");
+        }
+
+        var forbidden = batch.FirstOrDefault(r => ContainsForbiddenKey(r.PayloadJson));
+        if (forbidden is not null)
+        {
+            // Log the entity only: the payload itself holds the personal data.
+            _logger.LogError(
+                "Outbox record {EntityType} {EntityId} carries a field that must not leave the park. Nothing was pushed.",
+                forbidden.EntityType,
+                forbidden.EntityId);
+            return PushBatchResult.Failure(
+                PushFailureKind.PayloadRejected,
+                $"Record {forbidden.EntityType} {forbidden.EntityId} carries a field that must not leave the park.");
         }
 
         try
@@ -119,4 +145,36 @@ public sealed class CloudPushService : ICloudPushService
             return PushBatchResult.Failure(PushFailureKind.NetworkOrTimeout, $"Unexpected error: {ex.Message}");
         }
     }
+
+    private bool IsBaseUrlAllowed()
+    {
+        if (!Uri.TryCreate(_options.BaseUrl, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        return uri.Scheme == Uri.UriSchemeHttps
+            || (_options.AllowInsecureHttp && uri.Scheme == Uri.UriSchemeHttp);
+    }
+
+    /// <summary>Fails closed: a payload that cannot be parsed cannot be inspected, so it is treated as unsafe.</summary>
+    private static bool ContainsForbiddenKey(string payloadJson)
+    {
+        try
+        {
+            return ContainsForbiddenKey(JsonNode.Parse(payloadJson));
+        }
+        catch (JsonException)
+        {
+            return true;
+        }
+    }
+
+    private static bool ContainsForbiddenKey(JsonNode? node) => node switch
+    {
+        JsonObject obj => obj.Any(p =>
+            ForbiddenKeys.Contains(p.Key, StringComparer.OrdinalIgnoreCase) || ContainsForbiddenKey(p.Value)),
+        JsonArray array => array.Any(ContainsForbiddenKey),
+        _ => false
+    };
 }

@@ -121,6 +121,32 @@ public sealed class OutboxProcessorWorkerTests
     }
 
     [Fact]
+    public async Task ProcessBatchAsync_WhenPushIsMisconfigured_DoesNotIncrementRetryCountOrSave()
+    {
+        var r1 = SyncOutbox.Create("Beneficiary", "ID-1", "Insert", "{\"name\":\"1\"}", DateTime.UtcNow);
+        var r2 = SyncOutbox.Create("Beneficiary", "ID-2", "Insert", "{\"name\":\"2\"}", DateTime.UtcNow);
+
+        _outboxRepo.GetPendingBatchAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SyncOutbox> { r1, r2 });
+
+        _pushService.PushBatchAsync(Arg.Any<IReadOnlyList<SyncOutbox>>(), Arg.Any<CancellationToken>())
+            .Returns(PushBatchResult.Failure(PushFailureKind.Misconfigured, "BaseUrl must be https"));
+
+        var worker = new OutboxProcessorWorker(
+            _uowFactory,
+            _pushService,
+            _optionsMonitor,
+            NullLogger<OutboxProcessorWorker>.Instance);
+
+        await worker.ProcessBatchAsync(_optionsMonitor.CurrentValue, CancellationToken.None);
+
+        r1.RetryCount.ShouldBe(0);
+        r2.RetryCount.ShouldBe(0);
+        await _pushService.Received(1).PushBatchAsync(Arg.Any<IReadOnlyList<SyncOutbox>>(), Arg.Any<CancellationToken>());
+        await _uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task ProcessBatchAsync_WhenMultiRecordBatchFailsWithPayloadRejected_ExecutesSingleRecordFallback_PrunesSuccessesAndMarksFailureOnlyForPoisonRecord()
     {
         var good1 = SyncOutbox.Create("Beneficiary", "ID-1", "Insert", "{\"name\":\"Good1\"}", DateTime.UtcNow);

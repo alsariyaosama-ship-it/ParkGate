@@ -130,6 +130,14 @@ public sealed class OutboxProcessorWorker : BackgroundService
             return;
         }
 
+        if (pushResult.FailureKind == PushFailureKind.Misconfigured)
+        {
+            _logger.LogError(
+                "Cloud push is misconfigured ({Error}). Fix the CloudApi settings. Aborting cycle without incrementing record failure counters.",
+                pushResult.ErrorMessage);
+            return;
+        }
+
         // Failure is PayloadRejected or ServerError
         if (validRecords.Count > 1)
         {

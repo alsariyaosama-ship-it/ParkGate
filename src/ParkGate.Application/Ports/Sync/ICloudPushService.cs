@@ -8,7 +8,10 @@ public enum PushFailureKind
     NetworkOrTimeout = 1,
     Unauthorized = 2,
     ServerError = 3,
-    PayloadRejected = 4
+    PayloadRejected = 4,
+
+    /// <summary>The agent itself is configured wrongly (for example a non-HTTPS base URL). Records are not at fault.</summary>
+    Misconfigured = 5
 }
 
 public sealed record PushBatchResult(

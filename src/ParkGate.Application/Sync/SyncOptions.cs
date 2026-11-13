@@ -12,4 +12,7 @@ public sealed class CloudApiOptions
 {
     public string BaseUrl { get; set; } = string.Empty;
     public string ApiKey { get; set; } = string.Empty;
+
+    /// <summary>Allows an http:// base URL. For local development only; production must use https (R2.3).</summary>
+    public bool AllowInsecureHttp { get; set; }
 }
