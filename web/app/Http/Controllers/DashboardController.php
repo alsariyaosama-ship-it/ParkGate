@@ -96,6 +96,8 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'status' => [
                 'is_online' => $isOnline,
+                'pending_count' => $latestHeartbeat?->pending_count ?? 0,
+                'failed_count' => $latestHeartbeat?->failed_count ?? 0,
                 'last_heartbeat' => $lastHeartbeatDiff,
                 'last_sync' => $latestSync?->created_at?->diffForHumans() ?? '—',
             ],

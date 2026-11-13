@@ -455,6 +455,12 @@ public sealed class FakeSyncOutboxRepository : ISyncOutboxRepository
     {
         return Task.FromResult(_outboxes.Count(x => !x.IsProcessed));
     }
+
+    public Task<(int Pending, int Failed)> GetPendingAndFailedCountsAsync(int maxRetries, CancellationToken cancellationToken = default)
+    {
+        var unprocessed = _outboxes.Where(x => !x.IsProcessed).ToList();
+        return Task.FromResult((unprocessed.Count(x => x.RetryCount < maxRetries), unprocessed.Count(x => x.RetryCount >= maxRetries)));
+    }
 }
 
 public sealed class FakeUnitOfWork : IUnitOfWork

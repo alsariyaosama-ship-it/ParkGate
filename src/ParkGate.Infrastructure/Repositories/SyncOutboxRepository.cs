@@ -48,4 +48,16 @@ public sealed class SyncOutboxRepository : ISyncOutboxRepository
             .Where(x => !x.IsProcessed)
             .CountAsync(cancellationToken);
     }
+
+    public async Task<(int Pending, int Failed)> GetPendingAndFailedCountsAsync(
+        int maxRetries,
+        CancellationToken cancellationToken = default)
+    {
+        var failed = await _context.SyncOutboxes
+            .CountAsync(x => !x.IsProcessed && x.RetryCount >= maxRetries, cancellationToken);
+        var pending = await _context.SyncOutboxes
+            .CountAsync(x => !x.IsProcessed && x.RetryCount < maxRetries, cancellationToken);
+
+        return (pending, failed);
+    }
 }

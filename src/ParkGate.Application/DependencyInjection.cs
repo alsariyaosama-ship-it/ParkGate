@@ -10,6 +10,7 @@ using ParkGate.Application.Organizations.Services;
 using ParkGate.Application.Reports.Services;
 using ParkGate.Application.Security;
 using ParkGate.Application.Settings.Services;
+using ParkGate.Application.Sync;
 using ParkGate.Application.Users.Services;
 using ParkGate.Application.Workstations.Services;
 using ParkGate.Domain.Policies;
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddTransient<IReportService, ReportService>();
         services.AddTransient<IGiftVoucherService, GiftVoucherService>();
         services.AddTransient<IGiftReportService, GiftReportService>();
+        services.AddTransient<ISyncStatusService, SyncStatusService>();
 
         // 4. EntryCards services
         services.AddTransient<CardScanService>();

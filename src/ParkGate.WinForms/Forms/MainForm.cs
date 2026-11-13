@@ -5,6 +5,7 @@ using ParkGate.Application.Auth.Services;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Application.Settings.Services;
+using ParkGate.Application.Sync;
 using ParkGate.Domain.Enums;
 using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Resources;
@@ -17,6 +18,9 @@ public partial class MainForm : RtlFormBase
     private static readonly Color ConnectedColor = Color.FromArgb(27, 135, 63);
     private static readonly Color DisconnectedColor = Color.FromArgb(198, 40, 40);
 
+    /// <summary>The agent beats every minute; three missed beats means it is not running.</summary>
+    private static readonly TimeSpan AgentStaleAfter = TimeSpan.FromMinutes(3);
+
     private readonly ICurrentUser? _currentUser;
     private readonly ICurrentUserSession? _currentUserSession;
     private readonly ICurrentWorkstation? _currentWorkstation;
@@ -27,6 +31,7 @@ public partial class MainForm : RtlFormBase
     private readonly INotifyService? _notifyService;
     private readonly ILogger<MainForm>? _logger;
     private readonly IDatabaseBackupService? _databaseBackupService;
+    private readonly ISyncStatusService? _syncStatusService;
 
     private TimeSpan _serverUtcOffset = TimeSpan.Zero;
     private string? _parkTimeZoneId = "Libya Standard Time";
@@ -46,7 +51,8 @@ public partial class MainForm : RtlFormBase
         IFormFactory? formFactory,
         INotifyService? notifyService,
         ILogger<MainForm>? logger,
-        IDatabaseBackupService? databaseBackupService = null)
+        IDatabaseBackupService? databaseBackupService = null,
+        ISyncStatusService? syncStatusService = null)
     {
         InitializeComponent();
 
@@ -60,6 +66,7 @@ public partial class MainForm : RtlFormBase
         _notifyService = notifyService;
         _logger = logger;
         _databaseBackupService = databaseBackupService;
+        _syncStatusService = syncStatusService;
 
         InitializeFormText();
         ApplyCurrentUser();
@@ -425,7 +432,61 @@ public partial class MainForm : RtlFormBase
         {
             _logger?.LogWarning(ex, "Failed to synchronize server time with database.");
             SetConnectionState(false);
+            return;
         }
+
+        await RefreshSyncStatusAsync();
+    }
+
+    /// <summary>
+    /// Admin-only status line (R2.5): outbox rows that gave up are otherwise invisible. Hidden for other roles
+    /// and when the sync agent has never reported, so sites that do not use cloud sync see nothing.
+    /// </summary>
+    private async Task RefreshSyncStatusAsync()
+    {
+        if (_syncStatusService == null || !(_currentUser?.Has(Permission.ManageSettings) ?? false))
+        {
+            _statusSync.Visible = false;
+            return;
+        }
+
+        try
+        {
+            var result = await _syncStatusService.GetAsync();
+            if (result.IsFailure || result.Value.LastHeartbeatUtc is null)
+            {
+                _statusSync.Visible = false;
+                return;
+            }
+
+            var status = result.Value;
+            var heartbeatAge = DateTime.UtcNow + _serverUtcOffset - status.LastHeartbeatUtc.Value;
+
+            if (heartbeatAge > AgentStaleAfter)
+            {
+                ShowSyncStatus(Strings.Status_Sync_AgentStopped, DisconnectedColor);
+            }
+            else if (status.FailedCount > 0)
+            {
+                ShowSyncStatus(string.Format(Strings.Status_Sync_Failed, status.FailedCount), DisconnectedColor);
+            }
+            else
+            {
+                ShowSyncStatus(string.Format(Strings.Status_Sync_Ok, status.PendingCount), ConnectedColor);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Failed to read sync status.");
+            _statusSync.Visible = false;
+        }
+    }
+
+    private void ShowSyncStatus(string text, Color color)
+    {
+        _statusSync.Text = text;
+        _statusSync.ForeColor = color;
+        _statusSync.Visible = true;
     }
 
     private void SetConnectionState(bool connected)

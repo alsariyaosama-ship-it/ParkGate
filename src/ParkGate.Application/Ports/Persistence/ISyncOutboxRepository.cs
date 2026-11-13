@@ -9,4 +9,10 @@ public interface ISyncOutboxRepository
     Task AddRangeAsync(IEnumerable<SyncOutbox> outboxes, CancellationToken cancellationToken = default);
     Task DeleteRangeAsync(IEnumerable<SyncOutbox> outboxes, CancellationToken cancellationToken = default);
     Task<int> GetPendingCountAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Splits unprocessed rows into those still being retried and those that reached
+    /// <paramref name="maxRetries"/> and will never be sent again.
+    /// </summary>
+    Task<(int Pending, int Failed)> GetPendingAndFailedCountsAsync(int maxRetries, CancellationToken cancellationToken = default);
 }

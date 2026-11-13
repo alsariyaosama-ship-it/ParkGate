@@ -95,6 +95,8 @@ return new class extends Migration
         Schema::create('park_heartbeats', function (Blueprint $table) {
             $table->id();
             $table->timestamp('last_heartbeat_at');
+            $table->unsignedInteger('pending_count')->default(0);
+            $table->unsignedInteger('failed_count')->default(0);
             $table->string('ip_address', 45)->nullable();
             $table->timestamp('created_at')->useCurrent();
         });

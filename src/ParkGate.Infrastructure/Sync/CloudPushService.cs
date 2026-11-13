@@ -101,29 +101,7 @@ public sealed class CloudPushService : ICloudPushService
                 return PushBatchResult.Success();
             }
 
-            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            _logger.LogError(
-                "Failed to push records to cloud. StatusCode: {StatusCode}, Details: {Details}",
-                response.StatusCode,
-                errorContent);
-
-            var statusCode = response.StatusCode;
-            if (statusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
-            {
-                return PushBatchResult.Failure(PushFailureKind.Unauthorized, $"Status {(int)statusCode}: {errorContent}");
-            }
-
-            if (statusCode is HttpStatusCode.BadRequest || (int)statusCode == 422)
-            {
-                return PushBatchResult.Failure(PushFailureKind.PayloadRejected, $"Status {(int)statusCode}: {errorContent}");
-            }
-
-            if ((int)statusCode >= 500 && (int)statusCode <= 599)
-            {
-                return PushBatchResult.Failure(PushFailureKind.ServerError, $"Status {(int)statusCode}: {errorContent}");
-            }
-
-            return PushBatchResult.Failure(PushFailureKind.PayloadRejected, $"Status {(int)statusCode}: {errorContent}");
+            return await MapFailureAsync(response, cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -144,6 +122,59 @@ public sealed class CloudPushService : ICloudPushService
             _logger.LogError(ex, "Exception while attempting to push sync batch to cloud API.");
             return PushBatchResult.Failure(PushFailureKind.NetworkOrTimeout, $"Unexpected error: {ex.Message}");
         }
+    }
+
+    public async Task<PushBatchResult> SendHeartbeatAsync(int pendingCount, int failedCount, CancellationToken cancellationToken = default)
+    {
+        if (!IsBaseUrlAllowed())
+        {
+            _logger.LogError("CloudApi:BaseUrl must be an https:// address. No heartbeat was sent.");
+            return PushBatchResult.Failure(PushFailureKind.Misconfigured, "CloudApi:BaseUrl must be an https:// address.");
+        }
+
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/sync/heartbeat", new { pendingCount, failedCount }, cancellationToken);
+            return response.IsSuccessStatusCode
+                ? PushBatchResult.Success()
+                : await MapFailureAsync(response, cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex) when (ex is TaskCanceledException or HttpRequestException)
+        {
+            _logger.LogWarning(ex, "Could not reach the cloud API to send a heartbeat.");
+            return PushBatchResult.Failure(PushFailureKind.NetworkOrTimeout, $"Network error: {ex.Message}");
+        }
+    }
+
+    private async Task<PushBatchResult> MapFailureAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        _logger.LogError(
+            "Failed to push records to cloud. StatusCode: {StatusCode}, Details: {Details}",
+            response.StatusCode,
+            errorContent);
+
+        var statusCode = response.StatusCode;
+        if (statusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+        {
+            return PushBatchResult.Failure(PushFailureKind.Unauthorized, $"Status {(int)statusCode}: {errorContent}");
+        }
+
+        if (statusCode is HttpStatusCode.BadRequest || (int)statusCode == 422)
+        {
+            return PushBatchResult.Failure(PushFailureKind.PayloadRejected, $"Status {(int)statusCode}: {errorContent}");
+        }
+
+        if ((int)statusCode >= 500 && (int)statusCode <= 599)
+        {
+            return PushBatchResult.Failure(PushFailureKind.ServerError, $"Status {(int)statusCode}: {errorContent}");
+        }
+
+        return PushBatchResult.Failure(PushFailureKind.PayloadRejected, $"Status {(int)statusCode}: {errorContent}");
     }
 
     private bool IsBaseUrlAllowed()

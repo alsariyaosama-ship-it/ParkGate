@@ -226,6 +226,8 @@ DROP TABLE IF EXISTS `park_heartbeats`;
 CREATE TABLE `park_heartbeats` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `last_heartbeat_at` timestamp NOT NULL,
+  `pending_count` int unsigned NOT NULL DEFAULT '0',
+  `failed_count` int unsigned NOT NULL DEFAULT '0',
   `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

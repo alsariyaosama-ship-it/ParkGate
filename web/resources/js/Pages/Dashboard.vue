@@ -29,6 +29,12 @@ defineProps({
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         آخر مزامنة: {{ status.last_sync }} &bull; آخر نبضة اتصال: {{ status.last_heartbeat ?? 'لا يوجد' }}
                     </p>
+                    <p class="text-xs mt-1 text-slate-500 dark:text-slate-400" data-testid="sync-backlog">
+                        بانتظار الإرسال: <span class="font-mono font-semibold">{{ status.pending_count }}</span>
+                        <template v-if="status.failed_count > 0">
+                            &bull; <span class="font-semibold text-rose-700 dark:text-rose-300">سجلات متوقفة عن الإرسال: {{ status.failed_count }}</span>
+                        </template>
+                    </p>
                 </div>
 
                 <div class="flex items-center gap-2">

@@ -15,6 +15,7 @@ public sealed class CloudPushServiceTests
     {
         private readonly HttpStatusCode _statusCode;
         public HttpRequestMessage? LastRequest { get; private set; }
+        public string? LastBody { get; private set; }
 
         public FakeHttpMessageHandler(HttpStatusCode statusCode)
         {
@@ -24,6 +25,7 @@ public sealed class CloudPushServiceTests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             LastRequest = request;
+            LastBody = request.Content is null ? null : request.Content.ReadAsStringAsync(cancellationToken).GetAwaiter().GetResult();
             var response = new HttpResponseMessage(_statusCode)
             {
                 Content = new StringContent(_statusCode == HttpStatusCode.OK ? "{\"status\":\"ok\"}" : "Error Details")
@@ -182,5 +184,49 @@ public sealed class CloudPushServiceTests
         var result = await service.PushBatchAsync(new[] { record });
 
         result.IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task SendHeartbeatAsync_PostsCountsToHeartbeatEndpoint()
+    {
+        var handler = new FakeHttpMessageHandler(HttpStatusCode.OK);
+        var service = CreateService(handler, new CloudApiOptions { BaseUrl = "https://api.test.ly", ApiKey = "KEY123" });
+
+        var result = await service.SendHeartbeatAsync(pendingCount: 7, failedCount: 2);
+
+        result.IsSuccess.ShouldBeTrue();
+        handler.LastRequest!.RequestUri!.AbsolutePath.ShouldEndWith("api/sync/heartbeat");
+        handler.LastRequest.Method.ShouldBe(HttpMethod.Post);
+        handler.LastBody.ShouldNotBeNull();
+        using var doc = System.Text.Json.JsonDocument.Parse(handler.LastBody);
+        doc.RootElement.GetProperty("pendingCount").GetInt32().ShouldBe(7);
+        doc.RootElement.GetProperty("failedCount").GetInt32().ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task SendHeartbeatAsync_BaseUrlThatIsNotHttps_MakesNoHttpCall()
+    {
+        var handler = new FakeHttpMessageHandler(HttpStatusCode.OK);
+        var service = CreateService(handler, new CloudApiOptions { BaseUrl = "http://api.test.ly", ApiKey = "KEY123" });
+
+        var result = await service.SendHeartbeatAsync(0, 0);
+
+        result.FailureKind.ShouldBe(PushFailureKind.Misconfigured);
+        handler.LastRequest.ShouldBeNull();
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.Unauthorized, PushFailureKind.Unauthorized)]
+    [InlineData(HttpStatusCode.InternalServerError, PushFailureKind.ServerError)]
+    [InlineData(HttpStatusCode.UnprocessableEntity, PushFailureKind.PayloadRejected)]
+    public async Task SendHeartbeatAsync_ErrorResponse_MapsToFailureKind(HttpStatusCode status, PushFailureKind expected)
+    {
+        var handler = new FakeHttpMessageHandler(status);
+        var service = CreateService(handler, new CloudApiOptions { BaseUrl = "https://api.test.ly", ApiKey = "KEY123" });
+
+        var result = await service.SendHeartbeatAsync(0, 0);
+
+        result.IsSuccess.ShouldBeFalse();
+        result.FailureKind.ShouldBe(expected);
     }
 }
