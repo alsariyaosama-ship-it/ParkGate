@@ -16,12 +16,13 @@ public static class OutboxEntityExtractor
         nameof(EntryAttempt),
         nameof(EntryAttemptCompanion),
         nameof(Organization),
-        nameof(AgeCategory)
+        nameof(AgeCategory),
+        nameof(GiftVoucher)
     };
 
     /// <summary>
-    /// Properties that must never leave the park (Q-R2). The cloud does not store phone numbers
-    /// or national IDs, so they are excluded from the payload instead of being encrypted.
+    /// Properties that must never leave the park. The cloud does not store phone numbers or national
+    /// IDs (Q-R2) nor gift voucher tokens (R2.7), so they are excluded instead of being encrypted.
     /// </summary>
     private static readonly Dictionary<string, HashSet<string>> ExcludedProperties = new(StringComparer.Ordinal)
     {
@@ -29,6 +30,13 @@ public static class OutboxEntityExtractor
         {
             nameof(Beneficiary.Phone),
             nameof(Beneficiary.NationalId)
+        },
+        // The token is the bearer credential printed on the QR card (ADR-020). The cloud only
+        // reports on vouchers, so it never needs the secret or the signing key id (R2.7).
+        [nameof(GiftVoucher)] = new(StringComparer.Ordinal)
+        {
+            nameof(GiftVoucher.Token),
+            nameof(GiftVoucher.KeyId)
         }
     };
 

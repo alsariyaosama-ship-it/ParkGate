@@ -125,7 +125,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
   2. **Storage:** `GiftVouchers` is an EF Core-managed table (entity + `IEntityTypeConfiguration`), not a raw SQL table like `EntryCards`. Migration: `AddGiftVouchersAndCompanionLimit`.
   3. **Rolling interval:** gift eligibility uses a rolling window of days (`GiftIntervalDays` per org, default 30) measured from the last non-voided voucher's `IssuedAtUtc`, matching BR-03/BR-04 style.
   4. **Companion limit:** `MaxFreeCompanions` per org (NULL = no limit). Infants (age category `IsCompanionLimitExempt = true`) do not count. Exceeding the limit **rejects** check-in; no supervisor override.
-  5. **Cloud sync:** `GiftVoucher` is NOT added to `OutboxEntityExtractor.SyncableTypes` in Phase F5.
+  5. **Cloud sync:** `GiftVoucher` is NOT added to `OutboxEntityExtractor.SyncableTypes` in Phase F5. *(Superseded by ADR-022: it is synced from R2.7.)*
   6. **Keyboard shortcuts:** F6 = issue gift, F7 = supervisor override gift (added to AGENTS.md §5.11).
 - **Consequences:** Existing entry-card QRs continue to verify unchanged (regression-tested). New `GiftVouchers` table isolated from the sync outbox. Companion limit enforced server-side in `CheckInService`.
 
@@ -136,6 +136,14 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Context:** The cloud only needs aggregates and holder names. Field-level AES encryption (ADR-018/019) added a shared key to distribute, a double-encryption bug after a failed push (R2.1), and still put personal data on a shared host.
 - **Decision:** `Phone` and `NationalId` are excluded from the `Beneficiary` outbox payload by an explicit per-entity exclusion list in `OutboxEntityExtractor`. The cloud has no columns for them. `PayloadEncryptionService`, `AesHelper`, `CloudApiOptions.AesKey` and `PARKGATE_AES_KEY` are removed. `Notes` and `StatusReason` keep syncing (Q-R2b). Migration `PurgeSensitiveBeneficiaryOutbox` deletes pending Beneficiary rows and re-queues one clean row per holder. The cloud rejects a payload that is not a JSON object (422) instead of skipping it.
 - **Consequences:** No key management between the park and the host. Old cloud rows are not migrated: the web schema is unreleased and is edited in place (R2.6).
+
+---
+
+### ADR-022 — Gift vouchers sync to the cloud, without the redeemable token
+- **Status:** Proposed (R2.7; the token exclusion is the agent's choice, awaiting Osama's approval)
+- **Context:** ADR-020 item 5 kept `GiftVoucher` out of the outbox for Phase F5 only. The remediation plan (R2.7) needs gift totals on the cloud dashboard and reports. The voucher `Token` is the bearer credential printed on the QR card, and the cloud only reports on vouchers.
+- **Decision:** `GiftVoucher` is in `OutboxEntityExtractor.SyncableTypes`. An exclusion entry removes `Token` and `KeyId` from its payload, and the cloud `gift_vouchers` table has no such columns. The cloud ingests `GiftVoucher` after `Beneficiary` in dependency order. Organization gift policy and companion limit (`MaxFreeCompanions`, `GiftEnabled`, `GiftValue`, `GiftIntervalDays`) and `AgeCategory.IsCompanionLimitExempt` were already in those payloads and now get cloud columns. Migration `RequeueGiftAndPolicyOutbox` queues one current-state row per existing organization, age category and voucher. Dashboard and reports group vouchers by issue `BusinessDate`, which equals the redeem date because a voucher expires on the day it is issued.
+- **Consequences:** A leaked cloud database cannot redeem vouchers. The web schema stays unreleased and is edited in place.
 
 ---
 

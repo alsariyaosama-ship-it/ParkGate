@@ -7,6 +7,7 @@ use App\Models\AgeCategory;
 use App\Models\Beneficiary;
 use App\Models\EntryAttempt;
 use App\Models\EntryAttemptCompanion;
+use App\Models\GiftVoucher;
 use App\Models\Organization;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,7 @@ class SyncIngestionService
         'Beneficiary',
         'EntryAttempt',
         'EntryAttemptCompanion',
+        'GiftVoucher',
     ];
 
     /**
@@ -133,6 +135,10 @@ class SyncIngestionService
                 $this->upsertEntryAttemptCompanion($opType, $data);
                 break;
 
+            case 'GiftVoucher':
+                $this->upsertGiftVoucher($opType, $data);
+                break;
+
             default:
                 Log::info("Ignoring unhandled sync entity type: {$entityType}");
                 break;
@@ -157,6 +163,10 @@ class SyncIngestionService
                 'cooldown_minutes' => $data['CooldownMinutes'] ?? null,
                 'is_default' => (bool)($data['IsDefault'] ?? false),
                 'is_active' => (bool)($data['IsActive'] ?? true),
+                'max_free_companions' => $data['MaxFreeCompanions'] ?? null,
+                'gift_enabled' => (bool)($data['GiftEnabled'] ?? false),
+                'gift_value' => $data['GiftValue'] ?? 0,
+                'gift_interval_days' => $data['GiftIntervalDays'] ?? 30,
                 'created_at_utc' => $data['CreatedAtUtc'] ?? null,
                 'updated_at_utc' => $data['UpdatedAtUtc'] ?? null,
             ]
@@ -180,6 +190,7 @@ class SyncIngestionService
                 'description_ar' => $data['DescriptionAr'] ?? null,
                 'sort_order' => $data['SortOrder'] ?? 0,
                 'is_active' => (bool)($data['IsActive'] ?? true),
+                'is_companion_limit_exempt' => (bool)($data['IsCompanionLimitExempt'] ?? false),
             ]
         );
     }
@@ -268,6 +279,43 @@ class SyncIngestionService
             ],
             [
                 'count' => $data['Count'] ?? 0,
+            ]
+        );
+    }
+
+    private function upsertGiftVoucher(string $opType, array $data): void
+    {
+        $id = $data['Id'] ?? null;
+        if (!$id) return;
+
+        if ($opType === 'Delete') {
+            GiftVoucher::destroy($id);
+            return;
+        }
+
+        // The voucher token and signing key id are deliberately never read (R2.7): the cloud only reports.
+        GiftVoucher::updateOrCreate(
+            ['id' => $id],
+            [
+                'beneficiary_id' => $data['BeneficiaryId'] ?? null,
+                'organization_id' => $data['OrganizationId'] ?? null,
+                'value' => $data['Value'] ?? 0,
+                'issued_at_utc' => $data['IssuedAtUtc'] ?? null,
+                'business_date' => $data['BusinessDate'] ?? now()->toDateString(),
+                'expires_on' => $data['ExpiresOn'] ?? ($data['BusinessDate'] ?? now()->toDateString()),
+                'status' => $data['Status'] ?? 1,
+                'issued_by_user_id' => $data['IssuedByUserId'] ?? null,
+                'issued_workstation_id' => $data['IssuedWorkstationId'] ?? null,
+                'is_override' => (bool)($data['IsOverride'] ?? false),
+                'override_by_user_id' => $data['OverrideByUserId'] ?? null,
+                'override_reason' => $data['OverrideReason'] ?? null,
+                'redeemed_at_utc' => $data['RedeemedAtUtc'] ?? null,
+                'redeemed_business_date' => $data['RedeemedBusinessDate'] ?? null,
+                'redeemed_by_user_id' => $data['RedeemedByUserId'] ?? null,
+                'redeemed_workstation_id' => $data['RedeemedWorkstationId'] ?? null,
+                'voided_at_utc' => $data['VoidedAtUtc'] ?? null,
+                'voided_by_user_id' => $data['VoidedByUserId'] ?? null,
+                'void_reason' => $data['VoidReason'] ?? null,
             ]
         );
     }

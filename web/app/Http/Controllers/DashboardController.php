@@ -7,6 +7,7 @@ use App\Models\EntryAttempt;
 use App\Models\Organization;
 use App\Models\ParkHeartbeat;
 use App\Models\SyncBatch;
+use App\Services\GiftSummaryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,7 +18,7 @@ class DashboardController extends Controller
     /** Granted and supervisor-overridden attempts both let people in. */
     private const ENTRY_RESULTS = [1, 3];
 
-    public function index(Request $request): Response
+    public function index(Request $request, GiftSummaryService $gifts): Response
     {
         // business_date is the park's local date, so "today" is too (R2.8). The app timezone stays UTC
         // because every *_utc column is stored and read as UTC.
@@ -122,6 +123,7 @@ class DashboardController extends Controller
                 'active_beneficiaries' => $activeBeneficiaries,
             ],
             'org_breakdown' => $orgBreakdown,
+            'gifts' => $gifts->summarize($today, $today),
             'hourly_stats' => $hourlyData,
             'recent_entries' => $recentEntries,
         ]);

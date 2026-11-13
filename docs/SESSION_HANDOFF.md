@@ -10,17 +10,27 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-13 |
-| Last session | S29 — Phase R2 sync correctness: R2.1–R2.6 and R2.8 done, R1.8 done; R2.7 and R2.9 left |
+| Last session | S30 — Phase R2: R2.7 gift vouchers sync done; R2.9 and the end-to-end test left |
 | Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 merged (PR #12). R2 in progress |
 | Working branch | `phase/r2-sync` (main already merged into it after PR #12) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
-| .NET Unit tests | 617 passed: 202 domain + 177 application + 84 infrastructure + 154 architecture |
-| .NET Integration tests | 38 passed on LocalDB (S29) |
-| Web tests | `php artisan test` (PHP 8.4, SQLite): 79 passed (S29; 58 at the end of R1) |
-| Total tests | 734 (655 .NET + 79 web), all green |
-| Latest migration | `20261113…_AddSyncOutboxSequence` (S29). Applied on LocalDB by the tests; **not yet applied on SQLEXPRESS** (see Blockers) |
+| .NET Unit tests | 620 passed: 202 domain + 177 application + 87 infrastructure + 154 architecture |
+| .NET Integration tests | 39 passed on LocalDB (S30) |
+| Web tests | `php artisan test` (PHP 8.4, SQLite): 89 passed (S30; 79 at the end of S29) |
+| Total tests | 748 (659 .NET + 89 web), all green |
+| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (S30). Applied on LocalDB by the tests; **not yet applied on SQLEXPRESS** (see Blockers) |
 
 ## State of the work
+
+**Completed in S30 (on `phase/r2-sync`):**
+
+- R2.7 Gift vouchers sync (ADR-022, Proposed). `GiftVoucher` is in `SyncableTypes`; `Token` and `KeyId` are excluded
+  from its payload (the token is the redeemable QR secret). Organization gift policy / `MaxFreeCompanions` and
+  `AgeCategory.IsCompanionLimitExempt` were already serialized; the web now stores them. Migration
+  `RequeueGiftAndPolicyOutbox` queues one row per existing organization, age category and voucher. Web: `gift_vouchers`
+  table (existing migration edited in place), `GiftVoucher` model, ingestion (after `Beneficiary`),
+  `GiftSummaryService` (SQL aggregation by issue business date) feeding a `gifts` prop on the dashboard and reports,
+  shared `GiftSummary.vue`. `mysql_schema.sql` hand-edited again (R2.9 will generate it).
 
 **Completed in S29 (pushed on `phase/r2-sync`), one commit per task, each test-first:**
 
@@ -49,9 +59,6 @@
 - None.
 
 **Left in Phase R2**
-- R2.7 Gift vouchers sync (entity in the outbox, web `gift_vouchers` table/model/ingestion, gifts summary on the
-  dashboard and reports, new organization and age-category fields). ADR-020 item 5 and F5 plan A7 said "not synced in
-  F5"; they were scoped to that phase and the remediation plan supersedes them. Record that in the ADR when doing it.
 - R2.9 MySQL parity (CI job against MySQL 8, ISO-8601 timestamps with 7 fractional digits and `Z` in strict mode,
   generate `mysql_schema.sql` from the migrations). Note: `mysql_schema.sql` was hand-edited in S29 (R2.6, R2.5) until
   R2.9 generates it.
@@ -65,8 +72,8 @@
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
 1. PR #12 (R1) is merged into `main`. Continue on `phase/r2-sync`.
-2. Finish R2: R2.7 first (desktop extractor + web table + dashboard/report summary), then R2.9, then the
-   end-to-end test. Then open the R2 PR.
+2. Finish R2: R2.9 (MySQL parity), then the end-to-end test from the plan's "Done when". Then open the R2 PR.
+   Ask Osama to approve ADR-022 (token excluded from the cloud).
 3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
    dedicated `chore` commit, or do it in R9. Tip: Python on Windows writes CRLF; edit with `newline=''`.
 
@@ -76,8 +83,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **Apply the two new migrations on SQLEXPRESS** (`PurgeSensitiveBeneficiaryOutbox`, `AddSyncOutboxSequence`) before running the new SyncAgent there. Existing pending outbox rows get their sequence numbers in physical order.
-- **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts). On an already-created cloud database, drop and recreate `beneficiaries` and `park_heartbeats` (unreleased schema) or re-import `mysql_schema.sql`, then let the agent re-queue.
+- **Apply the three new migrations on SQLEXPRESS** (`PurgeSensitiveBeneficiaryOutbox`, `AddSyncOutboxSequence`, `RequeueGiftAndPolicyOutbox`) before running the new SyncAgent there. Existing pending outbox rows get their sequence numbers in physical order.
+- **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, drop and recreate `organizations`, `age_categories`, `beneficiaries`, `park_heartbeats` and create `gift_vouchers` (unreleased schema) or re-import `mysql_schema.sql`, then let the agent re-queue.
 - Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
 - Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
   and `NationalId`. R2.6 is unblocked.
@@ -97,6 +104,12 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Session Log (last 10 sessions)
 
+### S30 — 2026-11-13 — Phase R2: R2.7
+- Did R2.7 test-first: extractor + exclusion list, data migration, web ingestion/model/summary/Vue, ADR-022.
+- Declined the `laravel/boost` install asked for by `web/CLAUDE.md` (AGENTS.md §2: new packages need approval).
+- `dotnet ef` needs `--project src/ParkGate.Infrastructure` only (the design-time factory lives there); the WinForms
+  project is not a valid startup project.
+- Test counts: .NET unit 617 → 620, integration 38 → 39, web 79 → 89.
 ### S29 — 2026-11-13 — Phase R2: R2.1–R2.6, R2.8, R1.8
 - Created `phase/r2-sync` from `phase/r1-web-security` (PR #12 still open) and pushed it.
 - Did R2.6 → R1.8 → R2.1 → R2.2 → R2.3 → R2.4 → R2.5 → R2.8, one commit each, test-first. Left R2.7, R2.9.

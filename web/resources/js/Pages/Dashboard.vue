@@ -1,11 +1,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import GiftSummary from '@/Components/GiftSummary.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
     status: Object,
     kpis: Object,
     org_breakdown: Array,
+    gifts: Object,
     hourly_stats: Object,
     recent_entries: Array,
 });
@@ -175,6 +177,8 @@ defineProps({
                 </div>
             </div>
         </div>
+
+        <GiftSummary :gifts="gifts" title="قسائم الهدايا اليوم" subtitle="القسائم الصادرة اليوم وحالتها حسب الجهة" />
 
         <!-- Recent Synced Admissions Table -->
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">

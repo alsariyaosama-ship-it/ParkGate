@@ -169,7 +169,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R2.3 Last-line guard in `CloudPushService` against sensitive fields and non-HTTPS base URLs
 - [x] R2.4 Sort cloud ingestion records by dependency (parent before child)
 - [x] R2.5 Report poison outbox rows in the heartbeat, dashboard and desk status bar
-- [ ] R2.7 Sync gift vouchers and the new organization / age-category fields
+- [x] R2.7 Sync gift vouchers and the new organization / age-category fields
 - [x] R2.8 Fix dashboard counts (timezone, Overridden, voided, aggregate in SQL)
 - [ ] R2.9 MySQL parity: CI run against MySQL 8; generate `mysql_schema.sql` from the migrations
 

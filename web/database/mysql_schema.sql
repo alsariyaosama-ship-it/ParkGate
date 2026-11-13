@@ -98,6 +98,10 @@ CREATE TABLE `organizations` (
   `cooldown_minutes` int DEFAULT NULL,
   `is_default` tinyint(1) NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `max_free_companions` int unsigned DEFAULT NULL,
+  `gift_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `gift_value` decimal(10,3) NOT NULL DEFAULT '0.000',
+  `gift_interval_days` int unsigned NOT NULL DEFAULT '30',
   `created_at_utc` timestamp NULL DEFAULT NULL,
   `updated_at_utc` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -119,6 +123,7 @@ CREATE TABLE `age_categories` (
   `description_ar` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sort_order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `is_companion_limit_exempt` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -203,6 +208,38 @@ CREATE TABLE `entry_attempt_companions` (
   KEY `entry_attempt_companions_age_category_id_index` (`age_category_id`),
   CONSTRAINT `entry_attempt_companions_entry_attempt_id_foreign` FOREIGN KEY (`entry_attempt_id`) REFERENCES `entry_attempts` (`id`) ON DELETE CASCADE,
   CONSTRAINT `entry_attempt_companions_age_category_id_foreign` FOREIGN KEY (`age_category_id`) REFERENCES `age_categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Table structure for gift_vouchers (the voucher token is never synced, so it has no column)
+-- ----------------------------
+DROP TABLE IF EXISTS `gift_vouchers`;
+CREATE TABLE `gift_vouchers` (
+  `id` int unsigned NOT NULL,
+  `beneficiary_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `organization_id` int unsigned DEFAULT NULL,
+  `value` decimal(10,3) NOT NULL,
+  `issued_at_utc` timestamp NULL DEFAULT NULL,
+  `business_date` date NOT NULL,
+  `expires_on` date NOT NULL,
+  `status` tinyint unsigned NOT NULL DEFAULT '1',
+  `issued_by_user_id` int unsigned DEFAULT NULL,
+  `issued_workstation_id` int unsigned DEFAULT NULL,
+  `is_override` tinyint(1) NOT NULL DEFAULT '0',
+  `override_by_user_id` int unsigned DEFAULT NULL,
+  `override_reason` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `redeemed_at_utc` timestamp NULL DEFAULT NULL,
+  `redeemed_business_date` date DEFAULT NULL,
+  `redeemed_by_user_id` int unsigned DEFAULT NULL,
+  `redeemed_workstation_id` int unsigned DEFAULT NULL,
+  `voided_at_utc` timestamp NULL DEFAULT NULL,
+  `voided_by_user_id` int unsigned DEFAULT NULL,
+  `void_reason` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `gift_vouchers_beneficiary_id_index` (`beneficiary_id`),
+  KEY `gift_vouchers_business_date_status_index` (`business_date`,`status`),
+  CONSTRAINT `gift_vouchers_beneficiary_id_foreign` FOREIGN KEY (`beneficiary_id`) REFERENCES `beneficiaries` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `gift_vouchers_organization_id_foreign` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
