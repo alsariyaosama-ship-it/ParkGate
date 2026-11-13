@@ -266,6 +266,73 @@ public sealed class CheckInServiceTests
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 2);
     }
 
+    // ── R3.3: no silent fallback to user or workstation id 1 ────────────────
+
+    [Fact]
+    public async Task RecordEntryAsync_WhenWorkstationNotRegistered_ReturnsWorkstationNotFoundAndRecordsNothing()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-NOWS"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+        _currentWorkstation.Clear();
+
+        var result = await _sut.RecordEntryAsync(new RecordEntryRequest(holder.Id));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+        _attempts.ShouldBeEmpty();
+        holder.LastGrantedEntryUtc.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_WhenWorkstationNotRegistered_ReturnsWorkstationNotFound()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-NOWS2"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+        _currentWorkstation.Clear();
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorUserId: 2));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+        _attempts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_WhenNobodyIsSignedIn_ReturnsUnauthorized()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-NOUSER"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+        _currentUser.Clear();
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorUserId: 2));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
+        _attempts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_WithSupervisorButNobodySignedIn_ReturnsUnauthorized()
+    {
+        _currentUser.Clear();
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(Guid.NewGuid(), "إدخال بالخطأ"), supervisorUserId: 2);
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
+    }
+
+    [Fact]
+    public async Task GetTodayDeskEntriesAsync_WhenNoWorkstationGivenOrRegistered_ReturnsWorkstationNotFound()
+    {
+        _currentWorkstation.Clear();
+
+        var result = await _sut.GetTodayDeskEntriesAsync();
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+    }
+
     [Fact]
     public async Task GetTodayDeskEntriesAsync_WithMoreAttemptsThanTheGridShows_CountsEveryAttempt()
     {

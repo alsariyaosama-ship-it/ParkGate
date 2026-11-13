@@ -54,6 +54,12 @@ public sealed class CheckInService : ICheckInService
             return Errors.General.Forbidden;
         }
 
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
+        }
+
         var validation = await _recordValidator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
         {
@@ -96,8 +102,7 @@ public sealed class CheckInService : ICheckInService
         var context = new EligibilityContext(org, holder, defaultCooldown, nowUtc, businessDate);
         var decision = _eligibilityPolicy.Evaluate(context);
 
-        var workstationId = _currentWorkstation.WorkstationId ?? 1;
-        var userId = _currentUser.UserId ?? 1;
+        var (userId, workstationId) = actor.Value;
 
         if (!decision.IsEligible)
         {
@@ -183,6 +188,12 @@ public sealed class CheckInService : ICheckInService
         OverrideEntryRequest request,
         CancellationToken cancellationToken = default)
     {
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
+        }
+
         int approverUserId;
         if (_currentUser.Has(Permission.OverrideDenial))
         {
@@ -257,8 +268,7 @@ public sealed class CheckInService : ICheckInService
             .Select(c => new EntryAttemptCompanion(c.AgeCategoryId, c.Count))
             .ToList();
 
-        var workstationId = _currentWorkstation.WorkstationId ?? 1;
-        var userId = _currentUser.UserId ?? approverUserId;
+        var (userId, workstationId) = actor.Value;
 
         var attempt = EntryAttempt.CreateOverridden(
             attemptId,
@@ -309,7 +319,13 @@ public sealed class CheckInService : ICheckInService
         int? supervisorUserId = null,
         CancellationToken cancellationToken = default)
     {
-        var voidedByUserId = supervisorUserId ?? _currentUser.UserId ?? 0;
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
+        }
+
+        var voidedByUserId = supervisorUserId ?? actor.Value.UserId;
 
         if (supervisorUserId.HasValue)
         {
@@ -394,7 +410,11 @@ public sealed class CheckInService : ICheckInService
         var (_, _, _, timeZoneId) = await GetSettingsAsync(uow, cancellationToken);
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
-        var targetWorkstationId = workstationId ?? _currentWorkstation.WorkstationId ?? 1;
+        if ((workstationId ?? _currentWorkstation.WorkstationId) is not { } targetWorkstationId)
+        {
+            return Errors.Auth.WorkstationNotFound;
+        }
+
         var workstation = await uow.Workstations.GetByIdAsync(targetWorkstationId, cancellationToken);
         var workstationName = workstation?.DisplayName ?? _currentWorkstation.DisplayName ?? "Desk";
 

@@ -293,6 +293,46 @@ public sealed class GiftVoucherServiceTests : IDisposable
         (write.EntityName == nameof(GiftVoucher)).ShouldBeTrue();
     }
 
+    // ── R3.3: no silent fallback to user or workstation id 0 ────────────────
+
+    [Fact]
+    public async Task IssueAsync_WhenWorkstationNotRegistered_ReturnsWorkstationNotFoundAndIssuesNothing()
+    {
+        _currentWorkstation.Clear();
+
+        var result = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+        _auditWriter.Writes.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task IssueOverrideAsync_WhenNobodyIsSignedIn_ReturnsUnauthorized()
+    {
+        _currentUser.Clear();
+
+        var result = await _sut.IssueOverrideAsync(
+            new IssueGiftOverrideRequest(_holder.Id, "manager authorized", _supervisorUser.Id));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
+        _auditWriter.Writes.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task RedeemAsync_WhenWorkstationNotRegistered_ReturnsWorkstationNotFoundAndKeepsVoucherOpen()
+    {
+        var issued = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+        _currentWorkstation.Clear();
+
+        var result = await _sut.RedeemAsync(issued.Value.QrText);
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+        _auditWriter.Writes.ShouldNotContain(w => w.Action == "Gift.Redeemed");
+    }
+
     // ── Issue Override ───────────────────────────────────────────────────────
 
     [Fact]

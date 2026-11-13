@@ -87,6 +87,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return Errors.General.Forbidden;
         }
 
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
+        }
+
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
@@ -127,8 +133,8 @@ public sealed class GiftVoucherService : IGiftVoucherService
             org.GiftValue,
             nowUtc,
             businessDate,
-            _currentUser.UserId ?? 0,
-            _currentWorkstation.WorkstationId ?? 0);
+            actor.Value.UserId,
+            actor.Value.WorkstationId);
 
         uow.GiftVouchers.Add(voucher);
         await uow.SaveChangesAsync(ct);
@@ -136,8 +142,8 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         await _auditWriter.WriteAsync(
             action: "Gift.Issued",
-            userId: _currentUser.UserId,
-            workstationId: _currentWorkstation.WorkstationId,
+            userId: actor.Value.UserId,
+            workstationId: actor.Value.WorkstationId,
             entityName: nameof(GiftVoucher),
             entityId: voucher.Id.ToString(),
             detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
@@ -160,6 +166,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
         IssueGiftOverrideRequest request,
         CancellationToken ct = default)
     {
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
+        }
+
         int approverUserId;
         if (_currentUser.Has(Permission.OverrideGiftInterval))
         {
@@ -234,8 +246,8 @@ public sealed class GiftVoucherService : IGiftVoucherService
             org.GiftValue,
             nowUtc,
             businessDate,
-            _currentUser.UserId ?? approverUserId,
-            _currentWorkstation.WorkstationId ?? 0,
+            actor.Value.UserId,
+            actor.Value.WorkstationId,
             overrideByUserId,
             overrideReason);
 
@@ -247,7 +259,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
         await _auditWriter.WriteAsync(
             action: auditAction,
             userId: approverUserId,
-            workstationId: _currentWorkstation.WorkstationId,
+            workstationId: actor.Value.WorkstationId,
             entityName: nameof(GiftVoucher),
             entityId: voucher.Id.ToString(),
             detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
@@ -273,6 +285,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
         if (!_currentUser.Has(Permission.RedeemGift))
         {
             return Errors.General.Forbidden;
+        }
+
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
         }
 
         var verifyResult = _verifier.Verify(scannedText, QrPurpose.GiftVoucher);
@@ -322,8 +340,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return Errors.Gift.Expired;
         }
 
-        var userId = _currentUser.UserId ?? 0;
-        var workstationId = _currentWorkstation.WorkstationId ?? 0;
+        var (userId, workstationId) = actor.Value;
 
         voucher.Redeem(userId, workstationId, nowUtc, businessDate);
         await uow.SaveChangesAsync(ct);
