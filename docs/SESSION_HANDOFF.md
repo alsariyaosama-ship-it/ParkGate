@@ -92,13 +92,12 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Osama's local `web/.env` still holds the old default sync key and the `APP_KEY` that was published in
   `.env.production.example` (R1.3). Harmless for dev; regenerate both (`key:generate`,
   `parkgate:generate-key`) and set the agent's `CloudApi:ApiKey` to match.
-- `web/CLAUDE.md` asks for `laravel/boost`; not installed (AGENTS.md §2 needs your approval for new packages).
 - **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
   while `composer.json` still says `^8.3`. CI uses PHP 8.4. Confirm the host offers PHP 8.4 before R8.5,
   and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
 - Still open (the plan's defaults apply if unanswered): Q-R4b (glossary, R7.1), Q-R6 (desk PCs and
   workgroup/domain, R6.5), Q-R7 (lowest desk resolution, R5.8).
-- `web/CLAUDE.md` asks agents to install `laravel/boost`. Not installed: new packages need Osama's approval.- Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
+- Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
 
 ---
 
@@ -106,7 +105,9 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ### S30 — 2026-11-13 — Phase R2: R2.7
 - Did R2.7 test-first: extractor + exclusion list, data migration, web ingestion/model/summary/Vue, ADR-022.
-- Declined the `laravel/boost` install asked for by `web/CLAUDE.md` (AGENTS.md §2: new packages need approval).
+- Osama approved `laravel/boost` (dev only). Installed v2.10 with `boost:install --guidelines` only; no MCP server and no
+  skills (its docs search calls an external service). It rewrote `web/AGENTS.md` and `web/CLAUDE.md`. Composer is not on the
+  Bash PATH here; run it from PowerShell. Root `AGENTS.md` §2 still lists the approved packages: add Boost there when you approve.
 - `dotnet ef` needs `--project src/ParkGate.Infrastructure` only (the design-time factory lives there); the WinForms
   project is not a valid startup project.
 - Test counts: .NET unit 617 → 620, integration 38 → 39, web 79 → 89.
