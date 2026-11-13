@@ -167,7 +167,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R2.1 Fix double encryption after a failed push; make the outbox payload immutable
 - [x] R2.2 Order and deduplicate the outbox by a DB `Sequence`, not client clocks
 - [x] R2.3 Last-line guard in `CloudPushService` against sensitive fields and non-HTTPS base URLs
-- [ ] R2.4 Sort cloud ingestion records by dependency (parent before child)
+- [x] R2.4 Sort cloud ingestion records by dependency (parent before child)
 - [ ] R2.5 Report poison outbox rows in the heartbeat, dashboard and desk status bar
 - [ ] R2.7 Sync gift vouchers and the new organization / age-category fields
 - [ ] R2.8 Fix dashboard counts (timezone, Overridden, voided, aggregate in SQL)

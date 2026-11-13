@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Log;
 
 class SyncIngestionService
 {
+    /** Parent tables first: foreign keys are checked inside the single batch transaction (R2.4). */
+    private const DEPENDENCY_ORDER = [
+        'Organization',
+        'AgeCategory',
+        'Beneficiary',
+        'EntryAttempt',
+        'EntryAttemptCompanion',
+    ];
+
     /**
      * Ingests a batch of outbox records sent by ParkGate.SyncAgent.
      *
@@ -25,7 +34,7 @@ class SyncIngestionService
         $failed = 0;
 
         DB::transaction(function () use ($records, &$processed, &$failed) {
-            foreach ($records as $item) {
+            foreach (self::sortByDependency($records) as $item) {
                 try {
                     $entityType = $item['entityType'] ?? null;
                     $opType = $item['operationType'] ?? 'Insert';
@@ -60,6 +69,45 @@ class SyncIngestionService
             'processed' => $processed,
             'failed' => $failed,
         ];
+    }
+
+    /**
+     * Upserts run parent-first; deletes run after them, child-first, so a delete never
+     * meets a row that still references it. The sort is stable within a rank.
+     *
+     * @param  array<int, array<string, mixed>>  $records
+     * @return array<int, array<string, mixed>>
+     */
+    public static function sortByDependency(array $records): array
+    {
+        $rank = fn (array $item): int => (int) array_search($item['entityType'] ?? null, self::DEPENDENCY_ORDER, true);
+        $isDelete = fn (array $item): bool => ($item['operationType'] ?? null) === 'Delete';
+
+        $indexed = [];
+        foreach (array_values($records) as $position => $item) {
+            $indexed[] = [$item, $position];
+        }
+
+        usort($indexed, function (array $a, array $b) use ($rank, $isDelete): int {
+            [$itemA, $posA] = $a;
+            [$itemB, $posB] = $b;
+
+            $deleteA = $isDelete($itemA);
+            $deleteB = $isDelete($itemB);
+            if ($deleteA !== $deleteB) {
+                return $deleteA <=> $deleteB;
+            }
+
+            $rankA = $rank($itemA);
+            $rankB = $rank($itemB);
+            if ($rankA !== $rankB) {
+                return $deleteA ? $rankB <=> $rankA : $rankA <=> $rankB;
+            }
+
+            return $posA <=> $posB;
+        });
+
+        return array_map(fn (array $pair): array => $pair[0], $indexed);
     }
 
     private function processEntity(string $entityType, string $opType, array $data): void
