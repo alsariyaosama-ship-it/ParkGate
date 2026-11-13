@@ -160,7 +160,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R1.5 Remove `web/fix-permissions.php` and its references
 - [x] R1.6 Sync API: no internals in responses, no personal data in logs, throttle, payload validation
 - [x] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
-- [ ] R1.8 Test that no web response, view or model exposes `phone` or `national_id` — **deferred: do it right after R2.6** (the web still stores and shows both fields until R2.6 removes them)
+- [x] R1.8 Test that no web response, view or model exposes `phone` or `national_id` — **deferred: do it right after R2.6** (the web still stores and shows both fields until R2.6 removes them)
 
 ### R2 — Sync correctness · branch `phase/r2-sync`
 - [x] R2.6 Phone and national ID never leave the park (do this task first in R2)

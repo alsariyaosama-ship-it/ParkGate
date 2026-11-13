@@ -84,7 +84,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
   Fix: return a generic message plus a short error id; log entity type, entity id and the error id only. Add `throttle` middleware to `/api/sync/*`. Validate the payload shape with a FormRequest (max records per batch, required keys).
   Test first: a malformed batch returns 422 without exception text; the log line contains no payload content.
 - [ ] **R1.7 Web authorization and hardening.** Add a `throttle` to `POST /login` if Breeze's default was removed, set `SESSION_SECURE_COOKIE=true` and `APP_DEBUG=false` in the production example, and force HTTPS in production (`URL::forceScheme('https')`).
-- [ ] **R1.8 Phone and national ID on the web.** Removed entirely by R2.6 (Q-R2). After R2.6, add a test that no web response, view or model exposes `phone` or `national_id`.
+- [x] **R1.8 Phone and national ID on the web.** Removed entirely by R2.6 (Q-R2). After R2.6, add a test that no web response, view or model exposes `phone` or `national_id`.
 
 **Done when:** all R1 tests pass, and a fresh production-mode install has no way to obtain an account or a valid API key from the repository contents.
 

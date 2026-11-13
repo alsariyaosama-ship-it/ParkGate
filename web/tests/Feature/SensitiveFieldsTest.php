@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Beneficiary;
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -78,6 +79,57 @@ class SensitiveFieldsTest extends TestCase
     public function test_aes_key_is_no_longer_configured(): void
     {
         $this->assertArrayNotHasKey('aes_key', config('parkgate'));
+    }
+
+    /** R1.8: nothing the web serves mentions phone or national ID. */
+    public function test_beneficiaries_page_response_exposes_no_phone_or_national_id(): void
+    {
+        $org = Organization::create(['id' => 10, 'code' => 'SSF', 'name_ar' => 'جهة', 'is_active' => true]);
+        Beneficiary::create([
+            'id' => self::HOLDER_ID,
+            'organization_id' => $org->id,
+            'card_number' => 'CARD-1',
+            'full_name' => 'محمد أحمد',
+            'status' => 1,
+        ]);
+
+        $response = $this->actingAs(User::factory()->create())->get('/beneficiaries');
+
+        $response->assertOk();
+        $row = $response->viewData('page')['props']['beneficiaries']['data'][0];
+        $this->assertArrayNotHasKey('phone', $row);
+        $this->assertArrayNotHasKey('national_id', $row);
+        $this->assertStringNotContainsString('national_id', $response->getContent());
+    }
+
+    public function test_search_by_a_phone_number_finds_nothing_and_does_not_fail(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get('/beneficiaries?search=0912345678')
+            ->assertOk();
+    }
+
+    public function test_no_vue_page_or_php_source_mentions_phone_or_national_id(): void
+    {
+        $offenders = [];
+
+        foreach ([resource_path('js'), resource_path('views'), app_path()] as $root) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($files as $file) {
+                if (! preg_match('/\.(vue|js|php)$/', $file->getFilename())) {
+                    continue;
+                }
+
+                if (preg_match('/national_?id|\bphone\b/i', file_get_contents($file->getPathname()))) {
+                    $offenders[] = $file->getPathname();
+                }
+            }
+        }
+
+        $this->assertSame([], $offenders);
     }
 
     private function push(array $payload): \Illuminate\Testing\TestResponse

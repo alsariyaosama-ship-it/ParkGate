@@ -146,7 +146,7 @@ class SyncIngestionService
             return;
         }
 
-        // Phone and NationalId are deliberately never read (Q-R2): they stay in the park.
+        // Contact and ID-number fields are deliberately never read (ADR-021): they stay in the park.
         Beneficiary::updateOrCreate(
             ['id' => $id],
             [
