@@ -10,15 +10,15 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-13 |
-| Last session | S31 — Phase R2 complete: R2.9 MySQL parity and the end-to-end sync test done; R2 PR next |
-| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 merged (PR #12). R2 in progress |
-| Working branch | `phase/r2-sync` (main already merged into it after PR #12) |
+| Last session | S31 — Phase R2 complete and merged (PR #13); migrations applied on SQLEXPRESS; R3 next |
+| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 (PR #11), R1 (PR #12) and R2 (PR #13) merged. R3 next |
+| Working branch | `phase/r3-application` (created from `main` at `aefbdcd`, the PR #13 merge) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
 | .NET Unit tests | 620 passed: 202 domain + 177 application + 87 infrastructure + 154 architecture |
 | .NET Integration tests | 40 passed on LocalDB (S31) |
 | Web tests | `php artisan test` (PHP 8.4): 96 passed on SQLite and on MySQL 8 strict mode (S31; 89 at the end of S30) |
 | Total tests | 756 (660 .NET + 96 web), all green |
-| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (S30, no .NET migration in S31). Applied on LocalDB by the tests; **not yet applied on SQLEXPRESS** (see Blockers) |
+| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (S30, no .NET migration in S31). Applied on LocalDB by the tests and on SQLEXPRESS (S31) |
 
 ## State of the work
 
@@ -75,7 +75,7 @@
 - None.
 
 **Left in Phase R2**
-- Open the R2 pull request (below). Nothing else is left in the phase.
+- Nothing. PR #13 merged into `main` (`aefbdcd`) on 2026-11-13 after Osama's go-ahead; build, web and test-mysql were green.
 
 **Not started / Future**
 - F2 Electronic gate (deferred by client; SPEC §9 F2).
@@ -84,12 +84,12 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. PR #12 (R1) is merged into `main`. Continue on `phase/r2-sync`.
-2. R2 is complete. Open the R2 PR to `main` with `.github/pull_request_template.md` (Osama reviews and merges).
-   In the PR, ask Osama to approve ADR-022 (token excluded from the cloud) and to confirm that the seed rows were
-   dropped from `mysql_schema.sql`. Then start R3 on `phase/r3-application`.
-3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
+1. You are on `phase/r3-application` (from `main` after PR #13). Start R3 (`docs/REMEDIATION_PLAN.md`, Phase R3): R3.1 first.
+   Baseline first (AGENTS.md §1.1): build, unit tests, web tests.
+2. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
    dedicated `chore` commit, or do it in R9. Tip: Python on Windows writes CRLF; edit with `newline=''`.
+3. Osama still has to approve ADR-022 (token excluded from the cloud). He approved dropping the seed rows from
+   `mysql_schema.sql` (S31).
 
 Carried over from S25 (do it when a printer is available; it does not block Phase R):
 - Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
@@ -97,7 +97,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **Apply the three new migrations on SQLEXPRESS** (`PurgeSensitiveBeneficiaryOutbox`, `AddSyncOutboxSequence`, `RequeueGiftAndPolicyOutbox`) before running the new SyncAgent there. Existing pending outbox rows get their sequence numbers in physical order.
+- ~~Apply the three migrations on SQLEXPRESS~~ **Done in S31** (backup first: `C:\ProgramData\ParkGateackups\ParkGate_before_R2.bak`). The 7 pending outbox rows got sequences 1–11 with the re-queued ones and contain no phone, national ID, token or key id. Install the new SyncAgent build before it runs again (still the old one until R8.4).
 - **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, re-import `web/database/mysql_schema.sql` (it is generated now and drops and recreates every table, so it also wipes `users`: create the user again with `parkgate:create-user`), then let the agent re-queue.
 - Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
 - Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
@@ -127,6 +127,9 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - The plan asked for a PHP and .NET end-to-end run; the test is .NET-only (the web ingestion side has its own tests, and
   the whole web suite runs on MySQL). A single run across both stacks would need a running web server in CI.
 - Test counts: .NET integration 39 → 40, web 89 → 96. Pushed; GitHub `web` (both jobs) green.
+- Osama said the app is not in production yet. Merged PR #13 (merge commit), took an uncompressed backup (Express has no
+  `COMPRESSION`), applied the three migrations with `dotnet ef database update --project src/ParkGate.Infrastructure
+  --connection "Server=.\SQLEXPRESS;..."` and checked `__EFMigrationsHistory` and the outbox.
 ### S30 — 2026-11-13 — Phase R2: R2.7
 - Did R2.7 test-first: extractor + exclusion list, data migration, web ingestion/model/summary/Vue, ADR-022.
 - Osama approved `laravel/boost` (dev only). Installed v2.10 with `boost:install --guidelines` only; no MCP server and no
