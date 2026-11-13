@@ -57,6 +57,27 @@ public sealed class BeneficiaryServiceTests
             new ChangeBeneficiaryStatusRequestValidator());
     }
 
+    [Theory]
+    [InlineData(630, 90)]  // 10 h 30 min since the last entry of a 12 h cooldown: 1 h 30 min left, not "1 hour"
+    [InlineData(719, 1)]   // seconds-level remainders round up, never down to 0
+    public async Task GetByIdAsync_DuringCooldown_ReturnsExactRemainingMinutesAndNextAllowedTime(int minutesSinceEntry, int expectedRemaining)
+    {
+        // R3.9: the preview carries the exact next allowed instant and remaining minutes; the UI formats them.
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var lastEntry = now.AddMinutes(-minutesSinceEntry).AddSeconds(-20);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-WAIT"), "Ali Omar", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(lastEntry);
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.GetByIdAsync(holder.Id);
+
+        result.IsSuccess.ShouldBeTrue();
+        var eligibility = result.Value.Eligibility;
+        eligibility.IsEligible.ShouldBeFalse();
+        eligibility.NextAllowedEntryUtc.ShouldBe(lastEntry.AddMinutes(720));
+        eligibility.RemainingCooldownMinutes.ShouldBe(expectedRemaining);
+    }
+
     [Fact]
     public async Task LookupByCardNumberAsync_WhenCardNotFound_ShouldReturnError()
     {
