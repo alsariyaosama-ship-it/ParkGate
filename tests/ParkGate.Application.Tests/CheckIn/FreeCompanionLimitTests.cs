@@ -76,7 +76,7 @@ public sealed class FreeCompanionLimitTests
             _uowFactory,
             new RollingWindowEligibilityPolicy(),
             _currentUser,
-            _currentWorkstation,
+            _currentWorkstation, TestSettings.Over(_settings),
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());

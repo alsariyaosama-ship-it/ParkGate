@@ -68,7 +68,7 @@ public sealed class CheckInServiceTests
             _uowFactory,
             _policy,
             _currentUser,
-            _currentWorkstation,
+            _currentWorkstation, TestSettings.Over(_settings),
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());
@@ -262,6 +262,26 @@ public sealed class CheckInServiceTests
         result.Value.TotalDenied.ShouldBe(1);
         result.Value.TotalPersons.ShouldBe(3); // 1 holder + 2 children
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 2);
+    }
+
+    // ── R3.6: settings come from the cached settings service ────────────────
+
+    [Fact]
+    public async Task RecordEntryAsync_UsesGroupLimitFromSettingsService()
+    {
+        // The store says 10 (default); the settings service says 2. Check-in must follow the service.
+        var settings = new StubSettingsService();
+        settings.Current = settings.Current with { MaxGroupSize = 2 };
+        var sut = new CheckInService(
+            _uowFactory, _policy, _currentUser, _currentWorkstation, settings,
+            new RecordEntryRequestValidator(), new OverrideEntryRequestValidator(), new VoidEntryRequestValidator());
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-SET"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await sut.RecordEntryAsync(new RecordEntryRequest(holder.Id, [new CompanionRequestDto(_childCategory.Id, 2)]));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.CheckIn.ExceedsMaxGroupSize.Code);
     }
 
     // ── R3.5: the audit row commits with the change it describes ────────────

@@ -129,7 +129,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 - [x] **R3.4 [Verified] Audit JSON built by string interpolation.** `detailsJson: $"{{\"Reason\":\"{request.Reason}\"…"` breaks on quotes. Serialize with `System.Text.Json` everywhere `IAuditWriter.WriteAsync` is called.
   Test first: a reason containing `"` and `\` produces valid JSON.
 - [x] **R3.5 [Verified] Audit rows are written after commit in a separate call.** A crash between the two loses the audit entry for a granted entry, override or void. Write the audit row through the same unit of work before `CommitAsync`.
-- [ ] **R3.6 [Verified] Check-in reads four settings with four queries inside the locked transaction.** Use the cached `ISettingsService` instead of `GetSettingsAsync` in `CheckInService`. Remove the duplicated default literals.
+- [x] **R3.6 [Verified] Check-in reads four settings with four queries inside the locked transaction.** Use the cached `ISettingsService` instead of `GetSettingsAsync` in `CheckInService`. Remove the duplicated default literals.
 - [ ] **R3.7 [Verified] Card expiry uses the client clock.** `CardScanService` uses `TimeProvider.GetLocalNow()`. Use the database UTC time converted with `Park.TimeZoneId` (BR-05).
 - [ ] **R3.8 [Verified] Lookup by card ignores the organization filter until after the query**, and a card that exists in another organization is reported as "not registered". Return matches from all organizations plus a flag, so the UI can say "registered under «X»" (used by R4.4).
 - [ ] **R3.9 [Verified] Cooldown hours are shown with integer division** (`EffectiveCooldownMinutes / 60`). Return `NextEligibleAtUtc` and the remaining minutes in `EligibilityPreviewDto`; the UI formats them (R5.1).

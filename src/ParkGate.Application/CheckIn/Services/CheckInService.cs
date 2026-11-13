@@ -4,6 +4,7 @@ using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Application.Common;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
+using ParkGate.Application.Settings.Services;
 using ParkGate.Domain.Entities;
 using ParkGate.Domain.Enums;
 using ParkGate.Domain.Policies;
@@ -19,6 +20,7 @@ public sealed class CheckInService : ICheckInService
     private readonly IEntryEligibilityPolicy _eligibilityPolicy;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly ISettingsService _settings;
     private readonly IValidator<RecordEntryRequest> _recordValidator;
     private readonly IValidator<OverrideEntryRequest> _overrideValidator;
     private readonly IValidator<VoidEntryRequest> _voidValidator;
@@ -28,6 +30,7 @@ public sealed class CheckInService : ICheckInService
         IEntryEligibilityPolicy eligibilityPolicy,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
+        ISettingsService settings,
         IValidator<RecordEntryRequest> recordValidator,
         IValidator<OverrideEntryRequest> overrideValidator,
         IValidator<VoidEntryRequest> voidValidator)
@@ -36,6 +39,7 @@ public sealed class CheckInService : ICheckInService
         _eligibilityPolicy = eligibilityPolicy;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
+        _settings = settings;
         _recordValidator = recordValidator;
         _overrideValidator = overrideValidator;
         _voidValidator = voidValidator;
@@ -62,6 +66,9 @@ public sealed class CheckInService : ICheckInService
             return validation.ToError();
         }
 
+        // Cached settings, read before the row lock is taken (R3.6).
+        var settings = await _settings.GetSettingsAsync(cancellationToken);
+
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(cancellationToken);
 
@@ -78,7 +85,8 @@ public sealed class CheckInService : ICheckInService
         }
 
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
-        var (defaultCooldown, maxGroupSize, denialDedupMinutes, timeZoneId) = await GetSettingsAsync(uow, cancellationToken);
+        var (defaultCooldown, maxGroupSize, denialDedupMinutes, timeZoneId) =
+            (settings.DefaultCooldownMinutes, settings.MaxGroupSize, settings.DenialDedupMinutes, settings.TimeZoneId);
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
         var companionList = request.Companions ?? [];
@@ -203,6 +211,9 @@ public sealed class CheckInService : ICheckInService
             return validation.ToError();
         }
 
+        // Cached settings, read before the row lock is taken (R3.6).
+        var settings = await _settings.GetSettingsAsync(cancellationToken);
+
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(cancellationToken);
 
@@ -225,7 +236,7 @@ public sealed class CheckInService : ICheckInService
         }
 
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
-        var (defaultCooldown, maxGroupSize, _, timeZoneId) = await GetSettingsAsync(uow, cancellationToken);
+        var (defaultCooldown, maxGroupSize, timeZoneId) = (settings.DefaultCooldownMinutes, settings.MaxGroupSize, settings.TimeZoneId);
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
         var companionList = request.Companions ?? [];
@@ -382,7 +393,7 @@ public sealed class CheckInService : ICheckInService
 
         await using var uow = _uowFactory.Create();
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
-        var (_, _, _, timeZoneId) = await GetSettingsAsync(uow, cancellationToken);
+        var timeZoneId = (await _settings.GetSettingsAsync(cancellationToken)).TimeZoneId;
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
         if ((workstationId ?? _currentWorkstation.WorkstationId) is not { } targetWorkstationId)
@@ -470,38 +481,4 @@ public sealed class CheckInService : ICheckInService
         return counted > org.MaxFreeCompanions.Value;
     }
 
-    private static async Task<(int DefaultCooldownMinutes, int MaxGroupSize, int DenialDedupMinutes, string TimeZoneId)> GetSettingsAsync(
-        IUnitOfWork uow,
-        CancellationToken cancellationToken)
-    {
-        int defaultCooldown = 720;
-        var cdSetting = await uow.AppSettings.GetByKeyAsync("Entry.DefaultCooldownMinutes", cancellationToken);
-        if (cdSetting is not null && int.TryParse(cdSetting.Value, out var parsedCd))
-        {
-            defaultCooldown = parsedCd;
-        }
-
-        int maxGroupSize = 10;
-        var groupSetting = await uow.AppSettings.GetByKeyAsync("Entry.MaxGroupSize", cancellationToken);
-        if (groupSetting is not null && int.TryParse(groupSetting.Value, out var parsedGroup))
-        {
-            maxGroupSize = parsedGroup;
-        }
-
-        int denialDedup = 5;
-        var dedupSetting = await uow.AppSettings.GetByKeyAsync("Entry.DenialDedupMinutes", cancellationToken);
-        if (dedupSetting is not null && int.TryParse(dedupSetting.Value, out var parsedDedup))
-        {
-            denialDedup = parsedDedup;
-        }
-
-        string timeZoneId = "Libya Standard Time";
-        var tzSetting = await uow.AppSettings.GetByKeyAsync("Park.TimeZoneId", cancellationToken);
-        if (tzSetting is not null && !string.IsNullOrWhiteSpace(tzSetting.Value))
-        {
-            timeZoneId = tzSetting.Value;
-        }
-
-        return (defaultCooldown, maxGroupSize, denialDedup, timeZoneId);
-    }
 }

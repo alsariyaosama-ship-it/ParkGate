@@ -1,3 +1,8 @@
+using ParkGate.Application.Common;
+using ParkGate.Application.Security;
+using ParkGate.Application.Settings.Models;
+using ParkGate.Application.Settings.Services;
+using ParkGate.Application.Settings.Validators;
 using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
@@ -597,4 +602,46 @@ public sealed class FakeUnitOfWorkFactory : IUnitOfWorkFactory
     }
 
     public IUnitOfWork Create() => CurrentUow;
+}
+
+/// <summary>Settings fixed by the test, to prove a use case reads them from <see cref="ISettingsService"/> (R3.6).</summary>
+public sealed class StubSettingsService : ISettingsService
+{
+    public AppSettingsModel Current { get; set; } = new(
+        DefaultCooldownMinutes: 720,
+        MaxGroupSize: 10,
+        DenialDedupMinutes: 5,
+        PrefillCompanionsFromLastVisit: true,
+        DenialSoundEnabled: true,
+        MaxFailedLogins: 5,
+        LockoutMinutes: 15,
+        AutoLockMinutes: 0,
+        ParkName: "Test Park",
+        TimeZoneId: "Libya Standard Time");
+
+    public Task<AppSettingsModel> GetSettingsAsync(CancellationToken cancellationToken = default) => Task.FromResult(Current);
+
+    public Task<Result> UpdateSettingsAsync(UpdateSettingsRequest request, CancellationToken cancellationToken = default) =>
+        Task.FromResult(Result.Success());
+
+    public void InvalidateCache() { }
+}
+
+public sealed class ManualTimeProvider(DateTimeOffset now) : TimeProvider
+{
+    public DateTimeOffset Now { get; set; } = now;
+
+    public override DateTimeOffset GetUtcNow() => Now;
+}
+
+public static class TestSettings
+{
+    /// <summary>The real cached settings service over the fake store, so tests keep configuring values through it.</summary>
+    public static ISettingsService Over(FakeAppSettingRepository store) =>
+        new SettingsService(
+            store,
+            new FakeAuditWriter(),
+            new CurrentUserContext(),
+            new CurrentWorkstationContext("TEST"),
+            new UpdateSettingsRequestValidator());
 }
