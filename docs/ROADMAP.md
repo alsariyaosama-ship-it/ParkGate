@@ -153,14 +153,14 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R0.4 CI job for `web/` (`composer install`, `php artisan test`)
 
 ### R1 — Web security (critical) · branch `phase/r1-web-security`
-- [ ] R1.1 Remove public self-registration; add admin-only user creation command
-- [ ] R1.2 Remove the hardcoded default sync API key; add a key-generation command
-- [ ] R1.3 Remove the committed `APP_KEY` from `.env.production.example`
-- [ ] R1.4 Guard the seeder's default admin to local/testing environments
-- [ ] R1.5 Remove `web/fix-permissions.php` and its references
-- [ ] R1.6 Sync API: no internals in responses, no personal data in logs, throttle, payload validation
-- [ ] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
-- [ ] R1.8 Test that no web response, view or model exposes `phone` or `national_id`
+- [x] R1.1 Remove public self-registration; add admin-only user creation command
+- [x] R1.2 Remove the hardcoded default sync API key; add a key-generation command
+- [x] R1.3 Remove the committed `APP_KEY` from `.env.production.example`
+- [x] R1.4 Guard the seeder's default admin to local/testing environments
+- [x] R1.5 Remove `web/fix-permissions.php` and its references
+- [x] R1.6 Sync API: no internals in responses, no personal data in logs, throttle, payload validation
+- [x] R1.7 Login throttle, secure session cookie, `APP_DEBUG=false`, force HTTPS in production
+- [ ] R1.8 Test that no web response, view or model exposes `phone` or `national_id` — **deferred: do it right after R2.6** (the web still stores and shows both fields until R2.6 removes them)
 
 ### R2 — Sync correctness · branch `phase/r2-sync`
 - [ ] R2.6 Phone and national ID never leave the park (do this task first in R2)

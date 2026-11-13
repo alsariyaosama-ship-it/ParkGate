@@ -39,6 +39,7 @@ This plan follows `AGENTS.md`. Where this plan and `AGENTS.md` disagree, stop an
 | Q-R2 | The cloud must **not store phone numbers or national IDs**. | Neither field leaves the park. Field encryption and the AES key are no longer needed (R2.6). |
 | Q-R4 | The UI term for the card holder is **«الزائر»** (plural «الزوار»). | R7.1. |
 | Q-R5 | The park does not open past midnight (last entry about 23:00, closes 00:00). | No business-day cutoff. R6.7 is cancelled. |
+| Q-R2b | (2026-11-13) `Notes` and `StatusReason` **are synced** to the cloud. | R2.6 excludes only `Phone` and `NationalId`. The web keeps both text fields. |
 
 ### 2.2 Still open — ask at the start of R0
 
@@ -106,7 +107,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 - [ ] **R2.6 [Decided: Q-R2] Phone and national ID never leave the park. Do this task first in R2.**
   Desktop: exclude `Phone` and `NationalId` from the `Beneficiary` outbox payload in `OutboxEntityExtractor` (an explicit per-entity exclusion list, tested). Remove `PayloadEncryptionService`, `IPayloadEncryptionService`, `AesHelper`, `CloudApiOptions.AesKey` and their DI registrations and tests. Add a new EF migration that deletes pending `SyncOutboxes` rows of type `Beneficiary` and re-queues one clean row per holder, so no old payload with these fields is ever pushed.
   Web (unreleased, edit the existing migration): drop `phone` and `national_id` from `beneficiaries`, the model, `SyncIngestionService` (remove `decrypt` and `parkgate.aes_key`), `BeneficiaryController` search and output, the Vue pages, factories and seeders, and `PARKGATE_AES_KEY` from the env examples.
-  Decide with Osama whether `Notes` and `StatusReason` (free text that may contain personal details) should also stay local; recommended: exclude both.
+  `Notes` and `StatusReason` keep syncing (Q-R2b, decided 2026-11-13 against the recommendation to exclude them).
   Docs: SPEC §9 F3 and Q12, ADR-018 and ADR-019 (superseded parts), DEPLOYMENT.md.
   Test first: the serialized `Beneficiary` payload has no `Phone`/`NationalId` keys; ingestion of a payload without them succeeds; the `beneficiaries` table has no such columns.
 - [ ] **R2.7 [Verified] Gift vouchers are not synced.** `OutboxEntityExtractor.SyncableTypes` has no `GiftVoucher`; the cloud has no table for it. Add the entity to the outbox, a `gift_vouchers` table and model on the web, ingestion, and a gifts summary on the dashboard and reports (issued, redeemed, voided, value by organization). Also sync the new organization fields (`MaxFreeCompanions`, gift policy) and `AgeCategory.IsCompanionLimitExempt`.

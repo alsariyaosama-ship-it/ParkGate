@@ -22,6 +22,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // R1.4: demo data includes an admin with a known password. Never seed it
+        // outside development; production users come from parkgate:create-user.
+        if (! app()->environment('local', 'testing')) {
+            $this->command?->warn('DatabaseSeeder skipped: demo data is seeded only in local and testing.');
+
+            return;
+        }
+
         // 1. Admin User
         User::updateOrCreate(
             ['email' => 'admin@parkgate.ly'],

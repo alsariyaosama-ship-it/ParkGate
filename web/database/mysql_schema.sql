@@ -22,11 +22,8 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ----------------------------
--- Default Admin User (Password: password)
--- ----------------------------
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `created_at`, `updated_at`) VALUES
-(1, 'مدير النظام', 'admin@parkgate.ly', '$2y$12$eKgeknsmZ5HGmvf6hfXvN.L/y1mQf9.g6vO9UoX1YcWb5QnB5C6Qe', NOW(), NOW());
+-- No default user (R1.1/R1.4). Create the first one from the cPanel Terminal:
+--   php artisan parkgate:create-user "Name" admin@example.com
 
 -- ----------------------------
 -- Table structure for password_reset_tokens

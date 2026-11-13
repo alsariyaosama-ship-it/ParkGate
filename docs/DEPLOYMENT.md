@@ -202,6 +202,9 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
      "AesKey": "YOUR_AES_256_BASE64_KEY"
    }
    ```
+   قيمة `ApiKey` هي نفس قيمة `PARKGATE_API_KEY` في ملف `.env` على الاستضافة.
+   ولّدها مرة واحدة على السيرفر بالأمر `php artisan parkgate:generate-key`.
+   إذا كانت `PARKGATE_API_KEY` فارغة فالسحابة ترفض كل طلبات المزامنة.
 
 ### 8.2 التثبيت كخدمة ويندوز (Windows Service)
 لتشغيل الووركر كخدمة تبدأ تلقائياً مع إقلاع السيرفر:

@@ -10,43 +10,49 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-13 |
-| Last session | S27 — Phase R0 completed locally: baseline recorded (R0.2), web CI placed (R0.4), PR opened |
-| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 done, awaiting PR review; next R1 |
-| Working branch | `phase/r0-baseline` (PR to `main`, not merged) |
-| Build | `dotnet build ParkGate.sln -c Debug` (S27): 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 588 passed (S27): 202 domain + 169 application + 63 infrastructure + 154 architecture |
+| Last session | S28 — Phase R1 web security: R1.1–R1.7 done, R1.8 deferred to after R2.6, PR opened |
+| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 awaiting PR review |
+| Working branch | `phase/r1-web-security` (PR to `main`, not merged) |
+| Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
+| .NET Unit tests | 588 passed: 202 domain + 169 application + 63 infrastructure + 154 architecture. CI `build` green since PR #11 |
 | .NET Integration tests | 34 passed on LocalDB (S27) |
-| Web tests | `php artisan test` (PHP 8.4.0 local, SQLite): 33 passed, 82 assertions (S27) — first web baseline |
-| Total tests | 655 (622 .NET + 33 web), all green |
+| Web tests | `php artisan test` (PHP 8.4, SQLite): 58 passed (S28; 33 at the R0 baseline) |
+| Total tests | 680 (622 .NET + 58 web), all green |
 | Latest migration | `20261102125339_AddGiftVouchersAndCompanionLimit` (Applied on SQLEXPRESS and LocalDB) |
 
 ## State of the work
 
-**Completed in this session (S27, local):**
+**Completed in S28 (local), on `phase/r1-web-security`, one commit per task, each test-first:**
 
-1. R0.1 confirmed by a real `git fetch`: `main` == `origin/main` == `13ec3c6`.
-2. R0.2 baseline recorded in the Snapshot (655 tests green, 16 known NuGet audit warnings).
-3. R0.3 (done in S26) and the plan/handoff committed on `phase/r0-baseline`.
-4. R0.4 `.github/workflows/web.yml` added. Its first CI run is on the PR.
-5. PR `phase/r0-baseline` → `main` opened. Osama reviews and merges.
-
-S26 (cloud, no shell) did R0.1 by static analysis and R0.3; see the S26 log entry.
+- R1.1 `/register` and the email password-reset routes removed (mail is not configured), with the unused
+  Breeze `Welcome.vue`. New `php artisan parkgate:create-user {name} {email} [--reset-password]`
+  (prompted password, min 12 chars, user created verified).
+- R1.2 `PARKGATE_API_KEY` has no default; the env example ships it empty; `php artisan parkgate:generate-key`
+  prints 64 hex chars. `DEPLOYMENT.md` §8.1 says the agent's `CloudApi:ApiKey` must match.
+- R1.3 `APP_KEY` emptied in `.env.production.example`.
+- R1.4 `DatabaseSeeder` runs only in `local`/`testing`; `mysql_schema.sql` no longer inserts
+  `admin@parkgate.ly`.
+- R1.5 `web/fix-permissions.php` deleted (it was never in the cPanel zip; the packager uses an allowlist).
+- R1.6 Sync API: generic message + `error_id` on failure (422 rejected item / 500 server fault); log and
+  `sync_batches.error_message` hold only error id, entity type/id, exception class. `SyncPushRequest`
+  validates the batch (max 500 records). `/api/sync/*` throttled 60/min before the key check.
+- R1.7 `URL::forceScheme('https')` in production, `SESSION_SECURE_COOKIE=true` in the example; Breeze's
+  5-attempt login lock and `APP_DEBUG=false` now covered by tests.
+- R1.8 **deferred** (roadmap updated): the web still stores and shows `phone`/`national_id` until R2.6
+  removes them, so the "nothing exposes them" test can only pass after R2.6.
 
 **In progress**
-- None. R0 is complete pending PR review and green CI on both workflows.
+- None. R1 awaits PR review.
 **Not started / Future**
 - F2 Electronic gate (deferred by client; SPEC §9 F2).
 
 ## Next session — start here
 
-**Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud.**
-A cloud session reaches the folder through the desktop app's file tools only: it cannot run `git`, `dotnet`
-or `php`, and the platform grants terminals in click-only mode, so it cannot drive one through computer use
-either. `.github/` is write-protected for remote tools as well. S26 hit all three limits.
+Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. Check the R0 PR: both `build` and `web` workflows green. If `web` is red, fix it on `phase/r0-baseline`.
-   If the web suite needs no built assets, the Node and "Build assets" steps can be dropped.
-2. After Osama merges R0: R1 (web security) on `phase/r1-web-security`, starting with R1.1.
+1. Check the R1 PR: `build` and `web` green. After Osama merges, start R2 on `phase/r2-sync`.
+2. R2 order: **R2.6 first** (Q-R2b: `Notes`/`StatusReason` keep syncing), then **R1.8**
+   (the exposure test), then R2.1 onward.
 3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
    dedicated `chore` commit, or do it in R9.
 
@@ -56,21 +62,29 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- R0 PR review and merge (Osama).
-- Untracked `scripts/r0-baseline.ps1`: delete or keep? (The duplicate `Claude outputs/web.yml` was deleted.)
+- R1 PR review and merge (Osama).
+- Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
+  and `NationalId`. R2.6 is unblocked.
+- Q-R3 answered 2026-11-13: users are created with `parkgate:create-user` from the cPanel Terminal.
+- Osama's local `web/.env` still holds the old default sync key and the `APP_KEY` that was published in
+  `.env.production.example` (R1.3). Harmless for dev; regenerate both (`key:generate`,
+  `parkgate:generate-key`) and set the agent's `CloudApi:ApiKey` to match.
+- Untracked `scripts/r0-baseline.ps1`: delete or keep?
 - **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
-  while `composer.json` still says `^8.3`. CI now uses PHP 8.4. Confirm the cPanel host offers PHP 8.4
-  before R8.5, and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
-- Open confirmations (the plan's documented defaults apply if unanswered): §2.2 — Q-R3 (who creates web
-  dashboard users), Q-R4b (remaining glossary terms), Q-R6 (desk PC count, workgroup vs domain),
-  Q-R7 (lowest desk resolution). None of them block R0; they block R1.1, R7.1, R6.5 and R5.8.
-- Q-R2b (keep `Notes` / `StatusReason` local — recommended: yes) is needed before R2.6.
-- Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
+  while `composer.json` still says `^8.3`. CI uses PHP 8.4. Confirm the host offers PHP 8.4 before R8.5,
+  and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
+- Still open (the plan's defaults apply if unanswered): Q-R4b (glossary, R7.1), Q-R6 (desk PCs and
+  workgroup/domain, R6.5), Q-R7 (lowest desk resolution, R5.8).
+- `web/CLAUDE.md` asks agents to install `laravel/boost`. Not installed: new packages need Osama's approval.- Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
 
 ---
 
 ## Session Log (last 10 sessions)
 
+### S28 — 2026-11-13 — Phase R1 web security (R1.1–R1.7)
+- Merged PR #11 (R0) at Osama's request after CI went green; `main` = `6a3201e`.
+- R1.1–R1.7 done test-first on `phase/r1-web-security`; web tests 33 → 58. R1.8 deferred to after R2.6.
+- No .NET code changed.
 ### S27 — 2026-11-13 — Phase R0 completed (local session)
 - `git fetch origin`: `main` == `origin/main` == `13ec3c6`, nothing unpushed. S26's static result confirmed.
 - Created `phase/r0-baseline`; committed the remediation plan, roadmap Phase R and handoff [R0.1][R0.3].
