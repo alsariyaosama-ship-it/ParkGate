@@ -102,7 +102,7 @@ class DashboardNumbersTest extends TestCase
         ]);
 
         EntryAttempt::create([
-            'id' => str_pad($key, 8, '0').'-0000-0000-0000-000000000000',
+            'id' => substr(md5($key), 0, 8).'-0000-0000-0000-000000000000',
             'beneficiary_id' => '11111111-1111-1111-1111-111111111111',
             'organization_id' => 1,
             'attempted_at_utc' => $attemptedAtUtc,
