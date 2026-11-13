@@ -23,6 +23,9 @@ public sealed class FakeAuditWriter : IAuditWriter
 {
     public List<(string Action, int? UserId, int? WorkstationId, string? EntityName, string? EntityId)> Writes { get; } = [];
 
+    /// <summary>The details JSON of each write, in the same order as <see cref="Writes"/>.</summary>
+    public List<string?> Details { get; } = [];
+
     public Task WriteAsync(
         string action,
         int? userId = null,
@@ -33,6 +36,7 @@ public sealed class FakeAuditWriter : IAuditWriter
         CancellationToken cancellationToken = default)
     {
         Writes.Add((action, userId, workstationId, entityName, entityId));
+        Details.Add(detailsJson);
         return Task.CompletedTask;
     }
 }

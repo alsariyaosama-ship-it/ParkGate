@@ -167,7 +167,7 @@ public sealed class CheckInService : ICheckInService
             workstationId: workstationId,
             entityName: nameof(EntryAttempt),
             entityId: attemptId.ToString(),
-            detailsJson: $"{{\"TotalPersons\":{attempt.TotalPersons}}}",
+            detailsJson: AuditDetails.ToJson(new { attempt.TotalPersons }),
             cancellationToken: cancellationToken);
 
         return new CheckInResultDto(
@@ -297,7 +297,7 @@ public sealed class CheckInService : ICheckInService
             workstationId: workstationId,
             entityName: nameof(EntryAttempt),
             entityId: attemptId.ToString(),
-            detailsJson: $"{{\"Reason\":\"{request.Reason}\",\"TotalPersons\":{attempt.TotalPersons}}}",
+            detailsJson: AuditDetails.ToJson(new { request.Reason, attempt.TotalPersons }),
             cancellationToken: cancellationToken);
 
         return new CheckInResultDto(
@@ -390,7 +390,7 @@ public sealed class CheckInService : ICheckInService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(EntryAttempt),
             entityId: attempt.Id.ToString(),
-            detailsJson: $"{{\"Reason\":\"{request.Reason}\"}}",
+            detailsJson: AuditDetails.ToJson(new { request.Reason }),
             cancellationToken: cancellationToken);
 
         return Result.Success();

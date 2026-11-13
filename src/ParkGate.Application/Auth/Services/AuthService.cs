@@ -130,7 +130,7 @@ public sealed class AuthService : IAuthService
                 workstationId: _workstationSession.WorkstationId,
                 entityName: nameof(User),
                 entityId: normalizedUserName,
-                detailsJson: "{\"Reason\":\"UserNotFound\"}",
+                detailsJson: AuditDetails.ToJson(new { Reason = "UserNotFound" }),
                 cancellationToken: cancellationToken);
 
             return Errors.Auth.InvalidCredentials;
@@ -144,7 +144,7 @@ public sealed class AuthService : IAuthService
                 workstationId: _workstationSession.WorkstationId,
                 entityName: nameof(User),
                 entityId: user.Id.ToString(),
-                detailsJson: "{\"Reason\":\"AccountInactive\"}",
+                detailsJson: AuditDetails.ToJson(new { Reason = "AccountInactive" }),
                 cancellationToken: cancellationToken);
 
             return Errors.Auth.AccountInactive;
@@ -158,7 +158,7 @@ public sealed class AuthService : IAuthService
                 workstationId: _workstationSession.WorkstationId,
                 entityName: nameof(User),
                 entityId: user.Id.ToString(),
-                detailsJson: "{\"Reason\":\"AccountLocked\"}",
+                detailsJson: AuditDetails.ToJson(new { Reason = "AccountLocked" }),
                 cancellationToken: cancellationToken);
 
             return Errors.Auth.AccountLocked;
@@ -189,7 +189,7 @@ public sealed class AuthService : IAuthService
                 workstationId: _workstationSession.WorkstationId,
                 entityName: nameof(User),
                 entityId: user.Id.ToString(),
-                detailsJson: "{\"Reason\":\"InvalidPassword\"}",
+                detailsJson: AuditDetails.ToJson(new { Reason = "InvalidPassword" }),
                 cancellationToken: cancellationToken);
 
             return Errors.Auth.InvalidCredentials;

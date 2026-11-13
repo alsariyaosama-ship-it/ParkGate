@@ -300,7 +300,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Beneficiary),
             entityId: beneficiary.Id.ToString(),
-            detailsJson: $"{{\"NewStatus\":\"{request.TargetStatus}\",\"Reason\":\"{request.Reason}\"}}",
+            detailsJson: AuditDetails.ToJson(new { NewStatus = request.TargetStatus.ToString(), request.Reason }),
             cancellationToken: cancellationToken);
 
         return beneficiary.ToDto(org?.NameAr ?? string.Empty);

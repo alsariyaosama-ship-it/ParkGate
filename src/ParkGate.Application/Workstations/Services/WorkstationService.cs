@@ -77,7 +77,7 @@ public sealed class WorkstationService : IWorkstationService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Domain.Entities.Workstation),
             entityId: workstation.Id.ToString(),
-            detailsJson: $"{{\"DisplayName\":\"{workstation.DisplayName}\",\"Type\":\"{workstation.Type}\"}}",
+            detailsJson: AuditDetails.ToJson(new { workstation.DisplayName, Type = workstation.Type.ToString() }),
             cancellationToken: cancellationToken);
 
         return workstation.ToDto();

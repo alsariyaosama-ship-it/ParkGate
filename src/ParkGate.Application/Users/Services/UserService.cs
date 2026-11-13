@@ -95,7 +95,7 @@ public sealed class UserService : IUserService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(User),
             entityId: user.Id.ToString(),
-            detailsJson: $"{{\"UserName\":\"{user.UserName}\",\"Role\":\"{user.Role}\"}}",
+            detailsJson: AuditDetails.ToJson(new { user.UserName, Role = user.Role.ToString() }),
             cancellationToken: cancellationToken);
 
         return user.ToDto();
@@ -129,7 +129,7 @@ public sealed class UserService : IUserService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(User),
             entityId: user.Id.ToString(),
-            detailsJson: $"{{\"NewRole\":\"{newRole}\"}}",
+            detailsJson: AuditDetails.ToJson(new { NewRole = newRole.ToString() }),
             cancellationToken: cancellationToken);
 
         return user.ToDto();

@@ -230,7 +230,7 @@ public sealed class OrganizationService : IOrganizationService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Organization),
             entityId: org.Id.ToString(),
-            detailsJson: $"{{\"MaxFreeCompanions\":{(request.MaxFreeCompanions.HasValue ? request.MaxFreeCompanions.ToString() : "null")},\"GiftEnabled\":{request.GiftEnabled.ToString().ToLowerInvariant()},\"GiftValue\":{request.GiftValue},\"GiftIntervalDays\":{request.GiftIntervalDays}}}",
+            detailsJson: AuditDetails.ToJson(new { request.MaxFreeCompanions, request.GiftEnabled, request.GiftValue, request.GiftIntervalDays }),
             cancellationToken: cancellationToken);
 
         return org.ToDto();

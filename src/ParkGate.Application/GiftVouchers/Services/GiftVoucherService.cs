@@ -146,7 +146,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             workstationId: actor.Value.WorkstationId,
             entityName: nameof(GiftVoucher),
             entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
+            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value }),
             cancellationToken: ct);
 
         return new IssuedGiftVoucherDto(
@@ -262,7 +262,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             workstationId: actor.Value.WorkstationId,
             entityName: nameof(GiftVoucher),
             entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
+            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value }),
             cancellationToken: ct);
 
         return new IssuedGiftVoucherDto(
@@ -352,7 +352,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             workstationId: workstationId,
             entityName: nameof(GiftVoucher),
             entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
+            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value }),
             cancellationToken: ct);
 
         var holder = await uow.Beneficiaries.GetByIdAsync(voucher.BeneficiaryId, ct);
@@ -434,7 +434,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(GiftVoucher),
             entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Reason\":\"{request.Reason}\"}}",
+            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, request.Reason }),
             cancellationToken: ct);
 
         return Result.Success();

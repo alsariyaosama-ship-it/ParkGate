@@ -266,6 +266,47 @@ public sealed class CheckInServiceTests
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 2);
     }
 
+    // ── R3.4: audit details are serialized, not interpolated ────────────────
+
+    [Fact]
+    public async Task OverrideEntryAsync_ReasonWithQuoteAndBackslash_WritesValidAuditJson()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-JSON"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(_uowFactory.CurrentUow.CurrentDbTime.AddHours(-1));
+        _beneficiaries.Add(holder);
+        const string reason = "قال \"نعم\" عند C:\\الباب";
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, reason));
+
+        result.IsSuccess.ShouldBeTrue();
+        var details = _auditWriter.Details[_auditWriter.Writes.FindIndex(w => w.Action == "EntryOverridden")];
+        using var json = System.Text.Json.JsonDocument.Parse(details!);
+        json.RootElement.GetProperty("Reason").GetString().ShouldBe(reason);
+        json.RootElement.GetProperty("TotalPersons").GetInt32().ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_ReasonWithQuoteAndBackslash_WritesValidAuditJson()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-VOIDJSON"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(now);
+        _beneficiaries.Add(holder);
+        var attempt = EntryAttempt.CreateAllowed(
+            Guid.NewGuid(), holder.Id, _org.Id, now, DateOnly.FromDateTime(now), 720, now.AddHours(12), 1, 1, EntryChannel.Desk);
+        _attempts.Add(attempt);
+        const string reason = "خطأ \"إدخال\" \\ مكرر";
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, reason));
+
+        result.Error.Code.ShouldBe(Error.None.Code);
+        var details = _auditWriter.Details[_auditWriter.Writes.FindIndex(w => w.Action == "EntryVoided")];
+        using var json = System.Text.Json.JsonDocument.Parse(details!);
+        json.RootElement.GetProperty("Reason").GetString().ShouldBe(reason);
+    }
+
     // ── R3.3: no silent fallback to user or workstation id 1 ────────────────
 
     [Fact]
