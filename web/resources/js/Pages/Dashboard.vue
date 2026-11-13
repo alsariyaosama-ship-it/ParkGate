@@ -80,11 +80,11 @@ defineProps({
                     </div>
                 </div>
                 <div class="mt-3 flex items-baseline gap-2">
-                    <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ kpis.today_allowed.toLocaleString() }}</span>
+                    <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ kpis.today_entries.toLocaleString() }}</span>
                     <span class="text-xs text-slate-500 dark:text-slate-400">حركة</span>
                 </div>
                 <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
-                    <span>استثناءات المشرف: {{ kpis.today_overridden }}</span>
+                    <span>منها باستثناء المشرف: {{ kpis.today_overridden }}</span>
                 </div>
             </div>
 

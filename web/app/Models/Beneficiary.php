@@ -27,7 +27,7 @@ class Beneficiary extends Model
     ];
 
     protected $casts = [
-        'card_expiry_date' => 'date',
+        'card_expiry_date' => 'date:Y-m-d',
         'status' => 'integer',
         'last_granted_entry_utc' => 'datetime',
         'created_at_utc' => 'datetime',

@@ -37,7 +37,7 @@ class EntryAttempt extends Model
 
     protected $casts = [
         'attempted_at_utc' => 'datetime',
-        'business_date' => 'date',
+        'business_date' => 'date:Y-m-d',
         'result' => 'integer',
         'denial_reason' => 'integer',
         'cooldown_minutes_applied' => 'integer',
