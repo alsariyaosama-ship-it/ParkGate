@@ -60,6 +60,40 @@ public sealed class EntryAttemptRepository : IEntryAttemptRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default)
+    {
+        var day = _context.EntryAttempts
+            .AsNoTracking()
+            .Where(e => e.WorkstationId == workstationId && e.BusinessDate == businessDate);
+
+        var counts = await day
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Granted = g.Count(e => e.Result == EntryResult.Allowed && !e.IsVoided),
+                Overridden = g.Count(e => e.Result == EntryResult.Overridden && !e.IsVoided),
+                Denied = g.Count(e => e.Result == EntryResult.Denied),
+                Persons = g.Sum(e => (e.Result == EntryResult.Allowed || e.Result == EntryResult.Overridden) && !e.IsVoided
+                    ? e.TotalPersons
+                    : 0)
+            })
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (counts is null)
+        {
+            return TodayAttemptTotals.Empty;
+        }
+
+        var companions = await day
+            .Where(e => (e.Result == EntryResult.Allowed || e.Result == EntryResult.Overridden) && !e.IsVoided)
+            .SelectMany(e => e.Companions)
+            .GroupBy(c => c.AgeCategoryId)
+            .Select(g => new { AgeCategoryId = g.Key, Count = g.Sum(c => c.Count) })
+            .ToDictionaryAsync(x => x.AgeCategoryId, x => x.Count, cancellationToken);
+
+        return new TodayAttemptTotals(counts.Granted, counts.Overridden, counts.Denied, counts.Persons, companions);
+    }
+
     public void Add(EntryAttempt attempt)
     {
         _context.EntryAttempts.Add(attempt);

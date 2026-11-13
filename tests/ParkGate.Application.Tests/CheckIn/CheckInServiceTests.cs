@@ -265,4 +265,27 @@ public sealed class CheckInServiceTests
         result.Value.TotalPersons.ShouldBe(3); // 1 holder + 2 children
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 2);
     }
+
+    [Fact]
+    public async Task GetTodayDeskEntriesAsync_WithMoreAttemptsThanTheGridShows_CountsEveryAttempt()
+    {
+        // R3.1: totals used to be computed from the 50 newest rows only.
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var today = DateOnly.FromDateTime(now);
+        for (var i = 0; i < 60; i++)
+        {
+            _attempts.Add(EntryAttempt.CreateAllowed(
+                Guid.NewGuid(), Guid.NewGuid(), _org.Id, now.AddMinutes(-i), today,
+                720, now.AddHours(12), 1, 1, EntryChannel.Desk,
+                [new EntryAttemptCompanion(_childCategory.Id, 1)]));
+        }
+
+        var result = await _sut.GetTodayDeskEntriesAsync(1);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.TotalGranted.ShouldBe(60);
+        result.Value.TotalPersons.ShouldBe(120);
+        result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 60);
+        result.Value.RecentAttempts.Count.ShouldBe(20);
+    }
 }

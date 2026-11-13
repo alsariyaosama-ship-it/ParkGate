@@ -322,6 +322,22 @@ public sealed class FakeEntryAttemptRepository : IEntryAttemptRepository
         return Task.FromResult(list);
     }
 
+    public Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default)
+    {
+        var day = _attempts.Where(a => a.WorkstationId == workstationId && a.BusinessDate == businessDate).ToList();
+        var entered = day.Where(a => !a.IsVoided && (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)).ToList();
+
+        return Task.FromResult(new TodayAttemptTotals(
+            Granted: entered.Count(a => a.Result == EntryResult.Allowed),
+            Overridden: entered.Count(a => a.Result == EntryResult.Overridden),
+            Denied: day.Count(a => a.Result == EntryResult.Denied),
+            Persons: entered.Sum(a => a.TotalPersons),
+            CompanionsByCategory: entered
+                .SelectMany(a => a.Companions)
+                .GroupBy(c => c.AgeCategoryId)
+                .ToDictionary(g => g.Key, g => g.Sum(c => c.Count))));
+    }
+
     public void Add(EntryAttempt attempt) => _attempts.Add(attempt);
 
     public void Update(EntryAttempt attempt) { }

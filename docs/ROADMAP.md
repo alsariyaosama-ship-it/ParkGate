@@ -175,7 +175,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R2.10 End-to-end sync test: failing-then-recovering cloud, cloud data equals local data minus excluded fields (R2 "Done when")
 
 ### R3 — Desktop Application and Infrastructure · branch `phase/r3-application`
-- [ ] R3.1 Today's totals must not be capped at 50 attempts — add an aggregate query
+- [x] R3.1 Today's totals must not be capped at 50 attempts — add an aggregate query
 - [ ] R3.2 Replace trusted `SupervisorUserId` with short-lived single-use approval tokens
 - [ ] R3.3 Remove the silent `?? 1` / `?? 0` user and workstation id fallbacks
 - [ ] R3.4 Serialize audit JSON with `System.Text.Json`, not string interpolation

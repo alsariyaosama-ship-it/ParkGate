@@ -121,7 +121,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 
 ## Phase R3 — Desktop Application and Infrastructure fixes · branch `phase/r3-application`
 
-- [ ] **R3.1 [Verified] Today's totals are capped at 50 attempts.** `CheckInService.GetTodayDeskEntriesAsync` loads `GetTodayByWorkstationIdAsync(..., 50, ...)` and computes the totals from that list. Add an aggregate query (`IEntryAttemptRepository.GetTodayTotalsAsync`: granted, overridden, denied, persons, persons per category) and keep the list for the grid only.
+- [x] **R3.1 [Verified] Today's totals are capped at 50 attempts.** `CheckInService.GetTodayDeskEntriesAsync` loads `GetTodayByWorkstationIdAsync(..., 50, ...)` and computes the totals from that list. Add an aggregate query (`IEntryAttemptRepository.GetTodayTotalsAsync`: granted, overridden, denied, persons, persons per category) and keep the list for the grid only.
   Test first (integration): 60 granted attempts → `TotalGranted == 60`.
 - [ ] **R3.2 [Verified] Supervisor approval is trusted from the UI.** `OverrideEntryAsync`, `VoidEntryAsync` and the gift override accept a bare `SupervisorUserId`. Replace it with a short-lived approval: `IAuthService.AuthorizeSupervisorAsync(username, password)` returns an opaque single-use token (in-memory, 2-minute expiry, bound to the workstation); the use cases accept the token and resolve the approver from it. Remove the `_authService == null → SupervisorUserId = 1` branch from `SupervisorAuthDialog`; tests must inject a fake service instead.
   Test first: calling `OverrideEntryAsync` as an Operator with a made-up supervisor id is rejected; a token cannot be used twice.

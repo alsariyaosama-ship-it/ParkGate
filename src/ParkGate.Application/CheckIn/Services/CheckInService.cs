@@ -13,6 +13,9 @@ namespace ParkGate.Application.CheckIn.Services;
 
 public sealed class CheckInService : ICheckInService
 {
+    /// <summary>Rows the desk "today" grid shows; totals are not limited by it.</summary>
+    private const int RecentAttemptsShown = 20;
+
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IEntryEligibilityPolicy _eligibilityPolicy;
     private readonly IAuditWriter _auditWriter;
@@ -395,34 +398,23 @@ public sealed class CheckInService : ICheckInService
         var workstation = await uow.Workstations.GetByIdAsync(targetWorkstationId, cancellationToken);
         var workstationName = workstation?.DisplayName ?? _currentWorkstation.DisplayName ?? "Desk";
 
-        var attempts = await uow.EntryAttempts.GetTodayByWorkstationIdAsync(targetWorkstationId, businessDate, 50, cancellationToken);
+        // Totals come from an aggregate over the whole day; the list feeds the grid only (R3.1).
+        var totals = await uow.EntryAttempts.GetTodayTotalsAsync(targetWorkstationId, businessDate, cancellationToken);
+        var attempts = await uow.EntryAttempts.GetTodayByWorkstationIdAsync(targetWorkstationId, businessDate, RecentAttemptsShown, cancellationToken);
         var activeCategories = await uow.AgeCategories.GetAllActiveAsync(cancellationToken);
 
-        var totalGranted = attempts.Count(a => a.Result == EntryResult.Allowed && !a.IsVoided);
-        var totalDenied = attempts.Count(a => a.Result == EntryResult.Denied);
-        var totalOverridden = attempts.Count(a => a.Result == EntryResult.Overridden && !a.IsVoided);
-        var totalPersons = attempts.Where(a => !a.IsVoided && (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)).Sum(a => a.TotalPersons);
+        var categoryTotals = activeCategories
+            .Select(cat => new CompanionCountDto(cat.Id, cat.NameAr, totals.CompanionsByCategory.GetValueOrDefault(cat.Id)))
+            .ToList();
 
-        var categoryTotals = new List<CompanionCountDto>();
-        foreach (var cat in activeCategories)
-        {
-            var countForCat = attempts
-                .Where(a => !a.IsVoided && (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden))
-                .SelectMany(a => a.Companions)
-                .Where(c => c.AgeCategoryId == cat.Id)
-                .Sum(c => c.Count);
-
-            categoryTotals.Add(new CompanionCountDto(cat.Id, cat.NameAr, countForCat));
-        }
-
-        var attemptBeneficiaryIds = attempts.Take(20).Select(a => a.BeneficiaryId).Distinct().ToList();
+        var attemptBeneficiaryIds = attempts.Select(a => a.BeneficiaryId).Distinct().ToList();
         var beneficiaries = await uow.Beneficiaries.GetByIdsAsync(attemptBeneficiaryIds, cancellationToken);
         var beneficiariesMap = beneficiaries.ToDictionary(b => b.Id, b => (CardNumber: b.CardNumber.Value, FullName: b.FullName));
 
         var allOrgs = await uow.Organizations.GetAllAsync(false, cancellationToken);
         var orgMap = allOrgs.ToDictionary(o => o.Id, o => o.NameAr);
 
-        var recentAttemptDtos = attempts.Take(20).Select(a =>
+        var recentAttemptDtos = attempts.Select(a =>
         {
             beneficiariesMap.TryGetValue(a.BeneficiaryId, out var bInfo);
             orgMap.TryGetValue(a.OrganizationId, out var orgName);
@@ -443,10 +435,10 @@ public sealed class CheckInService : ICheckInService
             BusinessDate: businessDate,
             WorkstationId: targetWorkstationId,
             WorkstationName: workstationName,
-            TotalGranted: totalGranted,
-            TotalDenied: totalDenied,
-            TotalOverridden: totalOverridden,
-            TotalPersons: totalPersons,
+            TotalGranted: totals.Granted,
+            TotalDenied: totals.Denied,
+            TotalOverridden: totals.Overridden,
+            TotalPersons: totals.Persons,
             PersonsPerCategory: categoryTotals,
             RecentAttempts: recentAttemptDtos);
 
