@@ -20,7 +20,6 @@ public sealed class CheckInServiceTests
     private readonly List<EntryAttempt> _attempts = [];
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeAppSettingRepository _settings = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("DESK-01");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -68,7 +67,6 @@ public sealed class CheckInServiceTests
         _sut = new CheckInService(
             _uowFactory,
             _policy,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new RecordEntryRequestValidator(),
@@ -98,7 +96,7 @@ public sealed class CheckInServiceTests
         holder.LastGrantedEntryUtc.ShouldBe(_uowFactory.CurrentUow.CurrentDbTime);
         _attempts.Count.ShouldBe(1);
         _attempts[0].Result.ShouldBe(EntryResult.Allowed);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryGranted");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryGranted");
     }
 
     [Fact]
@@ -159,7 +157,7 @@ public sealed class CheckInServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.Result.ShouldBe(EntryResult.Overridden);
         holder.LastGrantedEntryUtc.ShouldBe(_uowFactory.CurrentUow.CurrentDbTime);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryOverridden");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryOverridden");
     }
 
     [Fact]
@@ -210,7 +208,7 @@ public sealed class CheckInServiceTests
 
         // Recalculates to entry1Time (BR-13)
         holder.LastGrantedEntryUtc.ShouldBe(entry1Time);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryVoided");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided");
     }
 
     [Fact]
@@ -239,7 +237,7 @@ public sealed class CheckInServiceTests
         attempt.IsVoided.ShouldBeTrue();
         attempt.VoidedByUserId.ShouldBe(supervisor.Id);
         holder.LastGrantedEntryUtc.ShouldBeNull();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryVoided" && w.UserId == supervisor.Id);
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided" && w.UserId == supervisor.Id);
     }
 
     [Fact]
@@ -266,6 +264,52 @@ public sealed class CheckInServiceTests
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 2);
     }
 
+    // ── R3.5: the audit row commits with the change it describes ────────────
+
+    [Fact]
+    public async Task RecordEntryAsync_WhenGranted_AuditRowIsCommittedInTheSameUnitOfWork()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-ATOM1"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.RecordEntryAsync(new RecordEntryRequest(holder.Id));
+
+        result.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("EntryGranted");
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_AuditRowIsCommittedInTheSameUnitOfWork()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-ATOM2"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(_uowFactory.CurrentUow.CurrentDbTime.AddHours(-1));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا"));
+
+        result.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("EntryOverridden");
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_AuditRowIsCommittedInTheSameUnitOfWork()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-ATOM3"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(now);
+        _beneficiaries.Add(holder);
+        var attempt = EntryAttempt.CreateAllowed(
+            Guid.NewGuid(), holder.Id, _org.Id, now, DateOnly.FromDateTime(now), 720, now.AddHours(12), 1, 1, EntryChannel.Desk);
+        _attempts.Add(attempt);
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, "إدخال بالخطأ"));
+
+        result.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("EntryVoided");
+    }
+
     // ── R3.4: audit details are serialized, not interpolated ────────────────
 
     [Fact]
@@ -280,7 +324,7 @@ public sealed class CheckInServiceTests
         var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, reason));
 
         result.IsSuccess.ShouldBeTrue();
-        var details = _auditWriter.Details[_auditWriter.Writes.FindIndex(w => w.Action == "EntryOverridden")];
+        var details = _uowFactory.CurrentUow.AuditLogRows.First(w => w.Action == "EntryOverridden").DetailsJson;
         using var json = System.Text.Json.JsonDocument.Parse(details!);
         json.RootElement.GetProperty("Reason").GetString().ShouldBe(reason);
         json.RootElement.GetProperty("TotalPersons").GetInt32().ShouldBe(1);
@@ -302,7 +346,7 @@ public sealed class CheckInServiceTests
         var result = await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, reason));
 
         result.Error.Code.ShouldBe(Error.None.Code);
-        var details = _auditWriter.Details[_auditWriter.Writes.FindIndex(w => w.Action == "EntryVoided")];
+        var details = _uowFactory.CurrentUow.AuditLogRows.First(w => w.Action == "EntryVoided").DetailsJson;
         using var json = System.Text.Json.JsonDocument.Parse(details!);
         json.RootElement.GetProperty("Reason").GetString().ShouldBe(reason);
     }

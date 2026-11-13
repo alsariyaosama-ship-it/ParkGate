@@ -168,7 +168,6 @@ public sealed class AuditLoggingTests
         var checkInService = new CheckInService(
             _uowFactory,
             new RollingWindowEligibilityPolicy(),
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new RecordEntryRequestValidator(),
@@ -181,7 +180,7 @@ public sealed class AuditLoggingTests
             Channel: EntryChannel.Desk));
 
         entry.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryGranted" && w.EntityName == nameof(EntryAttempt));
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryGranted" && w.EntityName == nameof(EntryAttempt));
 
         // Override entry (when cooldown active)
         var ovr = await checkInService.OverrideEntryAsync(new OverrideEntryRequest(
@@ -192,7 +191,7 @@ public sealed class AuditLoggingTests
             Channel: EntryChannel.Desk));
 
         ovr.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryOverridden" && w.EntityName == nameof(EntryAttempt));
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryOverridden" && w.EntityName == nameof(EntryAttempt));
 
         // Void entry
         var voidRes = await checkInService.VoidEntryAsync(new VoidEntryRequest(
@@ -200,7 +199,7 @@ public sealed class AuditLoggingTests
             Reason: "خطأ في تسجيل عدد المرافقين"));
 
         voidRes.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryVoided" && w.EntityName == nameof(EntryAttempt));
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided" && w.EntityName == nameof(EntryAttempt));
     }
 
     [Fact]

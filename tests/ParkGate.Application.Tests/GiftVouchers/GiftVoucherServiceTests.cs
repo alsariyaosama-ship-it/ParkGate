@@ -32,7 +32,6 @@ public sealed class GiftVoucherServiceTests : IDisposable
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeGiftVoucherRepository _giftRepo = new();
     private readonly FakeAppSettingRepository _settings = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("DESK-01");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -85,7 +84,6 @@ public sealed class GiftVoucherServiceTests : IDisposable
             new RollingIntervalGiftEligibilityPolicy(),
             _signer,
             _verifier,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new IssueGiftOverrideRequestValidator(),
@@ -174,7 +172,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
         var sut = new GiftVoucherService(
             _uowFactory,
             new RollingIntervalGiftEligibilityPolicy(),
-            _signer, _verifier, _auditWriter,
+            _signer, _verifier,
             emptyUser, _currentWorkstation,
             new IssueGiftOverrideRequestValidator(),
             new VoidGiftVoucherRequestValidator());
@@ -285,12 +283,26 @@ public sealed class GiftVoucherServiceTests : IDisposable
     {
         await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
 
-        _auditWriter.Writes.ShouldContain(w => w.Action == "Gift.Issued");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "Gift.Issued");
         // DetailsJson must not contain the QR text (would be > 200 chars of digits)
-        var write = _auditWriter.Writes.First(w => w.Action == "Gift.Issued");
+        var write = _uowFactory.CurrentUow.AuditLogRows.First(w => w.Action == "Gift.Issued");
         // The detailsJson should be short (just ReceiptNo and Value), not 203-digit QR string
         // We verify it's not null and doesn't exceed reasonable length
         (write.EntityName == nameof(GiftVoucher)).ShouldBeTrue();
+    }
+
+    // ── R3.5: the audit row commits with the change it describes ────────────
+
+    [Fact]
+    public async Task IssueAndRedeem_AuditRowsAreCommittedInTheSameUnitOfWork()
+    {
+        var issued = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("Gift.Issued");
+
+        var redeemed = await _sut.RedeemAsync(issued.Value.QrText);
+
+        redeemed.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("Gift.Redeemed");
     }
 
     // ── R3.3: no silent fallback to user or workstation id 0 ────────────────
@@ -304,7 +316,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
-        _auditWriter.Writes.ShouldBeEmpty();
+        _uowFactory.CurrentUow.AuditLogRows.ShouldBeEmpty();
     }
 
     [Fact]
@@ -317,7 +329,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
-        _auditWriter.Writes.ShouldBeEmpty();
+        _uowFactory.CurrentUow.AuditLogRows.ShouldBeEmpty();
     }
 
     [Fact]
@@ -330,7 +342,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
-        _auditWriter.Writes.ShouldNotContain(w => w.Action == "Gift.Redeemed");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldNotContain(w => w.Action == "Gift.Redeemed");
     }
 
     // ── Issue Override ───────────────────────────────────────────────────────
@@ -516,7 +528,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
         var emptyUser = new CurrentUserContext();
         var sut = new GiftVoucherService(
             _uowFactory, new RollingIntervalGiftEligibilityPolicy(),
-            _signer, _verifier, _auditWriter,
+            _signer, _verifier,
             emptyUser, _currentWorkstation,
             new IssueGiftOverrideRequestValidator(), new VoidGiftVoucherRequestValidator());
 

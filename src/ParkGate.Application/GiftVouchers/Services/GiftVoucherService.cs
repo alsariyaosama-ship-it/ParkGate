@@ -2,7 +2,6 @@ using FluentValidation;
 using ParkGate.Application.Common;
 using ParkGate.Application.EntryCards;
 using ParkGate.Application.GiftVouchers.DTOs;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Domain.Entities;
@@ -18,7 +17,6 @@ public sealed class GiftVoucherService : IGiftVoucherService
     private readonly IGiftEligibilityPolicy _policy;
     private readonly QrTokenSigner _signer;
     private readonly QrTokenVerifier _verifier;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<IssueGiftOverrideRequest> _overrideValidator;
@@ -29,7 +27,6 @@ public sealed class GiftVoucherService : IGiftVoucherService
         IGiftEligibilityPolicy policy,
         QrTokenSigner signer,
         QrTokenVerifier verifier,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<IssueGiftOverrideRequest> overrideValidator,
@@ -39,7 +36,6 @@ public sealed class GiftVoucherService : IGiftVoucherService
         _policy = policy;
         _signer = signer;
         _verifier = verifier;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _overrideValidator = overrideValidator;
@@ -138,16 +134,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         uow.GiftVouchers.Add(voucher);
         await uow.SaveChangesAsync(ct);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Issued", actor.Value.UserId, actor.Value.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
-
-        await _auditWriter.WriteAsync(
-            action: "Gift.Issued",
-            userId: actor.Value.UserId,
-            workstationId: actor.Value.WorkstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value }),
-            cancellationToken: ct);
 
         return new IssuedGiftVoucherDto(
             ReceiptNo: voucher.Id,
@@ -253,17 +243,11 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         uow.GiftVouchers.Add(voucher);
         await uow.SaveChangesAsync(ct);
-        await uow.CommitAsync(ct);
-
         var auditAction = isActualOverride ? "Gift.IssuedOverride" : "Gift.Issued";
-        await _auditWriter.WriteAsync(
-            action: auditAction,
-            userId: approverUserId,
-            workstationId: actor.Value.WorkstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value }),
-            cancellationToken: ct);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, auditAction, approverUserId, actor.Value.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        await uow.SaveChangesAsync(ct);
+        await uow.CommitAsync(ct);
 
         return new IssuedGiftVoucherDto(
             ReceiptNo: voucher.Id,
@@ -343,17 +327,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
         var (userId, workstationId) = actor.Value;
 
         voucher.Redeem(userId, workstationId, nowUtc, businessDate);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Redeemed", userId, workstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
-
-        await _auditWriter.WriteAsync(
-            action: "Gift.Redeemed",
-            userId: userId,
-            workstationId: workstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value }),
-            cancellationToken: ct);
 
         var holder = await uow.Beneficiaries.GetByIdAsync(voucher.BeneficiaryId, ct);
         var org = await uow.Organizations.GetByIdAsync(voucher.OrganizationId, ct);
@@ -425,17 +402,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
         var nowUtc = await uow.GetDbUtcNowAsync(ct);
 
         voucher.Void(voidedByUserId, request.Reason, nowUtc);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Voided", voidedByUserId, _currentWorkstation.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, request.Reason })));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
-
-        await _auditWriter.WriteAsync(
-            action: "Gift.Voided",
-            userId: voidedByUserId,
-            workstationId: _currentWorkstation.WorkstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: AuditDetails.ToJson(new { ReceiptNo = voucher.Id, request.Reason }),
-            cancellationToken: ct);
 
         return Result.Success();
     }

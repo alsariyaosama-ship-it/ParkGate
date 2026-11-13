@@ -2,7 +2,6 @@ using FluentValidation;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Domain.Entities;
@@ -18,7 +17,6 @@ public sealed class CheckInService : ICheckInService
 
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IEntryEligibilityPolicy _eligibilityPolicy;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<RecordEntryRequest> _recordValidator;
@@ -28,7 +26,6 @@ public sealed class CheckInService : ICheckInService
     public CheckInService(
         IUnitOfWorkFactory uowFactory,
         IEntryEligibilityPolicy eligibilityPolicy,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<RecordEntryRequest> recordValidator,
@@ -37,7 +34,6 @@ public sealed class CheckInService : ICheckInService
     {
         _uowFactory = uowFactory;
         _eligibilityPolicy = eligibilityPolicy;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _recordValidator = recordValidator;
@@ -158,17 +154,10 @@ public sealed class CheckInService : ICheckInService
         holder.RecordGrantedEntry(nowUtc);
         uow.EntryAttempts.Add(attempt);
 
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryGranted", userId, workstationId, nameof(EntryAttempt), attemptId.ToString(), AuditDetails.ToJson(new { attempt.TotalPersons })));
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
-            action: "EntryGranted",
-            userId: userId,
-            workstationId: workstationId,
-            entityName: nameof(EntryAttempt),
-            entityId: attemptId.ToString(),
-            detailsJson: AuditDetails.ToJson(new { attempt.TotalPersons }),
-            cancellationToken: cancellationToken);
 
         return new CheckInResultDto(
             AttemptId: attempt.Id,
@@ -288,17 +277,10 @@ public sealed class CheckInService : ICheckInService
         holder.RecordGrantedEntry(nowUtc);
         uow.EntryAttempts.Add(attempt);
 
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryOverridden", approverUserId, workstationId, nameof(EntryAttempt), attemptId.ToString(), AuditDetails.ToJson(new { request.Reason, attempt.TotalPersons })));
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
-            action: "EntryOverridden",
-            userId: approverUserId,
-            workstationId: workstationId,
-            entityName: nameof(EntryAttempt),
-            entityId: attemptId.ToString(),
-            detailsJson: AuditDetails.ToJson(new { request.Reason, attempt.TotalPersons }),
-            cancellationToken: cancellationToken);
 
         return new CheckInResultDto(
             AttemptId: attempt.Id,
@@ -381,17 +363,10 @@ public sealed class CheckInService : ICheckInService
         var latestRemaining = await uow.Beneficiaries.GetLatestGrantedEntryUtcAsync(holder.Id, cancellationToken);
         holder.RecalculateLastGrantedEntry(latestRemaining);
 
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryVoided", voidedByUserId, actor.Value.WorkstationId, nameof(EntryAttempt), attempt.Id.ToString(), AuditDetails.ToJson(new { request.Reason })));
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
-            action: "EntryVoided",
-            userId: voidedByUserId,
-            workstationId: _currentWorkstation.WorkstationId,
-            entityName: nameof(EntryAttempt),
-            entityId: attempt.Id.ToString(),
-            detailsJson: AuditDetails.ToJson(new { request.Reason }),
-            cancellationToken: cancellationToken);
 
         return Result.Success();
     }

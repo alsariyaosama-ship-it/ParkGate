@@ -428,6 +428,8 @@ public sealed class FakeAuditLogRepository : IAuditLogRepository
 {
     private readonly List<AuditLog> _logs = [];
 
+    public IReadOnlyList<AuditLog> Logs => _logs;
+
     public void Add(AuditLog log) => _logs.Add(log);
 
     public Task<IReadOnlyList<AuditLog>> GetRecentAsync(int count, CancellationToken cancellationToken = default) =>
@@ -521,8 +523,21 @@ public sealed class FakeUnitOfWork : IUnitOfWork
         GiftVouchers = giftVouchers ?? new FakeGiftVoucherRepository();
     }
 
+    /// <summary>Audit rows added through this unit of work.</summary>
+    public IReadOnlyList<AuditLog> AuditLogRows => ((FakeAuditLogRepository)AuditLogs).Logs;
+
+    /// <summary>Audit actions that were part of the unit of work when it committed (R3.5: same transaction).</summary>
+    public List<string> AuditActionsAtCommit { get; } = [];
+
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
-    public Task CommitAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        AuditActionsAtCommit.Clear();
+        AuditActionsAtCommit.AddRange(AuditLogRows.Select(l => l.Action));
+        return Task.CompletedTask;
+    }
+
     public Task RollbackAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
