@@ -11,8 +11,8 @@
 |---|---|
 | Last updated | 2026-11-13 |
 | Last session | S29 — Phase R2 sync correctness: R2.1–R2.6 and R2.8 done, R1.8 done; R2.7 and R2.9 left |
-| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 awaiting PR review (#12). R2 in progress |
-| Working branch | `phase/r2-sync`, branched from `phase/r1-web-security` (stacked: PR #12 is not merged yet) |
+| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 merged (PR #12). R2 in progress |
+| Working branch | `phase/r2-sync` (main already merged into it after PR #12) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
 | .NET Unit tests | 617 passed: 202 domain + 177 application + 84 infrastructure + 154 architecture |
 | .NET Integration tests | 38 passed on LocalDB (S29) |
@@ -64,8 +64,7 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. Check PR #12 (R1): if Osama merged it, rebase `phase/r2-sync` on `main` (merge commits are used, so
-   `git rebase --onto main phase/r1-web-security` or a plain merge both work), then open the R2 PR.
+1. PR #12 (R1) is merged into `main`. Continue on `phase/r2-sync`.
 2. Finish R2: R2.7 first (desktop extractor + web table + dashboard/report summary), then R2.9, then the
    end-to-end test. Then open the R2 PR.
 3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
@@ -77,7 +76,6 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- R1 PR review and merge (Osama). PR #12 is open, CI green.
 - **Apply the two new migrations on SQLEXPRESS** (`PurgeSensitiveBeneficiaryOutbox`, `AddSyncOutboxSequence`) before running the new SyncAgent there. Existing pending outbox rows get their sequence numbers in physical order.
 - **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts). On an already-created cloud database, drop and recreate `beneficiaries` and `park_heartbeats` (unreleased schema) or re-import `mysql_schema.sql`, then let the agent re-queue.
 - Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
@@ -87,7 +85,6 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Osama's local `web/.env` still holds the old default sync key and the `APP_KEY` that was published in
   `.env.production.example` (R1.3). Harmless for dev; regenerate both (`key:generate`,
   `parkgate:generate-key`) and set the agent's `CloudApi:ApiKey` to match.
-- Untracked `scripts/r0-baseline.ps1`: delete or keep? (still undecided)
 - `web/CLAUDE.md` asks for `laravel/boost`; not installed (AGENTS.md §2 needs your approval for new packages).
 - **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
   while `composer.json` still says `^8.3`. CI uses PHP 8.4. Confirm the host offers PHP 8.4 before R8.5,
