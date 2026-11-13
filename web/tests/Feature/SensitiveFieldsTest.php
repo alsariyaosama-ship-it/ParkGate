@@ -7,6 +7,7 @@ use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /**
@@ -34,7 +35,7 @@ class SensitiveFieldsTest extends TestCase
 
     public function test_beneficiary_model_does_not_accept_phone_or_national_id(): void
     {
-        $fillable = (new Beneficiary())->getFillable();
+        $fillable = (new Beneficiary)->getFillable();
 
         $this->assertNotContains('phone', $fillable);
         $this->assertNotContains('national_id', $fillable);
@@ -132,7 +133,7 @@ class SensitiveFieldsTest extends TestCase
         $this->assertSame([], $offenders);
     }
 
-    private function push(array $payload): \Illuminate\Testing\TestResponse
+    private function push(array $payload): TestResponse
     {
         return $this->withHeaders(['X-Api-Key' => self::API_KEY])->postJson('/api/sync/push', [
             'records' => [[

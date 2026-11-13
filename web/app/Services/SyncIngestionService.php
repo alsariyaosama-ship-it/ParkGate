@@ -26,9 +26,6 @@ class SyncIngestionService
 
     /**
      * Ingests a batch of outbox records sent by ParkGate.SyncAgent.
-     *
-     * @param array $records
-     * @return array
      */
     public function ingestBatch(array $records): array
     {
@@ -47,7 +44,7 @@ class SyncIngestionService
                     }
 
                     $data = json_decode($payloadRaw, true);
-                    if (!is_array($data)) {
+                    if (! is_array($data)) {
                         // Rejected, not skipped: the agent must not delete a record we did not store.
                         throw new \InvalidArgumentException('payloadJson is not a JSON object.');
                     }
@@ -148,10 +145,13 @@ class SyncIngestionService
     private function upsertOrganization(string $opType, array $data): void
     {
         $id = $data['Id'] ?? null;
-        if (!$id) return;
+        if (! $id) {
+            return;
+        }
 
         if ($opType === 'Delete') {
             Organization::destroy($id);
+
             return;
         }
 
@@ -161,10 +161,10 @@ class SyncIngestionService
                 'code' => $data['Code'] ?? '',
                 'name_ar' => $data['NameAr'] ?? '',
                 'cooldown_minutes' => $data['CooldownMinutes'] ?? null,
-                'is_default' => (bool)($data['IsDefault'] ?? false),
-                'is_active' => (bool)($data['IsActive'] ?? true),
+                'is_default' => (bool) ($data['IsDefault'] ?? false),
+                'is_active' => (bool) ($data['IsActive'] ?? true),
                 'max_free_companions' => $data['MaxFreeCompanions'] ?? null,
-                'gift_enabled' => (bool)($data['GiftEnabled'] ?? false),
+                'gift_enabled' => (bool) ($data['GiftEnabled'] ?? false),
                 'gift_value' => $data['GiftValue'] ?? 0,
                 'gift_interval_days' => $data['GiftIntervalDays'] ?? 30,
                 'created_at_utc' => $data['CreatedAtUtc'] ?? null,
@@ -176,10 +176,13 @@ class SyncIngestionService
     private function upsertAgeCategory(string $opType, array $data): void
     {
         $id = $data['Id'] ?? null;
-        if (!$id) return;
+        if (! $id) {
+            return;
+        }
 
         if ($opType === 'Delete') {
             AgeCategory::destroy($id);
+
             return;
         }
 
@@ -189,8 +192,8 @@ class SyncIngestionService
                 'name_ar' => $data['NameAr'] ?? '',
                 'description_ar' => $data['DescriptionAr'] ?? null,
                 'sort_order' => $data['SortOrder'] ?? 0,
-                'is_active' => (bool)($data['IsActive'] ?? true),
-                'is_companion_limit_exempt' => (bool)($data['IsCompanionLimitExempt'] ?? false),
+                'is_active' => (bool) ($data['IsActive'] ?? true),
+                'is_companion_limit_exempt' => (bool) ($data['IsCompanionLimitExempt'] ?? false),
             ]
         );
     }
@@ -198,10 +201,13 @@ class SyncIngestionService
     private function upsertBeneficiary(string $opType, array $data): void
     {
         $id = $data['Id'] ?? null;
-        if (!$id) return;
+        if (! $id) {
+            return;
+        }
 
         if ($opType === 'Delete') {
             Beneficiary::destroy($id);
+
             return;
         }
 
@@ -226,10 +232,13 @@ class SyncIngestionService
     private function upsertEntryAttempt(string $opType, array $data): void
     {
         $id = $data['Id'] ?? null;
-        if (!$id) return;
+        if (! $id) {
+            return;
+        }
 
         if ($opType === 'Delete') {
             EntryAttempt::destroy($id);
+
             return;
         }
 
@@ -250,7 +259,7 @@ class SyncIngestionService
                 'user_id' => $data['UserId'] ?? null,
                 'override_by_user_id' => $data['OverrideByUserId'] ?? null,
                 'override_reason' => $data['OverrideReason'] ?? null,
-                'is_voided' => (bool)($data['IsVoided'] ?? false),
+                'is_voided' => (bool) ($data['IsVoided'] ?? false),
                 'voided_at_utc' => $data['VoidedAtUtc'] ?? null,
                 'voided_by_user_id' => $data['VoidedByUserId'] ?? null,
                 'void_reason' => $data['VoidReason'] ?? null,
@@ -263,12 +272,15 @@ class SyncIngestionService
     {
         $attemptId = $data['EntryAttemptId'] ?? null;
         $categoryId = $data['AgeCategoryId'] ?? null;
-        if (!$attemptId || !$categoryId) return;
+        if (! $attemptId || ! $categoryId) {
+            return;
+        }
 
         if ($opType === 'Delete') {
             EntryAttemptCompanion::where('entry_attempt_id', $attemptId)
                 ->where('age_category_id', $categoryId)
                 ->delete();
+
             return;
         }
 
@@ -286,10 +298,13 @@ class SyncIngestionService
     private function upsertGiftVoucher(string $opType, array $data): void
     {
         $id = $data['Id'] ?? null;
-        if (!$id) return;
+        if (! $id) {
+            return;
+        }
 
         if ($opType === 'Delete') {
             GiftVoucher::destroy($id);
+
             return;
         }
 
@@ -306,7 +321,7 @@ class SyncIngestionService
                 'status' => $data['Status'] ?? 1,
                 'issued_by_user_id' => $data['IssuedByUserId'] ?? null,
                 'issued_workstation_id' => $data['IssuedWorkstationId'] ?? null,
-                'is_override' => (bool)($data['IsOverride'] ?? false),
+                'is_override' => (bool) ($data['IsOverride'] ?? false),
                 'override_by_user_id' => $data['OverrideByUserId'] ?? null,
                 'override_reason' => $data['OverrideReason'] ?? null,
                 'redeemed_at_utc' => $data['RedeemedAtUtc'] ?? null,

@@ -6,6 +6,7 @@ use App\Services\SyncIngestionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /**
@@ -103,7 +104,7 @@ class SyncApiHardeningTest extends TestCase
         $this->withHeaders(['X-Api-Key' => self::API_KEY])->postJson('/api/sync/heartbeat')->assertStatus(429);
     }
 
-    private function push(array $body): \Illuminate\Testing\TestResponse
+    private function push(array $body): TestResponse
     {
         return $this->withHeaders(['X-Api-Key' => self::API_KEY])->postJson('/api/sync/push', $body);
     }

@@ -118,7 +118,9 @@ class DatabaseSeeder extends Seeder
         $hours = [14, 15, 16, 17, 18, 19, 20, 21];
 
         foreach ($createdBeneficiaries as $idx => $b) {
-            if ($b->status === 3) continue; // blocked
+            if ($b->status === 3) {
+                continue;
+            } // blocked
 
             $h = $hours[$idx % count($hours)];
             $attemptTime = Carbon::today()->setHour($h)->setMinute(rand(5, 55));

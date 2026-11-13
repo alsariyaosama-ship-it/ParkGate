@@ -241,6 +241,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R9.3 `AGENTS.md` (needs Osama's approval): project count, web test command, UI test location
 - [ ] R9.4 `USER_GUIDE_AR.md` and `TEST_SCRIPT.md`: new shortcuts, registration, void button, glossary
 - [ ] R9.5 `SESSION_HANDOFF.md`: final state, known issues, next steps
+- [x] R9.6 Format all web PHP with Pint (done early in S30, in its own `style` commit; run `vendor/bin/pint --dirty --format agent` after each PHP change)
 
 **Done when:** R0–R9 are ticked, every phase PR is merged, and the acceptance line at the end of each phase in `docs/REMEDIATION_PLAN.md` holds.
 

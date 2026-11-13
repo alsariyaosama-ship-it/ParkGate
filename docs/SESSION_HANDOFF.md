@@ -110,6 +110,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
   Bash PATH here; run it from PowerShell. Root `AGENTS.md` §2 still lists the approved packages: add Boost there when you approve.
 - `dotnet ef` needs `--project src/ParkGate.Infrastructure` only (the design-time factory lives there); the WinForms
   project is not a valid startup project.
+- Ran Pint over all web PHP in a separate `style` commit (R9.6, 14 files, tests still 89 green). New web PHP must pass
+  `vendor/bin/pint --dirty --format agent`.
 - Test counts: .NET unit 617 → 620, integration 38 → 39, web 79 → 89.
 ### S29 — 2026-11-13 — Phase R2: R2.1–R2.6, R2.8, R1.8
 - Created `phase/r2-sync` from `phase/r1-web-security` (PR #12 still open) and pushed it.

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Organization extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $fillable = [

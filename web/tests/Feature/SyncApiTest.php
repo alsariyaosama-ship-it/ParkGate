@@ -2,12 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\AgeCategory;
 use App\Models\Beneficiary;
-use App\Models\EntryAttempt;
-use App\Models\Organization;
-use App\Models\ParkHeartbeat;
-use App\Models\SyncBatch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

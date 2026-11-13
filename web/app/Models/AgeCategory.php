@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class AgeCategory extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $fillable = [

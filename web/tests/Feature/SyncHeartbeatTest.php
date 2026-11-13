@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\ParkHeartbeat;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -80,7 +81,7 @@ class SyncHeartbeatTest extends TestCase
         $this->assertFalse($status['is_online']);
     }
 
-    private function heartbeat(array $body): \Illuminate\Testing\TestResponse
+    private function heartbeat(array $body): TestResponse
     {
         return $this->withHeaders(['X-Api-Key' => self::API_KEY])->postJson('/api/sync/heartbeat', $body);
     }

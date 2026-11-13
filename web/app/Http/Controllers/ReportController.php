@@ -22,12 +22,12 @@ class ReportController extends Controller
         $query = EntryAttempt::with(['beneficiary', 'organization'])
             ->whereBetween('business_date', [$startDate, $endDate]);
 
-        if (!empty($orgId)) {
+        if (! empty($orgId)) {
             $query->where('organization_id', $orgId);
         }
 
-        if (!empty($result)) {
-            $query->where('result', (int)$result);
+        if (! empty($result)) {
+            $query->where('result', (int) $result);
         }
 
         $totals = [
