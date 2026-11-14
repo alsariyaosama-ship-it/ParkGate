@@ -45,6 +45,7 @@ public sealed class AuditLoggingTests
     private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("GATE-01");
+    private readonly SupervisorApprovalStore _approvals = new();
     private readonly FakeUnitOfWorkFactory _uowFactory;
 
     public AuditLoggingTests()
@@ -89,7 +90,7 @@ public sealed class AuditLoggingTests
             _currentWorkstation,
             new FirstRunAdminRequestValidator(),
             new LoginRequestValidator(),
-            new ChangePasswordRequestValidator());
+            new ChangePasswordRequestValidator(), new SupervisorApprovalStore());
 
         // Login success audit
         var loginResult = await authService.LoginAsync(new LoginRequest("admin", "AdminPass123"));
@@ -169,7 +170,7 @@ public sealed class AuditLoggingTests
             _uowFactory,
             new RollingWindowEligibilityPolicy(),
             _currentUser,
-            _currentWorkstation, TestSettings.Over(_settings),
+            _currentWorkstation, TestSettings.Over(_settings), _approvals,
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());
@@ -186,7 +187,7 @@ public sealed class AuditLoggingTests
         var ovr = await checkInService.OverrideEntryAsync(new OverrideEntryRequest(
             BeneficiaryId: reg.Value.Id,
             Reason: "استثناء بأمر الإدارة",
-            SupervisorUserId: 1,
+            SupervisorApprovalToken: _approvals.Issue(1, _currentWorkstation.WorkstationId),
             Companions: [],
             Channel: EntryChannel.Desk));
 

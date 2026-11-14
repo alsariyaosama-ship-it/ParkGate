@@ -1046,7 +1046,7 @@ public partial class CheckInDeskControl : UserControl
                 var request = new OverrideEntryRequest(
                     BeneficiaryId: _activeHolder.Id,
                     Reason: supervisorDialog.Reason,
-                    SupervisorUserId: supervisorDialog.SupervisorUserId,
+                    SupervisorApprovalToken: supervisorDialog.ApprovalToken,
                     Companions: companions,
                     Channel: EntryChannel.Desk);
 
@@ -1209,7 +1209,7 @@ public partial class CheckInDeskControl : UserControl
         }
 
         string voidReason;
-        int? supervisorUserId = null;
+        string? approvalToken = null;
 
         var isSupervisorOrAdmin = _currentUser != null &&
             (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
@@ -1227,7 +1227,7 @@ public partial class CheckInDeskControl : UserControl
             }
 
             voidReason = authDialog.Reason;
-            supervisorUserId = authDialog.SupervisorUserId;
+            approvalToken = authDialog.ApprovalToken;
         }
         else
         {
@@ -1269,7 +1269,7 @@ public partial class CheckInDeskControl : UserControl
             try
             {
                 var request = new VoidEntryRequest(attempt.Id, voidReason);
-                var result = await _checkInService.VoidEntryAsync(request, supervisorUserId);
+                var result = await _checkInService.VoidEntryAsync(request, approvalToken);
 
                 if (result.IsSuccess)
                 {

@@ -34,7 +34,7 @@ public sealed class AuthServiceTests
             _workstationSession,
             new FirstRunAdminRequestValidator(),
             new LoginRequestValidator(),
-            new ChangePasswordRequestValidator());
+            new ChangePasswordRequestValidator(), new SupervisorApprovalStore());
     }
 
     [Fact]
@@ -187,19 +187,31 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
-    public async Task ValidateSupervisorCredentialsAsync_ShouldAcceptOnlySupervisorOrAdmin()
+    public async Task AuthorizeSupervisorAsync_ShouldAcceptOnlySupervisorOrAdmin()
     {
         var op = new User("op", "Operator", _passwordHasher.HashPassword("oppass"), UserRole.Operator);
         var sup = new User("sup", "Supervisor", _passwordHasher.HashPassword("suppass"), UserRole.Supervisor);
         _users.AddRange([op, sup]);
 
-        var opResult = await _sut.ValidateSupervisorCredentialsAsync("op", "oppass");
+        var opResult = await _sut.AuthorizeSupervisorAsync("op", "oppass");
         opResult.IsFailure.ShouldBeTrue();
         opResult.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
 
-        var supResult = await _sut.ValidateSupervisorCredentialsAsync("sup", "suppass");
+        var supResult = await _sut.AuthorizeSupervisorAsync("sup", "suppass");
         supResult.IsSuccess.ShouldBeTrue();
-        supResult.Value.UserName.ShouldBe("sup");
-        supResult.Value.Role.ShouldBe(UserRole.Supervisor);
+        supResult.Value.SupervisorFullName.ShouldBe("Supervisor");
+        supResult.Value.Token.ShouldNotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task AuthorizeSupervisorAsync_WrongPassword_IssuesNoToken()
+    {
+        var sup = new User("sup", "Supervisor", _passwordHasher.HashPassword("suppass"), UserRole.Supervisor);
+        _users.Add(sup);
+
+        var result = await _sut.AuthorizeSupervisorAsync("sup", "wrong");
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.InvalidCredentials.Code);
     }
 }

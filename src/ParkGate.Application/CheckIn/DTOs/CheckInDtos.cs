@@ -15,7 +15,7 @@ public sealed record RecordEntryRequest(
 public sealed record OverrideEntryRequest(
     Guid BeneficiaryId,
     string Reason,
-    int? SupervisorUserId = null,
+    string? SupervisorApprovalToken = null,
     IReadOnlyList<CompanionRequestDto>? Companions = null,
     EntryChannel Channel = EntryChannel.Desk);
 

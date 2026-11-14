@@ -22,6 +22,7 @@ public sealed class CheckInServiceTests
     private readonly FakeAppSettingRepository _settings = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("DESK-01");
+    private readonly SupervisorApprovalStore _approvals = new();
     private readonly FakeUnitOfWorkFactory _uowFactory;
     private readonly IEntryEligibilityPolicy _policy = new RollingWindowEligibilityPolicy();
 
@@ -68,7 +69,7 @@ public sealed class CheckInServiceTests
             _uowFactory,
             _policy,
             _currentUser,
-            _currentWorkstation, TestSettings.Over(_settings),
+            _currentWorkstation, TestSettings.Over(_settings), _approvals,
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());
@@ -231,7 +232,7 @@ public sealed class CheckInServiceTests
         _attempts.Add(attempt);
 
         var voidRequest = new VoidEntryRequest(attempt.Id, "Operator called supervisor to void");
-        var result = await _sut.VoidEntryAsync(voidRequest, supervisorUserId: supervisor.Id);
+        var result = await _sut.VoidEntryAsync(voidRequest, approvalToken: _approvals.Issue(supervisor.Id, 1));
 
         result.IsSuccess.ShouldBeTrue();
         attempt.IsVoided.ShouldBeTrue();
@@ -264,6 +265,84 @@ public sealed class CheckInServiceTests
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 2);
     }
 
+    // ── R3.2: supervisor approval is a single-use token, not a trusted id ───
+
+    private Beneficiary HolderInCooldown(string card)
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create(card), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(_uowFactory.CurrentUow.CurrentDbTime.AddHours(-1));
+        _beneficiaries.Add(holder);
+        return holder;
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_AsOperatorWithMadeUpToken_IsRejected()
+    {
+        var holder = HolderInCooldown("CARD-FAKE");
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: "2"));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+        _attempts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_TokenUsedTwice_SecondOverrideIsRejected()
+    {
+        var first = HolderInCooldown("CARD-TOK1");
+        var second = HolderInCooldown("CARD-TOK2");
+        var token = _approvals.Issue(2, 1);
+
+        var used = await _sut.OverrideEntryAsync(new OverrideEntryRequest(first.Id, "حالة خاصة جدا", SupervisorApprovalToken: token));
+        var reused = await _sut.OverrideEntryAsync(new OverrideEntryRequest(second.Id, "حالة خاصة جدا", SupervisorApprovalToken: token));
+
+        used.IsSuccess.ShouldBeTrue();
+        used.Value.Result.ShouldBe(EntryResult.Overridden);
+        reused.IsFailure.ShouldBeTrue();
+        reused.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_ApprovedBySupervisorToken_RecordsThatSupervisor()
+    {
+        var holder = HolderInCooldown("CARD-TOK3");
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: _approvals.Issue(2, 1)));
+
+        result.IsSuccess.ShouldBeTrue();
+        _attempts.Single().OverrideByUserId.ShouldBe(2);
+        _attempts.Single().UserId.ShouldBe(1); // the signed-in operator still records the entry
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_InvalidReason_DoesNotSpendTheToken()
+    {
+        var holder = HolderInCooldown("CARD-TOK4");
+        var token = _approvals.Issue(2, 1);
+
+        var invalid = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "قصير", SupervisorApprovalToken: token));
+        var retried = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: token));
+
+        invalid.IsFailure.ShouldBeTrue();
+        retried.IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_WithTokenIssuedOnAnotherDesk_IsRejected()
+    {
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var attempt = EntryAttempt.CreateAllowed(
+            Guid.NewGuid(), Guid.NewGuid(), _org.Id, now, DateOnly.FromDateTime(now), 720, now.AddHours(12), 1, 1, EntryChannel.Desk);
+        _attempts.Add(attempt);
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, "إدخال بالخطأ"), approvalToken: _approvals.Issue(2, workstationId: 99));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+        attempt.IsVoided.ShouldBeFalse();
+    }
+
     // ── R3.6: settings come from the cached settings service ────────────────
 
     [Fact]
@@ -273,7 +352,7 @@ public sealed class CheckInServiceTests
         var settings = new StubSettingsService();
         settings.Current = settings.Current with { MaxGroupSize = 2 };
         var sut = new CheckInService(
-            _uowFactory, _policy, _currentUser, _currentWorkstation, settings,
+            _uowFactory, _policy, _currentUser, _currentWorkstation, settings, _approvals,
             new RecordEntryRequestValidator(), new OverrideEntryRequestValidator(), new VoidEntryRequestValidator());
         var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-SET"), "Ali Salem", PhoneNumber.Create("0912345678"));
         _beneficiaries.Add(holder);
@@ -395,7 +474,7 @@ public sealed class CheckInServiceTests
         _beneficiaries.Add(holder);
         _currentWorkstation.Clear();
 
-        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorUserId: 2));
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: _approvals.Issue(2, 1)));
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
@@ -409,7 +488,7 @@ public sealed class CheckInServiceTests
         _beneficiaries.Add(holder);
         _currentUser.Clear();
 
-        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorUserId: 2));
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: _approvals.Issue(2, 1)));
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
@@ -421,7 +500,7 @@ public sealed class CheckInServiceTests
     {
         _currentUser.Clear();
 
-        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(Guid.NewGuid(), "إدخال بالخطأ"), supervisorUserId: 2);
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(Guid.NewGuid(), "إدخال بالخطأ"), approvalToken: _approvals.Issue(2, 1));
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);

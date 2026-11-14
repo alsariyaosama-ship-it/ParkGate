@@ -189,7 +189,7 @@ public sealed class GiftRedeemControlTests
             return Task.FromResult(RedeemResult);
         }
 
-        public Task<Result> VoidAsync(VoidGiftVoucherRequest request, int? supervisorUserId = null, CancellationToken ct = default) =>
+        public Task<Result> VoidAsync(VoidGiftVoucherRequest request, string? supervisorUserId = null, CancellationToken ct = default) =>
             Task.FromResult(Result.Success());
     }
 

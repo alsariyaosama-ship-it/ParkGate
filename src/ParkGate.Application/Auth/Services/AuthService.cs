@@ -19,6 +19,7 @@ public sealed class AuthService : IAuthService
     private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUserSession _currentUserSession;
     private readonly ICurrentWorkstationSession _workstationSession;
+    private readonly SupervisorApprovalStore _approvals;
     private readonly IValidator<FirstRunAdminRequest> _firstRunValidator;
     private readonly IValidator<LoginRequest> _loginValidator;
     private readonly IValidator<ChangePasswordRequest> _changePasswordValidator;
@@ -31,8 +32,10 @@ public sealed class AuthService : IAuthService
         ICurrentWorkstationSession workstationSession,
         IValidator<FirstRunAdminRequest> firstRunValidator,
         IValidator<LoginRequest> loginValidator,
-        IValidator<ChangePasswordRequest> changePasswordValidator)
+        IValidator<ChangePasswordRequest> changePasswordValidator,
+        SupervisorApprovalStore approvals)
     {
+        _approvals = approvals;
         _uowFactory = uowFactory;
         _passwordHasher = passwordHasher;
         _auditWriter = auditWriter;
@@ -293,7 +296,19 @@ public sealed class AuthService : IAuthService
         return Result.Success();
     }
 
-    public async Task<Result<UserDto>> ValidateSupervisorCredentialsAsync(string userName, string password, CancellationToken cancellationToken = default)
+    public async Task<Result<SupervisorApprovalDto>> AuthorizeSupervisorAsync(string userName, string password, CancellationToken cancellationToken = default)
+    {
+        var supervisor = await ValidateSupervisorCredentialsAsync(userName, password, cancellationToken);
+        if (supervisor.IsFailure)
+        {
+            return supervisor.Error;
+        }
+
+        var token = _approvals.Issue(supervisor.Value.Id, _workstationSession.WorkstationId);
+        return new SupervisorApprovalDto(token, supervisor.Value.Id, supervisor.Value.FullName);
+    }
+
+    private async Task<Result<UserDto>> ValidateSupervisorCredentialsAsync(string userName, string password, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
         {

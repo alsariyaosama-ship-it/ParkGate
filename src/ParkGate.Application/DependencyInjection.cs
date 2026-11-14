@@ -51,6 +51,7 @@ public static class DependencyInjection
 
         // 4. EntryCards services
         services.AddSingleton<ParkClock>();
+        services.AddSingleton<SupervisorApprovalStore>();
         services.AddTransient<CardScanService>();
         services.AddTransient<EntryCardIssuer>();
 

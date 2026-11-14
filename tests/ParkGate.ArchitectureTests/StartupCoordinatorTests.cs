@@ -116,9 +116,9 @@ public sealed class StartupCoordinatorTests
             return Task.FromResult(Result.Success());
         }
 
-        public Task<Result<UserDto>> ValidateSupervisorCredentialsAsync(string userName, string password, CancellationToken cancellationToken = default)
+        public Task<Result<SupervisorApprovalDto>> AuthorizeSupervisorAsync(string userName, string password, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(Result<UserDto>.Success(new UserDto(1, "admin", "Admin User", UserRole.Admin, true, false, null)));
+            return Task.FromResult(Result<SupervisorApprovalDto>.Success(new SupervisorApprovalDto("token", 1, "Admin User")));
         }
 
         public Task<Result<WorkstationDto>> EnsureWorkstationRegisteredAsync(string? machineName = null, CancellationToken cancellationToken = default)

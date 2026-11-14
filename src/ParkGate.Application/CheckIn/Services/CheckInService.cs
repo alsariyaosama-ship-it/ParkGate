@@ -21,6 +21,7 @@ public sealed class CheckInService : ICheckInService
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly ISettingsService _settings;
+    private readonly SupervisorApprovalStore _approvals;
     private readonly IValidator<RecordEntryRequest> _recordValidator;
     private readonly IValidator<OverrideEntryRequest> _overrideValidator;
     private readonly IValidator<VoidEntryRequest> _voidValidator;
@@ -31,6 +32,7 @@ public sealed class CheckInService : ICheckInService
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         ISettingsService settings,
+        SupervisorApprovalStore approvals,
         IValidator<RecordEntryRequest> recordValidator,
         IValidator<OverrideEntryRequest> overrideValidator,
         IValidator<VoidEntryRequest> voidValidator)
@@ -40,6 +42,7 @@ public sealed class CheckInService : ICheckInService
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _settings = settings;
+        _approvals = approvals;
         _recordValidator = recordValidator;
         _overrideValidator = overrideValidator;
         _voidValidator = voidValidator;
@@ -191,16 +194,8 @@ public sealed class CheckInService : ICheckInService
             return actor.Error;
         }
 
-        int approverUserId;
-        if (_currentUser.Has(Permission.OverrideDenial))
-        {
-            approverUserId = _currentUser.UserId!.Value;
-        }
-        else if (request.SupervisorUserId.HasValue)
-        {
-            approverUserId = request.SupervisorUserId.Value;
-        }
-        else
+        var canApproveSelf = _currentUser.Has(Permission.OverrideDenial);
+        if (!canApproveSelf && request.SupervisorApprovalToken is null)
         {
             return Errors.Auth.SupervisorRequired;
         }
@@ -209,6 +204,18 @@ public sealed class CheckInService : ICheckInService
         if (!validation.IsValid)
         {
             return validation.ToError();
+        }
+
+        // R3.2: the approver comes from a single-use token issued after the supervisor signed in, never from an id
+        // the UI supplies. The token is spent only once the request is valid.
+        int approverUserId;
+        if (canApproveSelf)
+        {
+            approverUserId = actor.Value.UserId;
+        }
+        else if (!_approvals.TryConsume(request.SupervisorApprovalToken, actor.Value.WorkstationId, out approverUserId))
+        {
+            return Errors.Auth.SupervisorRequired;
         }
 
         // Cached settings, read before the row lock is taken (R3.6).
@@ -309,7 +316,7 @@ public sealed class CheckInService : ICheckInService
 
     public async Task<Result> VoidEntryAsync(
         VoidEntryRequest request,
-        int? supervisorUserId = null,
+        string? approvalToken = null,
         CancellationToken cancellationToken = default)
     {
         var actor = Actor.Resolve(_currentUser, _currentWorkstation);
@@ -318,19 +325,7 @@ public sealed class CheckInService : ICheckInService
             return actor.Error;
         }
 
-        var voidedByUserId = supervisorUserId ?? actor.Value.UserId;
-
-        if (supervisorUserId.HasValue)
-        {
-            await using var uowCheck = _uowFactory.Create();
-            var approver = await uowCheck.Users.GetByIdAsync(supervisorUserId.Value, cancellationToken);
-            if (approver is null || !approver.IsActive || (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
-            {
-                return Errors.Auth.SupervisorRequired;
-            }
-            voidedByUserId = supervisorUserId.Value;
-        }
-        else if (!_currentUser.Has(Permission.VoidEntry))
+        if (approvalToken is null && !_currentUser.Has(Permission.VoidEntry))
         {
             return Errors.General.Forbidden;
         }
@@ -339,6 +334,23 @@ public sealed class CheckInService : ICheckInService
         if (!validation.IsValid)
         {
             return validation.ToError();
+        }
+
+        // R3.2: with a token, the supervisor who signed in on this desk is the one who voids.
+        var voidedByUserId = actor.Value.UserId;
+        if (approvalToken is not null)
+        {
+            if (!_approvals.TryConsume(approvalToken, actor.Value.WorkstationId, out voidedByUserId))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
+
+            await using var uowCheck = _uowFactory.Create();
+            var approver = await uowCheck.Users.GetByIdAsync(voidedByUserId, cancellationToken);
+            if (approver is null || !approver.IsActive || (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
         }
 
         await using var uow = _uowFactory.Create();

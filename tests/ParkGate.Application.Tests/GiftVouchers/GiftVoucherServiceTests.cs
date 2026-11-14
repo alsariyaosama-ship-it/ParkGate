@@ -34,6 +34,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
     private readonly FakeAppSettingRepository _settings = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("DESK-01");
+    private readonly SupervisorApprovalStore _approvals = new();
     private readonly FakeUnitOfWorkFactory _uowFactory;
     private readonly GiftVoucherService _sut;
 
@@ -85,7 +86,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
             _signer,
             _verifier,
             _currentUser,
-            _currentWorkstation,
+            _currentWorkstation, _approvals,
             new IssueGiftOverrideRequestValidator(),
             new VoidGiftVoucherRequestValidator());
     }
@@ -173,7 +174,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
             _uowFactory,
             new RollingIntervalGiftEligibilityPolicy(),
             _signer, _verifier,
-            emptyUser, _currentWorkstation,
+            emptyUser, _currentWorkstation, _approvals,
             new IssueGiftOverrideRequestValidator(),
             new VoidGiftVoucherRequestValidator());
 
@@ -305,6 +306,31 @@ public sealed class GiftVoucherServiceTests : IDisposable
         _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("Gift.Redeemed");
     }
 
+    // ── R3.2: supervisor approval is a single-use token, not a trusted id ───
+
+    [Fact]
+    public async Task IssueOverrideAsync_AsOperatorWithMadeUpToken_IsRejected()
+    {
+        var result = await _sut.IssueOverrideAsync(new IssueGiftOverrideRequest(_holder.Id, "manager authorized", "2"));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+    }
+
+    [Fact]
+    public async Task VoidAsync_TokenUsedTwice_SecondVoidIsRejected()
+    {
+        var first = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+        var token = _approvals.Issue(_supervisorUser.Id, _workstation.Id);
+
+        var voided = await _sut.VoidAsync(new VoidGiftVoucherRequest(first.Value.ReceiptNo, "printing mistake"), token);
+        var reused = await _sut.VoidAsync(new VoidGiftVoucherRequest(first.Value.ReceiptNo, "printing mistake"), token);
+
+        voided.IsSuccess.ShouldBeTrue();
+        reused.IsFailure.ShouldBeTrue();
+        reused.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+    }
+
     // ── R3.3: no silent fallback to user or workstation id 0 ────────────────
 
     [Fact]
@@ -325,7 +351,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
         _currentUser.Clear();
 
         var result = await _sut.IssueOverrideAsync(
-            new IssueGiftOverrideRequest(_holder.Id, "manager authorized", _supervisorUser.Id));
+            new IssueGiftOverrideRequest(_holder.Id, "manager authorized", _approvals.Issue(_supervisorUser.Id, _workstation.Id)));
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
@@ -367,7 +393,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
         // Try override while interval is active
         uow.CurrentDbTime = new DateTime(2026, 10, 10, 10, 0, 0, DateTimeKind.Utc);
         var result = await _sut.IssueOverrideAsync(
-            new IssueGiftOverrideRequest(_holder.Id, "manager authorized", _supervisorUser.Id));
+            new IssueGiftOverrideRequest(_holder.Id, "manager authorized", _approvals.Issue(_supervisorUser.Id, _workstation.Id)));
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.IsOverride.ShouldBeTrue();
@@ -377,7 +403,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
     public async Task IssueOverrideAsync_ReasonTooShort_ShouldReturnValidationError()
     {
         var result = await _sut.IssueOverrideAsync(
-            new IssueGiftOverrideRequest(_holder.Id, "hi", _supervisorUser.Id));
+            new IssueGiftOverrideRequest(_holder.Id, "hi", _approvals.Issue(_supervisorUser.Id, _workstation.Id)));
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("General.ValidationFailed");
@@ -390,7 +416,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
         _holder.Block("blocked");
 
         var result = await _sut.IssueOverrideAsync(
-            new IssueGiftOverrideRequest(_holder.Id, "valid reason here", _supervisorUser.Id));
+            new IssueGiftOverrideRequest(_holder.Id, "valid reason here", _approvals.Issue(_supervisorUser.Id, _workstation.Id)));
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe(Errors.Gift.OverrideNotAllowed.Code);
@@ -529,7 +555,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
         var sut = new GiftVoucherService(
             _uowFactory, new RollingIntervalGiftEligibilityPolicy(),
             _signer, _verifier,
-            emptyUser, _currentWorkstation,
+            emptyUser, _currentWorkstation, _approvals,
             new IssueGiftOverrideRequestValidator(), new VoidGiftVoucherRequestValidator());
 
         var result = await sut.RedeemAsync(qrText);

@@ -16,7 +16,7 @@ public sealed record IssueGiftVoucherRequest(Guid BeneficiaryId);
 public sealed record IssueGiftOverrideRequest(
     Guid BeneficiaryId,
     string Reason,
-    int? SupervisorUserId = null);
+    string? SupervisorApprovalToken = null);
 
 public sealed record IssuedGiftVoucherDto(
     int ReceiptNo,

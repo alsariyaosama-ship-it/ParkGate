@@ -218,7 +218,7 @@ public sealed class PermissionEnforcementTests
             _uowFactory,
             new RollingWindowEligibilityPolicy(),
             _operatorUser,
-            _currentWorkstation, TestSettings.Over(_settings),
+            _currentWorkstation, TestSettings.Over(_settings), new SupervisorApprovalStore(),
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());

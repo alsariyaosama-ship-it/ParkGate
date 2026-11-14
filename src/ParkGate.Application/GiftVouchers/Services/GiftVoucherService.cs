@@ -19,6 +19,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
     private readonly QrTokenVerifier _verifier;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly SupervisorApprovalStore _approvals;
     private readonly IValidator<IssueGiftOverrideRequest> _overrideValidator;
     private readonly IValidator<VoidGiftVoucherRequest> _voidValidator;
 
@@ -29,6 +30,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
         QrTokenVerifier verifier,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
+        SupervisorApprovalStore approvals,
         IValidator<IssueGiftOverrideRequest> overrideValidator,
         IValidator<VoidGiftVoucherRequest> voidValidator)
     {
@@ -38,6 +40,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
         _verifier = verifier;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
+        _approvals = approvals;
         _overrideValidator = overrideValidator;
         _voidValidator = voidValidator;
     }
@@ -162,16 +165,8 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return actor.Error;
         }
 
-        int approverUserId;
-        if (_currentUser.Has(Permission.OverrideGiftInterval))
-        {
-            approverUserId = _currentUser.UserId!.Value;
-        }
-        else if (request.SupervisorUserId.HasValue)
-        {
-            approverUserId = request.SupervisorUserId.Value;
-        }
-        else
+        var canApproveSelf = _currentUser.Has(Permission.OverrideGiftInterval);
+        if (!canApproveSelf && request.SupervisorApprovalToken is null)
         {
             return Errors.Auth.SupervisorRequired;
         }
@@ -182,10 +177,21 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return validation.ToError();
         }
 
+        // R3.2: the approver comes from a single-use token, never from an id the UI supplies.
+        int approverUserId;
+        if (canApproveSelf)
+        {
+            approverUserId = actor.Value.UserId;
+        }
+        else if (!_approvals.TryConsume(request.SupervisorApprovalToken, actor.Value.WorkstationId, out approverUserId))
+        {
+            return Errors.Auth.SupervisorRequired;
+        }
+
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
-        if (!_currentUser.Has(Permission.OverrideGiftInterval))
+        if (!canApproveSelf)
         {
             var approver = await uow.Users.GetByIdAsync(approverUserId, ct);
             if (approver is null || !approver.IsActive ||
@@ -347,27 +353,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
     public async Task<Result> VoidAsync(
         VoidGiftVoucherRequest request,
-        int? supervisorUserId = null,
+        string? approvalToken = null,
         CancellationToken ct = default)
     {
-        int voidedByUserId;
-
-        if (supervisorUserId.HasValue)
-        {
-            await using var uowCheck = _uowFactory.Create();
-            var approver = await uowCheck.Users.GetByIdAsync(supervisorUserId.Value, ct);
-            if (approver is null || !approver.IsActive ||
-                (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
-            {
-                return Errors.Auth.SupervisorRequired;
-            }
-            voidedByUserId = supervisorUserId.Value;
-        }
-        else if (_currentUser.Has(Permission.VoidGift))
-        {
-            voidedByUserId = _currentUser.UserId!.Value;
-        }
-        else
+        if (approvalToken is null && !_currentUser.Has(Permission.VoidGift))
         {
             return Errors.General.Forbidden;
         }
@@ -376,6 +365,28 @@ public sealed class GiftVoucherService : IGiftVoucherService
         if (!validation.IsValid)
         {
             return validation.ToError();
+        }
+
+        int voidedByUserId;
+        if (approvalToken is null)
+        {
+            voidedByUserId = _currentUser.UserId!.Value;
+        }
+        else
+        {
+            // R3.2: the supervisor who signed in on this desk is the one who voids.
+            if (!_approvals.TryConsume(approvalToken, _currentWorkstation.WorkstationId, out voidedByUserId))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
+
+            await using var uowCheck = _uowFactory.Create();
+            var approver = await uowCheck.Users.GetByIdAsync(voidedByUserId, ct);
+            if (approver is null || !approver.IsActive ||
+                (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
         }
 
         await using var uow = _uowFactory.Create();

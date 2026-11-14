@@ -176,7 +176,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 
 ### R3 — Desktop Application and Infrastructure · branch `phase/r3-application`
 - [x] R3.1 Today's totals must not be capped at 50 attempts — add an aggregate query
-- [ ] R3.2 Replace trusted `SupervisorUserId` with short-lived single-use approval tokens
+- [x] R3.2 Replace trusted `SupervisorUserId` with short-lived single-use approval tokens
 - [x] R3.3 Remove the silent `?? 1` / `?? 0` user and workstation id fallbacks
 - [x] R3.4 Serialize audit JSON with `System.Text.Json`, not string interpolation
 - [x] R3.5 Write audit rows inside the same unit of work, before commit

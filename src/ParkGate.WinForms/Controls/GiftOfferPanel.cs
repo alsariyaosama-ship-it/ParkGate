@@ -228,7 +228,7 @@ public partial class GiftOfferPanel : UserControl
                 var request = new IssueGiftOverrideRequest(
                     _currentBeneficiaryId.Value,
                     supervisorDialog.Reason,
-                    supervisorDialog.SupervisorUserId);
+                    supervisorDialog.ApprovalToken);
 
                 var result = await _giftVoucherService.IssueOverrideAsync(request);
                 if (result.IsSuccess)
