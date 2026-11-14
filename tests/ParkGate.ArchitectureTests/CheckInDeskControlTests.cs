@@ -643,6 +643,54 @@ public sealed class CheckInDeskControlTests
         GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBeFalse();
     }
 
+    // ── R4.6: choosing among several organizations ─────────────────────────
+
+    private static BeneficiaryLookupResultDto MatchIn(int orgId, string orgName, string name) => new(
+        new BeneficiaryDto(Guid.NewGuid(), orgId, orgName, "999", name, "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow),
+        new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null),
+        []);
+
+    [Fact]
+    public void SelectOrganizationDialog_HasEnterAndEscButtons_AndChoosesTheSelectedRow()
+    {
+        using var dialog = new ParkGate.WinForms.Forms.SelectOrganizationDialog();
+        var first = MatchIn(1, "هيئة الشهداء", "أحمد");
+        var second = MatchIn(2, "صندوق التضامن", "سالم");
+        dialog.SetMatches([first, second]);
+
+        dialog.AcceptButton.ShouldBe(GetField<Button>(dialog, "_btnSelect"));
+        dialog.CancelButton.ShouldBe(GetField<Button>(dialog, "_btnCancel"));
+        dialog.SelectedMatch.ShouldBeNull();
+
+        GetField<ListBox>(dialog, "_lstOrganizations").SelectedIndex = 1;
+        dialog.Choose();
+
+        dialog.DialogResult.ShouldBe(DialogResult.OK);
+        dialog.SelectedMatch.ShouldBe(second);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_SeveralOrganizationsAndChooserCancelled_ShowsNobody()
+    {
+        // R4.6: closing the chooser used to load matches[0].
+        var beneficiaries = new FakeBeneficiaryService
+        {
+            LookupReturnResult = [MatchIn(1, "هيئة الشهداء", "أحمد"), MatchIn(2, "صندوق التضامن", "سالم")]
+        };
+        using var control = new CheckInDeskControl(beneficiaries, null, null, null, null, null, null, null, null, null)
+        {
+            ChooseOrganizationOverride = _ => null
+        };
+        GetField<TextBox>(control, "_txtCardNumber").Text = "999";
+
+        await control.LookupCardAsync();
+
+        GetField<StatusBanner>(control, "_statusBanner").State.ShouldBe(BannerState.Neutral);
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeFalse();
+        GetField<Label>(control, "_lblHolderName").Text.ShouldNotContain("أحمد");
+    }
+
     [Fact]
     public void BusyScope_RestoresEachControlsPreviousEnabledState()
     {

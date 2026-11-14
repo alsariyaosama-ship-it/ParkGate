@@ -667,4 +667,6 @@ internal class Strings
     internal static string Banner_CardRegisteredElsewhereHint => GetString(nameof(Banner_CardRegisteredElsewhereHint));
     internal static string Text_ListSeparator => GetString(nameof(Text_ListSeparator));
     internal static string Confirm_DiscardRegistration => GetString(nameof(Confirm_DiscardRegistration));
+    internal static string Format_OrganizationHolderItem => GetString(nameof(Format_OrganizationHolderItem));
+    internal static string Banner_OrganizationNotChosen => GetString(nameof(Banner_OrganizationNotChosen));
 }

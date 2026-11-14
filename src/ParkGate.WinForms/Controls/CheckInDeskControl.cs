@@ -881,8 +881,16 @@ public partial class CheckInDeskControl : UserControl
                 }
                 else
                 {
-                    // Flow A2: Card found in multiple organizations
-                    matched = DisambiguateOrganization(matches) ?? matches[0];
+                    // Flow A2: Card found in multiple organizations. Cancelling picks nobody (R4.6).
+                    var chosen = DisambiguateOrganization(matches);
+                    if (chosen is null)
+                    {
+                        _statusBanner.Reset(Strings.Banner_OrganizationNotChosen);
+                        FocusCardNumberBox();
+                        return;
+                    }
+
+                    matched = chosen;
                 }
 
                 ShowHolderInfo(matched.Beneficiary, matched.Eligibility);
@@ -911,58 +919,20 @@ public partial class CheckInDeskControl : UserControl
     }
 }
 
+    /// <summary>Test seam: replaces the chooser dialog. Returns null for "cancelled".</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    internal Func<IReadOnlyList<BeneficiaryLookupResultDto>, BeneficiaryLookupResultDto?>? ChooseOrganizationOverride { get; set; }
+
     private BeneficiaryLookupResultDto? DisambiguateOrganization(IReadOnlyList<BeneficiaryLookupResultDto> matches)
     {
-        // Simple prompt or selection
-        using var form = new RtlFormBase
+        if (ChooseOrganizationOverride != null)
         {
-            Text = Strings.Title_SelectOrganization,
-            Width = 400,
-            Height = 250,
-            StartPosition = FormStartPosition.CenterParent,
-            FormBorderStyle = FormBorderStyle.FixedDialog,
-            MaximizeBox = false,
-            MinimizeBox = false
-        };
-
-        var lbl = new Label
-        {
-            Text = Strings.Header_SelectOrganization,
-            Dock = DockStyle.Top,
-            Height = 40,
-            Padding = new Padding(8)
-        };
-
-        var list = new ListBox
-        {
-            Dock = DockStyle.Fill,
-            Font = new Font("Cairo", 10.5F)
-        };
-
-        foreach (var m in matches)
-        {
-            list.Items.Add($"{m.Beneficiary.OrganizationName} — {m.Beneficiary.FullName}");
+            return ChooseOrganizationOverride(matches);
         }
-        list.SelectedIndex = 0;
 
-        var btn = new Button
-        {
-            Text = Strings.Btn_SelectOrg,
-            Dock = DockStyle.Bottom,
-            Height = 40,
-            BackColor = StatusBanner.ColorGranted,
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat
-        };
-        btn.Click += (_, _) => form.DialogResult = DialogResult.OK;
-
-        form.Controls.Add(list);
-        form.Controls.Add(btn);
-        form.Controls.Add(lbl);
-
-        return form.ShowDialog(this) == DialogResult.OK && list.SelectedIndex >= 0
-            ? matches[list.SelectedIndex]
-            : matches[0];
+        using var dialog = _formFactory?.Create<SelectOrganizationDialog>() ?? new SelectOrganizationDialog();
+        dialog.SetMatches(matches);
+        return dialog.ShowDialog(this) == DialogResult.OK ? dialog.SelectedMatch : null;
     }
 
     private void PrefillCompanions(IReadOnlyList<CompanionCountDto> companions)

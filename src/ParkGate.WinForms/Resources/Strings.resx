@@ -1646,4 +1646,10 @@
   <data name="Confirm_DiscardRegistration" xml:space="preserve">
     <value>في نموذج التسجيل بيانات لم تُحفظ. هل تريد تجاهلها؟</value>
   </data>
+  <data name="Format_OrganizationHolderItem" xml:space="preserve">
+    <value>{0} — {1}</value>
+  </data>
+  <data name="Banner_OrganizationNotChosen" xml:space="preserve">
+    <value>لم تُختر جهة — امسح البطاقة مرة أخرى أو اختر الجهة من الفلتر.</value>
+  </data>
 </root>
