@@ -753,7 +753,7 @@ public partial class MainForm : RtlFormBase
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Unexpected error during database backup.");
-            _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, ex.Message), Strings.App_Title);
+            _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, UserMessages.Describe(ex)), Strings.App_Title);
         }
         finally
         {

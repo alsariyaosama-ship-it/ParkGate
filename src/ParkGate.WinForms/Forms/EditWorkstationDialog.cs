@@ -122,7 +122,7 @@ public partial class EditWorkstationDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error updating workstation.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

@@ -222,7 +222,7 @@ public partial class EditOrganizationDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error saving organization.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

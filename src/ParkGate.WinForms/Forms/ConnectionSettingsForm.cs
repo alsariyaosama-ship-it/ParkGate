@@ -183,7 +183,7 @@ public partial class ConnectionSettingsForm : RtlFormBase
         {
             lblStatus.ForeColor = Color.FromArgb(198, 40, 40);
             lblStatus.Text = Strings.Msg_ConnectionFailed;
-            Notify.Error(ex.Message, Strings.Title_Error, this);
+            Notify.Error(UserMessages.LogAndDescribe(ex, "Connection test"), Strings.Title_Error, this);
         }
         finally
         {

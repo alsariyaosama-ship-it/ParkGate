@@ -133,7 +133,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error saving age category.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

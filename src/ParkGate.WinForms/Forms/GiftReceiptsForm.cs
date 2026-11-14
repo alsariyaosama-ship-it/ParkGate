@@ -220,7 +220,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Failed to initialize GiftReceiptsForm");
-            _notifyService?.Error(ErrorMessages.GetMessage(ex.Message));
+            _notifyService?.Error(UserMessages.Describe(ex));
         }
     }
 
@@ -263,7 +263,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Failed to load gift receipts report");
-            _notifyService?.Error(ErrorMessages.GetMessage(ex.Message));
+            _notifyService?.Error(UserMessages.Describe(ex));
         }
         finally
         {
@@ -389,7 +389,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Failed to export gift receipts to Excel");
-            _notifyService?.Error(ErrorMessages.GetMessage(ex.Message));
+            _notifyService?.Error(UserMessages.Describe(ex));
         }
         finally
         {
@@ -424,7 +424,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Failed to show print preview for gift receipts");
-            _notifyService?.Error(ErrorMessages.GetMessage(ex.Message));
+            _notifyService?.Error(UserMessages.Describe(ex));
         }
     }
 

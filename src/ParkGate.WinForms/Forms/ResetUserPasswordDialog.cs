@@ -102,7 +102,7 @@ public partial class ResetUserPasswordDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error resetting password.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

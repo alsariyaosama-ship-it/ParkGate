@@ -815,7 +815,7 @@ public partial class CheckInDeskControl : UserControl
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Error scanning QR card token.");
-                    _statusBanner.SetDenied("حدث خطأ أثناء فحص رمز QR: " + ex.Message);
+                    _statusBanner.SetDenied(Strings.Banner_QrScanFailed, UserMessages.Describe(ex));
                     FocusCardNumberBox();
                     return;
                 }
@@ -1012,7 +1012,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to register beneficiary.");
-                _notifyService?.Error(ex.Message, "خطأ في التسجيل");
+                _notifyService?.Error(UserMessages.Describe(ex), Strings.Title_Error);
             }
         }
     }
@@ -1375,7 +1375,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error voiding today entry.");
-                var msg = Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message;
+                var msg = UserMessages.Describe(ex);
                 if (_notifyService != null)
                 {
                     _notifyService.Error(msg);

@@ -672,4 +672,8 @@ internal class Strings
     internal static string Banner_ConnectionFailed => GetString(nameof(Banner_ConnectionFailed));
     internal static string Banner_ConnectionRetryHint => GetString(nameof(Banner_ConnectionRetryHint));
     internal static string Banner_AgeCategoriesUnavailable => GetString(nameof(Banner_AgeCategoriesUnavailable));
+    internal static string Msg_QrIssueFailed => GetString(nameof(Msg_QrIssueFailed));
+    internal static string Banner_QrScanFailed => GetString(nameof(Banner_QrScanFailed));
+    internal static string Msg_QrGenerationFailed => GetString(nameof(Msg_QrGenerationFailed));
+    internal static string Msg_QrSaveFailed => GetString(nameof(Msg_QrSaveFailed));
 }

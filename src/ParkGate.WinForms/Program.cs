@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ParkGate.WinForms.Common;
+using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
 using Serilog;
 using WinFormsApp = System.Windows.Forms.Application;
@@ -120,7 +121,7 @@ internal static class Program
     private static void ShowFatalErrorMessage(Exception exception)
     {
         MessageBox.Show(
-            $"تعذر بدء تشغيل البرنامج:\n{exception.Message}",
+            $"{Strings.Msg_StartupFailed}{Environment.NewLine}{UserMessages.Describe(exception)}",
             "خطأ حرج",
             MessageBoxButtons.OK,
             MessageBoxIcon.Stop,

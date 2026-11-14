@@ -662,7 +662,7 @@ public partial class BeneficiariesControl : UserControl
         }
         catch (Exception ex)
         {
-            _notifyService?.Error("حدث خطأ أثناء إصدار رمز QR: " + ex.Message, "خطأ");
+            _notifyService?.Error($"{Strings.Msg_QrIssueFailed} {UserMessages.LogAndDescribe(ex, "Issue QR card")}", Strings.Title_Error);
         }
         finally
         {

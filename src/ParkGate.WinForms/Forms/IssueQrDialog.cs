@@ -65,7 +65,7 @@ public partial class IssueQrDialog : RtlFormBase
         }
         catch (Exception ex)
         {
-            _notifyService?.Error("حدث خطأ غير متوقع أثناء إنتاج الرمز: " + ex.Message, "خطأ");
+            _notifyService?.Error($"{Strings.Msg_QrGenerationFailed} {UserMessages.LogAndDescribe(ex, "Generate QR card")}", Strings.Title_Error);
             _lblInstruction.Text = "فشل إصدار الرمز";
             _picQrCode.Image?.Dispose();
             _picQrCode.Image = null;
@@ -96,7 +96,7 @@ public partial class IssueQrDialog : RtlFormBase
             }
             catch (Exception ex)
             {
-                _notifyService?.Error("تعذر حفظ الصورة: " + ex.Message);
+                _notifyService?.Error($"{Strings.Msg_QrSaveFailed} {UserMessages.LogAndDescribe(ex, "Save QR image")}");
             }
         }
     }
@@ -187,7 +187,7 @@ public partial class IssueQrDialog : RtlFormBase
         }
         catch (Exception ex)
         {
-            _notifyService?.Error("تعذر إرسال أمر الطباعة: " + ex.Message, "خطأ");
+            _notifyService?.Error(string.Format(Strings.Msg_PrintFailed, UserMessages.LogAndDescribe(ex, "Print QR card")), Strings.Title_Error);
         }
     }
 }

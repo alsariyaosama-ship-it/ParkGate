@@ -1661,4 +1661,16 @@
   <data name="Banner_AgeCategoriesUnavailable" xml:space="preserve">
     <value>تعذّر تحميل فئات المرافقين، لذلك أُوقف تسجيل الدخول. امسح البطاقة مرة أخرى لإعادة المحاولة.</value>
   </data>
+  <data name="Msg_QrIssueFailed" xml:space="preserve">
+    <value>تعذّر إصدار رمز QR.</value>
+  </data>
+  <data name="Banner_QrScanFailed" xml:space="preserve">
+    <value>تعذّر فحص رمز QR</value>
+  </data>
+  <data name="Msg_QrGenerationFailed" xml:space="preserve">
+    <value>تعذّر إنتاج الرمز.</value>
+  </data>
+  <data name="Msg_QrSaveFailed" xml:space="preserve">
+    <value>تعذّر حفظ صورة الرمز.</value>
+  </data>
 </root>

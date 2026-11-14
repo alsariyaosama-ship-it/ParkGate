@@ -192,7 +192,7 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Unexpected error changing beneficiary status.");
-                var msg = Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message;
+                var msg = UserMessages.Describe(ex);
                 if (_notifyService != null)
                 {
                     _notifyService.Error(msg);

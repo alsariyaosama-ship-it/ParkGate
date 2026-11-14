@@ -146,7 +146,7 @@ public partial class SupervisorAuthDialog : RtlFormBase
             }
             catch (Exception ex)
             {
-                _lblError.Text = ex.Message;
+                _lblError.Text = UserMessages.LogAndDescribe(ex, "Supervisor authorization");
             }
         }
     }
