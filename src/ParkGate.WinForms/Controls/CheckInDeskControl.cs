@@ -47,6 +47,7 @@ public partial class CheckInDeskControl : UserControl
     private readonly ToolStripMenuItem _menuVoidToday = new();
     private BeneficiaryDto? _activeHolder;
     private EligibilityPreviewDto? _activeEligibility;
+    private bool _companionsBlockEntry;
     private int _maxGroupSize = 10;
     private bool _prefillFromLastVisit;
     private bool _denialSoundEnabled;
@@ -481,17 +482,16 @@ public partial class CheckInDeskControl : UserControl
             _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
         }
 
+        _companionsBlockEntry = totalPersons > _maxGroupSize || limitExceeded;
+        UpdateActionButtons();
+
         if (totalPersons > _maxGroupSize)
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorDenied;
-            _btnRecordEntry.Enabled = false;
-            _btnOverride.Enabled = false;
         }
         else if (limitExceeded)
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorDenied;
-            _btnRecordEntry.Enabled = false;
-            _btnOverride.Enabled = false;
             _statusBanner.SetWarning(
                 string.Format(Strings.Error_FreeCompanionsExceededBanner, maxFreeLimit),
                 Strings.Error_CheckIn_ExceedsFreeCompanionLimit);
@@ -499,9 +499,18 @@ public partial class CheckInDeskControl : UserControl
         else
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorGranted;
-            _btnRecordEntry.Enabled = _activeHolder != null && (_activeEligibility?.IsEligible ?? false);
-            _btnOverride.Enabled = _activeHolder != null && (_activeEligibility != null && !_activeEligibility.IsEligible && _activeEligibility.CanBeOverridden);
         }
+    }
+
+    /// <summary>
+    /// The one place that decides whether «تسجيل الدخول» and «تجاوز المشرف» are available: a holder is shown, the
+    /// companions fit the limits, and the eligibility allows it. Called after every operation (R4.1).
+    /// </summary>
+    private void UpdateActionButtons()
+    {
+        var holderShown = _activeHolder != null && _activeEligibility != null && !_companionsBlockEntry;
+        _btnRecordEntry.Enabled = holderShown && _activeEligibility!.IsEligible;
+        _btnOverride.Enabled = holderShown && !_activeEligibility!.IsEligible && _activeEligibility.CanBeOverridden;
     }
 
     public void ResetDesk()
@@ -1015,6 +1024,8 @@ public partial class CheckInDeskControl : UserControl
                 _statusBanner.SetDenied("فشل تسجيل الدخول", "حدث خطأ غير متوقع أثناء معالجة العملية.");
             }
         }
+
+        UpdateActionButtons();
     }
 
     public async Task OverrideEntryAsync()
@@ -1077,6 +1088,8 @@ public partial class CheckInDeskControl : UserControl
                 _statusBanner.SetDenied("فشل التجاوز", "حدث خطأ غير متوقع أثناء معالجة التجاوز.");
             }
         }
+
+        UpdateActionButtons();
     }
 
     private static string GetDenialReasonArabic(DenialReason reason) => reason switch

@@ -142,7 +142,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 
 All in `src/ParkGate.WinForms/Controls/CheckInDeskControl.cs` unless stated. UI tests live in `tests/ParkGate.ArchitectureTests`.
 
-- [ ] **R4.1 [Verified] `BusyScope` re-enables buttons unconditionally.** After a successful entry, `ResetDesk()` disables «تسجيل الدخول» and «تجاوز المشرف», then `BusyScope.Dispose` enables them again on an empty desk. Same after a non-overridable denial. Make `BusyScope` remember each control's previous `Enabled` state and restore it, and call `UpdateLiveTotalPersons()` after the scope ends so the desk state decides.
+- [x] **R4.1 [Verified] `BusyScope` re-enables buttons unconditionally.** After a successful entry, `ResetDesk()` disables «تسجيل الدخول» and «تجاوز المشرف», then `BusyScope.Dispose` enables them again on an empty desk. Same after a non-overridable denial. Make `BusyScope` remember each control's previous `Enabled` state and restore it, and call `UpdateLiveTotalPersons()` after the scope ends so the desk state decides.
   Test first: after `RecordEntryAsync` succeeds and the desk resets, both buttons are disabled.
 - [ ] **R4.2 [Verified] A scan during the 1.2 s success delay is lost.** The card box stays editable while `Task.Delay(AutoResetDelayMs)` runs, then `ResetDesk()` clears it. Reset the holder panel immediately, keep the success banner for the delay without clearing the card box, and if the box received input meanwhile, run the lookup. Also: a lookup requested while `_isSearching` is true must be queued, not dropped.
   Test first: type a card number during the delay → it is still there and looked up after the delay.

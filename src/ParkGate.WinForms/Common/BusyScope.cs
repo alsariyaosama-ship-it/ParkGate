@@ -10,12 +10,14 @@ public sealed class BusyScope : IDisposable
 {
     private readonly Control? _parent;
     private readonly Control[] _controlsToDisable;
+    private readonly bool[] _previousEnabled;
     private readonly Cursor _previousCursor;
 
     public BusyScope(Control? parent, params Control[] controlsToDisable)
     {
         _parent = parent;
         _controlsToDisable = controlsToDisable ?? [];
+        _previousEnabled = _controlsToDisable.Select(c => c.Enabled).ToArray();
         _previousCursor = parent?.Cursor ?? Cursors.Default;
 
         if (_parent != null)
@@ -31,9 +33,10 @@ public sealed class BusyScope : IDisposable
 
     public void Dispose()
     {
-        foreach (var control in _controlsToDisable)
+        // Restore what each control was, not "enabled": a control the caller disabled stays disabled (R4.1).
+        for (var i = 0; i < _controlsToDisable.Length; i++)
         {
-            control.Enabled = true;
+            _controlsToDisable[i].Enabled = _previousEnabled[i];
         }
 
         if (_parent != null)

@@ -487,6 +487,42 @@ public sealed class CheckInDeskControlTests
     }
 
     [Fact]
+    public async Task CheckInDeskControl_RecordEntryAsync_AfterSuccessAndReset_BothActionButtonsStayDisabled()
+    {
+        // R4.1: BusyScope used to re-enable the buttons on the empty desk after ResetDesk disabled them.
+        var holder = new BeneficiaryDto(
+            Guid.NewGuid(), 1, "صندوق التضامن", "100201", "محمد أحمد علي", "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
+
+        using var control = new CheckInDeskControl(null, new FakeCheckInService(), null, null, null, null, null, null, null, null);
+        control.AutoResetDelayMs = 0;
+        control.ShowHolderInfo(holder, eligibility);
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeTrue();
+
+        await control.RecordEntryAsync();
+
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeFalse();
+        GetField<Button>(control, "_btnOverride").Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void BusyScope_RestoresEachControlsPreviousEnabledState()
+    {
+        using var enabled = new Button { Enabled = true };
+        using var disabled = new Button { Enabled = false };
+
+        using (new ParkGate.WinForms.Common.BusyScope(null, enabled, disabled))
+        {
+            enabled.Enabled.ShouldBeFalse();
+            disabled.Enabled.ShouldBeFalse();
+        }
+
+        enabled.Enabled.ShouldBeTrue();
+        disabled.Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
     public async Task CheckInDeskControl_RefreshTodayDeskSummaryAsync_UpdatesSummaryStripAndBreakdown()
     {
         var fakeCheckInService = new FakeCheckInService();
