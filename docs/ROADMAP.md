@@ -195,7 +195,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R4.6 Designer-backed `SelectOrganizationDialog` with Accept/Cancel buttons
 - [ ] R4.7 No raw exception text in front of the operator (11 places)
 - [ ] R4.8 Move the 94 hardcoded Arabic literals to `Strings.resx`; add an architecture test
-- [ ] R4.9 Remove the fallback age categories with invented ids
+- [x] R4.9 Remove the fallback age categories with invented ids
 - [ ] R4.10 Warn once when the Cairo font family is not installed system-wide
 
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`

@@ -691,6 +691,67 @@ public sealed class CheckInDeskControlTests
         GetField<Label>(control, "_lblHolderName").Text.ShouldNotContain("أحمد");
     }
 
+    // ── R4.9: no invented age categories ───────────────────────────────────
+
+    private sealed class FailingAgeCategoryService : ParkGate.Application.AgeCategories.Services.IAgeCategoryService
+    {
+        public int Calls { get; private set; }
+        public bool Fail { get; set; } = true;
+
+        public Task<IReadOnlyList<AgeCategoryDto>> GetActiveAsync(CancellationToken cancellationToken = default)
+        {
+            Calls++;
+            return Fail
+                ? throw new InvalidOperationException("database is down")
+                : Task.FromResult<IReadOnlyList<AgeCategoryDto>>([new AgeCategoryDto(7, "طفل", null, 1, true)]);
+        }
+
+        public Task<IReadOnlyList<AgeCategoryDto>> GetAllAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<AgeCategoryDto>> GetByIdAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<AgeCategoryDto>> CreateAsync(CreateAgeCategoryRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<AgeCategoryDto>> UpdateAsync(UpdateAgeCategoryRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> DeactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> ReactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_AgeCategoriesFailToLoad_NoFakeCountersAndRecordingDisabled()
+    {
+        var categories = new FailingAgeCategoryService();
+        using var control = new CheckInDeskControl(null, null, null, categories, null, null, null, null, null, null);
+
+        await control.LoadAgeCategoriesAsync();
+
+        GetField<List<CounterInput>>(control, "_counterInputs").ShouldBeEmpty();
+        GetField<StatusBanner>(control, "_statusBanner").State.ShouldBe(BannerState.Denied);
+
+        control.ShowHolderInfo(
+            new BeneficiaryDto(Guid.NewGuid(), 1, "صندوق التضامن", "321", "علي", "0912345678", null, null,
+                BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow),
+            new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null));
+
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_AgeCategoriesFailed_NextLookupRetriesLoading()
+    {
+        var categories = new FailingAgeCategoryService();
+        using var control = new CheckInDeskControl(new FakeBeneficiaryService(), null, null, categories, null, null, null, null, null, null);
+        // Creating the handle raises Load, which loads the desk once; measure only what the lookup does.
+        // Fakes complete synchronously, so Load runs to the end here, on the test thread.
+        control.CreateControl();
+        await control.LoadAgeCategoriesAsync();
+        var callsBeforeLookup = categories.Calls;
+        categories.Fail = false;
+        GetField<TextBox>(control, "_txtCardNumber").Text = "322";
+
+        await control.LookupCardAsync();
+
+        categories.Calls.ShouldBe(callsBeforeLookup + 1);
+        GetField<List<CounterInput>>(control, "_counterInputs").Count.ShouldBe(1);
+    }
+
     [Fact]
     public void BusyScope_RestoresEachControlsPreviousEnabledState()
     {

@@ -1652,4 +1652,13 @@
   <data name="Banner_OrganizationNotChosen" xml:space="preserve">
     <value>لم تُختر جهة — امسح البطاقة مرة أخرى أو اختر الجهة من الفلتر.</value>
   </data>
+  <data name="Banner_ConnectionFailed" xml:space="preserve">
+    <value>تعذّر الاتصال بقاعدة البيانات</value>
+  </data>
+  <data name="Banner_ConnectionRetryHint" xml:space="preserve">
+    <value>يرجى التحقق من الاتصال بالخادم والمحاولة مرة أخرى.</value>
+  </data>
+  <data name="Banner_AgeCategoriesUnavailable" xml:space="preserve">
+    <value>تعذّر تحميل فئات المرافقين، لذلك أُوقف تسجيل الدخول. امسح البطاقة مرة أخرى لإعادة المحاولة.</value>
+  </data>
 </root>

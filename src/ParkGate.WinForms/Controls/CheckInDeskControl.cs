@@ -48,6 +48,7 @@ public partial class CheckInDeskControl : UserControl
     private BeneficiaryDto? _activeHolder;
     private EligibilityPreviewDto? _activeEligibility;
     private bool _companionsBlockEntry;
+    private bool _ageCategoriesUnavailable;
 
     // R4.4: the card last reported as registered under other organizations, so a second Enter can load it there.
     private string? _registeredElsewhereCard;
@@ -393,37 +394,24 @@ public partial class CheckInDeskControl : UserControl
     {
         if (_ageCategoryService == null)
         {
-            CreateDefaultAgeCategories();
             return;
         }
 
         try
         {
-            var categories = await _ageCategoryService.GetActiveAsync();
-            if (categories.Count == 0)
-            {
-                CreateDefaultAgeCategories();
-            }
-            else
-            {
-                PopulateAgeCategories(categories);
-            }
+            // No categories configured is valid: the holder enters alone. Never invent categories (R4.9).
+            PopulateAgeCategories(await _ageCategoryService.GetActiveAsync());
+            _ageCategoriesUnavailable = false;
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load age categories. Using defaults.");
-            CreateDefaultAgeCategories();
+            _logger?.LogWarning(ex, "Failed to load age categories. Recording is disabled until they load.");
+            PopulateAgeCategories([]);
+            _ageCategoriesUnavailable = true;
+            _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_AgeCategoriesUnavailable);
         }
-    }
 
-    private void CreateDefaultAgeCategories()
-    {
-        PopulateAgeCategories(
-        [
-            new AgeCategoryDto(1, "بالغ", "12 سنة فما فوق", 1, true),
-            new AgeCategoryDto(2, "طفل", "من 3 إلى 12 سنة", 2, true),
-            new AgeCategoryDto(3, "رضيع", "أقل من 3 سنوات", 3, true, IsCompanionLimitExempt: true)
-        ]);
+        UpdateActionButtons();
     }
 
     public void PopulateAgeCategories(IReadOnlyList<AgeCategoryDto> categories)
@@ -543,7 +531,7 @@ public partial class CheckInDeskControl : UserControl
     /// </summary>
     private void UpdateActionButtons()
     {
-        var holderShown = _activeHolder != null && _activeEligibility != null && !_companionsBlockEntry;
+        var holderShown = _activeHolder != null && _activeEligibility != null && !_companionsBlockEntry && !_ageCategoriesUnavailable;
         _btnRecordEntry.Enabled = holderShown && _activeEligibility!.IsEligible;
         _btnOverride.Enabled = holderShown && !_activeEligibility!.IsEligible && _activeEligibility.CanBeOverridden;
     }
@@ -776,6 +764,17 @@ public partial class CheckInDeskControl : UserControl
             // Always clear previous customer data and reset banner when initiating a new search
             ClearPreviousHolderData();
             _statusBanner.Reset();
+
+            if (_ageCategoriesUnavailable)
+            {
+                // R4.9: retry the companion categories before showing a holder; on failure the banner says so.
+                await LoadAgeCategoriesAsync();
+                if (_ageCategoriesUnavailable)
+                {
+                    FocusCardNumberBox();
+                    return;
+                }
+            }
 
         // 1. Check if scanned input is a signed QR token (203 digits per QrTokenFormat.DigitLength)
         if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength && _cardScanService != null)
