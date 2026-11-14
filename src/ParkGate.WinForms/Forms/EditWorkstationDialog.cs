@@ -94,7 +94,7 @@ public partial class EditWorkstationDialog : RtlFormBase
         var displayName = _txtDisplayName.Text.Trim();
         if (string.IsNullOrWhiteSpace(displayName))
         {
-            ShowWarning("الاسم التعريفي للمحطة مطلوب.");
+            ShowWarning(Strings.Ui_EditWorkstation_01);
             _txtDisplayName.Focus();
             return;
         }

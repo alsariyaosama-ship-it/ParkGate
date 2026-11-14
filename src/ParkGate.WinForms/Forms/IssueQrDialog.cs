@@ -43,13 +43,13 @@ public partial class IssueQrDialog : RtlFormBase
 
         if (_issuer == null)
         {
-            _notifyService?.Error("خدمة إصدار البطاقات غير متوفرة.");
+            _notifyService?.Error(Strings.Ui_IssueQr_01);
             return;
         }
 
         try
         {
-            _lblInstruction.Text = "جاري إصدار وتوقيع الرمز الرقمي...";
+            _lblInstruction.Text = Strings.Ui_IssueQr_02;
             var card = await _issuer.IssueAsync(beneficiary.Id);
             _issuedCard = card;
             
@@ -61,12 +61,12 @@ public partial class IssueQrDialog : RtlFormBase
             _picQrCode.Image?.Dispose();
             _picQrCode.Image = new Bitmap(rawImage);
 
-            _lblInstruction.Text = "هذا الرمز مخصص للاستخدام عبر تطبيق البوابة";
+            _lblInstruction.Text = Strings.Ui_IssueQr_03;
         }
         catch (Exception ex)
         {
             _notifyService?.Error($"{Strings.Msg_QrGenerationFailed} {UserMessages.LogAndDescribe(ex, "Generate QR card")}", Strings.Title_Error);
-            _lblInstruction.Text = "فشل إصدار الرمز";
+            _lblInstruction.Text = Strings.Ui_IssueQr_04;
             _picQrCode.Image?.Dispose();
             _picQrCode.Image = null;
         }
@@ -76,13 +76,13 @@ public partial class IssueQrDialog : RtlFormBase
     {
         if (_picQrCode.Image == null)
         {
-            _notifyService?.Warning("لا يوجد رمز QR متاح للحفظ.");
+            _notifyService?.Warning(Strings.Ui_IssueQr_05);
             return;
         }
 
         using var sfd = new SaveFileDialog
         {
-            Title = "حفظ رمز QR",
+            Title = Strings.Ui_IssueQr_06,
             Filter = "PNG Image (*.png)|*.png",
             FileName = $"QR_{_beneficiary?.CardNumber ?? "Card"}.png"
         };
@@ -92,7 +92,7 @@ public partial class IssueQrDialog : RtlFormBase
             try
             {
                 _picQrCode.Image.Save(sfd.FileName, System.Drawing.Imaging.ImageFormat.Png);
-                _notifyService?.Info("تم حفظ صورة رمز QR بنجاح.");
+                _notifyService?.Info(Strings.Ui_IssueQr_07);
             }
             catch (Exception ex)
             {
@@ -105,7 +105,7 @@ public partial class IssueQrDialog : RtlFormBase
     {
         if (_picQrCode.Image == null || _beneficiary == null)
         {
-            _notifyService?.Warning("لا توجد بطاقة جاهزة للطباعة.");
+            _notifyService?.Warning(Strings.Ui_IssueQr_08);
             return;
         }
 
@@ -148,23 +148,23 @@ public partial class IssueQrDialog : RtlFormBase
                 g.FillRectangle(headerBrush, headerRect);
 
                 using var sfCenter = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                g.DrawString("الحديقة العائلية الترفيهية — بطاقة دخول", regFont, Brushes.White, headerRect, sfCenter);
+                g.DrawString(Strings.Ui_IssueQr_09, regFont, Brushes.White, headerRect, sfCenter);
 
                 // Customer info on the right (RTL layout)
                 var infoRect = new Rectangle(cardRect.Left + 140, cardRect.Top + 40, 170, 140);
                 using var sfRtl = new StringFormat { FormatFlags = StringFormatFlags.DirectionRightToLeft };
-                g.DrawString($"الاسم: {_beneficiary.FullName}", subFont, Brushes.Black, infoRect, sfRtl);
+                g.DrawString(string.Format(Strings.Ui_IssueQr_10, _beneficiary.FullName), subFont, Brushes.Black, infoRect, sfRtl);
 
                 infoRect.Y += 28;
-                g.DrawString($"رقم البطاقة: {_beneficiary.CardNumber}", regFont, Brushes.Black, infoRect, sfRtl);
+                g.DrawString(string.Format(Strings.Ui_IssueQr_11, _beneficiary.CardNumber), regFont, Brushes.Black, infoRect, sfRtl);
 
                 infoRect.Y += 26;
-                g.DrawString($"الجهة: {_beneficiary.OrganizationName}", smallFont, Brushes.DarkSlateGray, infoRect, sfRtl);
+                g.DrawString(string.Format(Strings.Ui_IssueQr_12, _beneficiary.OrganizationName), smallFont, Brushes.DarkSlateGray, infoRect, sfRtl);
 
                 if (_issuedCard != null)
                 {
                     infoRect.Y += 24;
-                    g.DrawString($"الصلاحية: {_issuedCard.ExpiresOn:dd/MM/yyyy}", smallFont, Brushes.DarkSlateGray, infoRect, sfRtl);
+                    g.DrawString(string.Format(Strings.Ui_IssueQr_13, _issuedCard.ExpiresOn), smallFont, Brushes.DarkSlateGray, infoRect, sfRtl);
                 }
 
                 // QR Code on the left

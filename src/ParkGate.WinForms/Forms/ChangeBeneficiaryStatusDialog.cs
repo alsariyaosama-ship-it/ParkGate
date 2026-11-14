@@ -68,7 +68,7 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
     {
         _beneficiary = beneficiary;
 
-        _lblBeneficiaryInfo.Text = $"{beneficiary.FullName} (بطاقة: {beneficiary.CardNumber})";
+        _lblBeneficiaryInfo.Text = string.Format(Strings.Ui_ChangeBeneficiaryStatus_01, beneficiary.FullName, beneficiary.CardNumber);
         _lblCurrentStatus.Text = string.Format(Strings.Label_CurrentStatus, GetStatusArabic(beneficiary.Status));
 
         switch (beneficiary.Status)
@@ -91,15 +91,15 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
     {
         if (_radActive.Checked)
         {
-            _txtReason.PlaceholderText = "ملاحظات التنشيط (اختياري)...";
+            _txtReason.PlaceholderText = Strings.Ui_ChangeBeneficiaryStatus_02;
         }
         else if (_radSuspended.Checked)
         {
-            _txtReason.PlaceholderText = "سبب الإيقاف المؤقت (مطلوب - 5 أحرف على الأقل)...";
+            _txtReason.PlaceholderText = Strings.Ui_ChangeBeneficiaryStatus_03;
         }
         else if (_radBlocked.Checked)
         {
-            _txtReason.PlaceholderText = "سبب الحظر النهائي (مطلوب - 5 أحرف على الأقل)...";
+            _txtReason.PlaceholderText = Strings.Ui_ChangeBeneficiaryStatus_04;
         }
     }
 
@@ -120,7 +120,7 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
 
         if (targetStatus != BeneficiaryStatus.Active && reason.Length < 5)
         {
-            var msg = "سبب تغيير الحالة مطلوب ويجب ألا يقل عن 5 أحرف.";
+            var msg = Strings.Ui_ChangeBeneficiaryStatus_05;
             if (_notifyService != null)
             {
                 _notifyService.Warning(msg);

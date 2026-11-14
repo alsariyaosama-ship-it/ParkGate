@@ -1,4 +1,5 @@
 using System.Globalization;
+using ParkGate.WinForms.Resources;
 
 namespace ParkGate.WinForms.Common;
 
@@ -16,8 +17,8 @@ public static class DateTimeDisplayHelper
         var culture = (CultureInfo)CultureInfo.GetCultureInfo("ar-LY").Clone();
         culture.NumberFormat.DigitSubstitution = DigitShapes.None;
         culture.NumberFormat.NativeDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-        culture.DateTimeFormat.AMDesignator = "ص";
-        culture.DateTimeFormat.PMDesignator = "م";
+        culture.DateTimeFormat.AMDesignator = Strings.Ui_DateTimeDisplay_01;
+        culture.DateTimeFormat.PMDesignator = Strings.Ui_DateTimeDisplay_02;
         culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
         culture.DateTimeFormat.ShortTimePattern = "hh:mm tt";
         culture.DateTimeFormat.LongTimePattern = "hh:mm:ss tt";

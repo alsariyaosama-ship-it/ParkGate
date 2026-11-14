@@ -1673,4 +1673,292 @@
   <data name="Msg_QrSaveFailed" xml:space="preserve">
     <value>تعذّر حفظ صورة الرمز.</value>
   </data>
+  <data name="Ui_DateTimeDisplay_01" xml:space="preserve">
+    <value>ص</value>
+  </data>
+  <data name="Ui_DateTimeDisplay_02" xml:space="preserve">
+    <value>م</value>
+  </data>
+  <data name="Ui_Beneficiaries_01" xml:space="preserve">
+    <value>قائمة المستفيدين</value>
+  </data>
+  <data name="Ui_Beneficiaries_02" xml:space="preserve">
+    <value>سبب الحالة:</value>
+  </data>
+  <data name="Ui_Beneficiaries_03" xml:space="preserve">
+    <value>إجمالي المستفيدين: {0}</value>
+  </data>
+  <data name="Ui_Beneficiaries_04" xml:space="preserve">
+    <value>غير محدد</value>
+  </data>
+  <data name="Ui_Beneficiaries_05" xml:space="preserve">
+    <value>{0} فرد</value>
+  </data>
+  <data name="Ui_Beneficiaries_06" xml:space="preserve">
+    <value>تجاوز: {0}</value>
+  </data>
+  <data name="Ui_Beneficiaries_07" xml:space="preserve">
+    <value>مرفوض: {0}</value>
+  </data>
+  <data name="Ui_Beneficiaries_08" xml:space="preserve">
+    <value>دخول فردي</value>
+  </data>
+  <data name="Ui_Beneficiaries_09" xml:space="preserve">
+    <value>إلغاء عملية دخول مسجلة خطأً</value>
+  </data>
+  <data name="Ui_CheckInDesk_01" xml:space="preserve">
+    <value>آخر دخول: {0}</value>
+  </data>
+  <data name="Ui_CheckInDesk_02" xml:space="preserve">
+    <value>يسمح بالدخول بعد: {0} (فترة الانتظار: {1} ساعة)</value>
+  </data>
+  <data name="Ui_CheckInDesk_03" xml:space="preserve">
+    <value>البطاقة غير مسجلة — يرجى تسجيل بيانات المستفيد</value>
+  </data>
+  <data name="Ui_CheckInDesk_04" xml:space="preserve">
+    <value>أدخل الاسم الرباعي ورقم الهاتف للمتابعة</value>
+  </data>
+  <data name="Ui_CheckInDesk_05" xml:space="preserve">
+    <value>يرجى إدخال رقم البطاقة أولاً لتسجيل زبون جديد.</value>
+  </data>
+  <data name="Ui_CheckInDesk_06" xml:space="preserve">
+    <value>يرجى إدخال أو مسح رقم البطاقة</value>
+  </data>
+  <data name="Ui_CheckInDesk_07" xml:space="preserve">
+    <value>رمز QR غير صالح أو ملغى</value>
+  </data>
+  <data name="Ui_CheckInDesk_08" xml:space="preserve">
+    <value>الاسم الرباعي مطلوب.</value>
+  </data>
+  <data name="Ui_CheckInDesk_09" xml:space="preserve">
+    <value>رقم الهاتف مطلوب.</value>
+  </data>
+  <data name="Ui_CheckInDesk_10" xml:space="preserve">
+    <value>تم تسجيل الزبون بنجاح.</value>
+  </data>
+  <data name="Ui_CheckInDesk_11" xml:space="preserve">
+    <value>تم التسجيل</value>
+  </data>
+  <data name="Ui_CheckInDesk_12" xml:space="preserve">
+    <value>فشل التسجيل</value>
+  </data>
+  <data name="Ui_CheckInDesk_13" xml:space="preserve">
+    <value>تم تسجيل الدخول بنجاح!</value>
+  </data>
+  <data name="Ui_CheckInDesk_14" xml:space="preserve">
+    <value>المرافقون: {0} · الإجمالي: {1} فرد</value>
+  </data>
+  <data name="Ui_CheckInDesk_15" xml:space="preserve">
+    <value>فشل تسجيل الدخول</value>
+  </data>
+  <data name="Ui_CheckInDesk_16" xml:space="preserve">
+    <value>حدث خطأ غير متوقع أثناء معالجة العملية.</value>
+  </data>
+  <data name="Ui_CheckInDesk_17" xml:space="preserve">
+    <value>تجاوز فترة الانتظار استثنائياً</value>
+  </data>
+  <data name="Ui_CheckInDesk_18" xml:space="preserve">
+    <value>تم تسجيل الدخول بموافقة المشرف (تجاوز)</value>
+  </data>
+  <data name="Ui_CheckInDesk_19" xml:space="preserve">
+    <value>المشرف: {0} · السبب: {1}</value>
+  </data>
+  <data name="Ui_CheckInDesk_20" xml:space="preserve">
+    <value>فشل التجاوز</value>
+  </data>
+  <data name="Ui_CheckInDesk_21" xml:space="preserve">
+    <value>حدث خطأ غير متوقع أثناء معالجة التجاوز.</value>
+  </data>
+  <data name="Ui_GiftOffer_01" xml:space="preserve">
+    <value>تجاوز مدة انتظار الهدية استثنائياً</value>
+  </data>
+  <data name="Ui_GiftRedeem_01" xml:space="preserve">
+    <value>خدمة قسائم الهدايا غير متصلة</value>
+  </data>
+  <data name="Ui_Reports_01" xml:space="preserve">
+    <value>جاري استخراج بيانات التقرير...</value>
+  </data>
+  <data name="Ui_Reports_02" xml:space="preserve">
+    <value>الفئة العمرية</value>
+  </data>
+  <data name="Ui_Reports_03" xml:space="preserve">
+    <value>عدد المرافقين</value>
+  </data>
+  <data name="Ui_Reports_04" xml:space="preserve">
+    <value>الإجمالي العام: {0:N0} زيارة مقبولة | {1:N0} زبون | {2:N0} مرافق | {3:N0} إجمالي الأفراد | {4:N0} محاولة مرفوضة | {5:N0} ملغاة</value>
+  </data>
+  <data name="Ui_Reports_05" xml:space="preserve">
+    <value>الإجمالي: {0:N0} زيارة مقبولة | {1:N0} مستفيد فريد | {2:N0} مرافق | {3:N0} إجمالي الأفراد المستفيدين (تمثل {4} من زوار الحديقة)</value>
+  </data>
+  <data name="Ui_Reports_06" xml:space="preserve">
+    <value>إجمالي السجلات المعروضة: {0:N0}</value>
+  </data>
+  <data name="Ui_Reports_07" xml:space="preserve">
+    <value>الإجمالي: {0:N0} زيارة | {1:N0} فرد | متوسط حجم المجموعة: {2:F1}</value>
+  </data>
+  <data name="Ui_Reports_08" xml:space="preserve">
+    <value>تصدير التقرير إلى Excel</value>
+  </data>
+  <data name="Ui_Reports_09" xml:space="preserve">
+    <value>تعذر حفظ ملف Excel. تحقق من صلاحيات المجلد أو عدم فتح الملف في برنامج آخر.</value>
+  </data>
+  <data name="Ui_Reports_10" xml:space="preserve">
+    <value>تعذر فتح معاينة الطباعة.</value>
+  </data>
+  <data name="Ui_Reports_11" xml:space="preserve">
+    <value>الفترة: {0:dd/MM/yyyy} إلى {1:dd/MM/yyyy}</value>
+  </data>
+  <data name="Ui_Reports_12" xml:space="preserve">
+    <value> | الجهة: {0}</value>
+  </data>
+  <data name="Ui_Reports_13" xml:space="preserve">
+    <value>لا توجد بيانات متاحة في هذا التقرير.</value>
+  </data>
+  <data name="Ui_Reports_14" xml:space="preserve">
+    <value>طُبع من منظومة ParkGate بتاريخ {0:dd/MM/yyyy hh:mm tt}</value>
+  </data>
+  <data name="Ui_Reports_15" xml:space="preserve">
+    <value>المستفيد محظور</value>
+  </data>
+  <data name="Ui_Reports_16" xml:space="preserve">
+    <value>المستفيد موقوف</value>
+  </data>
+  <data name="Ui_Reports_17" xml:space="preserve">
+    <value>البطاقة منتهية الصلاحية</value>
+  </data>
+  <data name="Ui_Reports_18" xml:space="preserve">
+    <value>الجهة غير نشطة</value>
+  </data>
+  <data name="Ui_AgeCategories_01" xml:space="preserve">
+    <value>نعم</value>
+  </data>
+  <data name="Ui_AgeCategories_02" xml:space="preserve">
+    <value>لا</value>
+  </data>
+  <data name="Ui_AgeCategories_03" xml:space="preserve">
+    <value>إجمالي الفئات: {0}  (النشطة: {1} | المعطلة: {2})</value>
+  </data>
+  <data name="Ui_ChangeBeneficiaryStatus_01" xml:space="preserve">
+    <value>{0} (بطاقة: {1})</value>
+  </data>
+  <data name="Ui_ChangeBeneficiaryStatus_02" xml:space="preserve">
+    <value>ملاحظات التنشيط (اختياري)...</value>
+  </data>
+  <data name="Ui_ChangeBeneficiaryStatus_03" xml:space="preserve">
+    <value>سبب الإيقاف المؤقت (مطلوب - 5 أحرف على الأقل)...</value>
+  </data>
+  <data name="Ui_ChangeBeneficiaryStatus_04" xml:space="preserve">
+    <value>سبب الحظر النهائي (مطلوب - 5 أحرف على الأقل)...</value>
+  </data>
+  <data name="Ui_ChangeBeneficiaryStatus_05" xml:space="preserve">
+    <value>سبب تغيير الحالة مطلوب ويجب ألا يقل عن 5 أحرف.</value>
+  </data>
+  <data name="Ui_ConnectionSettings_01" xml:space="preserve">
+    <value>جاري اختبار الاتصال بقاعدة البيانات...</value>
+  </data>
+  <data name="Ui_ConnectionSettings_02" xml:space="preserve">
+    <value>هل ترغب في حفظ هذه الإعدادات على أي حال؟</value>
+  </data>
+  <data name="Ui_CreateUser_01" xml:space="preserve">
+    <value>اسم المستخدم مطلوب ويجب ألا يقل عن 3 أحرف.</value>
+  </data>
+  <data name="Ui_CreateUser_02" xml:space="preserve">
+    <value>الاسم الكامل مطلوب ويجب ألا يقل عن 3 أحرف.</value>
+  </data>
+  <data name="Ui_CreateUser_03" xml:space="preserve">
+    <value>كلمة المرور يجب ألا تقل عن 6 أحرف.</value>
+  </data>
+  <data name="Ui_EditAgeCategory_01" xml:space="preserve">
+    <value>اسم الفئة العمرية مطلوب.</value>
+  </data>
+  <data name="Ui_EditOrganization_01" xml:space="preserve">
+    <value>رمز الجهة مطلوب.</value>
+  </data>
+  <data name="Ui_EditOrganization_02" xml:space="preserve">
+    <value>اسم الجهة بالعربية مطلوب.</value>
+  </data>
+  <data name="Ui_EditWorkstation_01" xml:space="preserve">
+    <value>الاسم التعريفي للمحطة مطلوب.</value>
+  </data>
+  <data name="Ui_IssueQr_01" xml:space="preserve">
+    <value>خدمة إصدار البطاقات غير متوفرة.</value>
+  </data>
+  <data name="Ui_IssueQr_02" xml:space="preserve">
+    <value>جاري إصدار وتوقيع الرمز الرقمي...</value>
+  </data>
+  <data name="Ui_IssueQr_03" xml:space="preserve">
+    <value>هذا الرمز مخصص للاستخدام عبر تطبيق البوابة</value>
+  </data>
+  <data name="Ui_IssueQr_04" xml:space="preserve">
+    <value>فشل إصدار الرمز</value>
+  </data>
+  <data name="Ui_IssueQr_05" xml:space="preserve">
+    <value>لا يوجد رمز QR متاح للحفظ.</value>
+  </data>
+  <data name="Ui_IssueQr_06" xml:space="preserve">
+    <value>حفظ رمز QR</value>
+  </data>
+  <data name="Ui_IssueQr_07" xml:space="preserve">
+    <value>تم حفظ صورة رمز QR بنجاح.</value>
+  </data>
+  <data name="Ui_IssueQr_08" xml:space="preserve">
+    <value>لا توجد بطاقة جاهزة للطباعة.</value>
+  </data>
+  <data name="Ui_IssueQr_09" xml:space="preserve">
+    <value>الحديقة العائلية الترفيهية — بطاقة دخول</value>
+  </data>
+  <data name="Ui_IssueQr_10" xml:space="preserve">
+    <value>الاسم: {0}</value>
+  </data>
+  <data name="Ui_IssueQr_11" xml:space="preserve">
+    <value>رقم البطاقة: {0}</value>
+  </data>
+  <data name="Ui_IssueQr_12" xml:space="preserve">
+    <value>الجهة: {0}</value>
+  </data>
+  <data name="Ui_IssueQr_13" xml:space="preserve">
+    <value>الصلاحية: {0:dd/MM/yyyy}</value>
+  </data>
+  <data name="Ui_Main_01" xml:space="preserve">
+    <value>خدمة النسخ الاحتياطي غير متوفرة.</value>
+  </data>
+  <data name="Ui_Organizations_01" xml:space="preserve">
+    <value>{0} ساعة</value>
+  </data>
+  <data name="Ui_Organizations_02" xml:space="preserve">
+    <value>افتراضي</value>
+  </data>
+  <data name="Ui_Organizations_03" xml:space="preserve">
+    <value>مفعلة</value>
+  </data>
+  <data name="Ui_Organizations_04" xml:space="preserve">
+    <value>معطلة</value>
+  </data>
+  <data name="Ui_Organizations_05" xml:space="preserve">
+    <value>إجمالي الجهات: {0}  (النشطة: {1} | المعطلة: {2})</value>
+  </data>
+  <data name="Ui_ResetUserPassword_01" xml:space="preserve">
+    <value>كلمة المرور المؤقتة يجب ألا تقل عن 6 أحرف.</value>
+  </data>
+  <data name="Ui_Settings_01" xml:space="preserve">
+    <value>اسم المنتزه مطلوب.</value>
+  </data>
+  <data name="Ui_Users_01" xml:space="preserve">
+    <value>إجمالي المستخدمين: {0} (نشط: {1} | معطل: {2})</value>
+  </data>
+  <data name="Ui_VoidReason_01" xml:space="preserve">
+    <value>العملية: بطاقة {0} · {1} · {2} · {3} أفراد</value>
+  </data>
+  <data name="Ui_VoidReason_02" xml:space="preserve">
+    <value>سبب الإلغاء مطلوب ويجب ألا يقل عن 5 أحرف.</value>
+  </data>
+  <data name="Ui_Workstations_01" xml:space="preserve">
+    <value>إجمالي المحطات: {0} (نشطة: {1} | معطلة: {2})</value>
+  </data>
+  <data name="Ui_Program_01" xml:space="preserve">
+    <value>خطأ في النظام</value>
+  </data>
+  <data name="Ui_Program_02" xml:space="preserve">
+    <value>خطأ حرج</value>
+  </data>
 </root>

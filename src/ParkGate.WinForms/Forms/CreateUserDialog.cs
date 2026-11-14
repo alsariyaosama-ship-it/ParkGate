@@ -82,28 +82,28 @@ public partial class CreateUserDialog : RtlFormBase
 
         if (userName.Length < 3)
         {
-            ShowWarning("اسم المستخدم مطلوب ويجب ألا يقل عن 3 أحرف.");
+            ShowWarning(Strings.Ui_CreateUser_01);
             _txtUserName.Focus();
             return;
         }
 
         if (fullName.Length < 3)
         {
-            ShowWarning("الاسم الكامل مطلوب ويجب ألا يقل عن 3 أحرف.");
+            ShowWarning(Strings.Ui_CreateUser_02);
             _txtFullName.Focus();
             return;
         }
 
         if (password.Length < 6)
         {
-            ShowWarning("كلمة المرور يجب ألا تقل عن 6 أحرف.");
+            ShowWarning(Strings.Ui_CreateUser_03);
             _txtPassword.Focus();
             return;
         }
 
         if (password != confirmPassword)
         {
-            ShowWarning("كلمتا المرور غير متطابقتين.");
+            ShowWarning(Strings.Val_PasswordsDoNotMatch);
             _txtConfirmPassword.Focus();
             return;
         }

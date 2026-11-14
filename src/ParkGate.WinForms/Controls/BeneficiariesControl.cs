@@ -91,7 +91,7 @@ public partial class BeneficiariesControl : UserControl
         _btnSearch.Text = Strings.Btn_Search;
         _btnClearSearch.Text = Strings.Btn_ClearSearch;
 
-        _grpResults.Text = "قائمة المستفيدين";
+        _grpResults.Text = Strings.Ui_Beneficiaries_01;
         _colCardNumber.HeaderText = Strings.Col_Ben_CardNumber;
         _colOrganization.HeaderText = Strings.Col_Ben_Organization;
         _colFullName.HeaderText = Strings.Col_Ben_FullName;
@@ -109,7 +109,7 @@ public partial class BeneficiariesControl : UserControl
         _lblDetailNidTitle.Text = Strings.Col_Ben_NationalId + ":";
         _lblDetailExpiryTitle.Text = Strings.Col_Ben_ExpiryDate + ":";
         _lblDetailStatusTitle.Text = Strings.Col_Ben_Status + ":";
-        _lblDetailReasonTitle.Text = "سبب الحالة:";
+        _lblDetailReasonTitle.Text = Strings.Ui_Beneficiaries_02;
         _lblDetailNotesTitle.Text = Strings.Label_Notes;
 
         _btnEdit.Text = Strings.Btn_EditBeneficiary;
@@ -242,7 +242,7 @@ public partial class BeneficiariesControl : UserControl
 
                     await PopulateBeneficiariesGridAsync(_loadedBeneficiaries);
                     _lblSearchResultCount.Text = string.IsNullOrWhiteSpace(term)
-                        ? $"إجمالي المستفيدين: {_loadedBeneficiaries.Count}"
+                        ? string.Format(Strings.Ui_Beneficiaries_03, _loadedBeneficiaries.Count)
                         : string.Format(Strings.Summary_SearchResults, _loadedBeneficiaries.Count);
                 }
                 else
@@ -391,7 +391,7 @@ public partial class BeneficiariesControl : UserControl
         _lblDetailOrg.Text = b.OrganizationName;
         _lblDetailPhone.Text = b.Phone;
         _lblDetailNid.Text = FormatNationalId(b.NationalId, isOperator);
-        _lblDetailExpiry.Text = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? "غير محدد";
+        _lblDetailExpiry.Text = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? Strings.Ui_Beneficiaries_04;
 
         _lblDetailStatus.Text = GetStatusArabic(b.Status);
         _lblDetailStatus.ForeColor = b.Status switch
@@ -482,19 +482,19 @@ public partial class BeneficiariesControl : UserControl
             string detailsText;
             if (item.Companions.Count > 0)
             {
-                detailsText = string.Join(" · ", item.Companions.Select(c => $"{c.Count} فرد"));
+                detailsText = string.Join(" · ", item.Companions.Select(c => string.Format(Strings.Ui_Beneficiaries_05, c.Count)));
             }
             else if (!string.IsNullOrWhiteSpace(item.OverrideReason))
             {
-                detailsText = $"تجاوز: {item.OverrideReason}";
+                detailsText = string.Format(Strings.Ui_Beneficiaries_06, item.OverrideReason);
             }
             else if (item.DenialReason.HasValue)
             {
-                detailsText = $"مرفوض: {item.DenialReason.Value}";
+                detailsText = string.Format(Strings.Ui_Beneficiaries_07, item.DenialReason.Value);
             }
             else
             {
-                detailsText = "دخول فردي";
+                detailsText = Strings.Ui_Beneficiaries_08;
             }
 
             var rowIndex = _gridHistory.Rows.Add(
@@ -692,7 +692,7 @@ public partial class BeneficiariesControl : UserControl
             var authDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
                              new SupervisorAuthDialog(null, _currentUser);
 
-            authDialog.SetContext(defaultReason: "إلغاء عملية دخول مسجلة خطأً");
+            authDialog.SetContext(defaultReason: Strings.Ui_Beneficiaries_09);
 
             if (authDialog.ShowDialog(this) != DialogResult.OK)
             {

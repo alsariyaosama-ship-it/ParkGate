@@ -27,7 +27,7 @@ public partial class CounterInput : UserControl
 
     [Browsable(true)]
     [Category("Appearance")]
-    [DefaultValue("الفئة:")]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string Title
     {
         get => _lblTitle.Text;

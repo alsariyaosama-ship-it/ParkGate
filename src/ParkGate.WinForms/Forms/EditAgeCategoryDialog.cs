@@ -87,7 +87,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
 
         if (string.IsNullOrWhiteSpace(nameAr))
         {
-            ShowWarning("اسم الفئة العمرية مطلوب.");
+            ShowWarning(Strings.Ui_EditAgeCategory_01);
             _txtNameAr.Focus();
             return;
         }

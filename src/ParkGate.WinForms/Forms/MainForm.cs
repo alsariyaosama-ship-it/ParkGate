@@ -730,7 +730,7 @@ public partial class MainForm : RtlFormBase
 
         if (_databaseBackupService == null)
         {
-            _notifyService?.Error("خدمة النسخ الاحتياطي غير متوفرة.");
+            _notifyService?.Error(Strings.Ui_Main_01);
             return;
         }
 

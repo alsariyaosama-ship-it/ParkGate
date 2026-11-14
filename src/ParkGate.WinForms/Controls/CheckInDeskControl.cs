@@ -642,7 +642,7 @@ public partial class CheckInDeskControl : UserControl
                 _statusBanner.SetGranted(
                     message: Strings.Banner_Granted,
                     details: holder.LastGrantedEntryUtc.HasValue
-                        ? $"آخر دخول: {DateTimeDisplayHelper.FormatDateTime(DateTimeDisplayHelper.ToParkLocalTime(holder.LastGrantedEntryUtc.Value, _timeZoneId))}"
+                        ? string.Format(Strings.Ui_CheckInDesk_01, DateTimeDisplayHelper.FormatDateTime(DateTimeDisplayHelper.ToParkLocalTime(holder.LastGrantedEntryUtc.Value, _timeZoneId)))
                         : null);
 
                 _btnRecordEntry.Enabled = true;
@@ -661,7 +661,7 @@ public partial class CheckInDeskControl : UserControl
                 if (eligibility.NextAllowedEntryUtc.HasValue)
                 {
                     var nextLocal = DateTimeDisplayHelper.ToParkLocalTime(eligibility.NextAllowedEntryUtc.Value, _timeZoneId);
-                    details = $"يسمح بالدخول بعد: {DateTimeDisplayHelper.FormatDateTime(nextLocal)} (فترة الانتظار: {eligibility.EffectiveCooldownMinutes / 60} ساعة)";
+                    details = string.Format(Strings.Ui_CheckInDesk_02, DateTimeDisplayHelper.FormatDateTime(nextLocal), eligibility.EffectiveCooldownMinutes / 60);
                 }
 
                 _statusBanner.SetDenied(reasonText, details);
@@ -697,7 +697,7 @@ public partial class CheckInDeskControl : UserControl
         _txtRegNotes.Clear();
         SelectRegistrationOrganization(orgId ?? (_cmbOrganization.SelectedItem as OrgComboItem)?.Id);
 
-        _statusBanner.SetWarning("البطاقة غير مسجلة — يرجى تسجيل بيانات المستفيد", "أدخل الاسم الرباعي ورقم الهاتف للمتابعة");
+        _statusBanner.SetWarning(Strings.Ui_CheckInDesk_03, Strings.Ui_CheckInDesk_04);
         _btnRecordEntry.Enabled = false;
         _btnOverride.Enabled = false;
 
@@ -735,7 +735,7 @@ public partial class CheckInDeskControl : UserControl
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
         if (string.IsNullOrWhiteSpace(card))
         {
-            _notifyService?.Warning("يرجى إدخال رقم البطاقة أولاً لتسجيل زبون جديد.", "تنبيه");
+            _notifyService?.Warning(Strings.Ui_CheckInDesk_05, Strings.Title_Warning);
             FocusCardNumberBox();
             return;
         }
@@ -773,7 +773,7 @@ public partial class CheckInDeskControl : UserControl
             if (string.IsNullOrWhiteSpace(normalized))
             {
                 ClearPreviousHolderData();
-                _statusBanner.SetWarning("يرجى إدخال أو مسح رقم البطاقة", null);
+                _statusBanner.SetWarning(Strings.Ui_CheckInDesk_06, null);
                 FocusCardNumberBox();
                 return;
             }
@@ -803,7 +803,7 @@ public partial class CheckInDeskControl : UserControl
                     var scanResult = await _cardScanService.ScanAsync(normalized);
                     if (!scanResult.IsAccepted)
                     {
-                        _statusBanner.SetDenied(scanResult.MessageAr, "رمز QR غير صالح أو ملغى");
+                        _statusBanner.SetDenied(scanResult.MessageAr, Strings.Ui_CheckInDesk_07);
                         if (_denialSoundEnabled)
                         {
                             System.Media.SystemSounds.Exclamation.Play();
@@ -919,7 +919,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error occurred during card lookup.");
-                _statusBanner.SetDenied("تعذّر الاتصال بقاعدة البيانات", "يرجى التحقق من الاتصال بالخادم والمحاولة مرة أخرى.");
+                _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_ConnectionRetryHint);
                 FocusCardNumberBox();
             }
         }
@@ -1010,14 +1010,14 @@ public partial class CheckInDeskControl : UserControl
 
         if (string.IsNullOrWhiteSpace(fullName))
         {
-            _notifyService?.Warning("الاسم الرباعي مطلوب.", "تنبيه");
+            _notifyService?.Warning(Strings.Ui_CheckInDesk_08, Strings.Title_Warning);
             _txtRegFullName.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(phone))
         {
-            _notifyService?.Warning("رقم الهاتف مطلوب.", "تنبيه");
+            _notifyService?.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
             _txtRegPhone.Focus();
             return;
         }
@@ -1049,12 +1049,12 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
-                    _notifyService?.Info("تم تسجيل الزبون بنجاح.", "تم التسجيل");
+                    _notifyService?.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
                     await LookupCardAsync();
                 }
                 else
                 {
-                    _notifyService?.Error(ErrorMessages.GetMessage(regResult.Error), "فشل التسجيل");
+                    _notifyService?.Error(ErrorMessages.GetMessage(regResult.Error), Strings.Ui_CheckInDesk_12);
                 }
             }
             catch (Exception ex)
@@ -1089,7 +1089,7 @@ public partial class CheckInDeskControl : UserControl
                 var result = await _checkInService.RecordEntryAsync(request);
                 if (result.IsSuccess)
                 {
-                    _statusBanner.SetGranted("تم تسجيل الدخول بنجاح!", $"المرافقون: {companions.Sum(c => c.Count)} · الإجمالي: {result.Value.TotalPersons} فرد");
+                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_13, string.Format(Strings.Ui_CheckInDesk_14, companions.Sum(c => c.Count), result.Value.TotalPersons));
                     await RefreshTodayDeskSummaryAsync();
 
                     await FinishSuccessfulEntryAsync();
@@ -1106,7 +1106,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error recording entry.");
-                _statusBanner.SetDenied("فشل تسجيل الدخول", "حدث خطأ غير متوقع أثناء معالجة العملية.");
+                _statusBanner.SetDenied(Strings.Ui_CheckInDesk_15, Strings.Ui_CheckInDesk_16);
             }
         }
 
@@ -1123,7 +1123,7 @@ public partial class CheckInDeskControl : UserControl
         var supervisorDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
                                new SupervisorAuthDialog(null, _currentUser);
 
-        supervisorDialog.SetContext(defaultReason: "تجاوز فترة الانتظار استثنائياً");
+        supervisorDialog.SetContext(defaultReason: Strings.Ui_CheckInDesk_17);
 
         if (supervisorDialog.ShowDialog(this) != DialogResult.OK)
         {
@@ -1149,7 +1149,7 @@ public partial class CheckInDeskControl : UserControl
                 var result = await _checkInService.OverrideEntryAsync(request);
                 if (result.IsSuccess)
                 {
-                    _statusBanner.SetGranted("تم تسجيل الدخول بموافقة المشرف (تجاوز)", $"المشرف: {supervisorDialog.SupervisorFullName} · السبب: {supervisorDialog.Reason}");
+                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_18, string.Format(Strings.Ui_CheckInDesk_19, supervisorDialog.SupervisorFullName, supervisorDialog.Reason));
                     await RefreshTodayDeskSummaryAsync();
 
                     await FinishSuccessfulEntryAsync();
@@ -1162,7 +1162,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error performing override.");
-                _statusBanner.SetDenied("فشل التجاوز", "حدث خطأ غير متوقع أثناء معالجة التجاوز.");
+                _statusBanner.SetDenied(Strings.Ui_CheckInDesk_20, Strings.Ui_CheckInDesk_21);
             }
         }
 
@@ -1171,11 +1171,11 @@ public partial class CheckInDeskControl : UserControl
 
     private static string GetDenialReasonArabic(DenialReason reason) => reason switch
     {
-        DenialReason.CooldownActive => "فترة التهدئة نشطة (سبق الدخول)",
-        DenialReason.CardExpired => "صلاحية البطاقة منتهية",
-        DenialReason.HolderSuspended => "حساب الزبون موقوف مؤقتاً",
-        DenialReason.HolderBlocked => "حساب الزبون محظور",
-        DenialReason.OrganizationInactive => "الجهة الراعية غير نشطة",
+        DenialReason.CooldownActive => Strings.Denial_CooldownActive,
+        DenialReason.CardExpired => Strings.Denial_CardExpired,
+        DenialReason.HolderSuspended => Strings.Denial_HolderSuspended,
+        DenialReason.HolderBlocked => Strings.Denial_HolderBlocked,
+        DenialReason.OrganizationInactive => Strings.Denial_OrganizationInactive,
         _ => Strings.Banner_Denied
     };
 
@@ -1309,7 +1309,7 @@ public partial class CheckInDeskControl : UserControl
             var authDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
                              new SupervisorAuthDialog(null, _currentUser);
 
-            authDialog.SetContext(defaultReason: "إلغاء عملية دخول مسجلة خطأً");
+            authDialog.SetContext(defaultReason: Strings.Ui_Beneficiaries_09);
 
             if (authDialog.ShowDialog(this) != DialogResult.OK)
             {

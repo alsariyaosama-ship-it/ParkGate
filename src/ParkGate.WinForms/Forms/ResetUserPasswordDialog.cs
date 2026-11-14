@@ -71,14 +71,14 @@ public partial class ResetUserPasswordDialog : RtlFormBase
 
         if (newPassword.Length < 6)
         {
-            ShowWarning("كلمة المرور المؤقتة يجب ألا تقل عن 6 أحرف.");
+            ShowWarning(Strings.Ui_ResetUserPassword_01);
             _txtNewPassword.Focus();
             return;
         }
 
         if (newPassword != confirmPassword)
         {
-            ShowWarning("كلمتا المرور غير متطابقتين.");
+            ShowWarning(Strings.Val_PasswordsDoNotMatch);
             _txtConfirmPassword.Focus();
             return;
         }

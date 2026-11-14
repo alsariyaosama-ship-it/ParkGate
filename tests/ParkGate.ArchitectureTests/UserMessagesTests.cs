@@ -54,6 +54,26 @@ public sealed class UserMessagesTests
         offenders.ShouldBeEmpty("Show UserMessages.Describe(ex) and log the exception instead of its Message.");
     }
 
+    [Fact]
+    public void WinFormsCode_HasNoArabicLiteralsOutsideResources()
+    {
+        // R4.8 / AGENTS.md §5.7: user-visible Arabic lives in Strings.resx. Designer files and comments are exempt.
+        var root = FindRepoRoot();
+        var arabic = new Regex("[؀-ۿ]");
+        var offenders = Directory
+            .EnumerateFiles(Path.Combine(root, "src", "ParkGate.WinForms"), "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.EndsWith(".Designer.cs", StringComparison.OrdinalIgnoreCase) &&
+                        !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") &&
+                        !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            .SelectMany(f => File.ReadAllLines(f)
+                .Select((line, index) => (File: f, Line: index + 1, Text: line.Trim()))
+                .Where(l => !l.Text.StartsWith("//", StringComparison.Ordinal) && arabic.IsMatch(l.Text)))
+            .Select(l => $"{Path.GetRelativePath(root, l.File)}:{l.Line}")
+            .ToList();
+
+        offenders.ShouldBeEmpty("Move the text to Strings.resx and use Strings.<Key>.");
+    }
+
     private static string FindRepoRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);

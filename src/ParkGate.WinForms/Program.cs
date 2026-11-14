@@ -110,8 +110,8 @@ internal static class Program
         Log.Error(exception, "Unhandled exception captured in {Source}", source);
 
         MessageBox.Show(
-            "حدث خطأ غير متوقع في النظام. تم تسجيل تفاصيل الخطأ في ملف السجل.",
-            "خطأ في النظام",
+            Strings.Msg_UnexpectedError,
+            Strings.Ui_Program_01,
             MessageBoxButtons.OK,
             MessageBoxIcon.Error,
             MessageBoxDefaultButton.Button1,
@@ -122,7 +122,7 @@ internal static class Program
     {
         MessageBox.Show(
             $"{Strings.Msg_StartupFailed}{Environment.NewLine}{UserMessages.Describe(exception)}",
-            "خطأ حرج",
+            Strings.Ui_Program_02,
             MessageBoxButtons.OK,
             MessageBoxIcon.Stop,
             MessageBoxDefaultButton.Button1,

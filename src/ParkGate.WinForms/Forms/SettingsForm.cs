@@ -115,7 +115,7 @@ public partial class SettingsForm : RtlFormBase
 
         if (string.IsNullOrWhiteSpace(parkName))
         {
-            ShowWarning("اسم المنتزه مطلوب.");
+            ShowWarning(Strings.Ui_Settings_01);
             _tabSettings.SelectedTab = _tabGeneral;
             _txtParkName.Focus();
             return;
