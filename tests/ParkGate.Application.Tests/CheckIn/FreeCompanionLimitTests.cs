@@ -19,7 +19,6 @@ public sealed class FreeCompanionLimitTests
     private readonly List<EntryAttempt> _attempts = [];
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeAppSettingRepository _settings = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("DESK-01");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -76,9 +75,8 @@ public sealed class FreeCompanionLimitTests
         _sut = new CheckInService(
             _uowFactory,
             new RollingWindowEligibilityPolicy(),
-            _auditWriter,
             _currentUser,
-            _currentWorkstation,
+            _currentWorkstation, TestSettings.Over(_settings), new SupervisorApprovalStore(),
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());

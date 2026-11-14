@@ -9,18 +9,37 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-11-13 |
-| Last session | S31 — Phase R2 complete: R2.9 MySQL parity and the end-to-end sync test done; R2 PR next |
-| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 merged (PR #11). R1 merged (PR #12). R2 in progress |
-| Working branch | `phase/r2-sync` (main already merged into it after PR #12) |
+| Last updated | 2026-11-14 |
+| Last session | S32 — Phase R3 complete (R3.1–R3.10); R3 PR opened |
+| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 (PR #11), R1 (PR #12), R2 (PR #13) merged. R3 done, PR open; R4 next |
+| Working branch | `phase/r3-application` (PR to `main` open, awaiting Osama's review) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
-| .NET Unit tests | 620 passed: 202 domain + 177 application + 87 infrastructure + 154 architecture |
-| .NET Integration tests | 40 passed on LocalDB (S31) |
-| Web tests | `php artisan test` (PHP 8.4): 96 passed on SQLite and on MySQL 8 strict mode (S31; 89 at the end of S30) |
-| Total tests | 756 (660 .NET + 96 web), all green |
-| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (S30, no .NET migration in S31). Applied on LocalDB by the tests; **not yet applied on SQLEXPRESS** (see Blockers) |
+| .NET Unit tests | 662 passed: 202 domain + 218 application + 87 infrastructure + 155 architecture |
+| .NET Integration tests | 42 passed on LocalDB (S32) |
+| Web tests | `php artisan test` (PHP 8.4): 96 passed on SQLite and on MySQL 8 strict mode (no web change in S32) |
+| Total tests | 800 (704 .NET + 96 web), all green |
+| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (no migration in S32). Applied on LocalDB and on SQLEXPRESS |
 
 ## State of the work
+
+**Completed in S32 (on `phase/r3-application`), one commit per task, each test-first:**
+
+- R3.1 Desk totals from a SQL aggregate (`IEntryAttemptRepository.GetTodayTotalsAsync`); the grid list loads 20 rows.
+- R3.3 `Actor.Resolve` returns `General.Unauthorized` / `Auth.WorkstationNotFound` instead of `?? 1` / `?? 0` ids
+  (check-in, override, void, today's totals, gift issue/override/redeem). Existing codes reused: no new UI text.
+- R3.4 `AuditDetails.ToJson` serializes all 16 audit details (quotes, backslashes, culture-free numbers, readable Arabic).
+- R3.5 Check-in and gift audit rows go through `uow.AuditLogs` before `CommitAsync`; both services no longer take
+  `IAuditWriter`. Gift issue saves once for the receipt number, then adds the audit row and saves again.
+- R3.6 `CheckInService` reads `ISettingsService` before the row lock. **Behaviour change:** `SettingsService` cache now
+  expires after one minute, so a change saved on another desk applies there within a minute (before: next query).
+- R3.7 / R3.10 New `ParkClock` (DB UTC + `Park.TimeZoneId`). `CardScanService` expiry and `EntryCardIssuer` validity use it.
+  R3.10 was found during R3.7 and added to the roadmap.
+- R3.8 `LookupByCardNumberAsync(card, organizationId)` returns `CardLookupDto` (`Matches`, `RegisteredElsewhere`).
+  The desk passes its selection; showing «مسجلة لدى X» is R4.4, so the desk still offers inline registration.
+- R3.9 Application already returned `NextAllowedEntryUtc` and `RemainingCooldownMinutes`; tests pin them. The banner's
+  `/ 60` is R5.1's (cooldowns are entered in whole hours, so no wrong value shows today).
+- R3.2 `IAuthService.AuthorizeSupervisorAsync` + `SupervisorApprovalStore` (single-use, 2 min, bound to the desk);
+  the four supervisor use cases take a token. `SupervisorAuthDialog` lost its approve-as-user-1 fallback. ADR-023 (Proposed).
 
 **Completed in S31 (on `phase/r2-sync`):**
 
@@ -75,7 +94,7 @@
 - None.
 
 **Left in Phase R2**
-- Open the R2 pull request (below). Nothing else is left in the phase.
+- Nothing. PR #13 merged into `main` (`aefbdcd`) on 2026-11-13 after Osama's go-ahead; build, web and test-mysql were green.
 
 **Not started / Future**
 - F2 Electronic gate (deferred by client; SPEC §9 F2).
@@ -84,12 +103,12 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. PR #12 (R1) is merged into `main`. Continue on `phase/r2-sync`.
-2. R2 is complete. Open the R2 PR to `main` with `.github/pull_request_template.md` (Osama reviews and merges).
-   In the PR, ask Osama to approve ADR-022 (token excluded from the cloud) and to confirm that the seed rows were
-   dropped from `mysql_schema.sql`. Then start R3 on `phase/r3-application`.
-3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the three `w/mixed` files in a
-   dedicated `chore` commit, or do it in R9. Tip: Python on Windows writes CRLF; edit with `newline=''`.
+1. The R3 PR is open. If Osama merged it, branch `phase/r4-desk-ui` from `main`; otherwise wait or continue R4 on a
+   branch from `phase/r3-application` and say so. Baseline first (AGENTS.md §1.1).
+2. R4 (desk UI defects). R4.4 should use `CardLookupDto.RegisteredElsewhere` (R3.8). R4.8 moves the Arabic literals;
+   the ones touched in R3 (`SupervisorAuthDialog`, `CheckInDeskControl`) were not moved.
+3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the `w/mixed` files in a dedicated `chore` commit.
+   Edit files with `newline=''` in Python: text mode turns CRLF into LF (happened in S32, fixed by re-checkout).
 
 Carried over from S25 (do it when a printer is available; it does not block Phase R):
 - Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
@@ -97,7 +116,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **Apply the three new migrations on SQLEXPRESS** (`PurgeSensitiveBeneficiaryOutbox`, `AddSyncOutboxSequence`, `RequeueGiftAndPolicyOutbox`) before running the new SyncAgent there. Existing pending outbox rows get their sequence numbers in physical order.
+- ~~Apply the three migrations on SQLEXPRESS~~ **Done in S31** (backup first: `C:\ProgramData\ParkGateackups\ParkGate_before_R2.bak`). The 7 pending outbox rows got sequences 1–11 with the re-queued ones and contain no phone, national ID, token or key id. Install the new SyncAgent build before it runs again (still the old one until R8.4).
 - **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, re-import `web/database/mysql_schema.sql` (it is generated now and drops and recreates every table, so it also wipes `users`: create the user again with `parkgate:create-user`), then let the agent re-queue.
 - Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
 - Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
@@ -111,12 +130,21 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
   and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
 - Still open (the plan's defaults apply if unanswered): Q-R4b (glossary, R7.1), Q-R6 (desk PCs and
   workgroup/domain, R6.5), Q-R7 (lowest desk resolution, R5.8).
+- **Approve ADR-022** (gift token excluded from the cloud) **and ADR-023** (single-use supervisor approval tokens).
+- **Confirm the one-minute settings cache** (R3.6): a setting saved on one desk reaches the others within a minute.
 - Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
 
 ---
 
 ## Session Log (last 10 sessions)
 
+### S32 — 2026-11-14 — Phase R3 complete
+- Baseline green. Did R3.1, R3.3, R3.4, R3.5, R3.6, R3.7, R3.9, R3.10, R3.8, R3.2 in that order, one commit each.
+- R3.10 (EntryCardIssuer client clock) was found in R3.7 and added to the roadmap before doing it.
+- R3.9 needed no production change; the commit is test-only and says so.
+- The approval token is spent only after request validation, so a too-short reason does not cost the supervisor a re-login.
+- A Python edit wrote three test files with LF; fixed by deleting and re-checking them out after the commit.
+- Test counts: .NET unit 620 → 662, integration 40 → 42, web 96 (unchanged).
 ### S31 — 2026-11-13 — Phase R2: R2.9 and the end-to-end test
 - Baseline was green (620 unit, 87 infra, 154 architecture; web 89). Did R2.9 test-first in two commits, then the end-to-end test.
 - `phpunit.xml` does not force the SQLite values, so the MySQL job only sets `DB_*` env vars; no change to the default run.
@@ -127,6 +155,9 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - The plan asked for a PHP and .NET end-to-end run; the test is .NET-only (the web ingestion side has its own tests, and
   the whole web suite runs on MySQL). A single run across both stacks would need a running web server in CI.
 - Test counts: .NET integration 39 → 40, web 89 → 96. Pushed; GitHub `web` (both jobs) green.
+- Osama said the app is not in production yet. Merged PR #13 (merge commit), took an uncompressed backup (Express has no
+  `COMPRESSION`), applied the three migrations with `dotnet ef database update --project src/ParkGate.Infrastructure
+  --connection "Server=.\SQLEXPRESS;..."` and checked `__EFMigrationsHistory` and the outbox.
 ### S30 — 2026-11-13 — Phase R2: R2.7
 - Did R2.7 test-first: extractor + exclusion list, data migration, web ingestion/model/summary/Vue, ADR-022.
 - Osama approved `laravel/boost` (dev only). Installed v2.10 with `boost:install --guidelines` only; no MCP server and no
@@ -202,16 +233,4 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Commits:
   - `fix(winforms): ensure beneficiary details populate and buttons enable on grid load`
 - All 588 unit/arch tests and 34 integration tests pass (100% green).
-
-### S23 — 2026-11-04 — Phase F5 Completion (T-G8..T-G11)
-- Tasks: T-G8, T-G9, T-G10, T-G11 completed on `phase/f5-gift-vouchers`.
-- Commits:
-  - `feat(gift): desk companion limit, gift panel, and qr dialog [T-G8]`
-  - `feat(gift): rides gift redemption screen and main menu [T-G9]`
-  - `feat(gift): gift receipts report and excel export [T-G10]`
-- Highlights:
-  - Full end-to-end gift voucher flow implemented: Desk eligibility check & issue (F6/F7) -> Rides window redemption (F3) -> Comprehensive report & ClosedXML Excel export.
-  - Free-companion limit calculation live on desk with exemption for infants.
-  - Zero warnings, 621 tests passing (587 unit/arch + 34 LocalDB integration).
-  - Documentation and test script updated.
 

@@ -681,7 +681,7 @@ public partial class BeneficiariesControl : UserControl
         var attempt = (EntryAttemptDto)_gridHistory.SelectedRows[0].Tag!;
 
         string voidReason;
-        int? supervisorUserId = null;
+        string? approvalToken = null;
 
         var isSupervisorOrAdmin = _currentUser != null &&
             (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
@@ -700,7 +700,7 @@ public partial class BeneficiariesControl : UserControl
             }
 
             voidReason = authDialog.Reason;
-            supervisorUserId = authDialog.SupervisorUserId;
+            approvalToken = authDialog.ApprovalToken;
         }
         else
         {
@@ -745,7 +745,7 @@ public partial class BeneficiariesControl : UserControl
             try
             {
                 var request = new VoidEntryRequest(attempt.Id, voidReason);
-                var result = await _checkInService.VoidEntryAsync(request, supervisorUserId);
+                var result = await _checkInService.VoidEntryAsync(request, approvalToken);
 
                 if (result.IsSuccess)
                 {

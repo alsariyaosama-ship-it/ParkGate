@@ -13,5 +13,5 @@ public interface IGiftVoucherService
 
     Task<Result<GiftRedemptionDto>> RedeemAsync(string? scannedText, CancellationToken ct = default);
 
-    Task<Result> VoidAsync(VoidGiftVoucherRequest request, int? supervisorUserId = null, CancellationToken ct = default);
+    Task<Result> VoidAsync(VoidGiftVoucherRequest request, string? approvalToken = null, CancellationToken ct = default);
 }

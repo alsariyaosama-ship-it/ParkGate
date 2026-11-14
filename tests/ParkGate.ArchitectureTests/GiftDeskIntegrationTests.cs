@@ -276,7 +276,7 @@ public sealed class GiftDeskIntegrationTests
         public Task<Result<GiftRedemptionDto>> RedeemAsync(string? scannedText, CancellationToken ct = default) =>
             Task.FromResult(Result<GiftRedemptionDto>.Failure(new Error("Fake.NotImplemented")));
 
-        public Task<Result> VoidAsync(VoidGiftVoucherRequest request, int? supervisorUserId = null, CancellationToken ct = default) =>
+        public Task<Result> VoidAsync(VoidGiftVoucherRequest request, string? supervisorUserId = null, CancellationToken ct = default) =>
             Task.FromResult(Result.Success());
     }
 }

@@ -2,7 +2,6 @@ using FluentValidation;
 using ParkGate.Application.Common;
 using ParkGate.Application.EntryCards;
 using ParkGate.Application.GiftVouchers.DTOs;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Domain.Entities;
@@ -18,9 +17,9 @@ public sealed class GiftVoucherService : IGiftVoucherService
     private readonly IGiftEligibilityPolicy _policy;
     private readonly QrTokenSigner _signer;
     private readonly QrTokenVerifier _verifier;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly SupervisorApprovalStore _approvals;
     private readonly IValidator<IssueGiftOverrideRequest> _overrideValidator;
     private readonly IValidator<VoidGiftVoucherRequest> _voidValidator;
 
@@ -29,9 +28,9 @@ public sealed class GiftVoucherService : IGiftVoucherService
         IGiftEligibilityPolicy policy,
         QrTokenSigner signer,
         QrTokenVerifier verifier,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
+        SupervisorApprovalStore approvals,
         IValidator<IssueGiftOverrideRequest> overrideValidator,
         IValidator<VoidGiftVoucherRequest> voidValidator)
     {
@@ -39,9 +38,9 @@ public sealed class GiftVoucherService : IGiftVoucherService
         _policy = policy;
         _signer = signer;
         _verifier = verifier;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
+        _approvals = approvals;
         _overrideValidator = overrideValidator;
         _voidValidator = voidValidator;
     }
@@ -87,6 +86,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return Errors.General.Forbidden;
         }
 
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
+        }
+
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
@@ -127,21 +132,15 @@ public sealed class GiftVoucherService : IGiftVoucherService
             org.GiftValue,
             nowUtc,
             businessDate,
-            _currentUser.UserId ?? 0,
-            _currentWorkstation.WorkstationId ?? 0);
+            actor.Value.UserId,
+            actor.Value.WorkstationId);
 
         uow.GiftVouchers.Add(voucher);
         await uow.SaveChangesAsync(ct);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Issued", actor.Value.UserId, actor.Value.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
-
-        await _auditWriter.WriteAsync(
-            action: "Gift.Issued",
-            userId: _currentUser.UserId,
-            workstationId: _currentWorkstation.WorkstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
-            cancellationToken: ct);
 
         return new IssuedGiftVoucherDto(
             ReceiptNo: voucher.Id,
@@ -160,16 +159,14 @@ public sealed class GiftVoucherService : IGiftVoucherService
         IssueGiftOverrideRequest request,
         CancellationToken ct = default)
     {
-        int approverUserId;
-        if (_currentUser.Has(Permission.OverrideGiftInterval))
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
         {
-            approverUserId = _currentUser.UserId!.Value;
+            return actor.Error;
         }
-        else if (request.SupervisorUserId.HasValue)
-        {
-            approverUserId = request.SupervisorUserId.Value;
-        }
-        else
+
+        var canApproveSelf = _currentUser.Has(Permission.OverrideGiftInterval);
+        if (!canApproveSelf && request.SupervisorApprovalToken is null)
         {
             return Errors.Auth.SupervisorRequired;
         }
@@ -180,10 +177,21 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return validation.ToError();
         }
 
+        // R3.2: the approver comes from a single-use token, never from an id the UI supplies.
+        int approverUserId;
+        if (canApproveSelf)
+        {
+            approverUserId = actor.Value.UserId;
+        }
+        else if (!_approvals.TryConsume(request.SupervisorApprovalToken, actor.Value.WorkstationId, out approverUserId))
+        {
+            return Errors.Auth.SupervisorRequired;
+        }
+
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
-        if (!_currentUser.Has(Permission.OverrideGiftInterval))
+        if (!canApproveSelf)
         {
             var approver = await uow.Users.GetByIdAsync(approverUserId, ct);
             if (approver is null || !approver.IsActive ||
@@ -234,24 +242,18 @@ public sealed class GiftVoucherService : IGiftVoucherService
             org.GiftValue,
             nowUtc,
             businessDate,
-            _currentUser.UserId ?? approverUserId,
-            _currentWorkstation.WorkstationId ?? 0,
+            actor.Value.UserId,
+            actor.Value.WorkstationId,
             overrideByUserId,
             overrideReason);
 
         uow.GiftVouchers.Add(voucher);
         await uow.SaveChangesAsync(ct);
-        await uow.CommitAsync(ct);
-
         var auditAction = isActualOverride ? "Gift.IssuedOverride" : "Gift.Issued";
-        await _auditWriter.WriteAsync(
-            action: auditAction,
-            userId: approverUserId,
-            workstationId: _currentWorkstation.WorkstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
-            cancellationToken: ct);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, auditAction, approverUserId, actor.Value.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        await uow.SaveChangesAsync(ct);
+        await uow.CommitAsync(ct);
 
         return new IssuedGiftVoucherDto(
             ReceiptNo: voucher.Id,
@@ -273,6 +275,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
         if (!_currentUser.Has(Permission.RedeemGift))
         {
             return Errors.General.Forbidden;
+        }
+
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
         }
 
         var verifyResult = _verifier.Verify(scannedText, QrPurpose.GiftVoucher);
@@ -322,21 +330,13 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return Errors.Gift.Expired;
         }
 
-        var userId = _currentUser.UserId ?? 0;
-        var workstationId = _currentWorkstation.WorkstationId ?? 0;
+        var (userId, workstationId) = actor.Value;
 
         voucher.Redeem(userId, workstationId, nowUtc, businessDate);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Redeemed", userId, workstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
-
-        await _auditWriter.WriteAsync(
-            action: "Gift.Redeemed",
-            userId: userId,
-            workstationId: workstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Value\":{voucher.Value}}}",
-            cancellationToken: ct);
 
         var holder = await uow.Beneficiaries.GetByIdAsync(voucher.BeneficiaryId, ct);
         var org = await uow.Organizations.GetByIdAsync(voucher.OrganizationId, ct);
@@ -353,27 +353,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
     public async Task<Result> VoidAsync(
         VoidGiftVoucherRequest request,
-        int? supervisorUserId = null,
+        string? approvalToken = null,
         CancellationToken ct = default)
     {
-        int voidedByUserId;
-
-        if (supervisorUserId.HasValue)
-        {
-            await using var uowCheck = _uowFactory.Create();
-            var approver = await uowCheck.Users.GetByIdAsync(supervisorUserId.Value, ct);
-            if (approver is null || !approver.IsActive ||
-                (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
-            {
-                return Errors.Auth.SupervisorRequired;
-            }
-            voidedByUserId = supervisorUserId.Value;
-        }
-        else if (_currentUser.Has(Permission.VoidGift))
-        {
-            voidedByUserId = _currentUser.UserId!.Value;
-        }
-        else
+        if (approvalToken is null && !_currentUser.Has(Permission.VoidGift))
         {
             return Errors.General.Forbidden;
         }
@@ -382,6 +365,28 @@ public sealed class GiftVoucherService : IGiftVoucherService
         if (!validation.IsValid)
         {
             return validation.ToError();
+        }
+
+        int voidedByUserId;
+        if (approvalToken is null)
+        {
+            voidedByUserId = _currentUser.UserId!.Value;
+        }
+        else
+        {
+            // R3.2: the supervisor who signed in on this desk is the one who voids.
+            if (!_approvals.TryConsume(approvalToken, _currentWorkstation.WorkstationId, out voidedByUserId))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
+
+            await using var uowCheck = _uowFactory.Create();
+            var approver = await uowCheck.Users.GetByIdAsync(voidedByUserId, ct);
+            if (approver is null || !approver.IsActive ||
+                (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
         }
 
         await using var uow = _uowFactory.Create();
@@ -408,17 +413,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
         var nowUtc = await uow.GetDbUtcNowAsync(ct);
 
         voucher.Void(voidedByUserId, request.Reason, nowUtc);
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Voided", voidedByUserId, _currentWorkstation.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, request.Reason })));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
-
-        await _auditWriter.WriteAsync(
-            action: "Gift.Voided",
-            userId: voidedByUserId,
-            workstationId: _currentWorkstation.WorkstationId,
-            entityName: nameof(GiftVoucher),
-            entityId: voucher.Id.ToString(),
-            detailsJson: $"{{\"ReceiptNo\":{voucher.Id},\"Reason\":\"{request.Reason}\"}}",
-            cancellationToken: ct);
 
         return Result.Success();
     }

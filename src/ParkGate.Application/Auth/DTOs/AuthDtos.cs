@@ -24,3 +24,9 @@ public sealed record ChangePasswordRequest(
     string CurrentPassword,
     string NewPassword,
     string ConfirmNewPassword);
+
+/// <summary>
+/// A supervisor approval (R3.2): <see cref="Token"/> is single-use, expires after two minutes and is bound to this
+/// workstation. Pass it to the use case; the user id and name are for display only.
+/// </summary>
+public sealed record SupervisorApprovalDto(string Token, int SupervisorUserId, string SupervisorFullName);

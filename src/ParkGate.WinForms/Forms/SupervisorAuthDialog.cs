@@ -15,7 +15,8 @@ public partial class SupervisorAuthDialog : RtlFormBase
     private readonly IAuthService? _authService;
     private readonly ICurrentUser? _currentUser;
 
-    public int SupervisorUserId { get; private set; }
+    /// <summary>Single-use approval for the use case (R3.2). The approver is resolved from it, never from an id.</summary>
+    public string ApprovalToken { get; private set; } = string.Empty;
     public string SupervisorFullName { get; private set; } = string.Empty;
     public string Reason { get; private set; } = string.Empty;
 
@@ -117,11 +118,8 @@ public partial class SupervisorAuthDialog : RtlFormBase
 
         if (_authService == null)
         {
-            SupervisorUserId = 1;
-            SupervisorFullName = username;
-            Reason = reason;
-            DialogResult = DialogResult.OK;
-            Close();
+            // No service, no approval: never invent one (R3.2).
+            _lblError.Text = Strings.Error_Auth_SupervisorRequired;
             return;
         }
 
@@ -129,11 +127,11 @@ public partial class SupervisorAuthDialog : RtlFormBase
         {
             try
             {
-                var result = await _authService.ValidateSupervisorCredentialsAsync(username, password);
+                var result = await _authService.AuthorizeSupervisorAsync(username, password);
                 if (result.IsSuccess)
                 {
-                    SupervisorUserId = result.Value.Id;
-                    SupervisorFullName = result.Value.FullName;
+                    ApprovalToken = result.Value.Token;
+                    SupervisorFullName = result.Value.SupervisorFullName;
                     Reason = reason;
 
                     DialogResult = DialogResult.OK;

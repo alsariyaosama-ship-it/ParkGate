@@ -175,15 +175,16 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R2.10 End-to-end sync test: failing-then-recovering cloud, cloud data equals local data minus excluded fields (R2 "Done when")
 
 ### R3 — Desktop Application and Infrastructure · branch `phase/r3-application`
-- [ ] R3.1 Today's totals must not be capped at 50 attempts — add an aggregate query
-- [ ] R3.2 Replace trusted `SupervisorUserId` with short-lived single-use approval tokens
-- [ ] R3.3 Remove the silent `?? 1` / `?? 0` user and workstation id fallbacks
-- [ ] R3.4 Serialize audit JSON with `System.Text.Json`, not string interpolation
-- [ ] R3.5 Write audit rows inside the same unit of work, before commit
-- [ ] R3.6 Use the cached `ISettingsService` instead of four queries inside the locked transaction
-- [ ] R3.7 Card expiry from the DB clock, not the client clock (BR-05)
-- [ ] R3.8 Card lookup across organizations with a flag, instead of "not registered"
-- [ ] R3.9 Return `NextEligibleAtUtc` and remaining minutes instead of integer-divided hours
+- [x] R3.1 Today's totals must not be capped at 50 attempts — add an aggregate query
+- [x] R3.2 Replace trusted `SupervisorUserId` with short-lived single-use approval tokens
+- [x] R3.3 Remove the silent `?? 1` / `?? 0` user and workstation id fallbacks
+- [x] R3.4 Serialize audit JSON with `System.Text.Json`, not string interpolation
+- [x] R3.5 Write audit rows inside the same unit of work, before commit
+- [x] R3.6 Use the cached `ISettingsService` instead of four queries inside the locked transaction
+- [x] R3.7 Card expiry from the DB clock, not the client clock (BR-05)
+- [x] R3.8 Card lookup across organizations with a flag, instead of "not registered"
+- [x] R3.9 Return `NextEligibleAtUtc` and remaining minutes instead of integer-divided hours
+- [x] R3.10 `EntryCardIssuer` computes the card expiry from the client clock (`TimeProvider.GetLocalNow`) — use `ParkClock` (found in R3.7)
 
 ### R4 — Desk UI defects · branch `phase/r4-desk-ui`
 - [ ] R4.1 `BusyScope` must restore each control's previous `Enabled` state

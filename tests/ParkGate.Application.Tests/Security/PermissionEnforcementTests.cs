@@ -217,9 +217,8 @@ public sealed class PermissionEnforcementTests
         var sut = new CheckInService(
             _uowFactory,
             new RollingWindowEligibilityPolicy(),
-            _auditWriter,
             _operatorUser,
-            _currentWorkstation,
+            _currentWorkstation, TestSettings.Over(_settings), new SupervisorApprovalStore(),
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());

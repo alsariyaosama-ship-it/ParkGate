@@ -147,6 +147,14 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 
 ---
 
+### ADR-023 — Supervisor approval is a single-use token, not a user id
+- **Status:** Proposed (R3.2, awaiting Osama's approval)
+- **Context:** `OverrideEntryAsync`, `VoidEntryAsync` and the gift override and void accepted a bare `SupervisorUserId` from the UI and trusted it after a role lookup. Any caller could name a supervisor without their password, and `SupervisorAuthDialog` approved as user 1 when no auth service was injected.
+- **Decision:** `IAuthService.AuthorizeSupervisorAsync(userName, password)` (replacing `ValidateSupervisorCredentialsAsync`) checks the credentials and issues a token from `SupervisorApprovalStore`: 32 random bytes, in memory, valid for two minutes, bound to the current workstation, consumed on first use (also on a wrong desk). The four use cases take the token, resolve the approver from it, and still check the approver's role and active state in the database. A user who holds the permission approves themselves without a token, as before. The token is spent only after the request passes validation. An invalid, expired, reused or foreign token returns `Auth.SupervisorRequired`. The dialog's fallback is removed.
+- **Consequences:** No schema change. Tokens do not survive a restart of the desk app (the supervisor signs in again). Approvals cannot move between desks.
+
+---
+
 <!-- Template for new ADRs:
 ### ADR-0XX — Title
 - **Status:** Proposed | Accepted | Superseded by ADR-0YY

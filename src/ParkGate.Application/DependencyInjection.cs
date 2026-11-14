@@ -4,6 +4,7 @@ using ParkGate.Application.AgeCategories.Services;
 using ParkGate.Application.Auth.Services;
 using ParkGate.Application.Beneficiaries.Services;
 using ParkGate.Application.CheckIn.Services;
+using ParkGate.Application.Common;
 using ParkGate.Application.EntryCards;
 using ParkGate.Application.GiftVouchers.Services;
 using ParkGate.Application.Organizations.Services;
@@ -49,6 +50,8 @@ public static class DependencyInjection
         services.AddTransient<ISyncStatusService, SyncStatusService>();
 
         // 4. EntryCards services
+        services.AddSingleton<ParkClock>();
+        services.AddSingleton<SupervisorApprovalStore>();
         services.AddTransient<CardScanService>();
         services.AddTransient<EntryCardIssuer>();
 

@@ -20,9 +20,9 @@ public sealed class CheckInServiceTests
     private readonly List<EntryAttempt> _attempts = [];
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeAppSettingRepository _settings = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("DESK-01");
+    private readonly SupervisorApprovalStore _approvals = new();
     private readonly FakeUnitOfWorkFactory _uowFactory;
     private readonly IEntryEligibilityPolicy _policy = new RollingWindowEligibilityPolicy();
 
@@ -68,9 +68,8 @@ public sealed class CheckInServiceTests
         _sut = new CheckInService(
             _uowFactory,
             _policy,
-            _auditWriter,
             _currentUser,
-            _currentWorkstation,
+            _currentWorkstation, TestSettings.Over(_settings), _approvals,
             new RecordEntryRequestValidator(),
             new OverrideEntryRequestValidator(),
             new VoidEntryRequestValidator());
@@ -98,7 +97,7 @@ public sealed class CheckInServiceTests
         holder.LastGrantedEntryUtc.ShouldBe(_uowFactory.CurrentUow.CurrentDbTime);
         _attempts.Count.ShouldBe(1);
         _attempts[0].Result.ShouldBe(EntryResult.Allowed);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryGranted");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryGranted");
     }
 
     [Fact]
@@ -159,7 +158,7 @@ public sealed class CheckInServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.Result.ShouldBe(EntryResult.Overridden);
         holder.LastGrantedEntryUtc.ShouldBe(_uowFactory.CurrentUow.CurrentDbTime);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryOverridden");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryOverridden");
     }
 
     [Fact]
@@ -210,7 +209,7 @@ public sealed class CheckInServiceTests
 
         // Recalculates to entry1Time (BR-13)
         holder.LastGrantedEntryUtc.ShouldBe(entry1Time);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryVoided");
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided");
     }
 
     [Fact]
@@ -233,13 +232,13 @@ public sealed class CheckInServiceTests
         _attempts.Add(attempt);
 
         var voidRequest = new VoidEntryRequest(attempt.Id, "Operator called supervisor to void");
-        var result = await _sut.VoidEntryAsync(voidRequest, supervisorUserId: supervisor.Id);
+        var result = await _sut.VoidEntryAsync(voidRequest, approvalToken: _approvals.Issue(supervisor.Id, 1));
 
         result.IsSuccess.ShouldBeTrue();
         attempt.IsVoided.ShouldBeTrue();
         attempt.VoidedByUserId.ShouldBe(supervisor.Id);
         holder.LastGrantedEntryUtc.ShouldBeNull();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "EntryVoided" && w.UserId == supervisor.Id);
+        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided" && w.UserId == supervisor.Id);
     }
 
     [Fact]
@@ -264,5 +263,280 @@ public sealed class CheckInServiceTests
         result.Value.TotalDenied.ShouldBe(1);
         result.Value.TotalPersons.ShouldBe(3); // 1 holder + 2 children
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 2);
+    }
+
+    // ── R3.2: supervisor approval is a single-use token, not a trusted id ───
+
+    private Beneficiary HolderInCooldown(string card)
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create(card), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(_uowFactory.CurrentUow.CurrentDbTime.AddHours(-1));
+        _beneficiaries.Add(holder);
+        return holder;
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_AsOperatorWithMadeUpToken_IsRejected()
+    {
+        var holder = HolderInCooldown("CARD-FAKE");
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: "2"));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+        _attempts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_TokenUsedTwice_SecondOverrideIsRejected()
+    {
+        var first = HolderInCooldown("CARD-TOK1");
+        var second = HolderInCooldown("CARD-TOK2");
+        var token = _approvals.Issue(2, 1);
+
+        var used = await _sut.OverrideEntryAsync(new OverrideEntryRequest(first.Id, "حالة خاصة جدا", SupervisorApprovalToken: token));
+        var reused = await _sut.OverrideEntryAsync(new OverrideEntryRequest(second.Id, "حالة خاصة جدا", SupervisorApprovalToken: token));
+
+        used.IsSuccess.ShouldBeTrue();
+        used.Value.Result.ShouldBe(EntryResult.Overridden);
+        reused.IsFailure.ShouldBeTrue();
+        reused.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_ApprovedBySupervisorToken_RecordsThatSupervisor()
+    {
+        var holder = HolderInCooldown("CARD-TOK3");
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: _approvals.Issue(2, 1)));
+
+        result.IsSuccess.ShouldBeTrue();
+        _attempts.Single().OverrideByUserId.ShouldBe(2);
+        _attempts.Single().UserId.ShouldBe(1); // the signed-in operator still records the entry
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_InvalidReason_DoesNotSpendTheToken()
+    {
+        var holder = HolderInCooldown("CARD-TOK4");
+        var token = _approvals.Issue(2, 1);
+
+        var invalid = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "قصير", SupervisorApprovalToken: token));
+        var retried = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: token));
+
+        invalid.IsFailure.ShouldBeTrue();
+        retried.IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_WithTokenIssuedOnAnotherDesk_IsRejected()
+    {
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var attempt = EntryAttempt.CreateAllowed(
+            Guid.NewGuid(), Guid.NewGuid(), _org.Id, now, DateOnly.FromDateTime(now), 720, now.AddHours(12), 1, 1, EntryChannel.Desk);
+        _attempts.Add(attempt);
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, "إدخال بالخطأ"), approvalToken: _approvals.Issue(2, workstationId: 99));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.SupervisorRequired.Code);
+        attempt.IsVoided.ShouldBeFalse();
+    }
+
+    // ── R3.6: settings come from the cached settings service ────────────────
+
+    [Fact]
+    public async Task RecordEntryAsync_UsesGroupLimitFromSettingsService()
+    {
+        // The store says 10 (default); the settings service says 2. Check-in must follow the service.
+        var settings = new StubSettingsService();
+        settings.Current = settings.Current with { MaxGroupSize = 2 };
+        var sut = new CheckInService(
+            _uowFactory, _policy, _currentUser, _currentWorkstation, settings, _approvals,
+            new RecordEntryRequestValidator(), new OverrideEntryRequestValidator(), new VoidEntryRequestValidator());
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-SET"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await sut.RecordEntryAsync(new RecordEntryRequest(holder.Id, [new CompanionRequestDto(_childCategory.Id, 2)]));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.CheckIn.ExceedsMaxGroupSize.Code);
+    }
+
+    // ── R3.5: the audit row commits with the change it describes ────────────
+
+    [Fact]
+    public async Task RecordEntryAsync_WhenGranted_AuditRowIsCommittedInTheSameUnitOfWork()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-ATOM1"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.RecordEntryAsync(new RecordEntryRequest(holder.Id));
+
+        result.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("EntryGranted");
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_AuditRowIsCommittedInTheSameUnitOfWork()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-ATOM2"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(_uowFactory.CurrentUow.CurrentDbTime.AddHours(-1));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا"));
+
+        result.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("EntryOverridden");
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_AuditRowIsCommittedInTheSameUnitOfWork()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-ATOM3"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(now);
+        _beneficiaries.Add(holder);
+        var attempt = EntryAttempt.CreateAllowed(
+            Guid.NewGuid(), holder.Id, _org.Id, now, DateOnly.FromDateTime(now), 720, now.AddHours(12), 1, 1, EntryChannel.Desk);
+        _attempts.Add(attempt);
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, "إدخال بالخطأ"));
+
+        result.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditActionsAtCommit.ShouldContain("EntryVoided");
+    }
+
+    // ── R3.4: audit details are serialized, not interpolated ────────────────
+
+    [Fact]
+    public async Task OverrideEntryAsync_ReasonWithQuoteAndBackslash_WritesValidAuditJson()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-JSON"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(_uowFactory.CurrentUow.CurrentDbTime.AddHours(-1));
+        _beneficiaries.Add(holder);
+        const string reason = "قال \"نعم\" عند C:\\الباب";
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, reason));
+
+        result.IsSuccess.ShouldBeTrue();
+        var details = _uowFactory.CurrentUow.AuditLogRows.First(w => w.Action == "EntryOverridden").DetailsJson;
+        using var json = System.Text.Json.JsonDocument.Parse(details!);
+        json.RootElement.GetProperty("Reason").GetString().ShouldBe(reason);
+        json.RootElement.GetProperty("TotalPersons").GetInt32().ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_ReasonWithQuoteAndBackslash_WritesValidAuditJson()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-VOIDJSON"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(now);
+        _beneficiaries.Add(holder);
+        var attempt = EntryAttempt.CreateAllowed(
+            Guid.NewGuid(), holder.Id, _org.Id, now, DateOnly.FromDateTime(now), 720, now.AddHours(12), 1, 1, EntryChannel.Desk);
+        _attempts.Add(attempt);
+        const string reason = "خطأ \"إدخال\" \\ مكرر";
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, reason));
+
+        result.Error.Code.ShouldBe(Error.None.Code);
+        var details = _uowFactory.CurrentUow.AuditLogRows.First(w => w.Action == "EntryVoided").DetailsJson;
+        using var json = System.Text.Json.JsonDocument.Parse(details!);
+        json.RootElement.GetProperty("Reason").GetString().ShouldBe(reason);
+    }
+
+    // ── R3.3: no silent fallback to user or workstation id 1 ────────────────
+
+    [Fact]
+    public async Task RecordEntryAsync_WhenWorkstationNotRegistered_ReturnsWorkstationNotFoundAndRecordsNothing()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-NOWS"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+        _currentWorkstation.Clear();
+
+        var result = await _sut.RecordEntryAsync(new RecordEntryRequest(holder.Id));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+        _attempts.ShouldBeEmpty();
+        holder.LastGrantedEntryUtc.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_WhenWorkstationNotRegistered_ReturnsWorkstationNotFound()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-NOWS2"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+        _currentWorkstation.Clear();
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: _approvals.Issue(2, 1)));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+        _attempts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_WhenNobodyIsSignedIn_ReturnsUnauthorized()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-NOUSER"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+        _currentUser.Clear();
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: _approvals.Issue(2, 1)));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
+        _attempts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task VoidEntryAsync_WithSupervisorButNobodySignedIn_ReturnsUnauthorized()
+    {
+        _currentUser.Clear();
+
+        var result = await _sut.VoidEntryAsync(new VoidEntryRequest(Guid.NewGuid(), "إدخال بالخطأ"), approvalToken: _approvals.Issue(2, 1));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.General.Unauthorized.Code);
+    }
+
+    [Fact]
+    public async Task GetTodayDeskEntriesAsync_WhenNoWorkstationGivenOrRegistered_ReturnsWorkstationNotFound()
+    {
+        _currentWorkstation.Clear();
+
+        var result = await _sut.GetTodayDeskEntriesAsync();
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.Auth.WorkstationNotFound.Code);
+    }
+
+    [Fact]
+    public async Task GetTodayDeskEntriesAsync_WithMoreAttemptsThanTheGridShows_CountsEveryAttempt()
+    {
+        // R3.1: totals used to be computed from the 50 newest rows only.
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var today = DateOnly.FromDateTime(now);
+        for (var i = 0; i < 60; i++)
+        {
+            _attempts.Add(EntryAttempt.CreateAllowed(
+                Guid.NewGuid(), Guid.NewGuid(), _org.Id, now.AddMinutes(-i), today,
+                720, now.AddHours(12), 1, 1, EntryChannel.Desk,
+                [new EntryAttemptCompanion(_childCategory.Id, 1)]));
+        }
+
+        var result = await _sut.GetTodayDeskEntriesAsync(1);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.TotalGranted.ShouldBe(60);
+        result.Value.TotalPersons.ShouldBe(120);
+        result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 60);
+        result.Value.RecentAttempts.Count.ShouldBe(20);
     }
 }

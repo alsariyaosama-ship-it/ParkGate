@@ -15,16 +15,25 @@ public sealed class SettingsService : ISettingsService
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<UpdateSettingsRequest> _validator;
 
+    /// <summary>
+    /// Each desk caches its own copy, so a change saved on another desk reaches this one within this time
+    /// (R3.6). Check-in reads the cache instead of querying inside its locked transaction.
+    /// </summary>
+    private static readonly TimeSpan CacheLifetime = TimeSpan.FromMinutes(1);
+
+    private readonly TimeProvider _timeProvider;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private volatile AppSettingsModel? _cached;
+    private volatile CachedSettings? _cached;
 
     public SettingsService(
         IAppSettingsStore settingsStore,
         IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
-        IValidator<UpdateSettingsRequest> validator)
+        IValidator<UpdateSettingsRequest> validator,
+        TimeProvider? timeProvider = null)
     {
+        _timeProvider = timeProvider ?? TimeProvider.System;
         _settingsStore = settingsStore;
         _auditWriter = auditWriter;
         _currentUser = currentUser;
@@ -34,22 +43,22 @@ public sealed class SettingsService : ISettingsService
 
     public async Task<AppSettingsModel> GetSettingsAsync(CancellationToken cancellationToken = default)
     {
-        if (_cached is not null)
+        if (TryGetFresh() is { } fresh)
         {
-            return _cached;
+            return fresh;
         }
 
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            if (_cached is not null)
+            if (TryGetFresh() is { } loadedMeanwhile)
             {
-                return _cached;
+                return loadedMeanwhile;
             }
 
             var dict = await _settingsStore.GetAllAsync(cancellationToken);
 
-            _cached = new AppSettingsModel(
+            var settings = new AppSettingsModel(
                 DefaultCooldownMinutes: GetInt(dict, "Entry.DefaultCooldownMinutes", 720),
                 MaxGroupSize: GetInt(dict, "Entry.MaxGroupSize", 10),
                 DenialDedupMinutes: GetInt(dict, "Entry.DenialDedupMinutes", 5),
@@ -62,13 +71,24 @@ public sealed class SettingsService : ISettingsService
                 TimeZoneId: GetString(dict, "Park.TimeZoneId", "Libya Standard Time")
             );
 
-            return _cached;
+            _cached = new CachedSettings(settings, _timeProvider.GetUtcNow());
+            return settings;
         }
         finally
         {
             _semaphore.Release();
         }
     }
+
+    private AppSettingsModel? TryGetFresh()
+    {
+        var cached = _cached;
+        return cached is not null && _timeProvider.GetUtcNow() - cached.LoadedAt < CacheLifetime
+            ? cached.Settings
+            : null;
+    }
+
+    private sealed record CachedSettings(AppSettingsModel Settings, DateTimeOffset LoadedAt);
 
     public async Task<Result> UpdateSettingsAsync(UpdateSettingsRequest request, CancellationToken cancellationToken = default)
     {

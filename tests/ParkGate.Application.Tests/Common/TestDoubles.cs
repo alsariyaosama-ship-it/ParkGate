@@ -1,3 +1,8 @@
+using ParkGate.Application.Common;
+using ParkGate.Application.Security;
+using ParkGate.Application.Settings.Models;
+using ParkGate.Application.Settings.Services;
+using ParkGate.Application.Settings.Validators;
 using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
@@ -23,6 +28,9 @@ public sealed class FakeAuditWriter : IAuditWriter
 {
     public List<(string Action, int? UserId, int? WorkstationId, string? EntityName, string? EntityId)> Writes { get; } = [];
 
+    /// <summary>The details JSON of each write, in the same order as <see cref="Writes"/>.</summary>
+    public List<string?> Details { get; } = [];
+
     public Task WriteAsync(
         string action,
         int? userId = null,
@@ -33,6 +41,7 @@ public sealed class FakeAuditWriter : IAuditWriter
         CancellationToken cancellationToken = default)
     {
         Writes.Add((action, userId, workstationId, entityName, entityId));
+        Details.Add(detailsJson);
         return Task.CompletedTask;
     }
 }
@@ -322,6 +331,22 @@ public sealed class FakeEntryAttemptRepository : IEntryAttemptRepository
         return Task.FromResult(list);
     }
 
+    public Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default)
+    {
+        var day = _attempts.Where(a => a.WorkstationId == workstationId && a.BusinessDate == businessDate).ToList();
+        var entered = day.Where(a => !a.IsVoided && (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)).ToList();
+
+        return Task.FromResult(new TodayAttemptTotals(
+            Granted: entered.Count(a => a.Result == EntryResult.Allowed),
+            Overridden: entered.Count(a => a.Result == EntryResult.Overridden),
+            Denied: day.Count(a => a.Result == EntryResult.Denied),
+            Persons: entered.Sum(a => a.TotalPersons),
+            CompanionsByCategory: entered
+                .SelectMany(a => a.Companions)
+                .GroupBy(c => c.AgeCategoryId)
+                .ToDictionary(g => g.Key, g => g.Sum(c => c.Count))));
+    }
+
     public void Add(EntryAttempt attempt) => _attempts.Add(attempt);
 
     public void Update(EntryAttempt attempt) { }
@@ -407,6 +432,8 @@ public sealed class FakeGiftVoucherRepository : IGiftVoucherRepository
 public sealed class FakeAuditLogRepository : IAuditLogRepository
 {
     private readonly List<AuditLog> _logs = [];
+
+    public IReadOnlyList<AuditLog> Logs => _logs;
 
     public void Add(AuditLog log) => _logs.Add(log);
 
@@ -501,8 +528,21 @@ public sealed class FakeUnitOfWork : IUnitOfWork
         GiftVouchers = giftVouchers ?? new FakeGiftVoucherRepository();
     }
 
+    /// <summary>Audit rows added through this unit of work.</summary>
+    public IReadOnlyList<AuditLog> AuditLogRows => ((FakeAuditLogRepository)AuditLogs).Logs;
+
+    /// <summary>Audit actions that were part of the unit of work when it committed (R3.5: same transaction).</summary>
+    public List<string> AuditActionsAtCommit { get; } = [];
+
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
-    public Task CommitAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        AuditActionsAtCommit.Clear();
+        AuditActionsAtCommit.AddRange(AuditLogRows.Select(l => l.Action));
+        return Task.CompletedTask;
+    }
+
     public Task RollbackAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -562,4 +602,46 @@ public sealed class FakeUnitOfWorkFactory : IUnitOfWorkFactory
     }
 
     public IUnitOfWork Create() => CurrentUow;
+}
+
+/// <summary>Settings fixed by the test, to prove a use case reads them from <see cref="ISettingsService"/> (R3.6).</summary>
+public sealed class StubSettingsService : ISettingsService
+{
+    public AppSettingsModel Current { get; set; } = new(
+        DefaultCooldownMinutes: 720,
+        MaxGroupSize: 10,
+        DenialDedupMinutes: 5,
+        PrefillCompanionsFromLastVisit: true,
+        DenialSoundEnabled: true,
+        MaxFailedLogins: 5,
+        LockoutMinutes: 15,
+        AutoLockMinutes: 0,
+        ParkName: "Test Park",
+        TimeZoneId: "Libya Standard Time");
+
+    public Task<AppSettingsModel> GetSettingsAsync(CancellationToken cancellationToken = default) => Task.FromResult(Current);
+
+    public Task<Result> UpdateSettingsAsync(UpdateSettingsRequest request, CancellationToken cancellationToken = default) =>
+        Task.FromResult(Result.Success());
+
+    public void InvalidateCache() { }
+}
+
+public sealed class ManualTimeProvider(DateTimeOffset now) : TimeProvider
+{
+    public DateTimeOffset Now { get; set; } = now;
+
+    public override DateTimeOffset GetUtcNow() => Now;
+}
+
+public static class TestSettings
+{
+    /// <summary>The real cached settings service over the fake store, so tests keep configuring values through it.</summary>
+    public static ISettingsService Over(FakeAppSettingRepository store) =>
+        new SettingsService(
+            store,
+            new FakeAuditWriter(),
+            new CurrentUserContext(),
+            new CurrentWorkstationContext("TEST"),
+            new UpdateSettingsRequestValidator());
 }

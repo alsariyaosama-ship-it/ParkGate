@@ -1,3 +1,4 @@
+using ParkGate.Application.Common;
 using ParkGate.Application.Ports.EntryCards;
 
 namespace ParkGate.Application.EntryCards;
@@ -10,20 +11,21 @@ public sealed class EntryCardIssuer
 {
     private readonly QrTokenSigner _signer;
     private readonly IEntryCardRepository _cards;
-    private readonly TimeProvider _clock;
+    private readonly ParkClock _parkClock;
     private readonly EntryCardOptions _options;
 
-    public EntryCardIssuer(QrTokenSigner signer, IEntryCardRepository cards, TimeProvider clock, EntryCardOptions options)
+    public EntryCardIssuer(QrTokenSigner signer, IEntryCardRepository cards, ParkClock parkClock, EntryCardOptions options)
     {
         _signer = signer;
         _cards = cards;
-        _clock = clock;
+        _parkClock = parkClock;
         _options = options;
     }
 
     public async Task<IssuedEntryCard> IssueAsync(Guid beneficiaryId, DateOnly? expiresOn = null, CancellationToken ct = default)
     {
-        var today = DateOnly.FromDateTime(_clock.GetLocalNow().DateTime);
+        // Validity counts from the park business date on the database clock, not the desk clock (R3.10).
+        var today = await _parkClock.GetBusinessDateAsync(ct);
         var expiry = expiresOn ?? today.AddDays(_options.ValidityDays);
         if (expiry < today)
         {

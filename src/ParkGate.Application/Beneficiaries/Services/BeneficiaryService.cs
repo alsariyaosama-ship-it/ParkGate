@@ -42,8 +42,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
         _statusValidator = statusValidator;
     }
 
-    public async Task<Result<IReadOnlyList<BeneficiaryLookupResultDto>>> LookupByCardNumberAsync(
+    public async Task<Result<CardLookupDto>> LookupByCardNumberAsync(
         string cardNumber,
+        int? organizationId = null,
         CancellationToken cancellationToken = default)
     {
         if (!_currentUser.Has(Permission.CheckIn))
@@ -67,19 +68,26 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
         var localToday = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
-        var results = new List<BeneficiaryLookupResultDto>(beneficiaries.Count);
+        var matches = new List<BeneficiaryLookupResultDto>();
+        var registeredElsewhere = new List<OrganizationRefDto>();
         foreach (var beneficiary in beneficiaries)
         {
             var org = await uow.Organizations.GetByIdAsync(beneficiary.OrganizationId, cancellationToken);
             var orgName = org?.NameAr ?? string.Empty;
 
+            if (organizationId.HasValue && beneficiary.OrganizationId != organizationId.Value)
+            {
+                registeredElsewhere.Add(new OrganizationRefDto(beneficiary.OrganizationId, orgName));
+                continue;
+            }
+
             var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
             var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
 
-            results.Add(new BeneficiaryLookupResultDto(beneficiary.ToDto(orgName), preview, lastCompanions));
+            matches.Add(new BeneficiaryLookupResultDto(beneficiary.ToDto(orgName), preview, lastCompanions));
         }
 
-        return results;
+        return new CardLookupDto(matches, registeredElsewhere);
     }
 
     public async Task<Result<BeneficiaryLookupResultDto>> GetByIdAsync(
@@ -300,7 +308,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Beneficiary),
             entityId: beneficiary.Id.ToString(),
-            detailsJson: $"{{\"NewStatus\":\"{request.TargetStatus}\",\"Reason\":\"{request.Reason}\"}}",
+            detailsJson: AuditDetails.ToJson(new { NewStatus = request.TargetStatus.ToString(), request.Reason }),
             cancellationToken: cancellationToken);
 
         return beneficiary.ToDto(org?.NameAr ?? string.Empty);

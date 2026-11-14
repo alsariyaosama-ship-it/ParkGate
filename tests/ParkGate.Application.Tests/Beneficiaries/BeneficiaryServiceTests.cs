@@ -57,6 +57,27 @@ public sealed class BeneficiaryServiceTests
             new ChangeBeneficiaryStatusRequestValidator());
     }
 
+    [Theory]
+    [InlineData(630, 90)]  // 10 h 30 min since the last entry of a 12 h cooldown: 1 h 30 min left, not "1 hour"
+    [InlineData(719, 1)]   // seconds-level remainders round up, never down to 0
+    public async Task GetByIdAsync_DuringCooldown_ReturnsExactRemainingMinutesAndNextAllowedTime(int minutesSinceEntry, int expectedRemaining)
+    {
+        // R3.9: the preview carries the exact next allowed instant and remaining minutes; the UI formats them.
+        var now = _uowFactory.CurrentUow.CurrentDbTime;
+        var lastEntry = now.AddMinutes(-minutesSinceEntry).AddSeconds(-20);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-WAIT"), "Ali Omar", PhoneNumber.Create("0912345678"));
+        holder.RecordGrantedEntry(lastEntry);
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.GetByIdAsync(holder.Id);
+
+        result.IsSuccess.ShouldBeTrue();
+        var eligibility = result.Value.Eligibility;
+        eligibility.IsEligible.ShouldBeFalse();
+        eligibility.NextAllowedEntryUtc.ShouldBe(lastEntry.AddMinutes(720));
+        eligibility.RemainingCooldownMinutes.ShouldBe(expectedRemaining);
+    }
+
     [Fact]
     public async Task LookupByCardNumberAsync_WhenCardNotFound_ShouldReturnError()
     {
@@ -77,8 +98,9 @@ public sealed class BeneficiaryServiceTests
         var result = await _sut.LookupByCardNumberAsync("card-100");
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.Count.ShouldBe(1);
-        var item = result.Value[0];
+        result.Value.Matches.Count.ShouldBe(1);
+        result.Value.RegisteredElsewhere.ShouldBeEmpty();
+        var item = result.Value.Matches[0];
         item.Beneficiary.FullName.ShouldBe("Ali Omar");
         item.Beneficiary.CardNumber.ShouldBe("CARD-100");
         item.Eligibility.IsEligible.ShouldBeTrue();
@@ -97,8 +119,8 @@ public sealed class BeneficiaryServiceTests
         var result = await _sut.LookupByCardNumberAsync("١٢٣٤٥");
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.Count.ShouldBe(1);
-        result.Value[0].Beneficiary.CardNumber.ShouldBe("12345");
+        result.Value.Matches.Count.ShouldBe(1);
+        result.Value.Matches[0].Beneficiary.CardNumber.ShouldBe("12345");
     }
 
     [Fact]
@@ -117,9 +139,47 @@ public sealed class BeneficiaryServiceTests
         var result = await _sut.LookupByCardNumberAsync("CARD-SAME");
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.Count.ShouldBe(2);
-        result.Value.ShouldContain(h => h.Beneficiary.OrganizationName == "صندوق التضامن");
-        result.Value.ShouldContain(h => h.Beneficiary.OrganizationName == "التعليم");
+        result.Value.Matches.Count.ShouldBe(2);
+        result.Value.Matches.ShouldContain(h => h.Beneficiary.OrganizationName == "صندوق التضامن");
+        result.Value.Matches.ShouldContain(h => h.Beneficiary.OrganizationName == "التعليم");
+    }
+
+    // ── R3.8: lookup within the selected organization, and where else the card is registered ──
+
+    [Fact]
+    public async Task LookupByCardNumberAsync_CardOnlyInAnotherOrganization_ReportsWhereItIsRegistered()
+    {
+        var org2 = new Organization("EDU", "التعليم", cooldownMinutes: 720, isDefault: false, isActive: true);
+        typeof(Organization).GetProperty(nameof(Organization.Id))!.SetValue(org2, 2);
+        _organizations.Add(org2);
+        _beneficiaries.Add(new Beneficiary(Guid.NewGuid(), org2.Id, CardNumber.Create("CARD-ELSE"), "Holder Org 2", PhoneNumber.Create("0912345678")));
+
+        var result = await _sut.LookupByCardNumberAsync("CARD-ELSE", organizationId: _org.Id);
+
+        // Not "card not found": the desk can say "registered under «التعليم»" instead of offering a new registration.
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Matches.ShouldBeEmpty();
+        result.Value.RegisteredElsewhere.ShouldHaveSingleItem();
+        result.Value.RegisteredElsewhere[0].Id.ShouldBe(org2.Id);
+        result.Value.RegisteredElsewhere[0].NameAr.ShouldBe("التعليم");
+    }
+
+    [Fact]
+    public async Task LookupByCardNumberAsync_CardInSelectedAndAnotherOrganization_MatchesOnlyTheSelectedOne()
+    {
+        var org2 = new Organization("EDU", "التعليم", cooldownMinutes: 720, isDefault: false, isActive: true);
+        typeof(Organization).GetProperty(nameof(Organization.Id))!.SetValue(org2, 2);
+        _organizations.Add(org2);
+        var card = CardNumber.Create("CARD-BOTH");
+        _beneficiaries.AddRange([
+            new Beneficiary(Guid.NewGuid(), _org.Id, card, "Holder Org 1", PhoneNumber.Create("0912345678")),
+            new Beneficiary(Guid.NewGuid(), org2.Id, card, "Holder Org 2", PhoneNumber.Create("0912345678"))]);
+
+        var result = await _sut.LookupByCardNumberAsync("CARD-BOTH", organizationId: _org.Id);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Matches.ShouldHaveSingleItem().Beneficiary.FullName.ShouldBe("Holder Org 1");
+        result.Value.RegisteredElsewhere.ShouldHaveSingleItem().Id.ShouldBe(org2.Id);
     }
 
     [Fact]

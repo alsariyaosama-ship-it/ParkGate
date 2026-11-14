@@ -109,14 +109,7 @@ public sealed class SupervisorAuthDialogTests
     {
         var authService = new TestAuthService
         {
-            ValidateResult = Result<UserDto>.Success(new UserDto(
-                5,
-                "super",
-                "المشرف كمال",
-                UserRole.Supervisor,
-                true,
-                false,
-                null))
+            ApproveResult = Result<SupervisorApprovalDto>.Success(new SupervisorApprovalDto("token-5", 5, "المشرف كمال"))
         };
 
         using var form = new SupervisorAuthDialog(authService, null);
@@ -132,7 +125,7 @@ public sealed class SupervisorAuthDialogTests
         await form.SubmitAsync();
 
         form.DialogResult.ShouldBe(DialogResult.OK);
-        form.SupervisorUserId.ShouldBe(5);
+        form.ApprovalToken.ShouldBe("token-5");
         form.SupervisorFullName.ShouldBe("المشرف كمال");
         form.Reason.ShouldBe("تجاوز استثنائي بموافقة الإدارة");
         authService.ValidateCredentialsCallCount.ShouldBe(1);
@@ -143,7 +136,7 @@ public sealed class SupervisorAuthDialogTests
     {
         var authService = new TestAuthService
         {
-            ValidateResult = Result<UserDto>.Failure(Errors.Auth.InvalidCredentials)
+            ApproveResult = Result<SupervisorApprovalDto>.Failure(Errors.Auth.InvalidCredentials)
         };
 
         using var form = new SupervisorAuthDialog(authService, null);
@@ -164,21 +157,38 @@ public sealed class SupervisorAuthDialogTests
         authService.ValidateCredentialsCallCount.ShouldBe(1);
     }
 
+    [Fact]
+    public async Task SupervisorAuthDialog_WithoutAuthService_NeverApproves()
+    {
+        // R3.2: the old fallback approved as user 1 when no service was injected.
+        using var form = new SupervisorAuthDialog();
+
+        GetField<TextBox>(form, "_txtUsername").Text = "super";
+        GetField<TextBox>(form, "_txtPassword").Text = "superpass";
+        GetField<TextBox>(form, "_txtReason").Text = "تجاوز استثنائي بموافقة الإدارة";
+
+        await form.SubmitAsync();
+
+        form.DialogResult.ShouldNotBe(DialogResult.OK);
+        form.ApprovalToken.ShouldBeEmpty();
+        GetField<Label>(form, "_lblError").Text.ShouldBe(Strings.Error_Auth_SupervisorRequired);
+    }
+
     private sealed class TestAuthService : IAuthService
     {
         public int ValidateCredentialsCallCount { get; private set; }
-        public Result<UserDto> ValidateResult { get; set; } =
-            Result<UserDto>.Success(new UserDto(1, "admin", "Admin", UserRole.Admin, true, false, null));
+        public Result<SupervisorApprovalDto> ApproveResult { get; set; } =
+            Result<SupervisorApprovalDto>.Success(new SupervisorApprovalDto("token-1", 1, "Admin"));
 
-        public Task<Result<UserDto>> ValidateSupervisorCredentialsAsync(string userName, string password, CancellationToken cancellationToken = default)
+        public Task<Result<SupervisorApprovalDto>> AuthorizeSupervisorAsync(string userName, string password, CancellationToken cancellationToken = default)
         {
             ValidateCredentialsCallCount++;
-            return Task.FromResult(ValidateResult);
+            return Task.FromResult(ApproveResult);
         }
 
         public Task<bool> IsFirstRunAsync(CancellationToken cancellationToken = default) => Task.FromResult(false);
         public Task<Result<UserDto>> CompleteFirstRunAsync(FirstRunAdminRequest request, CancellationToken cancellationToken = default) =>
-            Task.FromResult(ValidateResult);
+            Task.FromResult(Result<UserDto>.Success(new UserDto(1, "admin", "Admin", UserRole.Admin, true, false, null)));
         public Task<Result<LoginResponse>> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
         public Task<Result> ChangePasswordAsync(ChangePasswordRequest request, CancellationToken cancellationToken = default) =>

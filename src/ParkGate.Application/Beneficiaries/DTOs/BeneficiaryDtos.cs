@@ -39,6 +39,17 @@ public sealed record BeneficiaryLookupResultDto(
     EligibilityPreviewDto Eligibility,
     IReadOnlyList<CompanionCountDto> LastCompanions);
 
+/// <summary>
+/// Result of a card lookup (R3.8). <see cref="Matches"/> are the holders in the selected organization, or in every
+/// organization when none is selected. <see cref="RegisteredElsewhere"/> lists the other organizations that have
+/// this card number, so the desk can say "registered under «X»" instead of "not registered".
+/// </summary>
+public sealed record CardLookupDto(
+    IReadOnlyList<BeneficiaryLookupResultDto> Matches,
+    IReadOnlyList<OrganizationRefDto> RegisteredElsewhere);
+
+public sealed record OrganizationRefDto(int Id, string NameAr);
+
 public sealed record RegisterBeneficiaryRequest(
     int OrganizationId,
     string CardNumber,

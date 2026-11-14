@@ -2,9 +2,9 @@ using FluentValidation;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
+using ParkGate.Application.Settings.Services;
 using ParkGate.Domain.Entities;
 using ParkGate.Domain.Enums;
 using ParkGate.Domain.Policies;
@@ -13,11 +13,15 @@ namespace ParkGate.Application.CheckIn.Services;
 
 public sealed class CheckInService : ICheckInService
 {
+    /// <summary>Rows the desk "today" grid shows; totals are not limited by it.</summary>
+    private const int RecentAttemptsShown = 20;
+
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IEntryEligibilityPolicy _eligibilityPolicy;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly ISettingsService _settings;
+    private readonly SupervisorApprovalStore _approvals;
     private readonly IValidator<RecordEntryRequest> _recordValidator;
     private readonly IValidator<OverrideEntryRequest> _overrideValidator;
     private readonly IValidator<VoidEntryRequest> _voidValidator;
@@ -25,18 +29,20 @@ public sealed class CheckInService : ICheckInService
     public CheckInService(
         IUnitOfWorkFactory uowFactory,
         IEntryEligibilityPolicy eligibilityPolicy,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
+        ISettingsService settings,
+        SupervisorApprovalStore approvals,
         IValidator<RecordEntryRequest> recordValidator,
         IValidator<OverrideEntryRequest> overrideValidator,
         IValidator<VoidEntryRequest> voidValidator)
     {
         _uowFactory = uowFactory;
         _eligibilityPolicy = eligibilityPolicy;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
+        _settings = settings;
+        _approvals = approvals;
         _recordValidator = recordValidator;
         _overrideValidator = overrideValidator;
         _voidValidator = voidValidator;
@@ -51,11 +57,20 @@ public sealed class CheckInService : ICheckInService
             return Errors.General.Forbidden;
         }
 
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
+        {
+            return actor.Error;
+        }
+
         var validation = await _recordValidator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
         {
             return validation.ToError();
         }
+
+        // Cached settings, read before the row lock is taken (R3.6).
+        var settings = await _settings.GetSettingsAsync(cancellationToken);
 
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(cancellationToken);
@@ -73,7 +88,8 @@ public sealed class CheckInService : ICheckInService
         }
 
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
-        var (defaultCooldown, maxGroupSize, denialDedupMinutes, timeZoneId) = await GetSettingsAsync(uow, cancellationToken);
+        var (defaultCooldown, maxGroupSize, denialDedupMinutes, timeZoneId) =
+            (settings.DefaultCooldownMinutes, settings.MaxGroupSize, settings.DenialDedupMinutes, settings.TimeZoneId);
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
         var companionList = request.Companions ?? [];
@@ -93,8 +109,7 @@ public sealed class CheckInService : ICheckInService
         var context = new EligibilityContext(org, holder, defaultCooldown, nowUtc, businessDate);
         var decision = _eligibilityPolicy.Evaluate(context);
 
-        var workstationId = _currentWorkstation.WorkstationId ?? 1;
-        var userId = _currentUser.UserId ?? 1;
+        var (userId, workstationId) = actor.Value;
 
         if (!decision.IsEligible)
         {
@@ -150,17 +165,10 @@ public sealed class CheckInService : ICheckInService
         holder.RecordGrantedEntry(nowUtc);
         uow.EntryAttempts.Add(attempt);
 
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryGranted", userId, workstationId, nameof(EntryAttempt), attemptId.ToString(), AuditDetails.ToJson(new { attempt.TotalPersons })));
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
-            action: "EntryGranted",
-            userId: userId,
-            workstationId: workstationId,
-            entityName: nameof(EntryAttempt),
-            entityId: attemptId.ToString(),
-            detailsJson: $"{{\"TotalPersons\":{attempt.TotalPersons}}}",
-            cancellationToken: cancellationToken);
 
         return new CheckInResultDto(
             AttemptId: attempt.Id,
@@ -180,16 +188,14 @@ public sealed class CheckInService : ICheckInService
         OverrideEntryRequest request,
         CancellationToken cancellationToken = default)
     {
-        int approverUserId;
-        if (_currentUser.Has(Permission.OverrideDenial))
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
         {
-            approverUserId = _currentUser.UserId!.Value;
+            return actor.Error;
         }
-        else if (request.SupervisorUserId.HasValue)
-        {
-            approverUserId = request.SupervisorUserId.Value;
-        }
-        else
+
+        var canApproveSelf = _currentUser.Has(Permission.OverrideDenial);
+        if (!canApproveSelf && request.SupervisorApprovalToken is null)
         {
             return Errors.Auth.SupervisorRequired;
         }
@@ -199,6 +205,21 @@ public sealed class CheckInService : ICheckInService
         {
             return validation.ToError();
         }
+
+        // R3.2: the approver comes from a single-use token issued after the supervisor signed in, never from an id
+        // the UI supplies. The token is spent only once the request is valid.
+        int approverUserId;
+        if (canApproveSelf)
+        {
+            approverUserId = actor.Value.UserId;
+        }
+        else if (!_approvals.TryConsume(request.SupervisorApprovalToken, actor.Value.WorkstationId, out approverUserId))
+        {
+            return Errors.Auth.SupervisorRequired;
+        }
+
+        // Cached settings, read before the row lock is taken (R3.6).
+        var settings = await _settings.GetSettingsAsync(cancellationToken);
 
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(cancellationToken);
@@ -222,7 +243,7 @@ public sealed class CheckInService : ICheckInService
         }
 
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
-        var (defaultCooldown, maxGroupSize, _, timeZoneId) = await GetSettingsAsync(uow, cancellationToken);
+        var (defaultCooldown, maxGroupSize, timeZoneId) = (settings.DefaultCooldownMinutes, settings.MaxGroupSize, settings.TimeZoneId);
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
         var companionList = request.Companions ?? [];
@@ -254,8 +275,7 @@ public sealed class CheckInService : ICheckInService
             .Select(c => new EntryAttemptCompanion(c.AgeCategoryId, c.Count))
             .ToList();
 
-        var workstationId = _currentWorkstation.WorkstationId ?? 1;
-        var userId = _currentUser.UserId ?? approverUserId;
+        var (userId, workstationId) = actor.Value;
 
         var attempt = EntryAttempt.CreateOverridden(
             attemptId,
@@ -275,17 +295,10 @@ public sealed class CheckInService : ICheckInService
         holder.RecordGrantedEntry(nowUtc);
         uow.EntryAttempts.Add(attempt);
 
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryOverridden", approverUserId, workstationId, nameof(EntryAttempt), attemptId.ToString(), AuditDetails.ToJson(new { request.Reason, attempt.TotalPersons })));
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
-            action: "EntryOverridden",
-            userId: approverUserId,
-            workstationId: workstationId,
-            entityName: nameof(EntryAttempt),
-            entityId: attemptId.ToString(),
-            detailsJson: $"{{\"Reason\":\"{request.Reason}\",\"TotalPersons\":{attempt.TotalPersons}}}",
-            cancellationToken: cancellationToken);
 
         return new CheckInResultDto(
             AttemptId: attempt.Id,
@@ -303,22 +316,16 @@ public sealed class CheckInService : ICheckInService
 
     public async Task<Result> VoidEntryAsync(
         VoidEntryRequest request,
-        int? supervisorUserId = null,
+        string? approvalToken = null,
         CancellationToken cancellationToken = default)
     {
-        var voidedByUserId = supervisorUserId ?? _currentUser.UserId ?? 0;
-
-        if (supervisorUserId.HasValue)
+        var actor = Actor.Resolve(_currentUser, _currentWorkstation);
+        if (actor.IsFailure)
         {
-            await using var uowCheck = _uowFactory.Create();
-            var approver = await uowCheck.Users.GetByIdAsync(supervisorUserId.Value, cancellationToken);
-            if (approver is null || !approver.IsActive || (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
-            {
-                return Errors.Auth.SupervisorRequired;
-            }
-            voidedByUserId = supervisorUserId.Value;
+            return actor.Error;
         }
-        else if (!_currentUser.Has(Permission.VoidEntry))
+
+        if (approvalToken is null && !_currentUser.Has(Permission.VoidEntry))
         {
             return Errors.General.Forbidden;
         }
@@ -327,6 +334,23 @@ public sealed class CheckInService : ICheckInService
         if (!validation.IsValid)
         {
             return validation.ToError();
+        }
+
+        // R3.2: with a token, the supervisor who signed in on this desk is the one who voids.
+        var voidedByUserId = actor.Value.UserId;
+        if (approvalToken is not null)
+        {
+            if (!_approvals.TryConsume(approvalToken, actor.Value.WorkstationId, out voidedByUserId))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
+
+            await using var uowCheck = _uowFactory.Create();
+            var approver = await uowCheck.Users.GetByIdAsync(voidedByUserId, cancellationToken);
+            if (approver is null || !approver.IsActive || (approver.Role != UserRole.Supervisor && approver.Role != UserRole.Admin))
+            {
+                return Errors.Auth.SupervisorRequired;
+            }
         }
 
         await using var uow = _uowFactory.Create();
@@ -362,17 +386,10 @@ public sealed class CheckInService : ICheckInService
         var latestRemaining = await uow.Beneficiaries.GetLatestGrantedEntryUtcAsync(holder.Id, cancellationToken);
         holder.RecalculateLastGrantedEntry(latestRemaining);
 
+        // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryVoided", voidedByUserId, actor.Value.WorkstationId, nameof(EntryAttempt), attempt.Id.ToString(), AuditDetails.ToJson(new { request.Reason })));
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
-            action: "EntryVoided",
-            userId: voidedByUserId,
-            workstationId: _currentWorkstation.WorkstationId,
-            entityName: nameof(EntryAttempt),
-            entityId: attempt.Id.ToString(),
-            detailsJson: $"{{\"Reason\":\"{request.Reason}\"}}",
-            cancellationToken: cancellationToken);
 
         return Result.Success();
     }
@@ -388,41 +405,34 @@ public sealed class CheckInService : ICheckInService
 
         await using var uow = _uowFactory.Create();
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
-        var (_, _, _, timeZoneId) = await GetSettingsAsync(uow, cancellationToken);
+        var timeZoneId = (await _settings.GetSettingsAsync(cancellationToken)).TimeZoneId;
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
-        var targetWorkstationId = workstationId ?? _currentWorkstation.WorkstationId ?? 1;
+        if ((workstationId ?? _currentWorkstation.WorkstationId) is not { } targetWorkstationId)
+        {
+            return Errors.Auth.WorkstationNotFound;
+        }
+
         var workstation = await uow.Workstations.GetByIdAsync(targetWorkstationId, cancellationToken);
         var workstationName = workstation?.DisplayName ?? _currentWorkstation.DisplayName ?? "Desk";
 
-        var attempts = await uow.EntryAttempts.GetTodayByWorkstationIdAsync(targetWorkstationId, businessDate, 50, cancellationToken);
+        // Totals come from an aggregate over the whole day; the list feeds the grid only (R3.1).
+        var totals = await uow.EntryAttempts.GetTodayTotalsAsync(targetWorkstationId, businessDate, cancellationToken);
+        var attempts = await uow.EntryAttempts.GetTodayByWorkstationIdAsync(targetWorkstationId, businessDate, RecentAttemptsShown, cancellationToken);
         var activeCategories = await uow.AgeCategories.GetAllActiveAsync(cancellationToken);
 
-        var totalGranted = attempts.Count(a => a.Result == EntryResult.Allowed && !a.IsVoided);
-        var totalDenied = attempts.Count(a => a.Result == EntryResult.Denied);
-        var totalOverridden = attempts.Count(a => a.Result == EntryResult.Overridden && !a.IsVoided);
-        var totalPersons = attempts.Where(a => !a.IsVoided && (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)).Sum(a => a.TotalPersons);
+        var categoryTotals = activeCategories
+            .Select(cat => new CompanionCountDto(cat.Id, cat.NameAr, totals.CompanionsByCategory.GetValueOrDefault(cat.Id)))
+            .ToList();
 
-        var categoryTotals = new List<CompanionCountDto>();
-        foreach (var cat in activeCategories)
-        {
-            var countForCat = attempts
-                .Where(a => !a.IsVoided && (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden))
-                .SelectMany(a => a.Companions)
-                .Where(c => c.AgeCategoryId == cat.Id)
-                .Sum(c => c.Count);
-
-            categoryTotals.Add(new CompanionCountDto(cat.Id, cat.NameAr, countForCat));
-        }
-
-        var attemptBeneficiaryIds = attempts.Take(20).Select(a => a.BeneficiaryId).Distinct().ToList();
+        var attemptBeneficiaryIds = attempts.Select(a => a.BeneficiaryId).Distinct().ToList();
         var beneficiaries = await uow.Beneficiaries.GetByIdsAsync(attemptBeneficiaryIds, cancellationToken);
         var beneficiariesMap = beneficiaries.ToDictionary(b => b.Id, b => (CardNumber: b.CardNumber.Value, FullName: b.FullName));
 
         var allOrgs = await uow.Organizations.GetAllAsync(false, cancellationToken);
         var orgMap = allOrgs.ToDictionary(o => o.Id, o => o.NameAr);
 
-        var recentAttemptDtos = attempts.Take(20).Select(a =>
+        var recentAttemptDtos = attempts.Select(a =>
         {
             beneficiariesMap.TryGetValue(a.BeneficiaryId, out var bInfo);
             orgMap.TryGetValue(a.OrganizationId, out var orgName);
@@ -443,10 +453,10 @@ public sealed class CheckInService : ICheckInService
             BusinessDate: businessDate,
             WorkstationId: targetWorkstationId,
             WorkstationName: workstationName,
-            TotalGranted: totalGranted,
-            TotalDenied: totalDenied,
-            TotalOverridden: totalOverridden,
-            TotalPersons: totalPersons,
+            TotalGranted: totals.Granted,
+            TotalDenied: totals.Denied,
+            TotalOverridden: totals.Overridden,
+            TotalPersons: totals.Persons,
             PersonsPerCategory: categoryTotals,
             RecentAttempts: recentAttemptDtos);
 
@@ -483,38 +493,4 @@ public sealed class CheckInService : ICheckInService
         return counted > org.MaxFreeCompanions.Value;
     }
 
-    private static async Task<(int DefaultCooldownMinutes, int MaxGroupSize, int DenialDedupMinutes, string TimeZoneId)> GetSettingsAsync(
-        IUnitOfWork uow,
-        CancellationToken cancellationToken)
-    {
-        int defaultCooldown = 720;
-        var cdSetting = await uow.AppSettings.GetByKeyAsync("Entry.DefaultCooldownMinutes", cancellationToken);
-        if (cdSetting is not null && int.TryParse(cdSetting.Value, out var parsedCd))
-        {
-            defaultCooldown = parsedCd;
-        }
-
-        int maxGroupSize = 10;
-        var groupSetting = await uow.AppSettings.GetByKeyAsync("Entry.MaxGroupSize", cancellationToken);
-        if (groupSetting is not null && int.TryParse(groupSetting.Value, out var parsedGroup))
-        {
-            maxGroupSize = parsedGroup;
-        }
-
-        int denialDedup = 5;
-        var dedupSetting = await uow.AppSettings.GetByKeyAsync("Entry.DenialDedupMinutes", cancellationToken);
-        if (dedupSetting is not null && int.TryParse(dedupSetting.Value, out var parsedDedup))
-        {
-            denialDedup = parsedDedup;
-        }
-
-        string timeZoneId = "Libya Standard Time";
-        var tzSetting = await uow.AppSettings.GetByKeyAsync("Park.TimeZoneId", cancellationToken);
-        if (tzSetting is not null && !string.IsNullOrWhiteSpace(tzSetting.Value))
-        {
-            timeZoneId = tzSetting.Value;
-        }
-
-        return (defaultCooldown, maxGroupSize, denialDedup, timeZoneId);
-    }
 }

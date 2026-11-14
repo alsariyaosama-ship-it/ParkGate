@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using ParkGate.Application.EntryCards;
+using ParkGate.Application.Common;
 using ParkGate.Application.Ports.EntryCards;
+using ParkGate.Application.Tests.Common;
 using ParkGate.Domain.EntryCards;
 using Shouldly;
 
@@ -200,13 +202,13 @@ public sealed class EntryCardsTests
         using var signer = new QrTokenSigner(ECDsa.Create(_issuingKey.ExportParameters(true)), KeyId);
         using var verifier = new QrTokenVerifier([new QrPublicKey(KeyId, _issuingKey.ExportSubjectPublicKeyInfo())]);
 
-        var clock = new FakeTimeProvider(new DateTimeOffset(2026, 10, 8, 21, 0, 0, TimeSpan.FromHours(2)));
         var repo = new FakeEntryCardRepository();
         var log = new FakeCardScanLog();
         var station = new GateStation("GATE-1");
 
-        var issuer = new EntryCardIssuer(signer, repo, clock, new EntryCardOptions { ValidityDays = 365 });
-        var scanner = new CardScanService(verifier, repo, log, clock, station);
+        var parkClock = new ParkClock(ScanTestUow(), new StubSettingsService());
+        var issuer = new EntryCardIssuer(signer, repo, parkClock, new EntryCardOptions { ValidityDays = 365 });
+        var scanner = new CardScanService(verifier, repo, log, parkClock, station);
 
         var beneficiaryId = Guid.NewGuid();
 
@@ -239,10 +241,51 @@ public sealed class EntryCardsTests
         log.Entries.Count.ShouldBe(4);
     }
 
-    private sealed class FakeTimeProvider(DateTimeOffset now) : TimeProvider
+    // ── R3.7: expiry is checked against the park's business date from the database clock ──
+
+    [Theory]
+    [InlineData("2026-11-13T21:30:00Z", CardScanStatus.Accepted)] // 23:30 in Tripoli: still the 13th
+    [InlineData("2026-11-13T22:30:00Z", CardScanStatus.Expired)]  // 00:30 in Tripoli: already the 14th
+    public async Task ScanAsync_CardExpiringOnThe13th_UsesTheDatabaseClockInTheParkTimeZone(string dbUtcNow, CardScanStatus expected)
     {
-        public override DateTimeOffset GetUtcNow() => now.ToUniversalTime();
-        public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.CreateCustomTimeZone("Custom", now.Offset, "Custom", "Custom");
+        using var signer = new QrTokenSigner(ECDsa.Create(_issuingKey.ExportParameters(true)), KeyId);
+        using var verifier = new QrTokenVerifier([new QrPublicKey(KeyId, _issuingKey.ExportSubjectPublicKeyInfo())]);
+        var repo = new FakeEntryCardRepository();
+        var cardId = QrTokenSigner.NewCardId();
+        await repo.ReplaceActiveCardAsync(Guid.NewGuid(), cardId, KeyId, new DateOnly(2026, 11, 13));
+
+        var uowFactory = new FakeUnitOfWorkFactory();
+        uowFactory.CurrentUow.CurrentDbTime = DateTime.Parse(dbUtcNow, null, System.Globalization.DateTimeStyles.AdjustToUniversal);
+        var parkClock = new ParkClock(uowFactory, new StubSettingsService());
+        var scanner = new CardScanService(verifier, repo, new FakeCardScanLog(), parkClock, new GateStation("GATE-1"));
+
+        var result = await scanner.ScanAsync(signer.Encode(cardId, new DateOnly(2026, 11, 13)));
+
+        result.Status.ShouldBe(expected);
+    }
+
+    [Fact]
+    public async Task IssueAsync_AfterMidnightInTheParkButNotInUtc_CountsValidityFromTheParkBusinessDate()
+    {
+        // R3.10: 22:30 UTC on the 13th is 00:30 on the 14th in Tripoli.
+        using var signer = new QrTokenSigner(ECDsa.Create(_issuingKey.ExportParameters(true)), KeyId);
+        var uowFactory = new FakeUnitOfWorkFactory();
+        uowFactory.CurrentUow.CurrentDbTime = new DateTime(2026, 11, 13, 22, 30, 0, DateTimeKind.Utc);
+        var issuer = new EntryCardIssuer(
+            signer, new FakeEntryCardRepository(), new ParkClock(uowFactory, new StubSettingsService()),
+            new EntryCardOptions { ValidityDays = 365 });
+
+        var card = await issuer.IssueAsync(Guid.NewGuid());
+
+        card.ExpiresOn.ShouldBe(new DateOnly(2026, 11, 14).AddDays(365));
+    }
+
+    /// <summary>Database clock of the workflow test: 21:00 on 8 October 2026 in Tripoli.</summary>
+    private static FakeUnitOfWorkFactory ScanTestUow()
+    {
+        var uowFactory = new FakeUnitOfWorkFactory();
+        uowFactory.CurrentUow.CurrentDbTime = new DateTime(2026, 10, 8, 19, 0, 0, DateTimeKind.Utc);
+        return uowFactory;
     }
 
     private sealed class FakeEntryCardRepository : IEntryCardRepository
