@@ -285,11 +285,38 @@ public partial class CheckInDeskControl : UserControl
                 break;
 
             case Keys.Escape:
+                if (_cmbOrganization.DroppedDown || _cmbRegOrganization.DroppedDown)
+                {
+                    // Esc closes the open list; it must not also reset the desk (R4.5).
+                    break;
+                }
+
+                if (!ConfirmDiscardRegistration())
+                {
+                    return true;
+                }
+
                 ResetDesk();
                 return true;
         }
 
         return base.ProcessCmdKey(ref msg, keyData);
+    }
+
+    /// <summary>
+    /// True when nothing would be lost, or the operator agreed to discard a half-filled registration (R4.5).
+    /// Without a notify service nothing is discarded.
+    /// </summary>
+    private bool ConfirmDiscardRegistration()
+    {
+        var hasInput = _grpRegistration.Visible &&
+            (!string.IsNullOrWhiteSpace(_txtRegFullName.Text) ||
+             !string.IsNullOrWhiteSpace(_txtRegPhone.Text) ||
+             !string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ||
+             !string.IsNullOrWhiteSpace(_txtRegNotes.Text) ||
+             _dtpRegExpiry.Checked);
+
+        return !hasInput || (_notifyService?.Confirm(Strings.Confirm_DiscardRegistration, Strings.Title_Warning) ?? false);
     }
 
     public async Task OnDeskLoadedAsync()

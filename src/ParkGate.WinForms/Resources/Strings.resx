@@ -1643,4 +1643,7 @@
   <data name="Text_ListSeparator" xml:space="preserve">
     <value>، </value>
   </data>
+  <data name="Confirm_DiscardRegistration" xml:space="preserve">
+    <value>في نموذج التسجيل بيانات لم تُحفظ. هل تريد تجاهلها؟</value>
+  </data>
 </root>

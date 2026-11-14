@@ -606,6 +606,43 @@ public sealed class CheckInDeskControlTests
         banner.State.ShouldBe(BannerState.Granted);
     }
 
+    // ── R4.5: Esc does not silently discard a half-filled registration ──────
+
+    private static bool PressEscape(CheckInDeskControl control) =>
+        (bool)typeof(CheckInDeskControl)
+            .GetMethod("ProcessCmdKey", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(control, [new Message(), Keys.Escape])!;
+
+    [Theory]
+    [InlineData(false, true)]  // operator says "keep": the form and the typed name stay
+    [InlineData(true, false)]  // operator confirms: the desk resets
+    public void CheckInDeskControl_Escape_OnHalfFilledRegistration_AsksFirst(bool confirm, bool formStays)
+    {
+        var notify = new FakeNotifyService(confirm);
+        using var control = new CheckInDeskControl(null, null, null, null, null, null, null, null, notify, null);
+        control.ShowInlineRegistration("888");
+        GetField<TextBox>(control, "_txtRegFullName").Text = "سالم محمود";
+
+        PressEscape(control).ShouldBeTrue();
+
+        notify.ConfirmCalls.ShouldBe(1);
+        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBe(formStays);
+        GetField<TextBox>(control, "_txtRegFullName").Text.ShouldBe(formStays ? "سالم محمود" : string.Empty);
+    }
+
+    [Fact]
+    public void CheckInDeskControl_Escape_OnEmptyRegistration_ResetsWithoutAsking()
+    {
+        var notify = new FakeNotifyService(confirmAnswer: false);
+        using var control = new CheckInDeskControl(null, null, null, null, null, null, null, null, notify, null);
+        control.ShowInlineRegistration("889");
+
+        PressEscape(control).ShouldBeTrue();
+
+        notify.ConfirmCalls.ShouldBe(0);
+        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBeFalse();
+    }
+
     [Fact]
     public void BusyScope_RestoresEachControlsPreviousEnabledState()
     {
@@ -830,6 +867,21 @@ public sealed class CheckInDeskControlTests
         public Task<ParkGate.Application.Common.Result> DeactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public Task<ParkGate.Application.Common.Result> ReactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> SetPolicyAsync(ParkGate.Application.Organizations.DTOs.SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    }
+
+    private sealed class FakeNotifyService(bool confirmAnswer) : ParkGate.WinForms.Services.INotifyService
+    {
+        public int ConfirmCalls { get; private set; }
+
+        public void Info(string message, string? title = null) { }
+        public void Warning(string message, string? title = null) { }
+        public void Error(string message, string? title = null) { }
+
+        public bool Confirm(string message, string? title = null)
+        {
+            ConfirmCalls++;
+            return confirmAnswer;
+        }
     }
 
     private sealed class FakeCheckInService : ParkGate.Application.CheckIn.Services.ICheckInService
