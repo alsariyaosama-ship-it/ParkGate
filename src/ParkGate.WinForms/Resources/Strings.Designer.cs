@@ -661,4 +661,6 @@ internal class Strings
     internal static string Col_Gift_Reason => GetString(nameof(Col_Gift_Reason));
     internal static string Msg_ExportExcelSuccess => GetString(nameof(Msg_ExportExcelSuccess));
     internal static string Msg_NoGiftReceiptsFound => GetString(nameof(Msg_NoGiftReceiptsFound));
+    internal static string Label_RegOrganization => GetString(nameof(Label_RegOrganization));
+    internal static string Val_RegOrganizationRequired => GetString(nameof(Val_RegOrganizationRequired));
 }

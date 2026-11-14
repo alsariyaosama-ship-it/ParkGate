@@ -123,6 +123,7 @@ public partial class CheckInDeskControl : UserControl
 
         // Inline Registration
         _grpRegistration.Text = Strings.Title_InlineRegistration;
+        _lblRegOrganization.Text = Strings.Label_RegOrganization;
         _lblRegFullName.Text = Strings.Label_RegFullName;
         _lblRegPhone.Text = Strings.Label_RegPhone;
         _lblRegNationalId.Text = Strings.Label_RegNationalId;
@@ -341,9 +342,12 @@ public partial class CheckInDeskControl : UserControl
             _cmbOrganization.Items.Clear();
             _cmbOrganization.Items.Add(new OrgComboItem(null, Strings.Filter_AllOrganizations));
 
+            // The registration panel offers real organizations only, never «الكل» (R4.3).
+            _cmbRegOrganization.Items.Clear();
             foreach (var org in orgs)
             {
                 _cmbOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
+                _cmbRegOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
             }
 
             _cmbOrganization.SelectedIndex = 0;
@@ -668,12 +672,24 @@ public partial class CheckInDeskControl : UserControl
         _txtRegNationalId.Clear();
         _dtpRegExpiry.Checked = false;
         _txtRegNotes.Clear();
+        SelectRegistrationOrganization(orgId ?? (_cmbOrganization.SelectedItem as OrgComboItem)?.Id);
 
         _statusBanner.SetWarning("البطاقة غير مسجلة — يرجى تسجيل بيانات المستفيد", "أدخل الاسم الرباعي ورقم الهاتف للمتابعة");
         _btnRecordEntry.Enabled = false;
         _btnOverride.Enabled = false;
 
         _txtRegFullName.Focus();
+    }
+
+    /// <summary>
+    /// Preselects the organization for a new holder: the one asked for (the filter), else the default organization.
+    /// Leaves it empty when neither exists, so the operator must choose (R4.3).
+    /// </summary>
+    private void SelectRegistrationOrganization(int? preferredOrgId)
+    {
+        var targetId = preferredOrgId ?? _organizations.FirstOrDefault(o => o.IsDefault)?.Id;
+        var match = _cmbRegOrganization.Items.OfType<OrgComboItem>().FirstOrDefault(i => i.Id == targetId);
+        _cmbRegOrganization.SelectedItem = match;
     }
 
     public void HideInlineRegistration()
@@ -899,12 +915,19 @@ public partial class CheckInDeskControl : UserControl
         }
     }
 
-    private async Task SaveInlineRegistrationAsync()
+    internal async Task SaveInlineRegistrationAsync()
     {
         var fullName = _txtRegFullName.Text.Trim();
         var phone = _txtRegPhone.Text.Trim();
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
-        var selectedOrgId = (_cmbOrganization.SelectedItem as OrgComboItem)?.Id;
+        var registrationOrgId = (_cmbRegOrganization.SelectedItem as OrgComboItem)?.Id;
+
+        if (registrationOrgId is null)
+        {
+            _notifyService?.Warning(Strings.Val_RegOrganizationRequired, Strings.Title_Warning);
+            _cmbRegOrganization.Focus();
+            return;
+        }
 
         if (string.IsNullOrWhiteSpace(fullName))
         {
@@ -929,16 +952,7 @@ public partial class CheckInDeskControl : UserControl
         {
             try
             {
-                int orgId;
-                if (selectedOrgId.HasValue)
-                {
-                    orgId = selectedOrgId.Value;
-                }
-                else
-                {
-                    var orgs = await _orgService?.GetAllAsync(activeOnly: true)!;
-                    orgId = orgs?.FirstOrDefault()?.Id ?? 1;
-                }
+                var orgId = registrationOrgId.Value;
 
                 DateOnly? expiry = _dtpRegExpiry.Checked ? DateOnly.FromDateTime(_dtpRegExpiry.Value) : null;
                 var natId = string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ? null : _txtRegNationalId.Text.Trim();

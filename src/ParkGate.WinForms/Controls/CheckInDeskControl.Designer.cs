@@ -32,6 +32,8 @@ partial class CheckInDeskControl
         this._splitMiddle = new System.Windows.Forms.SplitContainer();
         this._grpRegistration = new System.Windows.Forms.GroupBox();
         this._tblRegistration = new System.Windows.Forms.TableLayoutPanel();
+        this._lblRegOrganization = new System.Windows.Forms.Label();
+        this._cmbRegOrganization = new System.Windows.Forms.ComboBox();
         this._lblRegFullName = new System.Windows.Forms.Label();
         this._txtRegFullName = new System.Windows.Forms.TextBox();
         this._lblRegPhone = new System.Windows.Forms.Label();
@@ -246,7 +248,7 @@ partial class CheckInDeskControl
         this._grpRegistration.Location = new System.Drawing.Point(0, 0);
         this._grpRegistration.Name = "_grpRegistration";
         this._grpRegistration.Padding = new System.Windows.Forms.Padding(8);
-        this._grpRegistration.Size = new System.Drawing.Size(500, 254);
+        this._grpRegistration.Size = new System.Drawing.Size(500, 289);
         this._grpRegistration.TabIndex = 1;
         this._grpRegistration.TabStop = false;
         this._grpRegistration.Text = "تسجيل زبون جديد (فوري)";
@@ -257,31 +259,56 @@ partial class CheckInDeskControl
         this._tblRegistration.ColumnCount = 2;
         this._tblRegistration.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 165F));
         this._tblRegistration.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-        this._tblRegistration.Controls.Add(this._lblRegFullName, 0, 0);
-        this._tblRegistration.Controls.Add(this._txtRegFullName, 1, 0);
-        this._tblRegistration.Controls.Add(this._lblRegPhone, 0, 1);
-        this._tblRegistration.Controls.Add(this._txtRegPhone, 1, 1);
-        this._tblRegistration.Controls.Add(this._lblRegNationalId, 0, 2);
-        this._tblRegistration.Controls.Add(this._txtRegNationalId, 1, 2);
-        this._tblRegistration.Controls.Add(this._lblRegExpiry, 0, 3);
-        this._tblRegistration.Controls.Add(this._dtpRegExpiry, 1, 3);
-        this._tblRegistration.Controls.Add(this._lblRegNotes, 0, 4);
-        this._tblRegistration.Controls.Add(this._txtRegNotes, 1, 4);
-        this._tblRegistration.Controls.Add(this._pnlRegActions, 1, 5);
+        this._tblRegistration.Controls.Add(this._lblRegOrganization, 0, 0);
+        this._tblRegistration.Controls.Add(this._cmbRegOrganization, 1, 0);
+        this._tblRegistration.Controls.Add(this._lblRegFullName, 0, 1);
+        this._tblRegistration.Controls.Add(this._txtRegFullName, 1, 1);
+        this._tblRegistration.Controls.Add(this._lblRegPhone, 0, 2);
+        this._tblRegistration.Controls.Add(this._txtRegPhone, 1, 2);
+        this._tblRegistration.Controls.Add(this._lblRegNationalId, 0, 3);
+        this._tblRegistration.Controls.Add(this._txtRegNationalId, 1, 3);
+        this._tblRegistration.Controls.Add(this._lblRegExpiry, 0, 4);
+        this._tblRegistration.Controls.Add(this._dtpRegExpiry, 1, 4);
+        this._tblRegistration.Controls.Add(this._lblRegNotes, 0, 5);
+        this._tblRegistration.Controls.Add(this._txtRegNotes, 1, 5);
+        this._tblRegistration.Controls.Add(this._pnlRegActions, 1, 6);
         this._tblRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblRegistration.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         this._tblRegistration.Location = new System.Drawing.Point(8, 26);
         this._tblRegistration.Name = "_tblRegistration";
-        this._tblRegistration.RowCount = 6;
+        this._tblRegistration.RowCount = 7;
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
-        this._tblRegistration.Size = new System.Drawing.Size(484, 220);
+        this._tblRegistration.Size = new System.Drawing.Size(484, 255);
         this._tblRegistration.TabIndex = 0;
+        // 
+        // _lblRegOrganization
+        // 
+        this._lblRegOrganization.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this._lblRegOrganization.AutoSize = true;
+        this._lblRegOrganization.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblRegOrganization.Location = new System.Drawing.Point(437, 7);
+        this._lblRegOrganization.Name = "_lblRegOrganization";
+        this._lblRegOrganization.Size = new System.Drawing.Size(44, 17);
+        this._lblRegOrganization.TabIndex = 0;
+        this._lblRegOrganization.Text = "الجهة:";
+        // 
+        // _cmbRegOrganization
+        // 
+        this._cmbRegOrganization.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._cmbRegOrganization.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+        this._cmbRegOrganization.FormattingEnabled = true;
+        this._cmbRegOrganization.Location = new System.Drawing.Point(3, 4);
+        this._cmbRegOrganization.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+        this._cmbRegOrganization.Name = "_cmbRegOrganization";
+        this._cmbRegOrganization.Size = new System.Drawing.Size(348, 24);
+        this._cmbRegOrganization.TabIndex = 1;
         // 
         // _lblRegFullName
         // 
@@ -291,7 +318,7 @@ partial class CheckInDeskControl
         this._lblRegFullName.Location = new System.Drawing.Point(395, 7);
         this._lblRegFullName.Name = "_lblRegFullName";
         this._lblRegFullName.Size = new System.Drawing.Size(86, 17);
-        this._lblRegFullName.TabIndex = 0;
+        this._lblRegFullName.TabIndex = 2;
         this._lblRegFullName.Text = "الاسم الرباعي:";
         // 
         // _txtRegFullName
@@ -302,7 +329,7 @@ partial class CheckInDeskControl
         this._txtRegFullName.MaxLength = 100;
         this._txtRegFullName.Name = "_txtRegFullName";
         this._txtRegFullName.Size = new System.Drawing.Size(348, 24);
-        this._txtRegFullName.TabIndex = 1;
+        this._txtRegFullName.TabIndex = 3;
         // 
         // _lblRegPhone
         // 
@@ -312,7 +339,7 @@ partial class CheckInDeskControl
         this._lblRegPhone.Location = new System.Drawing.Point(407, 39);
         this._lblRegPhone.Name = "_lblRegPhone";
         this._lblRegPhone.Size = new System.Drawing.Size(74, 17);
-        this._lblRegPhone.TabIndex = 2;
+        this._lblRegPhone.TabIndex = 4;
         this._lblRegPhone.Text = "رقم الهاتف:";
         // 
         // _txtRegPhone
@@ -323,7 +350,7 @@ partial class CheckInDeskControl
         this._txtRegPhone.MaxLength = 20;
         this._txtRegPhone.Name = "_txtRegPhone";
         this._txtRegPhone.Size = new System.Drawing.Size(348, 24);
-        this._txtRegPhone.TabIndex = 3;
+        this._txtRegPhone.TabIndex = 5;
         // 
         // _lblRegNationalId
         // 
@@ -332,7 +359,7 @@ partial class CheckInDeskControl
         this._lblRegNationalId.Location = new System.Drawing.Point(365, 71);
         this._lblRegNationalId.Name = "_lblRegNationalId";
         this._lblRegNationalId.Size = new System.Drawing.Size(116, 17);
-        this._lblRegNationalId.TabIndex = 4;
+        this._lblRegNationalId.TabIndex = 6;
         this._lblRegNationalId.Text = "الرقم الوطني (اختياري):";
         // 
         // _txtRegNationalId
@@ -343,7 +370,7 @@ partial class CheckInDeskControl
         this._txtRegNationalId.MaxLength = 12;
         this._txtRegNationalId.Name = "_txtRegNationalId";
         this._txtRegNationalId.Size = new System.Drawing.Size(348, 24);
-        this._txtRegNationalId.TabIndex = 5;
+        this._txtRegNationalId.TabIndex = 7;
         // 
         // _lblRegExpiry
         // 
@@ -352,7 +379,7 @@ partial class CheckInDeskControl
         this._lblRegExpiry.Location = new System.Drawing.Point(367, 103);
         this._lblRegExpiry.Name = "_lblRegExpiry";
         this._lblRegExpiry.Size = new System.Drawing.Size(114, 17);
-        this._lblRegExpiry.TabIndex = 6;
+        this._lblRegExpiry.TabIndex = 8;
         this._lblRegExpiry.Text = "صلاحية البطاقة (اختياري):";
         // 
         // _dtpRegExpiry
@@ -366,7 +393,7 @@ partial class CheckInDeskControl
         this._dtpRegExpiry.Name = "_dtpRegExpiry";
         this._dtpRegExpiry.ShowCheckBox = true;
         this._dtpRegExpiry.Size = new System.Drawing.Size(348, 24);
-        this._dtpRegExpiry.TabIndex = 7;
+        this._dtpRegExpiry.TabIndex = 9;
         // 
         // _lblRegNotes
         // 
@@ -375,7 +402,7 @@ partial class CheckInDeskControl
         this._lblRegNotes.Location = new System.Drawing.Point(427, 137);
         this._lblRegNotes.Name = "_lblRegNotes";
         this._lblRegNotes.Size = new System.Drawing.Size(54, 17);
-        this._lblRegNotes.TabIndex = 8;
+        this._lblRegNotes.TabIndex = 10;
         this._lblRegNotes.Text = "ملاحظات:";
         // 
         // _txtRegNotes
@@ -386,7 +413,7 @@ partial class CheckInDeskControl
         this._txtRegNotes.MaxLength = 500;
         this._txtRegNotes.Name = "_txtRegNotes";
         this._txtRegNotes.Size = new System.Drawing.Size(348, 24);
-        this._txtRegNotes.TabIndex = 9;
+        this._txtRegNotes.TabIndex = 11;
         // 
         // _pnlRegActions
         // 
@@ -396,7 +423,7 @@ partial class CheckInDeskControl
         this._pnlRegActions.Location = new System.Drawing.Point(3, 163);
         this._pnlRegActions.Name = "_pnlRegActions";
         this._pnlRegActions.Size = new System.Drawing.Size(348, 54);
-        this._pnlRegActions.TabIndex = 10;
+        this._pnlRegActions.TabIndex = 12;
         // 
         // _btnSaveReg
         // 
@@ -1003,6 +1030,8 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Label _lblHolderStatus;
     private System.Windows.Forms.GroupBox _grpRegistration;
     private System.Windows.Forms.TableLayoutPanel _tblRegistration;
+    private System.Windows.Forms.Label _lblRegOrganization;
+    private System.Windows.Forms.ComboBox _cmbRegOrganization;
     private System.Windows.Forms.Label _lblRegFullName;
     private System.Windows.Forms.TextBox _txtRegFullName;
     private System.Windows.Forms.Label _lblRegPhone;

@@ -1628,4 +1628,10 @@
   <data name="Msg_NoGiftReceiptsFound" xml:space="preserve">
     <value>لا توجد قسائم تطابق معايير البحث المحددة.</value>
   </data>
+  <data name="Label_RegOrganization" xml:space="preserve">
+    <value>الجهة:</value>
+  </data>
+  <data name="Val_RegOrganizationRequired" xml:space="preserve">
+    <value>يرجى اختيار الجهة التي يتبع لها الزبون.</value>
+  </data>
 </root>

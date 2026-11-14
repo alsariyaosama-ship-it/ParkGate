@@ -506,6 +506,70 @@ public sealed class CheckInDeskControlTests
         GetField<Button>(control, "_btnOverride").Enabled.ShouldBeFalse();
     }
 
+    // ── R4.3: inline registration carries an explicit organization ──────────
+
+    private static (CheckInDeskControl Control, FakeBeneficiaryService Beneficiaries) DeskWithTwoOrganizations()
+    {
+        var beneficiaries = new FakeBeneficiaryService();
+        var orgs = new FakeOrganizationService(
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(1, "SHA", "هيئة الشهداء", 720, IsDefault: false, IsActive: true),
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
+        var control = new CheckInDeskControl(beneficiaries, null, orgs, null, null, null, null, null, null, null);
+        return (control, beneficiaries);
+    }
+
+    private static async Task FillAndSaveRegistrationAsync(CheckInDeskControl control)
+    {
+        GetField<TextBox>(control, "_txtRegFullName").Text = "سالم محمود علي الورفلي";
+        GetField<TextBox>(control, "_txtRegPhone").Text = "0912345678";
+        await control.SaveInlineRegistrationAsync();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_FilterAll_UsesTheDefaultOrganization()
+    {
+        var (control, beneficiaries) = DeskWithTwoOrganizations();
+        using var _ = control;
+        await control.OnDeskLoadedAsync();
+        GetField<ComboBox>(control, "_cmbOrganization").SelectedIndex = 0; // «الكل»
+        GetField<TextBox>(control, "_txtCardNumber").Text = "555";
+
+        control.ShowInlineRegistration("555");
+        await FillAndSaveRegistrationAsync(control);
+
+        beneficiaries.LastRegisterRequest.ShouldNotBeNull();
+        beneficiaries.LastRegisterRequest.OrganizationId.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_PreselectsTheFilteredOrganization()
+    {
+        var (control, beneficiaries) = DeskWithTwoOrganizations();
+        using var _ = control;
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "556";
+
+        control.ShowInlineRegistration("556", orgId: 1);
+        await FillAndSaveRegistrationAsync(control);
+
+        beneficiaries.LastRegisterRequest!.OrganizationId.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_OperatorCanChooseAnotherOrganization()
+    {
+        var (control, beneficiaries) = DeskWithTwoOrganizations();
+        using var _ = control;
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "557";
+
+        control.ShowInlineRegistration("557");
+        GetField<ComboBox>(control, "_cmbRegOrganization").SelectedIndex = 0; // first item: هيئة الشهداء (id 1)
+        await FillAndSaveRegistrationAsync(control);
+
+        beneficiaries.LastRegisterRequest!.OrganizationId.ShouldBe(1);
+    }
+
     [Fact]
     public void BusyScope_RestoresEachControlsPreviousEnabledState()
     {
@@ -697,8 +761,13 @@ public sealed class CheckInDeskControlTests
         public Task<ParkGate.Application.Common.Result<BeneficiaryLookupResultDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
+        public RegisterBeneficiaryRequest? LastRegisterRequest { get; private set; }
+
         public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> RegisterAsync(RegisterBeneficiaryRequest request, CancellationToken cancellationToken = default)
-            => throw new NotImplementedException();
+        {
+            LastRegisterRequest = request;
+            return Task.FromResult(ParkGate.Application.Common.Result.Failure<BeneficiaryDto>(ParkGate.Application.Common.Errors.General.NotFound));
+        }
 
         public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> UpdateAsync(UpdateBeneficiaryRequest request, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
@@ -711,6 +780,20 @@ public sealed class CheckInDeskControlTests
 
         public Task<ParkGate.Application.Common.Result<IReadOnlyList<EntryAttemptDto>>> GetHistoryAsync(Guid beneficiaryId, int maxResults = 100, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
+    }
+
+    private sealed class FakeOrganizationService(params ParkGate.Application.Organizations.DTOs.OrganizationDto[] organizations)
+        : ParkGate.Application.Organizations.Services.IOrganizationService
+    {
+        public Task<IReadOnlyList<ParkGate.Application.Organizations.DTOs.OrganizationDto>> GetAllAsync(bool activeOnly = false, CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<ParkGate.Application.Organizations.DTOs.OrganizationDto>>(organizations);
+
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> GetByIdAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> CreateAsync(ParkGate.Application.Organizations.DTOs.CreateOrganizationRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> UpdateAsync(ParkGate.Application.Organizations.DTOs.UpdateOrganizationRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> DeactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> ReactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> SetPolicyAsync(ParkGate.Application.Organizations.DTOs.SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 
     private sealed class FakeCheckInService : ParkGate.Application.CheckIn.Services.ICheckInService
