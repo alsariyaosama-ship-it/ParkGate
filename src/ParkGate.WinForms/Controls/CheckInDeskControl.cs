@@ -59,6 +59,10 @@ public partial class CheckInDeskControl : UserControl
     private string? _timeZoneId = "Libya Standard Time";
     private bool _isSearching;
 
+    // R4.2: a lookup asked for while one runs is queued; the counter tells the success delay a lookup happened.
+    private bool _lookupQueued;
+    private int _lookupCount;
+
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int AutoResetDelayMs { get; set; } = 1200;
@@ -743,10 +747,23 @@ public partial class CheckInDeskControl : UserControl
     {
         if (_isSearching)
         {
+            // R4.2: a scan that arrives during a lookup is looked up right after it, not dropped.
+            _lookupQueued = true;
             return;
         }
 
+        do
+        {
+            _lookupQueued = false;
+            await LookupCardOnceAsync();
+        }
+        while (_lookupQueued);
+    }
+
+    private async Task LookupCardOnceAsync()
+    {
         _isSearching = true;
+        _lookupCount++;
         try
         {
             var rawCard = _txtCardNumber.Text;
@@ -918,6 +935,37 @@ public partial class CheckInDeskControl : UserControl
     }
 }
 
+    /// <summary>Test seam for the success delay; production waits <see cref="AutoResetDelayMs"/> milliseconds.</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    internal Func<int, Task> SuccessDelay { get; set; } = milliseconds => Task.Delay(milliseconds);
+
+    /// <summary>
+    /// After a granted entry: free the desk at once and keep the success banner for the delay. A card scanned during
+    /// the delay is looked up as usual and is not wiped when the delay ends (R4.2). A negative delay keeps the desk.
+    /// </summary>
+    private async Task FinishSuccessfulEntryAsync()
+    {
+        if (AutoResetDelayMs < 0)
+        {
+            return;
+        }
+
+        var lookupsBefore = _lookupCount;
+        ClearPreviousHolderData();
+        _txtCardNumber.Clear();
+        FocusCardNumberBox();
+
+        if (AutoResetDelayMs > 0)
+        {
+            await SuccessDelay(AutoResetDelayMs);
+        }
+
+        if (_lookupCount == lookupsBefore && _statusBanner.State == BannerState.Granted)
+        {
+            _statusBanner.Reset();
+        }
+    }
+
     /// <summary>Test seam: replaces the chooser dialog. Returns null for "cancelled".</summary>
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
     internal Func<IReadOnlyList<BeneficiaryLookupResultDto>, BeneficiaryLookupResultDto?>? ChooseOrganizationOverride { get; set; }
@@ -1044,15 +1092,7 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted("تم تسجيل الدخول بنجاح!", $"المرافقون: {companions.Sum(c => c.Count)} · الإجمالي: {result.Value.TotalPersons} فرد");
                     await RefreshTodayDeskSummaryAsync();
 
-                    if (AutoResetDelayMs > 0)
-                    {
-                        await Task.Delay(AutoResetDelayMs);
-                    }
-
-                    if (AutoResetDelayMs >= 0)
-                    {
-                        ResetDesk();
-                    }
+                    await FinishSuccessfulEntryAsync();
                 }
                 else
                 {
@@ -1112,15 +1152,7 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted("تم تسجيل الدخول بموافقة المشرف (تجاوز)", $"المشرف: {supervisorDialog.SupervisorFullName} · السبب: {supervisorDialog.Reason}");
                     await RefreshTodayDeskSummaryAsync();
 
-                    if (AutoResetDelayMs > 0)
-                    {
-                        await Task.Delay(AutoResetDelayMs);
-                    }
-
-                    if (AutoResetDelayMs >= 0)
-                    {
-                        ResetDesk();
-                    }
+                    await FinishSuccessfulEntryAsync();
                 }
                 else
                 {

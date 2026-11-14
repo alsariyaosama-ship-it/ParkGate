@@ -188,7 +188,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 
 ### R4 — Desk UI defects · branch `phase/r4-desk-ui`
 - [x] R4.1 `BusyScope` must restore each control's previous `Enabled` state
-- [ ] R4.2 Do not lose a scan during the success delay; queue lookups instead of dropping them
+- [x] R4.2 Do not lose a scan during the success delay; queue lookups instead of dropping them
 - [x] R4.3 Organization combo in the inline registration panel (required)
 - [x] R4.4 Amber banner when the card is registered under another organization
 - [x] R4.5 Confirm before Esc discards a half-filled registration form

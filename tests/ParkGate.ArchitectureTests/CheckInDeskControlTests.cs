@@ -752,6 +752,80 @@ public sealed class CheckInDeskControlTests
         GetField<List<CounterInput>>(control, "_counterInputs").Count.ShouldBe(1);
     }
 
+    // ── R4.2: nothing is lost during the success banner ────────────────────
+
+    private static (CheckInDeskControl Control, FakeBeneficiaryService Beneficiaries, TaskCompletionSource Delay) DeskWithHolderShown(string nextHolderName)
+    {
+        // The success delay is a task the test completes itself, so everything stays on the test thread.
+        var delay = new TaskCompletionSource();
+        var next = new BeneficiaryDto(Guid.NewGuid(), 1, "صندوق التضامن", "777", nextHolderName, "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
+        var beneficiaries = new FakeBeneficiaryService { LookupReturnResult = [new BeneficiaryLookupResultDto(next, eligibility, [])] };
+        var control = new CheckInDeskControl(beneficiaries, new FakeCheckInService(), null, null, null, null, null, null, null, null)
+        {
+            AutoResetDelayMs = 300,
+            SuccessDelay = _ => delay.Task
+        };
+        control.ShowHolderInfo(
+            new BeneficiaryDto(Guid.NewGuid(), 1, "صندوق التضامن", "100", "الحامل الأول", "0912345678", null, null,
+                BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow),
+            eligibility);
+        return (control, beneficiaries, delay);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_ScanDuringSuccessDelay_IsShownAndNotWipedWhenTheDelayEnds()
+    {
+        var (control, _, delay) = DeskWithHolderShown("الحامل الثاني");
+        using var _c = control;
+
+        var recording = control.RecordEntryAsync();          // waits in the success delay
+        GetField<TextBox>(control, "_txtCardNumber").Text = "777";
+        await control.LookupCardAsync();                      // the scanner's Enter
+        delay.SetResult();
+        await recording;
+
+        GetField<TextBox>(control, "_txtCardNumber").Text.ShouldBe("777");
+        GetField<Label>(control, "_lblHolderName").Text.ShouldContain("الحامل الثاني");
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_TypingDuringSuccessDelay_KeepsTheText()
+    {
+        var (control, beneficiaries, delay) = DeskWithHolderShown("الحامل الثاني");
+        using var _c = control;
+
+        var recording = control.RecordEntryAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text.ShouldBeEmpty(); // freed at once for the next card
+        GetField<TextBox>(control, "_txtCardNumber").Text = "12";          // typed, no Enter yet
+        delay.SetResult();
+        await recording;
+
+        GetField<TextBox>(control, "_txtCardNumber").Text.ShouldBe("12");
+        beneficiaries.LookupCalls.ShouldBe(0); // a half-typed number is not looked up
+        GetField<StatusBanner>(control, "_statusBanner").State.ShouldBe(BannerState.Neutral);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_LookupWhileSearching_IsQueuedNotDropped()
+    {
+        var beneficiaries = new FakeBeneficiaryService { LookupGate = new TaskCompletionSource() };
+        using var control = new CheckInDeskControl(beneficiaries, null, null, null, null, null, null, null, null, null);
+        var cardBox = GetField<TextBox>(control, "_txtCardNumber");
+
+        cardBox.Text = "111";
+        var first = control.LookupCardAsync();
+        cardBox.Text = "222";
+        await control.LookupCardAsync();   // arrives while the first is still running
+        beneficiaries.LookupGate.SetResult();
+        await first;
+
+        beneficiaries.LookupCalls.ShouldBe(2);
+        beneficiaries.LastCardNumberLookup.ShouldBe("222");
+    }
+
     [Fact]
     public void BusyScope_RestoresEachControlsPreviousEnabledState()
     {
@@ -926,10 +1000,20 @@ public sealed class CheckInDeskControlTests
 
         public int? LastOrganizationLookup { get; private set; }
 
-        public Task<ParkGate.Application.Common.Result<CardLookupDto>> LookupByCardNumberAsync(string cardNumber, int? organizationId = null, CancellationToken cancellationToken = default)
+        public int LookupCalls { get; private set; }
+
+        /// <summary>When set, lookups wait for it: lets a test start a second lookup while the first is running.</summary>
+        public TaskCompletionSource? LookupGate { get; set; }
+
+        public async Task<ParkGate.Application.Common.Result<CardLookupDto>> LookupByCardNumberAsync(string cardNumber, int? organizationId = null, CancellationToken cancellationToken = default)
         {
+            LookupCalls++;
             LastCardNumberLookup = cardNumber;
             LastOrganizationLookup = organizationId;
+            if (LookupGate != null)
+            {
+                await LookupGate.Task;
+            }
 
             // Same split as BeneficiaryService (R3.8).
             var inSelected = LookupReturnResult.Where(m => organizationId is null || m.Beneficiary.OrganizationId == organizationId).ToList();
@@ -937,7 +1021,7 @@ public sealed class CheckInDeskControlTests
                 .Where(m => organizationId is not null && m.Beneficiary.OrganizationId != organizationId)
                 .Select(m => new OrganizationRefDto(m.Beneficiary.OrganizationId, m.Beneficiary.OrganizationName))
                 .ToList();
-            return Task.FromResult(ParkGate.Application.Common.Result.Success(new CardLookupDto(inSelected, elsewhere)));
+            return ParkGate.Application.Common.Result.Success(new CardLookupDto(inSelected, elsewhere));
         }
 
         public Task<ParkGate.Application.Common.Result<BeneficiaryLookupResultDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
