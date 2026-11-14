@@ -1634,4 +1634,13 @@
   <data name="Val_RegOrganizationRequired" xml:space="preserve">
     <value>يرجى اختيار الجهة التي يتبع لها الزبون.</value>
   </data>
+  <data name="Banner_CardRegisteredElsewhere" xml:space="preserve">
+    <value>البطاقة مسجلة لدى جهة: {0}</value>
+  </data>
+  <data name="Banner_CardRegisteredElsewhereHint" xml:space="preserve">
+    <value>اضغط Enter لعرض الزبون تحت جهته، أو F2 لتسجيله تحت الجهة المختارة.</value>
+  </data>
+  <data name="Text_ListSeparator" xml:space="preserve">
+    <value>، </value>
+  </data>
 </root>

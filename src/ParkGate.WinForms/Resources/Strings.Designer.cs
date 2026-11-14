@@ -663,4 +663,7 @@ internal class Strings
     internal static string Msg_NoGiftReceiptsFound => GetString(nameof(Msg_NoGiftReceiptsFound));
     internal static string Label_RegOrganization => GetString(nameof(Label_RegOrganization));
     internal static string Val_RegOrganizationRequired => GetString(nameof(Val_RegOrganizationRequired));
+    internal static string Banner_CardRegisteredElsewhere => GetString(nameof(Banner_CardRegisteredElsewhere));
+    internal static string Banner_CardRegisteredElsewhereHint => GetString(nameof(Banner_CardRegisteredElsewhereHint));
+    internal static string Text_ListSeparator => GetString(nameof(Text_ListSeparator));
 }

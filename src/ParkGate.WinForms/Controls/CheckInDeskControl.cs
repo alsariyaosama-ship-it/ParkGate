@@ -48,6 +48,10 @@ public partial class CheckInDeskControl : UserControl
     private BeneficiaryDto? _activeHolder;
     private EligibilityPreviewDto? _activeEligibility;
     private bool _companionsBlockEntry;
+
+    // R4.4: the card last reported as registered under other organizations, so a second Enter can load it there.
+    private string? _registeredElsewhereCard;
+    private IReadOnlyList<int> _registeredElsewhereOrgIds = [];
     private int _maxGroupSize = 10;
     private bool _prefillFromLastVisit;
     private bool _denialSoundEnabled;
@@ -692,6 +696,15 @@ public partial class CheckInDeskControl : UserControl
         _cmbRegOrganization.SelectedItem = match;
     }
 
+    private void SelectFilterOrganization(int? orgId)
+    {
+        var item = _cmbOrganization.Items.OfType<OrgComboItem>().FirstOrDefault(i => i.Id == orgId);
+        if (item != null)
+        {
+            _cmbOrganization.SelectedItem = item;
+        }
+    }
+
     public void HideInlineRegistration()
     {
         _grpRegistration.Visible = false;
@@ -792,6 +805,15 @@ public partial class CheckInDeskControl : UserControl
         {
             try
             {
+                if (_registeredElsewhereCard == normalized && _registeredElsewhereOrgIds.Count > 0)
+                {
+                    // Second Enter on the same card: follow it to its organization (several: «الكل», then choose).
+                    SelectFilterOrganization(_registeredElsewhereOrgIds.Count == 1 ? _registeredElsewhereOrgIds[0] : null);
+                }
+
+                _registeredElsewhereCard = null;
+                _registeredElsewhereOrgIds = [];
+
                 var selectedOrgId = (_cmbOrganization.SelectedItem as OrgComboItem)?.Id;
                 var lookupResult = await _beneficiaryService.LookupByCardNumberAsync(normalized, selectedOrgId);
 
@@ -804,6 +826,19 @@ public partial class CheckInDeskControl : UserControl
 
                 // The organization filter is applied by the service (R3.8). RegisteredElsewhere is shown by R4.4.
                 var matches = lookupResult.Value.Matches;
+
+                if (matches.Count == 0 && lookupResult.Value.RegisteredElsewhere.Count > 0)
+                {
+                    // R4.4: not "unregistered" — it belongs to another organization. Registration stays on F2.
+                    var elsewhere = lookupResult.Value.RegisteredElsewhere;
+                    _registeredElsewhereCard = normalized;
+                    _registeredElsewhereOrgIds = elsewhere.Select(o => o.Id).ToList();
+                    _statusBanner.SetWarning(
+                        string.Format(Strings.Banner_CardRegisteredElsewhere, string.Join(Strings.Text_ListSeparator, elsewhere.Select(o => o.NameAr))),
+                        Strings.Banner_CardRegisteredElsewhereHint);
+                    FocusCardNumberBox();
+                    return;
+                }
 
                 if (matches.Count == 0)
                 {

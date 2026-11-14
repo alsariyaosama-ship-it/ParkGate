@@ -570,6 +570,42 @@ public sealed class CheckInDeskControlTests
         beneficiaries.LastRegisterRequest!.OrganizationId.ShouldBe(1);
     }
 
+    // ── R4.4: a card registered under another organization ──────────────────
+
+    [Fact]
+    public async Task CheckInDeskControl_CardOnlyInAnotherOrganization_SaysWhereAndSecondEnterLoadsIt()
+    {
+        var holderInOrg2 = new BeneficiaryDto(
+            Guid.NewGuid(), 2, "صندوق التضامن", "777", "خالد عمر", "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
+        var beneficiaries = new FakeBeneficiaryService
+        {
+            LookupReturnResult = [new BeneficiaryLookupResultDto(holderInOrg2, eligibility, [])]
+        };
+        var orgs = new FakeOrganizationService(
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(1, "SHA", "هيئة الشهداء", 720, IsDefault: false, IsActive: true),
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
+        using var control = new CheckInDeskControl(beneficiaries, null, orgs, null, null, null, null, null, null, null);
+        await control.OnDeskLoadedAsync();
+        var filter = GetField<ComboBox>(control, "_cmbOrganization");
+        filter.SelectedIndex = 1; // هيئة الشهداء (id 1)
+        GetField<TextBox>(control, "_txtCardNumber").Text = "777";
+
+        await control.LookupCardAsync();
+
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        banner.State.ShouldBe(BannerState.Warning);
+        banner.Title.ShouldContain("صندوق التضامن");
+        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBeFalse();
+
+        await control.LookupCardAsync();
+
+        beneficiaries.LastOrganizationLookup.ShouldBe(2);
+        GetField<ComboBox>(control, "_cmbOrganization").SelectedIndex.ShouldBe(2);
+        banner.State.ShouldBe(BannerState.Granted);
+    }
+
     [Fact]
     public void BusyScope_RestoresEachControlsPreviousEnabledState()
     {
