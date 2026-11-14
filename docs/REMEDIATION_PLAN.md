@@ -154,7 +154,7 @@ All in `src/ParkGate.WinForms/Controls/CheckInDeskControl.cs` unless stated. UI 
 - [x] **R4.7 [Verified] Raw exception text reaches the operator** (11 places use `ex.Message`, for example the QR scan error and inline registration). Log the exception, show a `Strings.resx` message. For connection failures show the existing «تعذّر الاتصال…» banner with a retry hint.
 - [x] **R4.8 [Verified] Hardcoded Arabic strings** (94 literals outside designer files, against AGENTS.md §5.7). Move them to `Strings.resx`. Add an architecture test that fails on Arabic characters in non-designer `.cs` files under `ParkGate.WinForms`.
 - [x] **R4.9 [Verified] Fallback age categories with fake ids.** `CreateDefaultAgeCategories` invents ids 1–3 when loading fails, and its text («12 سنة فما فوق») differs from the seed («13 سنة فأكثر»). On load failure, disable recording and show the connection banner instead.
-- [ ] **R4.10 [Reproduce] Fonts set as `new Font("Cairo", …)` in designer files** resolve only if Cairo is installed system-wide. The installer installs it; an xcopy deployment does not. At startup, if `AppFont` loaded Cairo from the embedded resource but the family is not installed, log a warning and show it once to Admins. Do not rewrite the designer files.
+- [x] **R4.10 [Reproduce] Fonts set as `new Font("Cairo", …)` in designer files** resolve only if Cairo is installed system-wide. The installer installs it; an xcopy deployment does not. At startup, if `AppFont` loaded Cairo from the embedded resource but the family is not installed, log a warning and show it once to Admins. Do not rewrite the designer files.
 
 **Done when:** every flow in `docs/TEST_SCRIPT.md` passes, plus new script steps for R4.2–R4.6.
 

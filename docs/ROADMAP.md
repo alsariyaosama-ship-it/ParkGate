@@ -196,7 +196,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R4.7 No raw exception text in front of the operator (11 places)
 - [x] R4.8 Move the 94 hardcoded Arabic literals to `Strings.resx`; add an architecture test
 - [x] R4.9 Remove the fallback age categories with invented ids
-- [ ] R4.10 Warn once when the Cairo font family is not installed system-wide
+- [x] R4.10 Warn once when the Cairo font family is not installed system-wide
 
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
 - [ ] R5.1 Show the remaining time on denial (SPEC A3)

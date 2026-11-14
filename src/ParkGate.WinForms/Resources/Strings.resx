@@ -1961,4 +1961,7 @@
   <data name="Ui_Program_02" xml:space="preserve">
     <value>خطأ حرج</value>
   </data>
+  <data name="Msg_CairoNotInstalled" xml:space="preserve">
+    <value>خط Cairo غير مثبّت على هذا الجهاز، لذلك قد تظهر بعض الشاشات بخط مختلف. ثبّت الخط من برنامج التثبيت أو بالسكربت install-cairo-font.ps1.</value>
+  </data>
 </root>

@@ -777,4 +777,5 @@ internal class Strings
     internal static string Denial_HolderBlocked => GetString(nameof(Denial_HolderBlocked));
     internal static string Denial_HolderSuspended => GetString(nameof(Denial_HolderSuspended));
     internal static string Denial_OrganizationInactive => GetString(nameof(Denial_OrganizationInactive));
+    internal static string Msg_CairoNotInstalled => GetString(nameof(Msg_CairoNotInstalled));
 }

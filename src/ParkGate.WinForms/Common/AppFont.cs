@@ -15,6 +15,7 @@ public static class AppFont
     private static readonly PrivateFontCollection FontCollection = new();
     private static FontFamily? _cairoFamily;
     private static bool _initialized;
+    private static bool _cairoInstalled;
     private static readonly object SyncLock = new();
 
     private const uint FrPrivate = 0x10;
@@ -28,6 +29,19 @@ public static class AppFont
         {
             Initialize();
             return _cairoFamily?.Name ?? "Cairo";
+        }
+    }
+
+    /// <summary>
+    /// True when <c>new Font("Cairo", …)</c> resolves to Cairo, i.e. GDI+ sees an installed font. False when Cairo is
+    /// only in the private collection: Theme fonts still use it, but designer-file fonts fall back (R4.10).
+    /// </summary>
+    public static bool IsCairoInstalled
+    {
+        get
+        {
+            Initialize();
+            return _cairoInstalled;
         }
     }
 
@@ -62,6 +76,7 @@ public static class AppFont
                     if (testFont.Name.Equals("Cairo", StringComparison.OrdinalIgnoreCase))
                     {
                         _cairoFamily = new FontFamily("Cairo");
+                        _cairoInstalled = true;
                         _initialized = true;
                         return;
                     }
@@ -134,6 +149,7 @@ public static class AppFont
                     if (testFont.Name.Equals("Cairo", StringComparison.OrdinalIgnoreCase))
                     {
                         _cairoFamily = new FontFamily("Cairo");
+                        _cairoInstalled = true;
                         return;
                     }
                 }
