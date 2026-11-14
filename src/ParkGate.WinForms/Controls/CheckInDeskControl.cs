@@ -768,7 +768,7 @@ public partial class CheckInDeskControl : UserControl
             try
             {
                 var selectedOrgId = (_cmbOrganization.SelectedItem as OrgComboItem)?.Id;
-                var lookupResult = await _beneficiaryService.LookupByCardNumberAsync(normalized);
+                var lookupResult = await _beneficiaryService.LookupByCardNumberAsync(normalized, selectedOrgId);
 
                 if (lookupResult.IsFailure)
                 {
@@ -777,11 +777,8 @@ public partial class CheckInDeskControl : UserControl
                     return;
                 }
 
-                var matches = lookupResult.Value;
-                if (selectedOrgId.HasValue)
-                {
-                    matches = matches.Where(m => m.Beneficiary.OrganizationId == selectedOrgId.Value).ToList();
-                }
+                // The organization filter is applied by the service (R3.8). RegisteredElsewhere is shown by R4.4.
+                var matches = lookupResult.Value.Matches;
 
                 if (matches.Count == 0)
                 {

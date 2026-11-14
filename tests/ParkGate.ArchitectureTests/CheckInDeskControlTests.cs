@@ -642,10 +642,20 @@ public sealed class CheckInDeskControlTests
         public string? LastCardNumberLookup { get; private set; }
         public IReadOnlyList<BeneficiaryLookupResultDto> LookupReturnResult { get; set; } = [];
 
-        public Task<ParkGate.Application.Common.Result<IReadOnlyList<BeneficiaryLookupResultDto>>> LookupByCardNumberAsync(string cardNumber, CancellationToken cancellationToken = default)
+        public int? LastOrganizationLookup { get; private set; }
+
+        public Task<ParkGate.Application.Common.Result<CardLookupDto>> LookupByCardNumberAsync(string cardNumber, int? organizationId = null, CancellationToken cancellationToken = default)
         {
             LastCardNumberLookup = cardNumber;
-            return Task.FromResult(ParkGate.Application.Common.Result.Success(LookupReturnResult));
+            LastOrganizationLookup = organizationId;
+
+            // Same split as BeneficiaryService (R3.8).
+            var inSelected = LookupReturnResult.Where(m => organizationId is null || m.Beneficiary.OrganizationId == organizationId).ToList();
+            var elsewhere = LookupReturnResult
+                .Where(m => organizationId is not null && m.Beneficiary.OrganizationId != organizationId)
+                .Select(m => new OrganizationRefDto(m.Beneficiary.OrganizationId, m.Beneficiary.OrganizationName))
+                .ToList();
+            return Task.FromResult(ParkGate.Application.Common.Result.Success(new CardLookupDto(inSelected, elsewhere)));
         }
 
         public Task<ParkGate.Application.Common.Result<BeneficiaryLookupResultDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

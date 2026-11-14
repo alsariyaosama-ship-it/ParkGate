@@ -182,7 +182,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R3.5 Write audit rows inside the same unit of work, before commit
 - [x] R3.6 Use the cached `ISettingsService` instead of four queries inside the locked transaction
 - [x] R3.7 Card expiry from the DB clock, not the client clock (BR-05)
-- [ ] R3.8 Card lookup across organizations with a flag, instead of "not registered"
+- [x] R3.8 Card lookup across organizations with a flag, instead of "not registered"
 - [x] R3.9 Return `NextEligibleAtUtc` and remaining minutes instead of integer-divided hours
 - [x] R3.10 `EntryCardIssuer` computes the card expiry from the client clock (`TimeProvider.GetLocalNow`) — use `ParkClock` (found in R3.7)
 

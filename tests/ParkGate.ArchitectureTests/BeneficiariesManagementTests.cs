@@ -462,7 +462,7 @@ public sealed class BeneficiariesManagementTests
             _history = history;
         }
 
-        public Task<Result<IReadOnlyList<BeneficiaryLookupResultDto>>> LookupByCardNumberAsync(string cardNumber, CancellationToken cancellationToken = default)
+        public Task<Result<CardLookupDto>> LookupByCardNumberAsync(string cardNumber, int? organizationId = null, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         public Task<Result<BeneficiaryLookupResultDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
