@@ -56,10 +56,10 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 
 ## Phase R0 — Baseline and safety net · branch `phase/r0-baseline`
 
-- [ ] **R0.1** `git status`, `git log origin/main..main`. Report uncommitted or unpushed work to Osama and stop until he says commit or discard. Do not discard anything yourself.
-- [ ] **R0.2** Record the baseline: `dotnet build`, unit tests, integration tests on LocalDB, `php artisan test` in `web/`. Write the numbers in `SESSION_HANDOFF.md`.
-- [ ] **R0.3** Add Phase R (R0–R9 task list) to `docs/ROADMAP.md`. Ask the §2 questions.
-- [ ] **R0.4** Add a CI job for `web/` (`composer install`, `php artisan test`) to `.github/workflows/build.yml`, or a new `web.yml`. Today only the .NET solution is built in CI.
+- [x] **R0.1** `git status`, `git log origin/main..main`. Report uncommitted or unpushed work to Osama and stop until he says commit or discard. Do not discard anything yourself.
+- [x] **R0.2** Record the baseline: `dotnet build`, unit tests, integration tests on LocalDB, `php artisan test` in `web/`. Write the numbers in `SESSION_HANDOFF.md`.
+- [x] **R0.3** Add Phase R (R0–R9 task list) to `docs/ROADMAP.md`. Ask the §2 questions.
+- [x] **R0.4** Add a CI job for `web/` (`composer install`, `php artisan test`) to `.github/workflows/build.yml`, or a new `web.yml`. Today only the .NET solution is built in CI.
 
 **Done when:** baseline is green and recorded, roadmap updated, questions sent.
 
@@ -67,23 +67,23 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 
 ## Phase R1 — Web security (critical) · branch `phase/r1-web-security`
 
-- [ ] **R1.1 [Verified] Public self-registration exposes personal data.**
+- [x] **R1.1 [Verified] Public self-registration exposes personal data.**
   `web/routes/auth.php` serves `GET/POST /register`. `App\Models\User` does not implement `MustVerifyEmail`, so the `verified` middleware passes for any new account. Any visitor can register and open `/beneficiaries`.
   Fix: remove the register routes, `RegisteredUserController`, and the Register page and links now. Add `php artisan parkgate:create-user` (name, email, prompts for password) unless Osama answers Q-R3 differently. On cPanel without SSH the command must also be runnable from the cPanel Terminal or a one-time signed setup route that disables itself once a user exists — ask Osama which he has. Keep password reset only if mail is configured; otherwise remove those routes too.
   Test first: feature test — `GET /register` and `POST /register` return 404; a guest gets redirected from `/beneficiaries`.
-- [ ] **R1.2 [Verified] Hardcoded default sync API key.**
+- [x] **R1.2 [Verified] Hardcoded default sync API key.**
   `web/config/parkgate.php` falls back to `'parkgate-cloud-secret-key-2026'`. The same value is in `web/.env.production.example`.
   Fix: default to `null` (the middleware already rejects an empty expected key). Replace the example value with a placeholder. Add `php artisan parkgate:generate-key` that prints a random API key. Nothing is deployed yet, so there is no key to rotate.
   Test first: with no `PARKGATE_API_KEY` set, `POST /api/sync/push` returns 401 for any header value, including the old default.
-- [ ] **R1.3 [Verified] Committed `APP_KEY` in `.env.production.example`.** Replace with an empty value and a comment to run `php artisan key:generate`.
-- [ ] **R1.4 [Verified] Default admin in the seeder.** `DatabaseSeeder` creates `admin@parkgate.ly` with password `password`. Guard all seeding with `app()->environment('local', 'testing')`. Check `web/database/mysql_schema.sql` for an equivalent `INSERT` into `users` and remove it.
+- [x] **R1.3 [Verified] Committed `APP_KEY` in `.env.production.example`.** Replace with an empty value and a comment to run `php artisan key:generate`.
+- [x] **R1.4 [Verified] Default admin in the seeder.** `DatabaseSeeder` creates `admin@parkgate.ly` with password `password`. Guard all seeding with `app()->environment('local', 'testing')`. Check `web/database/mysql_schema.sql` for an equivalent `INSERT` into `users` and remove it.
   Test first: seeding in `production` environment creates no user.
-- [ ] **R1.5 [Verified] Remove `web/fix-permissions.php`** (tracked, contains a fixed key in the source). Remove references in `scripts/package-cpanel.ps1` and `web/README.md`.
-- [ ] **R1.6 [Verified] Sync API leaks internals and logs personal data.**
+- [x] **R1.5 [Verified] Remove `web/fix-permissions.php`** (tracked, contains a fixed key in the source). Remove references in `scripts/package-cpanel.ps1` and `web/README.md`.
+- [x] **R1.6 [Verified] Sync API leaks internals and logs personal data.**
   `SyncApiController` returns `$e->getMessage()` to the caller. `SyncIngestionService` logs the whole item (`['item' => $item]`) on failure.
   Fix: return a generic message plus a short error id; log entity type, entity id and the error id only. Add `throttle` middleware to `/api/sync/*`. Validate the payload shape with a FormRequest (max records per batch, required keys).
   Test first: a malformed batch returns 422 without exception text; the log line contains no payload content.
-- [ ] **R1.7 Web authorization and hardening.** Add a `throttle` to `POST /login` if Breeze's default was removed, set `SESSION_SECURE_COOKIE=true` and `APP_DEBUG=false` in the production example, and force HTTPS in production (`URL::forceScheme('https')`).
+- [x] **R1.7 Web authorization and hardening.** Add a `throttle` to `POST /login` if Breeze's default was removed, set `SESSION_SECURE_COOKIE=true` and `APP_DEBUG=false` in the production example, and force HTTPS in production (`URL::forceScheme('https')`).
 - [x] **R1.8 Phone and national ID on the web.** Removed entirely by R2.6 (Q-R2). After R2.6, add a test that no web response, view or model exposes `phone` or `national_id`.
 
 **Done when:** all R1 tests pass, and a fresh production-mode install has no way to obtain an account or a valid API key from the repository contents.
@@ -110,7 +110,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
   `Notes` and `StatusReason` keep syncing (Q-R2b, decided 2026-11-13 against the recommendation to exclude them).
   Docs: SPEC §9 F3 and Q12, ADR-018 and ADR-019 (superseded parts), DEPLOYMENT.md.
   Test first: the serialized `Beneficiary` payload has no `Phone`/`NationalId` keys; ingestion of a payload without them succeeds; the `beneficiaries` table has no such columns.
-- [ ] **R2.7 [Verified] Gift vouchers are not synced.** `OutboxEntityExtractor.SyncableTypes` has no `GiftVoucher`; the cloud has no table for it. Add the entity to the outbox, a `gift_vouchers` table and model on the web, ingestion, and a gifts summary on the dashboard and reports (issued, redeemed, voided, value by organization). Also sync the new organization fields (`MaxFreeCompanions`, gift policy) and `AgeCategory.IsCompanionLimitExempt`.
+- [x] **R2.7 [Verified] Gift vouchers are not synced.** `OutboxEntityExtractor.SyncableTypes` has no `GiftVoucher`; the cloud has no table for it. Add the entity to the outbox, a `gift_vouchers` table and model on the web, ingestion, and a gifts summary on the dashboard and reports (issued, redeemed, voided, value by organization). Also sync the new organization fields (`MaxFreeCompanions`, gift policy) and `AgeCategory.IsCompanionLimitExempt`.
 - [x] **R2.8 [Verified] Dashboard numbers are wrong.** `DashboardController`: (a) "today" uses `Carbon::today()` in the app timezone while `business_date` is park-local — set `APP_TIMEZONE=Africa/Tripoli` and compute today from it; (b) persons and entries count `result = 1` only — include Overridden (`3`) and exclude `is_voided`; (c) it loads all of today's attempts into memory — aggregate in SQL.
   Test first: one Allowed, one Overridden, one voided Allowed → entries 2, persons from the two non-voided rows.
 - [x] **R2.9 [Reproduce] MySQL parity.** Tests run on SQLite, production is MySQL. Add a CI job (or documented local run) that runs the web test suite against MySQL 8. Check that ISO-8601 timestamps with 7 fractional digits and `Z` ingest correctly into `timestamp` columns under strict mode; normalize in `SyncIngestionService` with `Carbon::parse(...)->utc()` if not. Shared cPanel hosting may have no SSH to run `artisan migrate`: keep `web/database/mysql_schema.sql` but generate it from the migrations in `package-cpanel.ps1` (never hand-edit it), and add a test that the generated file matches the migrations.
