@@ -155,6 +155,8 @@ All in `src/ParkGate.WinForms/Controls/CheckInDeskControl.cs` unless stated. UI 
 - [x] **R4.8 [Verified] Hardcoded Arabic strings** (94 literals outside designer files, against AGENTS.md §5.7). Move them to `Strings.resx`. Add an architecture test that fails on Arabic characters in non-designer `.cs` files under `ParkGate.WinForms`.
 - [x] **R4.9 [Verified] Fallback age categories with fake ids.** `CreateDefaultAgeCategories` invents ids 1–3 when loading fails, and its text («12 سنة فما فوق») differs from the seed («13 سنة فأكثر»). On load failure, disable recording and show the connection banner instead.
 - [x] **R4.10 [Reproduce] Fonts set as `new Font("Cairo", …)` in designer files** resolve only if Cairo is installed system-wide. The installer installs it; an xcopy deployment does not. At startup, if `AppFont` loaded Cairo from the embedded resource but the family is not installed, log a warning and show it once to Admins. Do not rewrite the designer files.
+- [x] **R4.11 [Verified] Gift redemption screen renders broken.** `GiftRedeemControl.Designer.cs` paired `AutoScaleDimensions = (7, 17)` (a Font-mode value) with `AutoScaleMode.Dpi`, so WinForms multiplied every size by `dpi / 17` (about 7x). Found while running TC-21 by hand. Fix: `(96, 96)`. Guard: `DesignerScalingTests` fails for any designer that uses Dpi with unequal dimensions.
+- [x] **R4.12 [Verified] Scan row overlaps on the gift redemption screen.** The label, input and buttons used absolute positions from a 988 px design width, so on a wide window the input ran under the label. The row is now a `TableLayoutPanel` (AGENTS.md §5.3).
 
 **Done when:** every flow in `docs/TEST_SCRIPT.md` passes, plus new script steps for R4.2–R4.6.
 

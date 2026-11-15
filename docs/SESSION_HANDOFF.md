@@ -10,7 +10,7 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-14 |
-| Last session | S33 — Phase R4 code complete (R4.1–R4.10); manual test script run pending |
+| Last session | S34 — PR #15 opened; TC-14–TC-21 run by Osama (all passed except TC-20, Cairo, not yet tried); gift screen fixed (R4.11, R4.12) |
 | Current phase | Phase R — Remediation. R0–R2 merged (PR #11–#13). R3 PR #14 open. R4 code done on `phase/r4-desk-ui`, PR not opened yet |
 | Working branch | `phase/r4-desk-ui` (branched from `phase/r3-application`, because PR #14 was still open) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
@@ -120,8 +120,8 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. **Osama runs `docs/TEST_SCRIPT.md`** on the desk (TC-01 to TC-21) — the R4 "Done when". Fix what fails first.
-2. When PR #14 (R3) is merged: merge `main` into `phase/r4-desk-ui`, then open the R4 PR to `main`.
+1. PR #15 (R4) is open. Osama passed TC-14–TC-19 and TC-21 on the desk; **TC-20 (Cairo missing) is still untried**. TC-21's F7 gift override must be re-run on the fixed gift screen (R4.11/R4.12).
+2. After PR #15 is merged, start R5 from `main`.
 3. Then R5 (desk UX) on `phase/r5-desk-ux`. R5.1 replaces the banner's `/ 60` hours (key `Ui_CheckInDesk_02`).
 4. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
    hangs the test host. Use synchronous fakes or a seam (`SuccessDelay`, `ChooseOrganizationOverride`), and run
@@ -157,6 +157,14 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S34 — 2026-11-15 — PR #15, manual tests, gift screen fix
+
+- Merged `main` (PR #14) into `phase/r4-desk-ui`, opened PR #15, ticked R0, R1 and R2.7 in the remediation plan, ignored VS-generated `.resx` files.
+- Osama ran TC-14–TC-21; the F7 step of TC-21 could not run because the gift screen rendered broken.
+- R4.11: `GiftRedeemControl` had `AutoScaleDimensions` 7x17 with `AutoScaleMode.Dpi` (sizes multiplied by about 7). Fixed to 96x96; new `DesignerScalingTests` guards every designer.
+- R4.12: the scan row overlapped on wide windows; now a `TableLayoutPanel`. Both verified by rendering the control headless (before: one huge button; after: correct rows).
+- Tests: 691 unit/architecture, 42 integration, all green. Tip: if the app is running it locks `bin\`; build with `--artifacts-path artifacts/verify` (git-ignored).
 
 ### S33 — 2026-11-14 — Phase R4 code complete
 - PR #14 was still open, so `phase/r4-desk-ui` was branched from `phase/r3-application` (handoff option).
