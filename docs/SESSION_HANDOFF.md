@@ -164,6 +164,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Osama ran TC-14–TC-21; the F7 step of TC-21 could not run because the gift screen rendered broken.
 - R4.11: `GiftRedeemControl` had `AutoScaleDimensions` 7x17 with `AutoScaleMode.Dpi` (sizes multiplied by about 7). Fixed to 96x96; new `DesignerScalingTests` guards every designer.
 - R4.12: the scan row overlapped on wide windows; now a `TableLayoutPanel`. Both verified by rendering the control headless (before: one huge button; after: correct rows).
+- R4.13: Osama reported the gift panel and the registration buttons clipped on the desk. Cause: `GiftOfferPanel` in Font scaling mode inside a Dpi parent, and too little height for the registration group. Fixed and verified by rendering at 1920x890 and 1366x640. Gifts are disabled for every organization in the dev databases (`GiftEnabled = 0`), which is why the offer panel never showed; enable it per organization in Management > Organizations.
 - Tests: 691 unit/architecture, 42 integration, all green. Tip: if the app is running it locks `bin\`; build with `--artifacts-path artifacts/verify` (git-ignored).
 
 ### S33 — 2026-11-14 — Phase R4 code complete

@@ -117,14 +117,15 @@ partial class CheckInDeskControl
         this._mainLayout.Dock = System.Windows.Forms.DockStyle.Fill;
         this._mainLayout.Location = new System.Drawing.Point(10, 10);
         this._mainLayout.Margin = new System.Windows.Forms.Padding(0);
+        this._mainLayout.MinimumSize = new System.Drawing.Size(0, 690);
         this._mainLayout.Name = "_mainLayout";
         this._mainLayout.RowCount = 6;
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 76F));
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 55F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 62F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 45F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 38F));
         this._mainLayout.Size = new System.Drawing.Size(988, 641);
         this._mainLayout.TabIndex = 0;
         // 
@@ -969,6 +970,7 @@ partial class CheckInDeskControl
         // 
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+        this.AutoScroll = true;
         this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
         this.Controls.Add(this._mainLayout);
         this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);

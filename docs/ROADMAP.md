@@ -199,6 +199,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R4.10 Warn once when the Cairo font family is not installed system-wide
 - [x] R4.11 Fix gift redemption screen scaling (`AutoScaleDimensions` 96x96) and add a designer scaling guard test
 - [x] R4.12 Lay out the gift redemption scan row with a `TableLayoutPanel`
+- [x] R4.13 Stop clipping on the check-in desk (gift panel, registration buttons) at 120 % DPI
 
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
 - [ ] R5.1 Show the remaining time on denial (SPEC A3)
