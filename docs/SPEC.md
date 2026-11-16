@@ -208,6 +208,17 @@ The MVP data model and abstractions must make these additive, not rewrites.
 - Push only what dashboards need. **Phone and national ID are never pushed** (ADR-021); notes and status reason are (Q-R2b).
 - Change tracking via `rowversion` / `CreatedAtUtc` watermark; a background sync worker with retry; works when internet is intermittent.
 
+### F6 — Phone verification (recommendation to park management, not built)
+- Highest assurance option. After each free entry or gift, the holder receives an SMS or WhatsApp notification; sensitive actions (gift issue, lost-card replacement, new registration) require a one-time code sent to the holder's phone.
+- Stops an operator from spending the quota of an absent holder without the holder knowing. A code can still be forwarded, and the phone number must come from the organization or be verified once at registration, or the operator could enter their own.
+- Needs an SMS gateway or `WhatsApp Business API` (cost per message), internet at the desk with a fallback that never blocks entry, and a change to ADR-021 because the phone number would leave the park. Requires an ADR and Osama's approval before any work.
+
+### F7 — Organization card-number list (recommendation to park management, not built)
+- Each organization provides the card numbers of its employees, as an exact list (preferred) or a range, without names; full employee data only if the organization agrees.
+- The desk can register a holder only with a number on the list, so an operator cannot invent holders. A number registered by someone else is reported to a supervisor when its real owner arrives.
+- A range is much weaker than a list: any number inside it passes.
+- To decide when approved: what happens for an organization without a list (recommended: supervisor approval), and when a number disappears from a new list (recommended: suspend the holder with the reason shown). Import from Excel with ClosedXML.
+
 ## 10. Data retention and privacy (MVP)
 - Entry history is kept indefinitely until the client defines a policy.
 - Personal data is visible only to authenticated users; exports are limited to Supervisor/Admin.
@@ -226,7 +237,7 @@ Defaults below are applied until the user answers. An agent must not change a de
 | Q6 | How many desks? Is an offline fallback needed if the server PC fails? | Up to 10 desks, no offline mode | — |
 | Q7 | Do other organizations get different rules (cooldown, group size)? | Per-organization cooldown only | — |
 | Q8 | Does the park invoice the fund for free entries? What report format does the fund require? | **Answered 2026-10-04:** no financial claims; per-organization statistics are important (FR-RPT-03) | — |
-| Q9 | Must card validity be checked against the fund's own database? | No integration | — |
+| Q9 | Must card validity be checked against the fund's own database? | **Answered 2026-11-16:** no integration now; the physical card is the reference (ADR-024). The organization's number list is recommended (F7) | — |
 | Q10 | Operating hours — any rule tied to closing time? | None | — |
 | Q11 | Gate group handling: Option A, B or C (§9 F2)? | **Deferred by the client** until F2 is scheduled | F2 |
 | Q12 | Which data may go to the cloud? | Answered (Q-R2/Q-R2b): everything except phone and national ID | F3 |
