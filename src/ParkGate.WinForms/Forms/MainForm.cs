@@ -22,55 +22,51 @@ public partial class MainForm : RtlFormBase
     /// <summary>The agent beats every minute; three missed beats means it is not running.</summary>
     private static readonly TimeSpan AgentStaleAfter = TimeSpan.FromMinutes(3);
 
-    private readonly ICurrentUser? _currentUser;
-    private readonly ICurrentUserSession? _currentUserSession;
-    private readonly ICurrentWorkstation? _currentWorkstation;
-    private readonly IAuthService? _authService;
-    private readonly ISettingsService? _settingsService;
-    private readonly IUnitOfWorkFactory? _uowFactory;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<MainForm>? _logger;
-    private readonly IDatabaseBackupService? _databaseBackupService;
-    private readonly ISyncStatusService? _syncStatusService;
-    private readonly IDatabaseSizeService? _databaseSizeService;
+    private readonly ICurrentUser _currentUser;
+    private readonly ICurrentUserSession _currentUserSession;
+    private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly IAuthService _authService;
+    private readonly ISettingsService _settingsService;
+    private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<MainForm> _logger;
+    private readonly IDatabaseBackupService _databaseBackupService;
+    private readonly ISyncStatusService _syncStatusService;
+    private readonly IDatabaseSizeService _databaseSizeService;
 
     private TimeSpan _serverUtcOffset = TimeSpan.Zero;
     private string? _parkTimeZoneId = "Libya Standard Time";
     private bool _isLoggingOut;
 
-    public MainForm() : this(null, null, null, null, null, null, null, null, null, null)
-    {
-    }
-
     public MainForm(
-        ICurrentUser? currentUser,
-        ICurrentUserSession? currentUserSession,
-        ICurrentWorkstation? currentWorkstation,
-        IAuthService? authService,
-        ISettingsService? settingsService,
-        IUnitOfWorkFactory? uowFactory,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<MainForm>? logger,
-        IDatabaseBackupService? databaseBackupService = null,
-        ISyncStatusService? syncStatusService = null,
-        IDatabaseSizeService? databaseSizeService = null)
+        ICurrentUser currentUser,
+        ICurrentUserSession currentUserSession,
+        ICurrentWorkstation currentWorkstation,
+        IAuthService authService,
+        ISettingsService settingsService,
+        IUnitOfWorkFactory uowFactory,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<MainForm> logger,
+        IDatabaseBackupService databaseBackupService,
+        ISyncStatusService syncStatusService,
+        IDatabaseSizeService databaseSizeService)
     {
         InitializeComponent();
 
-        _currentUser = currentUser;
-        _currentUserSession = currentUserSession;
-        _currentWorkstation = currentWorkstation;
-        _authService = authService;
-        _settingsService = settingsService;
-        _uowFactory = uowFactory;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
-        _databaseBackupService = databaseBackupService;
-        _syncStatusService = syncStatusService;
-        _databaseSizeService = databaseSizeService;
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        _currentUserSession = currentUserSession ?? throw new ArgumentNullException(nameof(currentUserSession));
+        _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _uowFactory = uowFactory ?? throw new ArgumentNullException(nameof(uowFactory));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _databaseBackupService = databaseBackupService ?? throw new ArgumentNullException(nameof(databaseBackupService));
+        _syncStatusService = syncStatusService ?? throw new ArgumentNullException(nameof(syncStatusService));
+        _databaseSizeService = databaseSizeService ?? throw new ArgumentNullException(nameof(databaseSizeService));
 
         InitializeFormText();
         ApplyCurrentUser();
@@ -116,21 +112,16 @@ public partial class MainForm : RtlFormBase
 
     public void ApplyCurrentUser()
     {
-        var fullName = _currentUser?.FullName ?? _currentUser?.UserName ?? "-";
-        var roleName = GetRoleArabicName(_currentUser?.Role);
+        var fullName = _currentUser.FullName ?? _currentUser.UserName ?? "-";
+        var roleName = GetRoleArabicName(_currentUser.Role);
         _statusUser.Text = string.Format(Strings.Status_User, fullName, roleName);
 
-        var wsName = _currentWorkstation?.DisplayName ?? _currentWorkstation?.MachineName ?? Environment.MachineName;
+        var wsName = _currentWorkstation.DisplayName ?? _currentWorkstation.MachineName ?? Environment.MachineName;
         _statusWorkstation.Text = string.Format(Strings.Status_Workstation, wsName);
     }
 
     public void ApplyPermissions()
     {
-        if (_currentUser == null)
-        {
-            return;
-        }
-
         // Operations
         _menuOperations.Visible = _currentUser.HasAny(Permission.CheckIn, Permission.RedeemGift);
         _menuCheckIn.Visible = _currentUser.Has(Permission.CheckIn);
@@ -216,22 +207,14 @@ public partial class MainForm : RtlFormBase
 
     public void ShowCheckInDesk()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.CheckIn))
+        if (!_currentUser.Has(Permission.CheckIn))
         {
             return;
         }
 
         if (_checkInDeskControl == null)
         {
-            _checkInDeskControl = _formFactory?.CreateControl<Controls.CheckInDeskControl>() ??
-                                  new Controls.CheckInDeskControl(
-                                      null, null, null, null,
-                                      _settingsService,
-                                      _currentUser,
-                                      _currentWorkstation,
-                                      _formFactory,
-                                      _notifyService,
-                                      null);
+            _checkInDeskControl = _formFactory.CreateControl<Controls.CheckInDeskControl>();
 
             _checkInDeskControl.Dock = DockStyle.Fill;
             _mainContainer.Controls.Add(_checkInDeskControl);
@@ -270,11 +253,7 @@ public partial class MainForm : RtlFormBase
     {
         if (_beneficiariesControl == null)
         {
-            _beneficiariesControl = _formFactory?.CreateControl<Controls.BeneficiariesControl>() ??
-                                    new Controls.BeneficiariesControl(
-                                        null, null, _settingsService,
-                                        _currentUser, _currentWorkstation,
-                                        _formFactory, _notifyService, null);
+            _beneficiariesControl = _formFactory.CreateControl<Controls.BeneficiariesControl>();
 
             _beneficiariesControl.Dock = DockStyle.Fill;
             _beneficiariesControl.RequestCheckIn += (_, card) => ShowCheckInDeskWithCard(card);
@@ -313,17 +292,14 @@ public partial class MainForm : RtlFormBase
 
     public void ShowGiftRedeem()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.RedeemGift))
+        if (!_currentUser.Has(Permission.RedeemGift))
         {
             return;
         }
 
         if (_giftRedeemControl == null)
         {
-            _giftRedeemControl = _formFactory?.CreateControl<Controls.GiftRedeemControl>() ??
-                                 new Controls.GiftRedeemControl(
-                                     null, null, _currentUser, _currentWorkstation,
-                                     _settingsService, _notifyService, null);
+            _giftRedeemControl = _formFactory.CreateControl<Controls.GiftRedeemControl>();
 
             _giftRedeemControl.Dock = DockStyle.Fill;
             _mainContainer.Controls.Add(_giftRedeemControl);
@@ -351,16 +327,14 @@ public partial class MainForm : RtlFormBase
 
     public void ShowReports(int tabIndex = 0)
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.ViewReports))
+        if (!_currentUser.Has(Permission.ViewReports))
         {
             return;
         }
 
         if (_reportsControl == null)
         {
-            _reportsControl = _formFactory?.CreateControl<Controls.ReportsControl>() ??
-                              new Controls.ReportsControl(
-                                  null, null, null, _settingsService, _notifyService, null);
+            _reportsControl = _formFactory.CreateControl<Controls.ReportsControl>();
 
             _reportsControl.Dock = DockStyle.Fill;
             _mainContainer.Controls.Add(_reportsControl);
@@ -393,10 +367,10 @@ public partial class MainForm : RtlFormBase
             return;
         }
 
-        _logger?.LogWarning("Cairo is not installed for GDI+; designer fonts fall back to the default font. Install it with the installer or scripts/install-cairo-font.ps1.");
-        if (warning.ShouldNotify(_currentUser?.IsInRole(UserRole.Admin) ?? false))
+        _logger.LogWarning("Cairo is not installed for GDI+; designer fonts fall back to the default font. Install it with the installer or scripts/install-cairo-font.ps1.");
+        if (warning.ShouldNotify(_currentUser.IsInRole(UserRole.Admin)))
         {
-            _notifyService?.Warning(Strings.Msg_CairoNotInstalled, Strings.Title_Warning);
+            _notifyService.Warning(Strings.Msg_CairoNotInstalled, Strings.Title_Warning);
         }
     }
 
@@ -404,19 +378,16 @@ public partial class MainForm : RtlFormBase
     {
         try
         {
-            if (_settingsService != null)
+            var settings = await _settingsService.GetSettingsAsync();
+            _parkTimeZoneId = settings.TimeZoneId;
+            if (!string.IsNullOrWhiteSpace(settings.ParkName))
             {
-                var settings = await _settingsService.GetSettingsAsync();
-                _parkTimeZoneId = settings.TimeZoneId;
-                if (!string.IsNullOrWhiteSpace(settings.ParkName))
-                {
-                    _lblWelcomeParkName.Text = settings.ParkName;
-                }
+                _lblWelcomeParkName.Text = settings.ParkName;
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load application settings for park time zone.");
+            _logger.LogWarning(ex, "Failed to load application settings for park time zone.");
         }
 
         await SyncServerTimeAsync();
@@ -426,7 +397,7 @@ public partial class MainForm : RtlFormBase
         _clockTimer.Start();
         _syncTimer.Start();
 
-        if (_currentUser?.Has(Permission.CheckIn) ?? true)
+        if (_currentUser.Has(Permission.CheckIn))
         {
             ShowCheckInDesk();
         }
@@ -434,12 +405,6 @@ public partial class MainForm : RtlFormBase
 
     private async Task SyncServerTimeAsync()
     {
-        if (_uowFactory == null)
-        {
-            SetConnectionState(true);
-            return;
-        }
-
         try
         {
             await using var uow = _uowFactory.Create();
@@ -450,7 +415,7 @@ public partial class MainForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to synchronize server time with database.");
+            _logger.LogWarning(ex, "Failed to synchronize server time with database.");
             SetConnectionState(false);
             return;
         }
@@ -464,7 +429,7 @@ public partial class MainForm : RtlFormBase
     /// </summary>
     private async Task RefreshSyncStatusAsync()
     {
-        if (_syncStatusService == null || !(_currentUser?.Has(Permission.ManageSettings) ?? false))
+        if (!(_currentUser.Has(Permission.ManageSettings)))
         {
             _statusSync.Visible = false;
             return;
@@ -497,7 +462,7 @@ public partial class MainForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to read sync status.");
+            _logger.LogWarning(ex, "Failed to read sync status.");
             _statusSync.Visible = false;
         }
     }
@@ -534,34 +499,33 @@ public partial class MainForm : RtlFormBase
 
     private void OnChangePasswordClicked(object? sender, EventArgs e)
     {
-        if (_currentUser?.UserId == null)
+        if (_currentUser.UserId == null)
         {
             return;
         }
 
-        var changeForm = _formFactory?.Create<ChangePasswordForm>() ?? new ChangePasswordForm(_authService, null);
+        var changeForm = _formFactory.Create<ChangePasswordForm>();
         changeForm.SetContext(_currentUser.UserId.Value, isMandatoryChange: false);
         changeForm.ShowDialog(this);
     }
 
     private async Task OnLogoutClickedAsync()
     {
-        var confirm = _notifyService?.Confirm(Strings.Msg_ConfirmLogout, Strings.Title_Logout)
-            ?? Notify.Confirm(Strings.Msg_ConfirmLogout, Strings.Title_Logout);
+        var confirm = _notifyService.Confirm(Strings.Msg_ConfirmLogout, Strings.Title_Logout);
 
         if (!confirm)
         {
             return;
         }
 
-        _logger?.LogInformation("User {UserName} initiated logout.", _currentUser?.UserName);
-        _authService?.Logout();
-        _currentUserSession?.Clear();
+        _logger.LogInformation("User {UserName} initiated logout.", _currentUser.UserName);
+        _authService.Logout();
+        _currentUserSession.Clear();
 
         _isLoggingOut = true;
         Hide();
 
-        var loginForm = _formFactory?.Create<LoginForm>() ?? new LoginForm(_authService, _currentWorkstation, _formFactory);
+        var loginForm = _formFactory.Create<LoginForm>();
         var result = loginForm.ShowDialog();
 
         if (result == DialogResult.OK)
@@ -585,24 +549,17 @@ public partial class MainForm : RtlFormBase
                       $"{Strings.About_Vendor}\n" +
                       $"{Strings.About_Version}";
 
-        if (_notifyService != null)
-        {
-            _notifyService.Info(message, Strings.About_Title);
-        }
-        else
-        {
-            Notify.Info(message, Strings.About_Title);
-        }
+        _notifyService.Info(message, Strings.About_Title);
     }
 
     public void ShowOrganizations()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.ManageOrganizations))
+        if (!_currentUser.Has(Permission.ManageOrganizations))
         {
             return;
         }
 
-        var form = _formFactory?.Create<OrganizationsForm>() ?? new OrganizationsForm(null, _formFactory, _notifyService, null);
+        var form = _formFactory.Create<OrganizationsForm>();
         using (form)
         {
             form.ShowDialog(this);
@@ -611,12 +568,12 @@ public partial class MainForm : RtlFormBase
 
     public void ShowAgeCategories()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.ManageAgeCategories))
+        if (!_currentUser.Has(Permission.ManageAgeCategories))
         {
             return;
         }
 
-        var form = _formFactory?.Create<AgeCategoriesForm>() ?? new AgeCategoriesForm(null, _formFactory, _notifyService, null);
+        var form = _formFactory.Create<AgeCategoriesForm>();
         using (form)
         {
             form.ShowDialog(this);
@@ -625,12 +582,12 @@ public partial class MainForm : RtlFormBase
 
     public void ShowUsers()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.ManageUsers))
+        if (!_currentUser.Has(Permission.ManageUsers))
         {
             return;
         }
 
-        var form = _formFactory?.Create<UsersForm>() ?? new UsersForm(null, _currentUser, _settingsService, _formFactory, _notifyService, null);
+        var form = _formFactory.Create<UsersForm>();
         using (form)
         {
             form.ShowDialog(this);
@@ -639,12 +596,12 @@ public partial class MainForm : RtlFormBase
 
     public void ShowWorkstations()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.ManageWorkstations))
+        if (!_currentUser.Has(Permission.ManageWorkstations))
         {
             return;
         }
 
-        var form = _formFactory?.Create<WorkstationsForm>() ?? new WorkstationsForm(null, _settingsService, _formFactory, _notifyService, null);
+        var form = _formFactory.Create<WorkstationsForm>();
         using (form)
         {
             form.ShowDialog(this);
@@ -653,12 +610,12 @@ public partial class MainForm : RtlFormBase
 
     public void ShowGiftReceiptsReport()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.ViewReports))
+        if (!_currentUser.Has(Permission.ViewReports))
         {
             return;
         }
 
-        var form = _formFactory?.Create<GiftReceiptsForm>() ?? new GiftReceiptsForm(null, null, null, _settingsService, _notifyService, null);
+        var form = _formFactory.Create<GiftReceiptsForm>();
         using (form)
         {
             form.ShowDialog(this);
@@ -667,12 +624,12 @@ public partial class MainForm : RtlFormBase
 
     public void ShowSettings()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.ManageSettings))
+        if (!_currentUser.Has(Permission.ManageSettings))
         {
             return;
         }
 
-        var form = _formFactory?.Create<SettingsForm>() ?? new SettingsForm(_settingsService, _notifyService, null);
+        var form = _formFactory.Create<SettingsForm>();
         using (form)
         {
             form.ShowDialog(this);
@@ -682,14 +639,7 @@ public partial class MainForm : RtlFormBase
     private void ShowNextPhaseNotice(string featureName)
     {
         var message = $"{featureName}:\n{Strings.Msg_FeatureInNextPhase}";
-        if (_notifyService != null)
-        {
-            _notifyService.Info(message, featureName);
-        }
-        else
-        {
-            Notify.Info(message, featureName);
-        }
+        _notifyService.Info(message, featureName);
     }
 
     private void OnMainFormClosing(object? sender, FormClosingEventArgs e)
@@ -701,8 +651,7 @@ public partial class MainForm : RtlFormBase
 
         if (e.CloseReason == CloseReason.UserClosing)
         {
-            var confirm = _notifyService?.Confirm(Strings.Msg_ConfirmExit, Strings.Title_Exit)
-                ?? Notify.Confirm(Strings.Msg_ConfirmExit, Strings.Title_Exit);
+            var confirm = _notifyService.Confirm(Strings.Msg_ConfirmExit, Strings.Title_Exit);
 
             if (!confirm)
             {
@@ -713,20 +662,14 @@ public partial class MainForm : RtlFormBase
 
     private async Task OnBackupNowClickedAsync()
     {
-        if (_currentUser != null && !_currentUser.Has(Permission.TriggerBackup))
+        if (!_currentUser.Has(Permission.TriggerBackup))
         {
-            _notifyService?.Error(Strings.Error_General_Forbidden);
+            _notifyService.Error(Strings.Error_General_Forbidden);
             return;
         }
 
-        if (_notifyService != null && !_notifyService.Confirm(Strings.Msg_ConfirmBackupNow, Strings.App_Title))
+        if (!_notifyService.Confirm(Strings.Msg_ConfirmBackupNow, Strings.App_Title))
         {
-            return;
-        }
-
-        if (_databaseBackupService == null)
-        {
-            _notifyService?.Error(Strings.Ui_Main_01);
             return;
         }
 
@@ -743,22 +686,22 @@ public partial class MainForm : RtlFormBase
                 var message = string.Format(Strings.Msg_BackupSuccess, result.Value) + sizeNote;
                 if (nearLimit)
                 {
-                    _notifyService?.Warning(message, Strings.App_Title);
+                    _notifyService.Warning(message, Strings.App_Title);
                 }
                 else
                 {
-                    _notifyService?.Info(message, Strings.App_Title);
+                    _notifyService.Info(message, Strings.App_Title);
                 }
             }
             else
             {
-                _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, result.Error.Message), Strings.App_Title);
+                _notifyService.Error(string.Format(Strings.Msg_BackupFailed, result.Error.Message), Strings.App_Title);
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Unexpected error during database backup.");
-            _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, UserMessages.Describe(ex)), Strings.App_Title);
+            _logger.LogError(ex, "Unexpected error during database backup.");
+            _notifyService.Error(string.Format(Strings.Msg_BackupFailed, UserMessages.Describe(ex)), Strings.App_Title);
         }
         finally
         {
@@ -773,11 +716,6 @@ public partial class MainForm : RtlFormBase
     /// </summary>
     private async Task<(string Note, bool NearLimit)> DescribeDatabaseSizeAsync()
     {
-        if (_databaseSizeService is null)
-        {
-            return (string.Empty, false);
-        }
-
         try
         {
             var size = await _databaseSizeService.GetAsync();
@@ -796,7 +734,7 @@ public partial class MainForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Could not read the database size after a backup.");
+            _logger.LogWarning(ex, "Could not read the database size after a backup.");
             return (string.Empty, false);
         }
     }

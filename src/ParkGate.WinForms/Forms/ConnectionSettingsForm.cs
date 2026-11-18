@@ -8,24 +8,20 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class ConnectionSettingsForm : RtlFormBase
 {
-    private readonly IConnectionSettingsStore? _settingsStore;
-    private readonly IDatabaseStartupService? _startupService;
-    private readonly IAppConnectionStringProvider? _connectionStringProvider;
-
-    public ConnectionSettingsForm() : this(null, null, null)
-    {
-    }
+    private readonly IConnectionSettingsStore _settingsStore;
+    private readonly IDatabaseStartupService _startupService;
+    private readonly IAppConnectionStringProvider _connectionStringProvider;
 
     public ConnectionSettingsForm(
-        IConnectionSettingsStore? settingsStore,
-        IDatabaseStartupService? startupService,
-        IAppConnectionStringProvider? connectionStringProvider)
+        IConnectionSettingsStore settingsStore,
+        IDatabaseStartupService startupService,
+        IAppConnectionStringProvider connectionStringProvider)
     {
         InitializeComponent();
 
-        _settingsStore = settingsStore;
-        _startupService = startupService;
-        _connectionStringProvider = connectionStringProvider;
+        _settingsStore = settingsStore ?? throw new ArgumentNullException(nameof(settingsStore));
+        _startupService = startupService ?? throw new ArgumentNullException(nameof(startupService));
+        _connectionStringProvider = connectionStringProvider ?? throw new ArgumentNullException(nameof(connectionStringProvider));
 
         InitializeFormTextAndOptions();
         PopulateFromExistingSettings();
@@ -53,8 +49,8 @@ public partial class ConnectionSettingsForm : RtlFormBase
 
     private void PopulateFromExistingSettings()
     {
-        var connStr = _connectionStringProvider?.CurrentConnectionString
-            ?? _settingsStore?.GetConnectionString()
+        var connStr = _connectionStringProvider.CurrentConnectionString
+            ?? _settingsStore.GetConnectionString()
             ?? "Server=(localdb)\\mssqllocaldb;Database=ParkGate_Dev;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 
         ParseConnectionString(connStr);
@@ -164,7 +160,7 @@ public partial class ConnectionSettingsForm : RtlFormBase
         try
         {
             var connStr = BuildConnectionString();
-            var canConnect = _startupService != null && await _startupService.CanConnectAsync(connStr);
+            var canConnect = await _startupService.CanConnectAsync(connStr);
 
             if (canConnect)
             {
@@ -204,25 +200,22 @@ public partial class ConnectionSettingsForm : RtlFormBase
             var connStr = BuildConnectionString();
 
             // Check connection before saving
-            if (_startupService != null)
+            var canConnect = await _startupService.CanConnectAsync(connStr);
+            if (!canConnect)
             {
-                var canConnect = await _startupService.CanConnectAsync(connStr);
-                if (!canConnect)
-                {
-                    var proceedAnyway = Notify.Confirm(
-                        Strings.Msg_ConnectionFailed + Environment.NewLine + Strings.Ui_ConnectionSettings_02,
-                        Strings.Title_Confirm,
-                        this);
+                var proceedAnyway = Notify.Confirm(
+                    Strings.Msg_ConnectionFailed + Environment.NewLine + Strings.Ui_ConnectionSettings_02,
+                    Strings.Title_Confirm,
+                    this);
 
-                    if (!proceedAnyway)
-                    {
-                        return;
-                    }
+                if (!proceedAnyway)
+                {
+                    return;
                 }
             }
 
-            _settingsStore?.SaveConnectionString(connStr);
-            _connectionStringProvider?.UpdateConnectionString(connStr);
+            _settingsStore.SaveConnectionString(connStr);
+            _connectionStringProvider.UpdateConnectionString(connStr);
 
             DialogResult = DialogResult.OK;
             Close();

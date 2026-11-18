@@ -20,40 +20,36 @@ namespace ParkGate.WinForms.Controls;
 /// </summary>
 public partial class GiftRedeemControl : UserControl
 {
-    private readonly IGiftVoucherService? _giftVoucherService;
-    private readonly IGiftReportService? _giftReportService;
-    private readonly ICurrentUser? _currentUser;
-    private readonly ICurrentWorkstation? _currentWorkstation;
-    private readonly ISettingsService? _settingsService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<GiftRedeemControl>? _logger;
+    private readonly IGiftVoucherService _giftVoucherService;
+    private readonly IGiftReportService _giftReportService;
+    private readonly ICurrentUser _currentUser;
+    private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly ISettingsService _settingsService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<GiftRedeemControl> _logger;
 
     private bool _isBusy;
     private bool _denialSoundEnabled = true;
     private string? _timeZoneId = "Libya Standard Time";
 
-    public GiftRedeemControl() : this(null, null, null, null, null, null, null)
-    {
-    }
-
     public GiftRedeemControl(
-        IGiftVoucherService? giftVoucherService,
-        IGiftReportService? giftReportService,
-        ICurrentUser? currentUser,
-        ICurrentWorkstation? currentWorkstation,
-        ISettingsService? settingsService,
-        INotifyService? notifyService,
-        ILogger<GiftRedeemControl>? logger)
+        IGiftVoucherService giftVoucherService,
+        IGiftReportService giftReportService,
+        ICurrentUser currentUser,
+        ICurrentWorkstation currentWorkstation,
+        ISettingsService settingsService,
+        INotifyService notifyService,
+        ILogger<GiftRedeemControl> logger)
     {
         InitializeComponent();
 
-        _giftVoucherService = giftVoucherService;
-        _giftReportService = giftReportService;
-        _currentUser = currentUser;
-        _currentWorkstation = currentWorkstation;
-        _settingsService = settingsService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _giftVoucherService = giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService));
+        _giftReportService = giftReportService ?? throw new ArgumentNullException(nameof(giftReportService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeControlText();
         Theme.ApplyGridStyle(_gridToday);
@@ -112,17 +108,12 @@ public partial class GiftRedeemControl : UserControl
     private void ApplyPermissions()
     {
         // ViewReports controls visibility of today's workstation grid per T-G9
-        var canViewReports = _currentUser == null || _currentUser.Has(Permission.ViewReports);
+        var canViewReports = _currentUser.Has(Permission.ViewReports);
         _grpToday.Visible = canViewReports;
     }
 
     private async Task LoadSettingsAsync()
     {
-        if (_settingsService == null)
-        {
-            return;
-        }
-
         try
         {
             var settings = await _settingsService.GetSettingsAsync();
@@ -131,7 +122,7 @@ public partial class GiftRedeemControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load settings in GiftRedeemControl.");
+            _logger.LogWarning(ex, "Failed to load settings in GiftRedeemControl.");
         }
     }
 
@@ -173,12 +164,6 @@ public partial class GiftRedeemControl : UserControl
         }
 
         var normalizedInput = DigitNormalizer.NormalizeDigits(rawInput);
-
-        if (_giftVoucherService == null)
-        {
-            _statusBanner.SetDenied(Strings.Ui_GiftRedeem_01, null);
-            return;
-        }
 
         _isBusy = true;
         _txtScan.Enabled = false;
@@ -227,7 +212,7 @@ public partial class GiftRedeemControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Unexpected error redeeming gift voucher.");
+            _logger.LogError(ex, "Unexpected error redeeming gift voucher.");
             _statusBanner.SetDenied(Strings.Msg_UnexpectedError, null);
         }
         finally
@@ -241,12 +226,7 @@ public partial class GiftRedeemControl : UserControl
 
     public async Task RefreshTodayRedemptionsAsync()
     {
-        if (_giftReportService == null)
-        {
-            return;
-        }
-
-        if (_currentUser != null && !_currentUser.Has(Permission.ViewReports))
+        if (!_currentUser.Has(Permission.ViewReports))
         {
             return;
         }
@@ -261,7 +241,7 @@ public partial class GiftRedeemControl : UserControl
                 today,
                 today,
                 organizationId: null,
-                workstationId: _currentWorkstation?.WorkstationId,
+                workstationId: _currentWorkstation.WorkstationId,
                 filter: GiftReceiptFilter.Redeemed);
 
             if (reportResult.IsSuccess)
@@ -294,7 +274,7 @@ public partial class GiftRedeemControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to refresh today's gift redemptions.");
+            _logger.LogWarning(ex, "Failed to refresh today's gift redemptions.");
         }
     }
 

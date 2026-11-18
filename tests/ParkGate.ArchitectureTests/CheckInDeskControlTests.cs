@@ -25,7 +25,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_InitialState_ShouldHaveZonesConfiguredAndRtl()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
 
         control.RightToLeft.ShouldBe(RightToLeft.Yes);
 
@@ -72,7 +72,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_ShowHolderInfo_WhenEligible_ShouldEnableRecordEntry()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
 
         var holder = new BeneficiaryDto(
             Id: Guid.NewGuid(),
@@ -118,7 +118,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_ShowHolderInfo_WhenCooldownActive_ShouldDisableRecordEntryAndEnableOverride()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
 
         var holder = new BeneficiaryDto(
             Id: Guid.NewGuid(),
@@ -160,7 +160,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_ShowInlineRegistration_ShouldToggleVisibility()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
 
         var grpHolder = GetField<GroupBox>(control, "_grpHolder");
         var grpReg = GetField<GroupBox>(control, "_grpRegistration");
@@ -177,7 +177,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_ResetDesk_ShouldClearStateAndFocusCard()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
 
         var holder = new BeneficiaryDto(
             Id: Guid.NewGuid(),
@@ -219,7 +219,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_PopulateAgeCategories_ShouldCreateCounterInputs()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
 
         control.PopulateAgeCategories(
         [
@@ -238,7 +238,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_CompanionsExceedingMaxGroupSize_ShouldDisableRecordEntry()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
 
         var holder = new BeneficiaryDto(
             Id: Guid.NewGuid(),
@@ -291,7 +291,7 @@ public sealed class CheckInDeskControlTests
     {
         // R6.16: Application masks the ID for operators; the desk shows exactly what it receives.
         var operatorUser = new FakeCurrentUser { Role = UserRole.Operator, UserId = 1, UserName = "op1" };
-        using var control = new CheckInDeskControl(null, null, null, null, null, operatorUser, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(operatorUser);
 
         var holder = new BeneficiaryDto(
             Id: Guid.NewGuid(),
@@ -318,7 +318,7 @@ public sealed class CheckInDeskControlTests
     public void CheckInDeskControl_SupervisorRole_ShouldNotMaskNationalId()
     {
         var supervisorUser = new FakeCurrentUser { Role = UserRole.Supervisor, UserId = 2, UserName = "sup1" };
-        using var control = new CheckInDeskControl(null, null, null, null, null, supervisorUser, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(supervisorUser);
 
         var holder = new BeneficiaryDto(
             Id: Guid.NewGuid(),
@@ -345,7 +345,7 @@ public sealed class CheckInDeskControlTests
     public async Task CheckInDeskControl_LookupCardAsync_WhenCardNotFound_ShowsInlineRegistration()
     {
         var fakeBeneficiaryService = new FakeBeneficiaryService();
-        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(fakeBeneficiaryService);
 
         var txtCard = GetField<TextBox>(control, "_txtCardNumber");
         txtCard.Text = "998877";
@@ -366,7 +366,7 @@ public sealed class CheckInDeskControlTests
     public async Task CheckInDeskControl_LookupCardAsync_NormalizesArabicDigits()
     {
         var fakeBeneficiaryService = new FakeBeneficiaryService();
-        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(fakeBeneficiaryService);
 
         var txtCard = GetField<TextBox>(control, "_txtCardNumber");
         txtCard.Text = "١٢٣٤٥";
@@ -411,7 +411,7 @@ public sealed class CheckInDeskControlTests
             LookupReturnResult = [new BeneficiaryLookupResultDto(holder, eligibility, [])]
         };
 
-        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(fakeBeneficiaryService);
 
         var txtCard = GetField<TextBox>(control, "_txtCardNumber");
         txtCard.Text = "100200";
@@ -462,7 +462,7 @@ public sealed class CheckInDeskControlTests
             RemainingCooldownMinutes: null);
 
         var fakeCheckInService = new FakeCheckInService();
-        using var control = new CheckInDeskControl(null, fakeCheckInService, null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(fakeCheckInService);
         control.AutoResetDelayMs = -1;
 
         control.PopulateAgeCategories(
@@ -496,7 +496,7 @@ public sealed class CheckInDeskControlTests
             BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
         var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
 
-        using var control = new CheckInDeskControl(null, new FakeCheckInService(), null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(new FakeCheckInService());
         control.AutoResetDelayMs = 0;
         control.ShowHolderInfo(holder, eligibility);
         GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeTrue();
@@ -515,7 +515,7 @@ public sealed class CheckInDeskControlTests
         var orgs = new FakeOrganizationService(
             new ParkGate.Application.Organizations.DTOs.OrganizationDto(1, "SHA", "هيئة الشهداء", 720, IsDefault: false, IsActive: true),
             new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
-        var control = new CheckInDeskControl(beneficiaries, null, orgs, null, null, null, null, null, null, null);
+        var control = TestUi.Create<CheckInDeskControl>(beneficiaries, orgs);
         return (control, beneficiaries);
     }
 
@@ -587,7 +587,7 @@ public sealed class CheckInDeskControlTests
         var orgs = new FakeOrganizationService(
             new ParkGate.Application.Organizations.DTOs.OrganizationDto(1, "SHA", "هيئة الشهداء", 720, IsDefault: false, IsActive: true),
             new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
-        using var control = new CheckInDeskControl(beneficiaries, null, orgs, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries, orgs);
         await control.OnDeskLoadedAsync();
         var filter = GetField<ComboBox>(control, "_cmbOrganization");
         filter.SelectedIndex = 1; // هيئة الشهداء (id 1)
@@ -620,7 +620,7 @@ public sealed class CheckInDeskControlTests
     public void CheckInDeskControl_Escape_OnHalfFilledRegistration_AsksFirst(bool confirm, bool formStays)
     {
         var notify = new FakeNotifyService(confirm);
-        using var control = new CheckInDeskControl(null, null, null, null, null, null, null, null, notify, null);
+        using var control = TestUi.Create<CheckInDeskControl>(notify);
         control.ShowInlineRegistration("888");
         GetField<TextBox>(control, "_txtRegFullName").Text = "سالم محمود";
 
@@ -635,7 +635,7 @@ public sealed class CheckInDeskControlTests
     public void CheckInDeskControl_Escape_OnEmptyRegistration_ResetsWithoutAsking()
     {
         var notify = new FakeNotifyService(confirmAnswer: false);
-        using var control = new CheckInDeskControl(null, null, null, null, null, null, null, null, notify, null);
+        using var control = TestUi.Create<CheckInDeskControl>(notify);
         control.ShowInlineRegistration("889");
 
         PressEscape(control).ShouldBeTrue();
@@ -679,10 +679,8 @@ public sealed class CheckInDeskControlTests
         {
             LookupReturnResult = [MatchIn(1, "هيئة الشهداء", "أحمد"), MatchIn(2, "صندوق التضامن", "سالم")]
         };
-        using var control = new CheckInDeskControl(beneficiaries, null, null, null, null, null, null, null, null, null)
-        {
-            ChooseOrganizationOverride = _ => null
-        };
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries);
+        control.ChooseOrganizationOverride = _ => null;
         GetField<TextBox>(control, "_txtCardNumber").Text = "999";
 
         await control.LookupCardAsync();
@@ -719,7 +717,7 @@ public sealed class CheckInDeskControlTests
     public async Task CheckInDeskControl_AgeCategoriesFailToLoad_NoFakeCountersAndRecordingDisabled()
     {
         var categories = new FailingAgeCategoryService();
-        using var control = new CheckInDeskControl(null, null, null, categories, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(categories);
 
         await control.LoadAgeCategoriesAsync();
 
@@ -738,7 +736,7 @@ public sealed class CheckInDeskControlTests
     public async Task CheckInDeskControl_AgeCategoriesFailed_NextLookupRetriesLoading()
     {
         var categories = new FailingAgeCategoryService();
-        using var control = new CheckInDeskControl(new FakeBeneficiaryService(), null, null, categories, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(new FakeBeneficiaryService(), categories);
         // Creating the handle raises Load, which loads the desk once; measure only what the lookup does.
         // Fakes complete synchronously, so Load runs to the end here, on the test thread.
         control.CreateControl();
@@ -763,11 +761,9 @@ public sealed class CheckInDeskControlTests
             BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
         var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
         var beneficiaries = new FakeBeneficiaryService { LookupReturnResult = [new BeneficiaryLookupResultDto(next, eligibility, [])] };
-        var control = new CheckInDeskControl(beneficiaries, new FakeCheckInService(), null, null, null, null, null, null, null, null)
-        {
-            AutoResetDelayMs = 300,
-            SuccessDelay = _ => delay.Task
-        };
+        var control = TestUi.Create<CheckInDeskControl>(beneficiaries, new FakeCheckInService());
+        control.AutoResetDelayMs = 300;
+        control.SuccessDelay = _ => delay.Task;
         control.ShowHolderInfo(
             new BeneficiaryDto(Guid.NewGuid(), 1, "صندوق التضامن", "100", "الحامل الأول", "0912345678", null, null,
                 BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow),
@@ -813,7 +809,7 @@ public sealed class CheckInDeskControlTests
     public async Task CheckInDeskControl_LookupWhileSearching_IsQueuedNotDropped()
     {
         var beneficiaries = new FakeBeneficiaryService { LookupGate = new TaskCompletionSource() };
-        using var control = new CheckInDeskControl(beneficiaries, null, null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries);
         var cardBox = GetField<TextBox>(control, "_txtCardNumber");
 
         cardBox.Text = "111";
@@ -847,7 +843,7 @@ public sealed class CheckInDeskControlTests
     public async Task CheckInDeskControl_RefreshTodayDeskSummaryAsync_UpdatesSummaryStripAndBreakdown()
     {
         var fakeCheckInService = new FakeCheckInService();
-        using var control = new CheckInDeskControl(null, fakeCheckInService, null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(fakeCheckInService);
 
         await control.RefreshTodayDeskSummaryAsync();
 
@@ -859,7 +855,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_ProcessCmdKey_F2_StartsManualRegistration()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
         var txtCard = GetField<TextBox>(control, "_txtCardNumber");
         txtCard.Text = "554433";
 
@@ -876,7 +872,7 @@ public sealed class CheckInDeskControlTests
     [Fact]
     public void CheckInDeskControl_ProcessCmdKey_Escape_ResetsDesk()
     {
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
         var txtCard = GetField<TextBox>(control, "_txtCardNumber");
         txtCard.Text = "554433";
 
@@ -919,7 +915,7 @@ public sealed class CheckInDeskControlTests
             RemainingCooldownMinutes: null);
 
         var fakeBeneficiaryService = new FakeBeneficiaryService();
-        using var control = new CheckInDeskControl(fakeBeneficiaryService, null, null, null, null, null, null, null, null, null);
+        using var control = TestUi.Create<CheckInDeskControl>(fakeBeneficiaryService);
 
         control.ShowHolderInfo(holder, eligibility);
         var lblName = GetField<Label>(control, "_lblHolderName");
@@ -965,7 +961,7 @@ public sealed class CheckInDeskControlTests
             NextAllowedEntryUtc: null,
             RemainingCooldownMinutes: null);
 
-        using var control = new CheckInDeskControl();
+        using var control = TestUi.Create<CheckInDeskControl>();
         control.ShowHolderInfo(holder, eligibility);
 
         var lblName = GetField<Label>(control, "_lblHolderName");

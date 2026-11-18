@@ -36,7 +36,7 @@ public sealed class ManagementFormsTests
     [Fact]
     public void EditOrganizationDialog_ParameterlessCtor_ShouldInitializeRtl()
     {
-        using var dialog = new EditOrganizationDialog();
+        using var dialog = TestUi.Create<EditOrganizationDialog>();
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
         dialog.Text.ShouldBe(Strings.Title_AddOrganization);
     }
@@ -47,7 +47,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeOrganizationService();
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new EditOrganizationDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<EditOrganizationDialog>(fakeService, fakeNotify);
 
         var txtCode = GetField<TextBox>(dialog, "_txtCode");
         var txtName = GetField<TextBox>(dialog, "_txtNameAr");
@@ -75,7 +75,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeOrganizationService([org]);
         var fakeNotify = new FakeNotifyService { NextConfirmResult = true };
 
-        using var form = new OrganizationsForm(fakeService, null, fakeNotify, null);
+        using var form = TestUi.Create<OrganizationsForm>(fakeService, fakeNotify);
         await form.LoadOrganizationsAsync();
 
         var grid = GetField<DataGridView>(form, "_gridOrganizations");
@@ -93,7 +93,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeOrganizationService();
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new EditOrganizationDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<EditOrganizationDialog>(fakeService, fakeNotify);
 
         var txtCode = GetField<TextBox>(dialog, "_txtCode");
         var txtName = GetField<TextBox>(dialog, "_txtNameAr");
@@ -138,7 +138,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeOrganizationService([existing]);
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new EditOrganizationDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<EditOrganizationDialog>(fakeService, fakeNotify);
         dialog.SetOrganization(existing);
 
         var txtName = GetField<TextBox>(dialog, "_txtNameAr");
@@ -173,7 +173,7 @@ public sealed class ManagementFormsTests
     [Fact]
     public void EditOrganizationDialog_GiftControls_ShouldBeDisabledWhenGiftsOff()
     {
-        using var dialog = new EditOrganizationDialog();
+        using var dialog = TestUi.Create<EditOrganizationDialog>();
 
         var chkGiftEnabled = GetField<CheckBox>(dialog, "_chkGiftEnabled");
         var numGiftValue = GetField<NumericUpDown>(dialog, "_numGiftValue");
@@ -198,7 +198,7 @@ public sealed class ManagementFormsTests
         var org = new OrganizationDto(1, "ORG_POLICY", "جهة السياسة", 720, false, true, MaxFreeCompanions: 3, GiftEnabled: true, GiftValue: 12.5m, GiftIntervalDays: 14);
         var fakeService = new FakeOrganizationService([org]);
 
-        using var form = new OrganizationsForm(fakeService, null, null, null);
+        using var form = TestUi.Create<OrganizationsForm>(fakeService);
         await form.LoadOrganizationsAsync();
 
         var grid = GetField<DataGridView>(form, "_gridOrganizations");
@@ -219,7 +219,7 @@ public sealed class ManagementFormsTests
     [Fact]
     public void EditAgeCategoryDialog_ParameterlessCtor_ShouldInitializeRtl()
     {
-        using var dialog = new EditAgeCategoryDialog();
+        using var dialog = TestUi.Create<EditAgeCategoryDialog>();
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
         dialog.Text.ShouldBe(Strings.Title_AddAgeCategory);
     }
@@ -230,7 +230,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeAgeCategoryService();
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new EditAgeCategoryDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<EditAgeCategoryDialog>(fakeService, fakeNotify);
 
         var txtName = GetField<TextBox>(dialog, "_txtNameAr");
         var txtDesc = GetField<TextBox>(dialog, "_txtDescriptionAr");
@@ -255,7 +255,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeAgeCategoryService([cat]);
         var fakeNotify = new FakeNotifyService { NextConfirmResult = true };
 
-        using var form = new AgeCategoriesForm(fakeService, null, fakeNotify, null);
+        using var form = TestUi.Create<AgeCategoriesForm>(fakeService, fakeNotify);
         await form.LoadAgeCategoriesAsync();
 
         var grid = GetField<DataGridView>(form, "_gridAgeCategories");
@@ -274,7 +274,7 @@ public sealed class ManagementFormsTests
         var fakeNotify = new FakeNotifyService();
 
         // 1. Create with exempt = true
-        using (var createDialog = new EditAgeCategoryDialog(fakeService, fakeNotify, null))
+        using (var createDialog = TestUi.Create<EditAgeCategoryDialog>(fakeService, fakeNotify))
         {
             var txtName = GetField<TextBox>(createDialog, "_txtNameAr");
             var chkExempt = GetField<CheckBox>(createDialog, "_chkIsCompanionLimitExempt");
@@ -291,7 +291,7 @@ public sealed class ManagementFormsTests
         // 2. Edit with exempt = false
         var existing = new AgeCategoryDto(1, "طفل", "من 2 إلى 12", 2, true, IsCompanionLimitExempt: true);
         fakeService = new FakeAgeCategoryService([existing]);
-        using (var editDialog = new EditAgeCategoryDialog(fakeService, fakeNotify, null))
+        using (var editDialog = TestUi.Create<EditAgeCategoryDialog>(fakeService, fakeNotify))
         {
             editDialog.SetAgeCategory(existing);
             var chkExempt = GetField<CheckBox>(editDialog, "_chkIsCompanionLimitExempt");
@@ -313,7 +313,7 @@ public sealed class ManagementFormsTests
         var catNonExempt = new AgeCategoryDto(2, "بالغ", "أكبر من 18 سنة", 2, true, IsCompanionLimitExempt: false);
         var fakeService = new FakeAgeCategoryService([catExempt, catNonExempt]);
 
-        using var form = new AgeCategoriesForm(fakeService, null, null, null);
+        using var form = TestUi.Create<AgeCategoriesForm>(fakeService);
         await form.LoadAgeCategoriesAsync();
 
         var grid = GetField<DataGridView>(form, "_gridAgeCategories");
@@ -329,7 +329,7 @@ public sealed class ManagementFormsTests
     [Fact]
     public void EditWorkstationDialog_ParameterlessCtor_ShouldInitializeRtl()
     {
-        using var dialog = new EditWorkstationDialog();
+        using var dialog = TestUi.Create<EditWorkstationDialog>();
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
         dialog.Text.ShouldBe(Strings.Title_EditWorkstation);
     }
@@ -341,7 +341,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeWorkstationService([ws]);
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new EditWorkstationDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<EditWorkstationDialog>(fakeService, fakeNotify);
         dialog.SetWorkstation(ws);
 
         var txtName = GetField<TextBox>(dialog, "_txtDisplayName");
@@ -362,7 +362,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeWorkstationService([ws]);
         var fakeNotify = new FakeNotifyService { NextConfirmResult = true };
 
-        using var form = new WorkstationsForm(fakeService, null, null, fakeNotify, null);
+        using var form = TestUi.Create<WorkstationsForm>(fakeService, fakeNotify);
         await form.LoadWorkstationsAsync();
 
         var grid = GetField<DataGridView>(form, "_gridWorkstations");
@@ -381,7 +381,7 @@ public sealed class ManagementFormsTests
     [Fact]
     public void CreateUserDialog_ParameterlessCtor_ShouldInitializeRtl()
     {
-        using var dialog = new CreateUserDialog();
+        using var dialog = TestUi.Create<CreateUserDialog>();
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
         dialog.Text.ShouldBe(Strings.Title_CreateUser);
     }
@@ -392,7 +392,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeUserService();
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new CreateUserDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<CreateUserDialog>(fakeService, fakeNotify);
 
         var txtUser = GetField<TextBox>(dialog, "_txtUserName");
         var txtFull = GetField<TextBox>(dialog, "_txtFullName");
@@ -431,7 +431,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeUserService([user]);
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new ChangeUserRoleDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<ChangeUserRoleDialog>(fakeService, fakeNotify);
         dialog.SetUser(user);
 
         var cmbRole = GetField<ComboBox>(dialog, "_cmbRole");
@@ -451,7 +451,7 @@ public sealed class ManagementFormsTests
         var fakeService = new FakeUserService([user]);
         var fakeNotify = new FakeNotifyService();
 
-        using var dialog = new ResetUserPasswordDialog(fakeService, fakeNotify, null);
+        using var dialog = TestUi.Create<ResetUserPasswordDialog>(fakeService, fakeNotify);
         dialog.SetUser(user);
 
         var txtPass = GetField<TextBox>(dialog, "_txtNewPassword");
@@ -478,7 +478,7 @@ public sealed class ManagementFormsTests
         var fakeNotify = new FakeNotifyService();
         var currentUser = new FakeCurrentUser(5, "admin", "Admin User", UserRole.Admin);
 
-        using var form = new UsersForm(fakeService, currentUser, null, null, fakeNotify, null);
+        using var form = TestUi.Create<UsersForm>(fakeService, currentUser, fakeNotify);
         await form.LoadUsersAsync();
 
         await form.ToggleActiveAsync();
@@ -494,7 +494,7 @@ public sealed class ManagementFormsTests
     [Fact]
     public void SettingsForm_ParameterlessCtor_ShouldInitializeRtl()
     {
-        using var form = new SettingsForm();
+        using var form = TestUi.Create<SettingsForm>();
         form.RightToLeft.ShouldBe(RightToLeft.Yes);
         form.Text.ShouldBe(Strings.Title_Settings);
     }
@@ -517,7 +517,7 @@ public sealed class ManagementFormsTests
         var fakeSettingsService = new FakeSettingsService(initialSettings);
         var fakeNotify = new FakeNotifyService();
 
-        using var form = new SettingsForm(fakeSettingsService, fakeNotify, null);
+        using var form = TestUi.Create<SettingsForm>(fakeSettingsService, fakeNotify);
         await form.LoadSettingsAsync();
 
         var numCooldown = GetField<NumericUpDown>(form, "_numCooldownHours");

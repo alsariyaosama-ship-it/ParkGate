@@ -18,12 +18,12 @@ namespace ParkGate.WinForms.Controls;
 
 public partial class ReportsControl : UserControl
 {
-    private readonly IReportService? _reportService;
-    private readonly IExcelExportService? _excelExportService;
-    private readonly IOrganizationService? _organizationService;
-    private readonly ISettingsService? _settingsService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<ReportsControl>? _logger;
+    private readonly IReportService _reportService;
+    private readonly IExcelExportService _excelExportService;
+    private readonly IOrganizationService _organizationService;
+    private readonly ISettingsService _settingsService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<ReportsControl> _logger;
 
     private List<OrganizationDto> _organizations = [];
     private IReadOnlyList<AgeCategoryDto> _activeCategories = [];
@@ -37,26 +37,22 @@ public partial class ReportsControl : UserControl
 
     private string? _timeZoneId = "Libya Standard Time";
 
-    public ReportsControl() : this(null, null, null, null, null, null)
-    {
-    }
-
     public ReportsControl(
-        IReportService? reportService,
-        IExcelExportService? excelExportService,
-        IOrganizationService? organizationService,
-        ISettingsService? settingsService,
-        INotifyService? notifyService,
-        ILogger<ReportsControl>? logger)
+        IReportService reportService,
+        IExcelExportService excelExportService,
+        IOrganizationService organizationService,
+        ISettingsService settingsService,
+        INotifyService notifyService,
+        ILogger<ReportsControl> logger)
     {
         InitializeComponent();
 
-        _reportService = reportService;
-        _excelExportService = excelExportService;
-        _organizationService = organizationService;
-        _settingsService = settingsService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
+        _excelExportService = excelExportService ?? throw new ArgumentNullException(nameof(excelExportService));
+        _organizationService = organizationService ?? throw new ArgumentNullException(nameof(organizationService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         ApplyLocalizedTexts();
         ApplyStyles();
@@ -154,11 +150,8 @@ public partial class ReportsControl : UserControl
     {
         try
         {
-            if (_settingsService != null)
-            {
-                var settings = await _settingsService.GetSettingsAsync();
-                _timeZoneId = settings.TimeZoneId;
-            }
+            var settings = await _settingsService.GetSettingsAsync();
+            _timeZoneId = settings.TimeZoneId;
 
             await LoadOrganizationsAsync();
             await LoadActiveCategoriesAsync();
@@ -169,7 +162,7 @@ public partial class ReportsControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to initialize reports control.");
+            _logger.LogError(ex, "Failed to initialize reports control.");
         }
     }
 
@@ -202,11 +195,6 @@ public partial class ReportsControl : UserControl
 
     private async Task LoadOrganizationsAsync()
     {
-        if (_organizationService == null)
-        {
-            return;
-        }
-
         try
         {
             var orgs = await _organizationService.GetAllAsync(activeOnly: true);
@@ -222,17 +210,12 @@ public partial class ReportsControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error loading organizations for report filter.");
+            _logger.LogError(ex, "Error loading organizations for report filter.");
         }
     }
 
     private async Task LoadActiveCategoriesAsync()
     {
-        if (_reportService == null)
-        {
-            return;
-        }
-
         try
         {
             var res = await _reportService.GetActiveAgeCategoriesAsync();
@@ -243,7 +226,7 @@ public partial class ReportsControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error loading active age categories for reports.");
+            _logger.LogError(ex, "Error loading active age categories for reports.");
         }
     }
 
@@ -273,18 +256,13 @@ public partial class ReportsControl : UserControl
 
     public async Task RunCurrentReportAsync()
     {
-        if (_reportService == null)
-        {
-            return;
-        }
-
         var fromDate = DateOnly.FromDateTime(_dtpFromDate.Value);
         var toDate = DateOnly.FromDateTime(_dtpToDate.Value);
         var isDailyTab = _tabControl.SelectedIndex == 0;
 
         if (!isDailyTab && fromDate > toDate)
         {
-            _notifyService?.Warning(Strings.Msg_InvalidDateRange);
+            _notifyService.Warning(Strings.Msg_InvalidDateRange);
             return;
         }
 
@@ -316,8 +294,8 @@ public partial class ReportsControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error generating report.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error generating report.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
         finally
         {
@@ -339,7 +317,7 @@ public partial class ReportsControl : UserControl
         var result = await _reportService!.GetDailySummaryAsync(date, SelectedOrganizationId);
         if (!result.IsSuccess)
         {
-            _notifyService?.Error(ErrorMessages.GetMessage(result.Error));
+            _notifyService.Error(ErrorMessages.GetMessage(result.Error));
             return;
         }
 
@@ -439,7 +417,7 @@ public partial class ReportsControl : UserControl
         var result = await _reportService!.GetDateRangeSummaryAsync(fromDate, toDate, SelectedOrganizationId);
         if (!result.IsSuccess)
         {
-            _notifyService?.Error(ErrorMessages.GetMessage(result.Error));
+            _notifyService.Error(ErrorMessages.GetMessage(result.Error));
             return;
         }
 
@@ -511,7 +489,7 @@ public partial class ReportsControl : UserControl
         var result = await _reportService!.GetOrganizationStatisticsAsync(fromDate, toDate, SelectedOrganizationId);
         if (!result.IsSuccess)
         {
-            _notifyService?.Error(ErrorMessages.GetMessage(result.Error));
+            _notifyService.Error(ErrorMessages.GetMessage(result.Error));
             return;
         }
 
@@ -577,7 +555,7 @@ public partial class ReportsControl : UserControl
         var result = await _reportService!.GetOperatorWorkstationStatisticsAsync(fromDate, toDate);
         if (!result.IsSuccess)
         {
-            _notifyService?.Error(ErrorMessages.GetMessage(result.Error));
+            _notifyService.Error(ErrorMessages.GetMessage(result.Error));
             return;
         }
 
@@ -648,7 +626,7 @@ public partial class ReportsControl : UserControl
         var result = await _reportService!.GetDenialsAndOverridesLogAsync(fromDate, toDate, SelectedOrganizationId, SelectedDenialFilter);
         if (!result.IsSuccess)
         {
-            _notifyService?.Error(ErrorMessages.GetMessage(result.Error));
+            _notifyService.Error(ErrorMessages.GetMessage(result.Error));
             return;
         }
 
@@ -711,7 +689,7 @@ public partial class ReportsControl : UserControl
         var result = await _reportService!.GetHourlyDistributionAsync(fromDate, toDate, SelectedOrganizationId, _timeZoneId);
         if (!result.IsSuccess)
         {
-            _notifyService?.Error(ErrorMessages.GetMessage(result.Error));
+            _notifyService.Error(ErrorMessages.GetMessage(result.Error));
             return;
         }
 
@@ -751,11 +729,6 @@ public partial class ReportsControl : UserControl
     // Excel Export
     public async Task ExportToExcelAsync()
     {
-        if (_excelExportService == null)
-        {
-            return;
-        }
-
         byte[]? bytes = null;
         string defaultFileName = string.Empty;
 
@@ -813,7 +786,7 @@ public partial class ReportsControl : UserControl
 
         if (bytes == null || bytes.Length == 0)
         {
-            _notifyService?.Warning(Strings.Msg_NoDataToExport);
+            _notifyService.Warning(Strings.Msg_NoDataToExport);
             return;
         }
 
@@ -829,12 +802,12 @@ public partial class ReportsControl : UserControl
             try
             {
                 await File.WriteAllBytesAsync(sfd.FileName, bytes);
-                _notifyService?.Info(Strings.Msg_ExportSuccess);
+                _notifyService.Info(Strings.Msg_ExportSuccess);
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to save exported excel file.");
-                _notifyService?.Error(Strings.Ui_Reports_09);
+                _logger.LogError(ex, "Failed to save exported excel file.");
+                _notifyService.Error(Strings.Ui_Reports_09);
             }
         }
     }
@@ -861,8 +834,8 @@ public partial class ReportsControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error opening print preview.");
-            _notifyService?.Error(Strings.Ui_Reports_10);
+            _logger.LogError(ex, "Error opening print preview.");
+            _notifyService.Error(Strings.Ui_Reports_10);
         }
     }
 

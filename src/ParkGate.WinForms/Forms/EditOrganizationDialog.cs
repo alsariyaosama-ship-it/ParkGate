@@ -14,28 +14,24 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class EditOrganizationDialog : RtlFormBase
 {
-    private readonly IOrganizationService? _organizationService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<EditOrganizationDialog>? _logger;
+    private readonly IOrganizationService _organizationService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<EditOrganizationDialog> _logger;
 
     private OrganizationDto? _existingOrg;
 
     public OrganizationDto? SavedOrganization { get; private set; }
 
-    public EditOrganizationDialog() : this(null, null, null)
-    {
-    }
-
     public EditOrganizationDialog(
-        IOrganizationService? organizationService,
-        INotifyService? notifyService,
-        ILogger<EditOrganizationDialog>? logger)
+        IOrganizationService organizationService,
+        INotifyService notifyService,
+        ILogger<EditOrganizationDialog> logger)
     {
         InitializeComponent();
 
-        _organizationService = organizationService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _organizationService = organizationService ?? throw new ArgumentNullException(nameof(organizationService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         WireEvents();
@@ -129,11 +125,6 @@ public partial class EditOrganizationDialog : RtlFormBase
 
     public async Task SaveAsync()
     {
-        if (_organizationService == null)
-        {
-            return;
-        }
-
         var code = _txtCode.Text.Trim().ToUpperInvariant();
         var nameAr = _txtNameAr.Text.Trim();
 
@@ -190,7 +181,7 @@ public partial class EditOrganizationDialog : RtlFormBase
                     }
 
                     SavedOrganization = policyResult.Value;
-                    _notifyService?.Info(Strings.Msg_SaveOrgSuccess);
+                    _notifyService.Info(Strings.Msg_SaveOrgSuccess);
                     DialogResult = DialogResult.OK;
                     Close();
                 }
@@ -214,14 +205,14 @@ public partial class EditOrganizationDialog : RtlFormBase
                     }
 
                     SavedOrganization = policyResult.Value;
-                    _notifyService?.Info(Strings.Msg_SaveOrgSuccess);
+                    _notifyService.Info(Strings.Msg_SaveOrgSuccess);
                     DialogResult = DialogResult.OK;
                     Close();
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error saving organization.");
+                _logger.LogError(ex, "Error saving organization.");
                 ShowError(UserMessages.Describe(ex));
             }
         }
@@ -229,25 +220,11 @@ public partial class EditOrganizationDialog : RtlFormBase
 
     private void ShowWarning(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Warning(message);
-        }
-        else
-        {
-            Notify.Warning(message, Strings.Title_Warning);
-        }
+        _notifyService.Warning(message);
     }
 
     private void ShowError(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Error(message);
-        }
-        else
-        {
-            Notify.Error(message, Strings.Title_Error);
-        }
+        _notifyService.Error(message);
     }
 }

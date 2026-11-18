@@ -14,24 +14,20 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class SettingsForm : RtlFormBase
 {
-    private readonly ISettingsService? _settingsService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<SettingsForm>? _logger;
-
-    public SettingsForm() : this(null, null, null)
-    {
-    }
+    private readonly ISettingsService _settingsService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<SettingsForm> _logger;
 
     public SettingsForm(
-        ISettingsService? settingsService,
-        INotifyService? notifyService,
-        ILogger<SettingsForm>? logger)
+        ISettingsService settingsService,
+        INotifyService notifyService,
+        ILogger<SettingsForm> logger)
     {
         InitializeComponent();
 
-        _settingsService = settingsService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         WireEvents();
@@ -73,11 +69,6 @@ public partial class SettingsForm : RtlFormBase
 
     public async Task LoadSettingsAsync()
     {
-        if (_settingsService == null)
-        {
-            return;
-        }
-
         try
         {
             var s = await _settingsService.GetSettingsAsync();
@@ -98,18 +89,13 @@ public partial class SettingsForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error loading settings.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error loading settings.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 
     public async Task SaveAsync()
     {
-        if (_settingsService == null)
-        {
-            return;
-        }
-
         var parkName = _txtParkName.Text.Trim();
         var timeZoneId = _txtTimeZone.Text.Trim();
 
@@ -155,7 +141,7 @@ public partial class SettingsForm : RtlFormBase
                 var result = await _settingsService.UpdateSettingsAsync(request);
                 if (result.IsSuccess)
                 {
-                    _notifyService?.Info(Strings.Msg_SaveSettingsSuccess);
+                    _notifyService.Info(Strings.Msg_SaveSettingsSuccess);
                     DialogResult = DialogResult.OK;
                     Close();
                 }
@@ -166,7 +152,7 @@ public partial class SettingsForm : RtlFormBase
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error saving settings.");
+                _logger.LogError(ex, "Error saving settings.");
                 ShowError(UserMessages.Describe(ex));
             }
         }
@@ -174,25 +160,11 @@ public partial class SettingsForm : RtlFormBase
 
     private void ShowWarning(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Warning(message);
-        }
-        else
-        {
-            Notify.Warning(message, Strings.Title_Warning);
-        }
+        _notifyService.Warning(message);
     }
 
     private void ShowError(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Error(message);
-        }
-        else
-        {
-            Notify.Error(message, Strings.Title_Error);
-        }
+        _notifyService.Error(message);
     }
 }

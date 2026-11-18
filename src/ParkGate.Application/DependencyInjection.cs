@@ -54,7 +54,7 @@ public static class DependencyInjection
         // 4. EntryCards services
         services.AddSingleton<ParkClock>();
         services.AddSingleton<SupervisorApprovalStore>();
-        services.AddTransient<CardScanService>();
+        services.AddTransient<ICardScanService, CardScanService>();
         services.AddTransient<EntryCardIssuer>();
 
         // 5. Automatic FluentValidation validators registration via assembly scanning

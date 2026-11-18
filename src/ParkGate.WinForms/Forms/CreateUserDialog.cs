@@ -15,26 +15,22 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class CreateUserDialog : RtlFormBase
 {
-    private readonly IUserService? _userService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<CreateUserDialog>? _logger;
+    private readonly IUserService _userService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<CreateUserDialog> _logger;
 
     public UserDto? CreatedUser { get; private set; }
 
-    public CreateUserDialog() : this(null, null, null)
-    {
-    }
-
     public CreateUserDialog(
-        IUserService? userService,
-        INotifyService? notifyService,
-        ILogger<CreateUserDialog>? logger)
+        IUserService userService,
+        INotifyService notifyService,
+        ILogger<CreateUserDialog> logger)
     {
         InitializeComponent();
 
-        _userService = userService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         PopulateRolesCombo();
@@ -70,11 +66,6 @@ public partial class CreateUserDialog : RtlFormBase
 
     public async Task SaveAsync()
     {
-        if (_userService == null)
-        {
-            return;
-        }
-
         var userName = _txtUserName.Text.Trim();
         var fullName = _txtFullName.Text.Trim();
         var password = _txtPassword.Text;
@@ -119,7 +110,7 @@ public partial class CreateUserDialog : RtlFormBase
                 if (result.IsSuccess)
                 {
                     CreatedUser = result.Value;
-                    _notifyService?.Info(Strings.Msg_CreateUserSuccess);
+                    _notifyService.Info(Strings.Msg_CreateUserSuccess);
                     DialogResult = DialogResult.OK;
                     Close();
                 }
@@ -130,7 +121,7 @@ public partial class CreateUserDialog : RtlFormBase
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error creating user.");
+                _logger.LogError(ex, "Error creating user.");
                 ShowError(UserMessages.Describe(ex));
             }
         }
@@ -138,26 +129,12 @@ public partial class CreateUserDialog : RtlFormBase
 
     private void ShowWarning(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Warning(message);
-        }
-        else
-        {
-            Notify.Warning(message, Strings.Title_Warning);
-        }
+        _notifyService.Warning(message);
     }
 
     private void ShowError(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Error(message);
-        }
-        else
-        {
-            Notify.Error(message, Strings.Title_Error);
-        }
+        _notifyService.Error(message);
     }
 
     private sealed class ComboBoxItem<T>

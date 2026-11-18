@@ -12,22 +12,21 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class IssueQrDialog : RtlFormBase
 {
-    private readonly EntryCardIssuer? _issuer;
-    private readonly IQrImageRenderer? _qrRenderer;
-    private readonly INotifyService? _notifyService;
+    private readonly EntryCardIssuer _issuer;
+    private readonly IQrImageRenderer _qrRenderer;
+    private readonly INotifyService _notifyService;
     private BeneficiaryDto? _beneficiary;
     private IssuedEntryCard? _issuedCard;
 
-    public IssueQrDialog() : this(null, null, null)
-    {
-    }
-
-    public IssueQrDialog(EntryCardIssuer? issuer, IQrImageRenderer? qrRenderer, INotifyService? notifyService)
+    public IssueQrDialog(
+        EntryCardIssuer issuer,
+        IQrImageRenderer qrRenderer,
+        INotifyService notifyService)
     {
         InitializeComponent();
-        _issuer = issuer;
-        _qrRenderer = qrRenderer;
-        _notifyService = notifyService;
+        _issuer = issuer ?? throw new ArgumentNullException(nameof(issuer));
+        _qrRenderer = qrRenderer ?? throw new ArgumentNullException(nameof(qrRenderer));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
 
         Theme.ApplyPrimaryButtonStyle(_btnPrint);
         Theme.ApplySecondaryButtonStyle(_btnSave);
@@ -42,12 +41,6 @@ public partial class IssueQrDialog : RtlFormBase
     {
         _beneficiary = beneficiary;
         _lblCustomerName.Text = beneficiary.FullName;
-
-        if (_issuer == null || _qrRenderer == null)
-        {
-            _notifyService?.Error(Strings.Ui_IssueQr_01);
-            return;
-        }
 
         try
         {
@@ -66,7 +59,7 @@ public partial class IssueQrDialog : RtlFormBase
         }
         catch (Exception ex)
         {
-            _notifyService?.Error($"{Strings.Msg_QrGenerationFailed} {UserMessages.LogAndDescribe(ex, "Generate QR card")}", Strings.Title_Error);
+            _notifyService.Error($"{Strings.Msg_QrGenerationFailed} {UserMessages.LogAndDescribe(ex, "Generate QR card")}", Strings.Title_Error);
             _lblInstruction.Text = Strings.Ui_IssueQr_04;
             _picQrCode.Image?.Dispose();
             _picQrCode.Image = null;
@@ -77,7 +70,7 @@ public partial class IssueQrDialog : RtlFormBase
     {
         if (_picQrCode.Image == null)
         {
-            _notifyService?.Warning(Strings.Ui_IssueQr_05);
+            _notifyService.Warning(Strings.Ui_IssueQr_05);
             return;
         }
 
@@ -93,11 +86,11 @@ public partial class IssueQrDialog : RtlFormBase
             try
             {
                 _picQrCode.Image.Save(sfd.FileName, System.Drawing.Imaging.ImageFormat.Png);
-                _notifyService?.Info(Strings.Ui_IssueQr_07);
+                _notifyService.Info(Strings.Ui_IssueQr_07);
             }
             catch (Exception ex)
             {
-                _notifyService?.Error($"{Strings.Msg_QrSaveFailed} {UserMessages.LogAndDescribe(ex, "Save QR image")}");
+                _notifyService.Error($"{Strings.Msg_QrSaveFailed} {UserMessages.LogAndDescribe(ex, "Save QR image")}");
             }
         }
     }
@@ -106,7 +99,7 @@ public partial class IssueQrDialog : RtlFormBase
     {
         if (_picQrCode.Image == null || _beneficiary == null)
         {
-            _notifyService?.Warning(Strings.Ui_IssueQr_08);
+            _notifyService.Warning(Strings.Ui_IssueQr_08);
             return;
         }
 
@@ -114,7 +107,7 @@ public partial class IssueQrDialog : RtlFormBase
         {
             if (System.Drawing.Printing.PrinterSettings.InstalledPrinters.Count == 0)
             {
-                _notifyService?.Warning(Strings.Msg_NoPrinterInstalled, Strings.Title_Warning);
+                _notifyService.Warning(Strings.Msg_NoPrinterInstalled, Strings.Title_Warning);
                 return;
             }
 
@@ -188,7 +181,7 @@ public partial class IssueQrDialog : RtlFormBase
         }
         catch (Exception ex)
         {
-            _notifyService?.Error(string.Format(Strings.Msg_PrintFailed, UserMessages.LogAndDescribe(ex, "Print QR card")), Strings.Title_Error);
+            _notifyService.Error(string.Format(Strings.Msg_PrintFailed, UserMessages.LogAndDescribe(ex, "Print QR card")), Strings.Title_Error);
         }
     }
 }

@@ -27,18 +27,18 @@ namespace ParkGate.WinForms.Controls;
 /// </summary>
 public partial class CheckInDeskControl : UserControl
 {
-    private readonly IBeneficiaryService? _beneficiaryService;
-    private readonly ICheckInService? _checkInService;
-    private readonly IOrganizationService? _orgService;
-    private readonly IAgeCategoryService? _ageCategoryService;
-    private readonly ISettingsService? _settingsService;
-    private readonly ICurrentUser? _currentUser;
-    private readonly ICurrentWorkstation? _currentWorkstation;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<CheckInDeskControl>? _logger;
-    private readonly ParkGate.Application.EntryCards.CardScanService? _cardScanService;
-    private readonly IGiftVoucherService? _giftVoucherService;
+    private readonly IBeneficiaryService _beneficiaryService;
+    private readonly ICheckInService _checkInService;
+    private readonly IOrganizationService _orgService;
+    private readonly IAgeCategoryService _ageCategoryService;
+    private readonly ISettingsService _settingsService;
+    private readonly ICurrentUser _currentUser;
+    private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<CheckInDeskControl> _logger;
+    private readonly ParkGate.Application.EntryCards.ICardScanService _cardScanService;
+    private readonly IGiftVoucherService _giftVoucherService;
 
     private readonly List<CounterInput> _counterInputs = [];
     private readonly List<OrganizationDto> _organizations = [];
@@ -67,45 +67,42 @@ public partial class CheckInDeskControl : UserControl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int AutoResetDelayMs { get; set; } = 1200;
 
-    public CheckInDeskControl() : this(null, null, null, null, null, null, null, null, null, null, null, null)
-    {
-    }
-
     public CheckInDeskControl(
-        IBeneficiaryService? beneficiaryService,
-        ICheckInService? checkInService,
-        IOrganizationService? orgService,
-        IAgeCategoryService? ageCategoryService,
-        ISettingsService? settingsService,
-        ICurrentUser? currentUser,
-        ICurrentWorkstation? currentWorkstation,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<CheckInDeskControl>? logger,
-        ParkGate.Application.EntryCards.CardScanService? cardScanService = null,
-        IGiftVoucherService? giftVoucherService = null)
+        IBeneficiaryService beneficiaryService,
+        ICheckInService checkInService,
+        IOrganizationService orgService,
+        IAgeCategoryService ageCategoryService,
+        ISettingsService settingsService,
+        ICurrentUser currentUser,
+        ICurrentWorkstation currentWorkstation,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<CheckInDeskControl> logger,
+        ParkGate.Application.EntryCards.ICardScanService cardScanService,
+        IGiftVoucherService giftVoucherService,
+        ILogger<GiftOfferPanel> giftPanelLogger)
     {
         InitializeComponent();
 
-        _beneficiaryService = beneficiaryService;
-        _checkInService = checkInService;
-        _orgService = orgService;
-        _ageCategoryService = ageCategoryService;
-        _settingsService = settingsService;
-        _currentUser = currentUser;
-        _currentWorkstation = currentWorkstation;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
-        _cardScanService = cardScanService;
-        _giftVoucherService = giftVoucherService;
+        _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
+        _checkInService = checkInService ?? throw new ArgumentNullException(nameof(checkInService));
+        _orgService = orgService ?? throw new ArgumentNullException(nameof(orgService));
+        _ageCategoryService = ageCategoryService ?? throw new ArgumentNullException(nameof(ageCategoryService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _cardScanService = cardScanService ?? throw new ArgumentNullException(nameof(cardScanService));
+        _giftVoucherService = giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService));
 
         _giftPanel.InitializeServices(
             _giftVoucherService,
             _currentUser,
             _formFactory,
             _notifyService,
-            null,
+            giftPanelLogger,
             _timeZoneId);
 
         InitializeControlText();
@@ -321,7 +318,7 @@ public partial class CheckInDeskControl : UserControl
              !string.IsNullOrWhiteSpace(_txtRegNotes.Text) ||
              _dtpRegExpiry.Checked);
 
-        return !hasInput || (_notifyService?.Confirm(Strings.Confirm_DiscardRegistration, Strings.Title_Warning) ?? false);
+        return !hasInput || (_notifyService.Confirm(Strings.Confirm_DiscardRegistration, Strings.Title_Warning));
     }
 
     public async Task OnDeskLoadedAsync()
@@ -342,11 +339,6 @@ public partial class CheckInDeskControl : UserControl
 
     private async Task LoadSettingsAsync()
     {
-        if (_settingsService == null)
-        {
-            return;
-        }
-
         try
         {
             var settings = await _settingsService.GetSettingsAsync();
@@ -358,17 +350,12 @@ public partial class CheckInDeskControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load check-in settings.");
+            _logger.LogWarning(ex, "Failed to load check-in settings.");
         }
     }
 
     private async Task LoadOrganizationsAsync()
     {
-        if (_orgService == null)
-        {
-            return;
-        }
-
         try
         {
             var orgs = await _orgService.GetAllAsync(activeOnly: true);
@@ -390,17 +377,12 @@ public partial class CheckInDeskControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load organizations for filter.");
+            _logger.LogWarning(ex, "Failed to load organizations for filter.");
         }
     }
 
     public async Task LoadAgeCategoriesAsync()
     {
-        if (_ageCategoryService == null)
-        {
-            return;
-        }
-
         try
         {
             // No categories configured is valid: the holder enters alone. Never invent categories (R4.9).
@@ -409,7 +391,7 @@ public partial class CheckInDeskControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load age categories. Recording is disabled until they load.");
+            _logger.LogWarning(ex, "Failed to load age categories. Recording is disabled until they load.");
             PopulateAgeCategories([]);
             _ageCategoriesUnavailable = true;
             _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_AgeCategoriesUnavailable);
@@ -728,7 +710,7 @@ public partial class CheckInDeskControl : UserControl
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
         if (string.IsNullOrWhiteSpace(card))
         {
-            _notifyService?.Warning(Strings.Ui_CheckInDesk_05, Strings.Title_Warning);
+            _notifyService.Warning(Strings.Ui_CheckInDesk_05, Strings.Title_Warning);
             FocusCardNumberBox();
             return;
         }
@@ -787,7 +769,7 @@ public partial class CheckInDeskControl : UserControl
             }
 
         // 1. Check if scanned input is a signed QR token (203 digits per QrTokenFormat.DigitLength)
-        if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength && _cardScanService != null)
+        if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength)
         {
             using (new BusyScope(this, _btnSearch, _btnNewHolder))
             {
@@ -805,7 +787,7 @@ public partial class CheckInDeskControl : UserControl
                         return;
                     }
 
-                    if (scanResult.BeneficiaryId.HasValue && _beneficiaryService != null)
+                    if (scanResult.BeneficiaryId.HasValue)
                     {
                         var lookupById = await _beneficiaryService.GetByIdAsync(scanResult.BeneficiaryId.Value);
                         if (lookupById.IsSuccess)
@@ -824,17 +806,12 @@ public partial class CheckInDeskControl : UserControl
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogError(ex, "Error scanning QR card token.");
+                    _logger.LogError(ex, "Error scanning QR card token.");
                     _statusBanner.SetDenied(Strings.Banner_QrScanFailed, UserMessages.Describe(ex));
                     FocusCardNumberBox();
                     return;
                 }
             }
-        }
-
-        if (_beneficiaryService == null)
-        {
-            return;
         }
 
         using (new BusyScope(this, _btnSearch, _btnNewHolder))
@@ -911,7 +888,7 @@ public partial class CheckInDeskControl : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error occurred during card lookup.");
+                _logger.LogError(ex, "Error occurred during card lookup.");
                 _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_ConnectionRetryHint);
                 FocusCardNumberBox();
             }
@@ -970,7 +947,7 @@ public partial class CheckInDeskControl : UserControl
             return ChooseOrganizationOverride(matches);
         }
 
-        using var dialog = _formFactory?.Create<SelectOrganizationDialog>() ?? new SelectOrganizationDialog();
+        using var dialog = _formFactory.Create<SelectOrganizationDialog>();
         dialog.SetMatches(matches);
         return dialog.ShowDialog(this) == DialogResult.OK ? dialog.SelectedMatch : null;
     }
@@ -996,27 +973,22 @@ public partial class CheckInDeskControl : UserControl
 
         if (registrationOrgId is null)
         {
-            _notifyService?.Warning(Strings.Val_RegOrganizationRequired, Strings.Title_Warning);
+            _notifyService.Warning(Strings.Val_RegOrganizationRequired, Strings.Title_Warning);
             _cmbRegOrganization.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(fullName))
         {
-            _notifyService?.Warning(Strings.Ui_CheckInDesk_08, Strings.Title_Warning);
+            _notifyService.Warning(Strings.Ui_CheckInDesk_08, Strings.Title_Warning);
             _txtRegFullName.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(phone))
         {
-            _notifyService?.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
+            _notifyService.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
             _txtRegPhone.Focus();
-            return;
-        }
-
-        if (_beneficiaryService == null)
-        {
             return;
         }
 
@@ -1042,25 +1014,25 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
-                    _notifyService?.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
+                    _notifyService.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
                     await LookupCardAsync();
                 }
                 else
                 {
-                    _notifyService?.Error(ErrorMessages.GetMessage(regResult.Error), Strings.Ui_CheckInDesk_12);
+                    _notifyService.Error(ErrorMessages.GetMessage(regResult.Error), Strings.Ui_CheckInDesk_12);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to register beneficiary.");
-                _notifyService?.Error(UserMessages.Describe(ex), Strings.Title_Error);
+                _logger.LogError(ex, "Failed to register beneficiary.");
+                _notifyService.Error(UserMessages.Describe(ex), Strings.Title_Error);
             }
         }
     }
 
     public async Task RecordEntryAsync()
     {
-        if (_activeHolder == null || _checkInService == null)
+        if (_activeHolder == null)
         {
             return;
         }
@@ -1098,7 +1070,7 @@ public partial class CheckInDeskControl : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error recording entry.");
+                _logger.LogError(ex, "Error recording entry.");
                 _statusBanner.SetDenied(Strings.Ui_CheckInDesk_15, Strings.Ui_CheckInDesk_16);
             }
         }
@@ -1108,13 +1080,12 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task OverrideEntryAsync()
     {
-        if (_activeHolder == null || _checkInService == null)
+        if (_activeHolder == null)
         {
             return;
         }
 
-        var supervisorDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
-                               new SupervisorAuthDialog(null, _currentUser);
+        var supervisorDialog = _formFactory.Create<SupervisorAuthDialog>();
 
         supervisorDialog.SetContext(defaultReason: Strings.Ui_CheckInDesk_17);
 
@@ -1154,7 +1125,7 @@ public partial class CheckInDeskControl : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error performing override.");
+                _logger.LogError(ex, "Error performing override.");
                 _statusBanner.SetDenied(Strings.Ui_CheckInDesk_20, Strings.Ui_CheckInDesk_21);
             }
         }
@@ -1174,14 +1145,9 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task RefreshTodayDeskSummaryAsync()
     {
-        if (_checkInService == null)
-        {
-            return;
-        }
-
         try
         {
-            var summaryResult = await _checkInService.GetTodayDeskEntriesAsync(_currentWorkstation?.WorkstationId);
+            var summaryResult = await _checkInService.GetTodayDeskEntriesAsync(_currentWorkstation.WorkstationId);
             if (summaryResult.IsSuccess)
             {
                 var summary = summaryResult.Value;
@@ -1263,7 +1229,7 @@ public partial class CheckInDeskControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to refresh today's desk summary.");
+            _logger.LogWarning(ex, "Failed to refresh today's desk summary.");
         }
     }
 
@@ -1279,7 +1245,7 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task VoidSelectedTodayEntryAsync()
     {
-        if (_gridToday.SelectedRows.Count == 0 || _checkInService == null)
+        if (_gridToday.SelectedRows.Count == 0)
         {
             return;
         }
@@ -1294,13 +1260,11 @@ public partial class CheckInDeskControl : UserControl
         string voidReason;
         string? approvalToken = null;
 
-        var isSupervisorOrAdmin = _currentUser != null &&
-            (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
+        var isSupervisorOrAdmin = (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
 
         if (!isSupervisorOrAdmin)
         {
-            var authDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
-                             new SupervisorAuthDialog(null, _currentUser);
+            var authDialog = _formFactory.Create<SupervisorAuthDialog>();
 
             authDialog.SetContext(defaultReason: Strings.Ui_Beneficiaries_09);
 
@@ -1314,8 +1278,7 @@ public partial class CheckInDeskControl : UserControl
         }
         else
         {
-            var reasonDialog = _formFactory?.Create<VoidReasonDialog>() ??
-                               new VoidReasonDialog(_notifyService);
+            var reasonDialog = _formFactory.Create<VoidReasonDialog>();
 
             var localTimeStr = DateTimeDisplayHelper.FormatDateTime(
                 DateTimeDisplayHelper.ToParkLocalTime(attempt.AttemptedAtUtc, _timeZoneId));
@@ -1350,14 +1313,7 @@ public partial class CheckInDeskControl : UserControl
 
                 if (result.IsSuccess)
                 {
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Info(Strings.Msg_VoidSuccess);
-                    }
-                    else
-                    {
-                        Notify.Info(Strings.Msg_VoidSuccess, Strings.Title_Info);
-                    }
+                    _notifyService.Info(Strings.Msg_VoidSuccess);
 
                     await RefreshTodayDeskSummaryAsync();
 
@@ -1369,28 +1325,14 @@ public partial class CheckInDeskControl : UserControl
                 else
                 {
                     var msg = ErrorMessages.GetMessage(result.Error);
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Warning(msg);
-                    }
-                    else
-                    {
-                        Notify.Warning(msg, Strings.Title_Warning);
-                    }
+                    _notifyService.Warning(msg);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error voiding today entry.");
+                _logger.LogError(ex, "Error voiding today entry.");
                 var msg = UserMessages.Describe(ex);
-                if (_notifyService != null)
-                {
-                    _notifyService.Error(msg);
-                }
-                else
-                {
-                    Notify.Error(msg, Strings.Title_Error);
-                }
+                _notifyService.Error(msg);
             }
         }
     }

@@ -22,7 +22,7 @@ public sealed class MainFormTests
     [Fact]
     public void MainForm_ShouldHaveArabicMenusAndStatusLabels()
     {
-        using var form = new MainForm();
+        using var form = TestUi.Create<MainForm>();
 
         var menuStrip = GetField<MenuStrip>(form, "_mainMenuStrip");
         var statusStrip = GetField<StatusStrip>(form, "_statusStrip");
@@ -54,7 +54,7 @@ public sealed class MainFormTests
 
         var wsContext = new CurrentWorkstationContext("DESK-01");
 
-        using var form = new MainForm(userContext, userContext, wsContext, null, null, null, null, null, null);
+        using var form = TestUi.Create<MainForm>(userContext, userContext, wsContext);
 
         var menuOperations = GetField<ToolStripMenuItem>(form, "_menuOperations");
         var menuManagement = GetField<ToolStripMenuItem>(form, "_menuManagement");
@@ -73,7 +73,7 @@ public sealed class MainFormTests
 
         var wsContext = new CurrentWorkstationContext("DESK-02");
 
-        using var form = new MainForm(userContext, userContext, wsContext, null, null, null, null, null, null);
+        using var form = TestUi.Create<MainForm>(userContext, userContext, wsContext);
 
         var menuOperations = GetField<ToolStripMenuItem>(form, "_menuOperations");
         var menuManagement = GetField<ToolStripMenuItem>(form, "_menuManagement");
@@ -98,7 +98,7 @@ public sealed class MainFormTests
 
         var wsContext = new CurrentWorkstationContext("ADMIN-PC");
 
-        using var form = new MainForm(userContext, userContext, wsContext, null, null, null, null, null, null);
+        using var form = TestUi.Create<MainForm>(userContext, userContext, wsContext);
 
         var menuOperations = GetField<ToolStripMenuItem>(form, "_menuOperations");
         var menuManagement = GetField<ToolStripMenuItem>(form, "_menuManagement");
@@ -126,7 +126,7 @@ public sealed class MainFormTests
 
         var wsContext = new CurrentWorkstationContext("GATE-01");
 
-        using var form = new MainForm(userContext, userContext, wsContext, null, null, null, null, null, null);
+        using var form = TestUi.Create<MainForm>(userContext, userContext, wsContext);
 
         var statusUser = GetField<ToolStripStatusLabel>(form, "_statusUser");
         statusUser.Text.ShouldNotBeNull();

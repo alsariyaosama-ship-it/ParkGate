@@ -17,31 +17,27 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class EditBeneficiaryDialog : RtlFormBase
 {
-    private readonly IBeneficiaryService? _beneficiaryService;
-    private readonly IOrganizationService? _orgService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<EditBeneficiaryDialog>? _logger;
+    private readonly IBeneficiaryService _beneficiaryService;
+    private readonly IOrganizationService _orgService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<EditBeneficiaryDialog> _logger;
 
     private BeneficiaryDto? _originalBeneficiary;
 
     public BeneficiaryDto? UpdatedBeneficiary { get; private set; }
 
-    public EditBeneficiaryDialog() : this(null, null, null, null)
-    {
-    }
-
     public EditBeneficiaryDialog(
-        IBeneficiaryService? beneficiaryService,
-        IOrganizationService? orgService,
-        INotifyService? notifyService,
-        ILogger<EditBeneficiaryDialog>? logger)
+        IBeneficiaryService beneficiaryService,
+        IOrganizationService orgService,
+        INotifyService notifyService,
+        ILogger<EditBeneficiaryDialog> logger)
     {
         InitializeComponent();
 
-        _beneficiaryService = beneficiaryService;
-        _orgService = orgService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
+        _orgService = orgService ?? throw new ArgumentNullException(nameof(orgService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         WireEvents();
@@ -74,11 +70,6 @@ public partial class EditBeneficiaryDialog : RtlFormBase
 
     public async Task LoadOrganizationsAsync(int selectedOrgId = 0)
     {
-        if (_orgService == null)
-        {
-            return;
-        }
-
         try
         {
             var orgs = await _orgService.GetAllAsync(activeOnly: false);
@@ -102,7 +93,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to load organizations for edit dialog.");
+            _logger.LogError(ex, "Failed to load organizations for edit dialog.");
         }
     }
 
@@ -134,7 +125,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
 
     public async Task SaveAsync()
     {
-        if (_originalBeneficiary == null || _beneficiaryService == null)
+        if (_originalBeneficiary == null)
         {
             return;
         }
@@ -171,14 +162,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
                 if (result.IsSuccess)
                 {
                     UpdatedBeneficiary = result.Value;
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Info(Strings.Msg_EditBeneficiarySuccess);
-                    }
-                    else
-                    {
-                        Notify.Info(Strings.Msg_EditBeneficiarySuccess, Strings.Title_Info);
-                    }
+                    _notifyService.Info(Strings.Msg_EditBeneficiarySuccess);
 
                     DialogResult = DialogResult.OK;
                     Close();
@@ -186,28 +170,14 @@ public partial class EditBeneficiaryDialog : RtlFormBase
                 else
                 {
                     var msg = ErrorMessages.GetMessage(result.Error);
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Warning(msg);
-                    }
-                    else
-                    {
-                        Notify.Warning(msg, Strings.Title_Warning);
-                    }
+                    _notifyService.Warning(msg);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Unexpected error updating beneficiary.");
+                _logger.LogError(ex, "Unexpected error updating beneficiary.");
                 var msg = UserMessages.Describe(ex);
-                if (_notifyService != null)
-                {
-                    _notifyService.Error(msg);
-                }
-                else
-                {
-                    Notify.Error(msg, Strings.Title_Error);
-                }
+                _notifyService.Error(msg);
             }
         }
     }

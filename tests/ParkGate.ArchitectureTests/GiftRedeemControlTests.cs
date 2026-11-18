@@ -30,7 +30,7 @@ public sealed class GiftRedeemControlTests
     [Fact]
     public void GiftRedeemControl_ParameterlessConstructor_ShouldBeDesignerCompatibleAndRtl()
     {
-        using var control = new GiftRedeemControl();
+        using var control = TestUi.Create<GiftRedeemControl>();
         control.RightToLeft.ShouldBe(RightToLeft.Yes);
 
         var txtScan = GetField<TextBox>(control, "_txtScan");
@@ -51,7 +51,7 @@ public sealed class GiftRedeemControlTests
     public async Task GiftRedeemControl_RedeemAsync_WhenEmptyInput_ShouldShowWarningBanner()
     {
         var fakeGiftService = new FakeGiftVoucherService();
-        using var control = new GiftRedeemControl(fakeGiftService, null, null, null, null, null, null);
+        using var control = TestUi.Create<GiftRedeemControl>(fakeGiftService);
 
         var txtScan = GetField<TextBox>(control, "_txtScan");
         txtScan.Text = "   ";
@@ -78,7 +78,7 @@ public sealed class GiftRedeemControlTests
                 RedeemedAtUtc: DateTime.UtcNow))
         };
 
-        using var control = new GiftRedeemControl(fakeGiftService, null, null, null, null, null, null);
+        using var control = TestUi.Create<GiftRedeemControl>(fakeGiftService);
 
         var txtScan = GetField<TextBox>(control, "_txtScan");
         txtScan.Text = "١٠٠٥"; // Arabic-Indic digits for 1005
@@ -111,7 +111,7 @@ public sealed class GiftRedeemControlTests
             RedeemResult = Result<GiftRedemptionDto>.Failure(new Error("Gift.AlreadyRedeemed"))
         };
 
-        using var control = new GiftRedeemControl(fakeGiftService, null, null, null, null, null, null);
+        using var control = TestUi.Create<GiftRedeemControl>(fakeGiftService);
 
         var txtScan = GetField<TextBox>(control, "_txtScan");
         txtScan.Text = "1005";
@@ -126,7 +126,7 @@ public sealed class GiftRedeemControlTests
     public void GiftRedeemControl_ApplyPermissions_ShouldHideTodayGridWhenNoViewReportsPermission()
     {
         var fakeUser = new FakeCurrentUser(UserRole.Operator, [Permission.RedeemGift]); // lacks ViewReports
-        using var control = new GiftRedeemControl(null, null, fakeUser, null, null, null, null);
+        using var control = TestUi.Create<GiftRedeemControl>(fakeUser);
 
         // Call private ApplyPermissions
         var method = control.GetType().GetMethod("ApplyPermissions", BindingFlags.NonPublic | BindingFlags.Instance)!;
@@ -141,7 +141,7 @@ public sealed class GiftRedeemControlTests
     {
         // 1. Operator without RedeemGift permission
         var opUser = new FakeCurrentUser(UserRole.Operator, [Permission.CheckIn]);
-        using var form1 = new MainForm(opUser, null, null, null, null, null, null, null, null, null);
+        using var form1 = TestUi.Create<MainForm>(opUser);
         form1.ApplyPermissions();
 
         var menuRedeem1 = GetField<ToolStripMenuItem>(form1, "_menuGiftRedemption");
@@ -149,7 +149,7 @@ public sealed class GiftRedeemControlTests
 
         // 2. Rides operator with RedeemGift permission
         var ridesUser = new FakeCurrentUser(UserRole.Operator, [Permission.RedeemGift]);
-        using var form2 = new MainForm(ridesUser, null, null, null, null, null, null, null, null, null);
+        using var form2 = TestUi.Create<MainForm>(ridesUser);
         form2.ApplyPermissions();
 
         var menuRedeem2 = GetField<ToolStripMenuItem>(form2, "_menuGiftRedemption");

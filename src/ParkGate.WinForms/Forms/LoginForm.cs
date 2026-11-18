@@ -9,24 +9,20 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class LoginForm : RtlFormBase
 {
-    private readonly IAuthService? _authService;
-    private readonly ICurrentWorkstation? _currentWorkstation;
-    private readonly IFormFactory? _formFactory;
-
-    public LoginForm() : this(null, null, null)
-    {
-    }
+    private readonly IAuthService _authService;
+    private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly IFormFactory _formFactory;
 
     public LoginForm(
-        IAuthService? authService,
-        ICurrentWorkstation? currentWorkstation,
-        IFormFactory? formFactory)
+        IAuthService authService,
+        ICurrentWorkstation currentWorkstation,
+        IFormFactory formFactory)
     {
         InitializeComponent();
 
-        _authService = authService;
-        _currentWorkstation = currentWorkstation;
-        _formFactory = formFactory;
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
 
         InitializeFormText();
         WireEvents();
@@ -42,7 +38,7 @@ public partial class LoginForm : RtlFormBase
         btnLogin.Text = Strings.Btn_Login;
         btnExit.Text = Strings.Btn_Exit;
 
-        var wsName = _currentWorkstation?.MachineName ?? Environment.MachineName;
+        var wsName = _currentWorkstation.MachineName ?? Environment.MachineName;
         lblWorkstation.Text = string.Format(Strings.Status_Workstation, wsName);
     }
 
@@ -76,19 +72,12 @@ public partial class LoginForm : RtlFormBase
             return;
         }
 
-        if (_authService == null)
-        {
-            DialogResult = DialogResult.OK;
-            Close();
-            return;
-        }
-
         SetBusy(true);
         lblError.Text = string.Empty;
 
         try
         {
-            var machineName = _currentWorkstation?.MachineName ?? Environment.MachineName;
+            var machineName = _currentWorkstation.MachineName ?? Environment.MachineName;
             var request = new LoginRequest(username, password, machineName);
             var result = await _authService.LoginAsync(request);
 
@@ -97,7 +86,7 @@ public partial class LoginForm : RtlFormBase
                 var loginResponse = result.Value;
                 if (loginResponse.MustChangePassword)
                 {
-                    var changeForm = _formFactory?.Create<ChangePasswordForm>() ?? new ChangePasswordForm(_authService, null);
+                    var changeForm = _formFactory.Create<ChangePasswordForm>();
                     changeForm.SetContext(loginResponse.User.Id, isMandatoryChange: true);
 
                     var changeResult = changeForm.ShowDialog(this);
@@ -141,6 +130,5 @@ public partial class LoginForm : RtlFormBase
 
     private void btnLogin_Click(object sender, EventArgs e)
     {
-
     }
 }

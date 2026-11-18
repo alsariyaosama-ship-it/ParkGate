@@ -98,7 +98,7 @@ public sealed class GiftReportsAndExportTests
     [Fact]
     public void GiftReceiptsForm_ConstructsParameterless_AndIsRtl()
     {
-        using var form = new GiftReceiptsForm();
+        using var form = TestUi.Create<GiftReceiptsForm>();
         form.RightToLeft.ShouldBe(System.Windows.Forms.RightToLeft.Yes);
         form.RightToLeftLayout.ShouldBeTrue();
         form.Text.ShouldNotBeNullOrWhiteSpace();
@@ -140,7 +140,7 @@ public sealed class GiftReportsAndExportTests
             TotalValue: 40.000m);
 
         var fakeService = new FakeGiftReportService(fakeReport);
-        using var form = new GiftReceiptsForm(fakeService, null, null, null, null, null);
+        using var form = TestUi.Create<GiftReceiptsForm>(fakeService);
 
         await form.LoadReportAsync();
 
@@ -155,13 +155,13 @@ public sealed class GiftReportsAndExportTests
         var userWithReports = new FakeCurrentUser(UserRole.Operator, [Permission.ViewReports]);
         var userWithoutReports = new FakeCurrentUser(UserRole.Operator, [Permission.CheckIn]);
 
-        using var formWithReports = new MainForm(userWithReports, null, null, null, null, null, null, null, null, null);
+        using var formWithReports = TestUi.Create<MainForm>(userWithReports);
         formWithReports.ApplyPermissions();
         var menuWith = GetMenuItem(formWithReports, "_menuGiftReceiptsReport");
         menuWith.ShouldNotBeNull();
         menuWith.Available.ShouldBeTrue();
 
-        using var formWithoutReports = new MainForm(userWithoutReports, null, null, null, null, null, null, null, null, null);
+        using var formWithoutReports = TestUi.Create<MainForm>(userWithoutReports);
         formWithoutReports.ApplyPermissions();
         var menuWithout = GetMenuItem(formWithoutReports, "_menuGiftReceiptsReport");
         menuWithout.ShouldNotBeNull();

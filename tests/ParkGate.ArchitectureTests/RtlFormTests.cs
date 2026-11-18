@@ -29,14 +29,14 @@ public sealed class RtlFormTests
     [Fact]
     public void AgeCategoriesForm_ShouldHaveCairoFont()
     {
-        using var form = new AgeCategoriesForm();
+        using var form = TestUi.Create<AgeCategoriesForm>();
         form.Font.Name.ShouldBe("Cairo");
     }
 
     [Fact]
     public void MainForm_ShouldInheritRtlFormBaseAndHaveArabicTitle()
     {
-        using var form = new MainForm();
+        using var form = TestUi.Create<MainForm>();
 
         form.ShouldBeAssignableTo<RtlFormBase>();
         form.RightToLeft.ShouldBe(RightToLeft.Yes);

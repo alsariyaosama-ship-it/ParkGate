@@ -18,34 +18,30 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class WorkstationsForm : RtlFormBase
 {
-    private readonly IWorkstationService? _workstationService;
-    private readonly ISettingsService? _settingsService;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<WorkstationsForm>? _logger;
+    private readonly IWorkstationService _workstationService;
+    private readonly ISettingsService _settingsService;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<WorkstationsForm> _logger;
 
     private readonly List<WorkstationDto> _workstations = [];
     private WorkstationDto? _selectedWorkstation;
     private string _timeZoneId = "Libya Standard Time";
 
-    public WorkstationsForm() : this(null, null, null, null, null)
-    {
-    }
-
     public WorkstationsForm(
-        IWorkstationService? workstationService,
-        ISettingsService? settingsService,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<WorkstationsForm>? logger)
+        IWorkstationService workstationService,
+        ISettingsService settingsService,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<WorkstationsForm> logger)
     {
         InitializeComponent();
 
-        _workstationService = workstationService;
-        _settingsService = settingsService;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
+        _workstationService = workstationService ?? throw new ArgumentNullException(nameof(workstationService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         Theme.ApplyGridStyle(_gridWorkstations);
@@ -72,17 +68,14 @@ public partial class WorkstationsForm : RtlFormBase
     {
         Load += async (_, _) =>
         {
-            if (_settingsService != null)
+            try
             {
-                try
-                {
-                    var settings = await _settingsService.GetSettingsAsync();
-                    _timeZoneId = settings.TimeZoneId;
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogWarning(ex, "Failed to load time zone settings.");
-                }
+                var settings = await _settingsService.GetSettingsAsync();
+                _timeZoneId = settings.TimeZoneId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to load time zone settings.");
             }
             await LoadWorkstationsAsync();
         };
@@ -104,11 +97,6 @@ public partial class WorkstationsForm : RtlFormBase
 
     public async Task LoadWorkstationsAsync()
     {
-        if (_workstationService == null)
-        {
-            return;
-        }
-
         try
         {
             var list = await _workstationService.GetAllAsync();
@@ -120,8 +108,8 @@ public partial class WorkstationsForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error loading workstations.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error loading workstations.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 
@@ -212,8 +200,7 @@ public partial class WorkstationsForm : RtlFormBase
             return;
         }
 
-        var dialog = _formFactory?.Create<EditWorkstationDialog>() ??
-                     new EditWorkstationDialog(_workstationService, _notifyService, null);
+        var dialog = _formFactory.Create<EditWorkstationDialog>();
 
         using (dialog)
         {
@@ -227,7 +214,7 @@ public partial class WorkstationsForm : RtlFormBase
 
     public async Task ToggleActiveAsync()
     {
-        if (_selectedWorkstation == null || _workstationService == null)
+        if (_selectedWorkstation == null)
         {
             return;
         }
@@ -237,8 +224,7 @@ public partial class WorkstationsForm : RtlFormBase
             ? Strings.Msg_ConfirmDeactivateWs
             : Strings.Msg_ConfirmReactivateWs;
 
-        var confirmed = _notifyService?.Confirm(confirmMsg, Strings.Title_Confirm) ??
-                        Notify.Confirm(confirmMsg, Strings.Title_Confirm);
+        var confirmed = _notifyService.Confirm(confirmMsg, Strings.Title_Confirm);
 
         if (!confirmed)
         {
@@ -257,13 +243,13 @@ public partial class WorkstationsForm : RtlFormBase
             }
             else
             {
-                _notifyService?.Warning(ErrorMessages.GetMessage(result.Error));
+                _notifyService.Warning(ErrorMessages.GetMessage(result.Error));
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error toggling workstation active state.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error toggling workstation active state.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 }

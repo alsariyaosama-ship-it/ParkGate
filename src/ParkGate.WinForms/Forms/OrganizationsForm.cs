@@ -16,30 +16,26 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class OrganizationsForm : RtlFormBase
 {
-    private readonly IOrganizationService? _organizationService;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<OrganizationsForm>? _logger;
+    private readonly IOrganizationService _organizationService;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<OrganizationsForm> _logger;
 
     private readonly List<OrganizationDto> _organizations = [];
     private OrganizationDto? _selectedOrg;
 
-    public OrganizationsForm() : this(null, null, null, null)
-    {
-    }
-
     public OrganizationsForm(
-        IOrganizationService? organizationService,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<OrganizationsForm>? logger)
+        IOrganizationService organizationService,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<OrganizationsForm> logger)
     {
         InitializeComponent();
 
-        _organizationService = organizationService;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
+        _organizationService = organizationService ?? throw new ArgumentNullException(nameof(organizationService));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         Theme.ApplyGridStyle(_gridOrganizations);
@@ -103,11 +99,6 @@ public partial class OrganizationsForm : RtlFormBase
 
     public async Task LoadOrganizationsAsync()
     {
-        if (_organizationService == null)
-        {
-            return;
-        }
-
         try
         {
             var activeOnly = _chkActiveOnly.Checked;
@@ -120,8 +111,8 @@ public partial class OrganizationsForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error loading organizations.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error loading organizations.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 
@@ -221,8 +212,7 @@ public partial class OrganizationsForm : RtlFormBase
 
     public async Task AddOrganizationAsync()
     {
-        var dialog = _formFactory?.Create<EditOrganizationDialog>() ??
-                     new EditOrganizationDialog(_organizationService, _notifyService, null);
+        var dialog = _formFactory.Create<EditOrganizationDialog>();
 
         using (dialog)
         {
@@ -240,8 +230,7 @@ public partial class OrganizationsForm : RtlFormBase
             return;
         }
 
-        var dialog = _formFactory?.Create<EditOrganizationDialog>() ??
-                     new EditOrganizationDialog(_organizationService, _notifyService, null);
+        var dialog = _formFactory.Create<EditOrganizationDialog>();
 
         using (dialog)
         {
@@ -255,7 +244,7 @@ public partial class OrganizationsForm : RtlFormBase
 
     public async Task ToggleActiveAsync()
     {
-        if (_selectedOrg == null || _organizationService == null)
+        if (_selectedOrg == null)
         {
             return;
         }
@@ -265,8 +254,7 @@ public partial class OrganizationsForm : RtlFormBase
             ? Strings.Msg_ConfirmDeactivateOrg
             : Strings.Msg_ConfirmReactivateOrg;
 
-        var confirmed = _notifyService?.Confirm(confirmMsg, Strings.Title_Confirm) ??
-                        Notify.Confirm(confirmMsg, Strings.Title_Confirm);
+        var confirmed = _notifyService.Confirm(confirmMsg, Strings.Title_Confirm);
 
         if (!confirmed)
         {
@@ -285,13 +273,13 @@ public partial class OrganizationsForm : RtlFormBase
             }
             else
             {
-                _notifyService?.Warning(ErrorMessages.GetMessage(result.Error));
+                _notifyService.Warning(ErrorMessages.GetMessage(result.Error));
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error toggling organization active state.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error toggling organization active state.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 }
