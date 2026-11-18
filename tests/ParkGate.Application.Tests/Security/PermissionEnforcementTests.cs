@@ -40,7 +40,6 @@ public sealed class PermissionEnforcementTests
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeAppSettingRepository _settings = new();
     private readonly FakePasswordHasher _passwordHasher = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _operatorUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("GATE-01");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -78,7 +77,6 @@ public sealed class PermissionEnforcementTests
         var sut = new UserService(
             _uowFactory,
             _passwordHasher,
-            _auditWriter,
             _operatorUser,
             _currentWorkstation,
             new CreateUserRequestValidator());
@@ -109,7 +107,6 @@ public sealed class PermissionEnforcementTests
     {
         var sut = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _operatorUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
@@ -138,7 +135,6 @@ public sealed class PermissionEnforcementTests
     {
         var sut = new AgeCategoryService(
             _uowFactory,
-            _auditWriter,
             _operatorUser,
             _currentWorkstation,
             new CreateAgeCategoryRequestValidator(),
@@ -166,7 +162,6 @@ public sealed class PermissionEnforcementTests
     {
         var sut = new WorkstationService(
             _uowFactory,
-            _auditWriter,
             _operatorUser,
             _currentWorkstation,
             new UpdateWorkstationRequestValidator());
@@ -189,7 +184,7 @@ public sealed class PermissionEnforcementTests
     {
         var sut = new SettingsService(
             _settings,
-            _auditWriter,
+            _uowFactory,
             _operatorUser,
             _currentWorkstation,
             new UpdateSettingsRequestValidator());

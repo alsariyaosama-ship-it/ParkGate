@@ -1,6 +1,5 @@
 using FluentValidation;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Application.Workstations.DTOs;
@@ -10,20 +9,17 @@ namespace ParkGate.Application.Workstations.Services;
 public sealed class WorkstationService : IWorkstationService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<UpdateWorkstationRequest> _updateValidator;
 
     public WorkstationService(
         IUnitOfWorkFactory uowFactory,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<UpdateWorkstationRequest> updateValidator)
     {
         _uowFactory = uowFactory;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _updateValidator = updateValidator;
@@ -69,9 +65,7 @@ public sealed class WorkstationService : IWorkstationService
         }
 
         workstation.Update(request.DisplayName, request.Type);
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "WorkstationUpdated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
@@ -79,6 +73,8 @@ public sealed class WorkstationService : IWorkstationService
             entityId: workstation.Id.ToString(),
             detailsJson: AuditDetails.ToJson(new { workstation.DisplayName, Type = workstation.Type.ToString() }),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return workstation.ToDto();
     }
@@ -98,15 +94,15 @@ public sealed class WorkstationService : IWorkstationService
         }
 
         workstation.Deactivate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "WorkstationDeactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Domain.Entities.Workstation),
             entityId: workstation.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -126,15 +122,15 @@ public sealed class WorkstationService : IWorkstationService
         }
 
         workstation.Activate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "WorkstationReactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Domain.Entities.Workstation),
             entityId: workstation.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

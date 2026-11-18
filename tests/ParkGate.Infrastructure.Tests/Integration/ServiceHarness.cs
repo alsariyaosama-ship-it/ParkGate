@@ -5,6 +5,8 @@ using ParkGate.Application.Common;
 using ParkGate.Application.EntryCards;
 using ParkGate.Application.GiftVouchers.Services;
 using ParkGate.Application.GiftVouchers.Validators;
+using ParkGate.Application.Organizations.Services;
+using ParkGate.Application.Organizations.Validators;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Application.Settings.Models;
@@ -56,6 +58,14 @@ internal sealed class ServiceHarness : IDisposable
         _approvals,
         new IssueGiftOverrideRequestValidator(),
         new VoidGiftVoucherRequestValidator());
+
+    public OrganizationService Organizations(User user, Workstation desk) => new(
+        _uowFactory,
+        new DeskUser(user),
+        new Desk(desk),
+        new CreateOrganizationRequestValidator(),
+        new UpdateOrganizationRequestValidator(),
+        new SetOrganizationPolicyRequestValidator());
 
     /// <summary>Starts every action at the same moment so the database work really overlaps.</summary>
     public static async Task<T[]> RunTogetherAsync<T>(int parallelism, Func<int, Task<T>> action)

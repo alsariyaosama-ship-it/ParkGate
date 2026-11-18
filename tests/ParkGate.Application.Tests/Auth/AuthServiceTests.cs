@@ -15,7 +15,6 @@ public sealed class AuthServiceTests
     private readonly List<Workstation> _workstations = [];
     private readonly FakeAppSettingRepository _settings = new();
     private readonly FakePasswordHasher _passwordHasher = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUserSession = new();
     private readonly CurrentWorkstationContext _workstationSession = new("GATE-01");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -29,7 +28,6 @@ public sealed class AuthServiceTests
         _sut = new AuthService(
             _uowFactory,
             _passwordHasher,
-            _auditWriter,
             _currentUserSession,
             _workstationSession,
             new FirstRunAdminRequestValidator(),
@@ -69,7 +67,7 @@ public sealed class AuthServiceTests
         _users.Count.ShouldBe(1);
         _users[0].PasswordHash.ShouldBe("HASHED_StrongPass123");
 
-        _auditWriter.Writes.ShouldContain(w => w.Action == "FirstRunAdminCreated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "FirstRunAdminCreated");
     }
 
     [Fact]
@@ -127,7 +125,7 @@ public sealed class AuthServiceTests
         lockResult.IsFailure.ShouldBeTrue();
         lockResult.Error.Code.ShouldBe(Errors.Auth.AccountLocked.Code);
         user.IsLockedOut(_uowFactory.CurrentUow.CurrentDbTime).ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserLockedOut");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserLockedOut");
     }
 
     [Fact]
@@ -149,7 +147,7 @@ public sealed class AuthServiceTests
         _workstationSession.IsRegistered.ShouldBeTrue();
         _workstationSession.MachineName.ShouldBe("DESK-PC-99");
 
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserLogin");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserLogin");
     }
 
     [Fact]
@@ -183,7 +181,7 @@ public sealed class AuthServiceTests
         result.IsSuccess.ShouldBeTrue();
         user.PasswordHash.ShouldBe("HASHED_NewPass1234");
         user.MustChangePassword.ShouldBeFalse();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "PasswordChanged");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "PasswordChanged");
     }
 
     [Fact]

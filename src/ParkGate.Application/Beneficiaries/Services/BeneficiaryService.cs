@@ -1,7 +1,6 @@
 using FluentValidation;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Domain.Entities;
@@ -15,7 +14,6 @@ public sealed class BeneficiaryService : IBeneficiaryService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IEntryEligibilityPolicy _eligibilityPolicy;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<RegisterBeneficiaryRequest> _registerValidator;
@@ -25,7 +23,6 @@ public sealed class BeneficiaryService : IBeneficiaryService
     public BeneficiaryService(
         IUnitOfWorkFactory uowFactory,
         IEntryEligibilityPolicy eligibilityPolicy,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<RegisterBeneficiaryRequest> registerValidator,
@@ -34,7 +31,6 @@ public sealed class BeneficiaryService : IBeneficiaryService
     {
         _uowFactory = uowFactory;
         _eligibilityPolicy = eligibilityPolicy;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _registerValidator = registerValidator;
@@ -176,15 +172,15 @@ public sealed class BeneficiaryService : IBeneficiaryService
             request.Notes);
 
         uow.Beneficiaries.Add(beneficiary);
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "BeneficiaryRegistered",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Beneficiary),
             entityId: beneficiary.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return beneficiary.ToDto(org.NameAr);
     }
@@ -225,8 +221,10 @@ public sealed class BeneficiaryService : IBeneficiaryService
             return Errors.Organization.NotFound;
         }
 
+        string? cardChange = null;
         if (beneficiary.CardNumber != cardVo)
         {
+            cardChange = AuditDetails.ToJson(new { OldCardNumber = beneficiary.CardNumber.Value, NewCardNumber = cardVo!.Value });
             var existingCard = await uow.Beneficiaries.GetByOrgAndCardAsync(request.OrganizationId, cardVo!, cancellationToken);
             if (existingCard is not null && existingCard.Id != beneficiary.Id)
             {
@@ -248,15 +246,16 @@ public sealed class BeneficiaryService : IBeneficiaryService
             request.CardExpiryDate,
             request.Notes);
 
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "BeneficiaryUpdated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Beneficiary),
             entityId: beneficiary.Id.ToString(),
+            detailsJson: cardChange,
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return beneficiary.ToDto(org.NameAr);
     }
@@ -298,11 +297,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
                 return Errors.Beneficiary.InvalidStatusTransition;
         }
 
-        await uow.SaveChangesAsync(cancellationToken);
-
         var org = await uow.Organizations.GetByIdAsync(beneficiary.OrganizationId, cancellationToken);
 
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "BeneficiaryStatusChanged",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
@@ -310,6 +307,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             entityId: beneficiary.Id.ToString(),
             detailsJson: AuditDetails.ToJson(new { NewStatus = request.TargetStatus.ToString(), request.Reason }),
             cancellationToken: cancellationToken);
+        await uow.SaveChangesAsync(cancellationToken);
 
         return beneficiary.ToDto(org?.NameAr ?? string.Empty);
     }

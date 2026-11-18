@@ -1,7 +1,6 @@
 using FluentValidation;
 using ParkGate.Application.Common;
 using ParkGate.Application.Organizations.DTOs;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Domain.Entities;
@@ -11,7 +10,6 @@ namespace ParkGate.Application.Organizations.Services;
 public sealed class OrganizationService : IOrganizationService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<CreateOrganizationRequest> _createValidator;
@@ -20,7 +18,6 @@ public sealed class OrganizationService : IOrganizationService
 
     public OrganizationService(
         IUnitOfWorkFactory uowFactory,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<CreateOrganizationRequest> createValidator,
@@ -28,7 +25,6 @@ public sealed class OrganizationService : IOrganizationService
         IValidator<SetOrganizationPolicyRequest> policyValidator)
     {
         _uowFactory = uowFactory;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _createValidator = createValidator;
@@ -93,16 +89,20 @@ public sealed class OrganizationService : IOrganizationService
             request.IsDefault,
             isActive: true);
 
+        // The audit row names the new identity id, so save twice inside one transaction (R6.11).
+        await uow.BeginTransactionAsync(cancellationToken);
         uow.Organizations.Add(org);
         await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "OrganizationCreated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Organization),
             entityId: org.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
+        await uow.CommitAsync(cancellationToken);
 
         return org.ToDto();
     }
@@ -141,15 +141,15 @@ public sealed class OrganizationService : IOrganizationService
 
         org.Update(request.Code, request.NameAr, request.CooldownMinutes);
 
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "OrganizationUpdated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Organization),
             entityId: org.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return org.ToDto();
     }
@@ -174,15 +174,15 @@ public sealed class OrganizationService : IOrganizationService
         }
 
         org.Deactivate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "OrganizationDeactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Organization),
             entityId: org.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -222,9 +222,7 @@ public sealed class OrganizationService : IOrganizationService
             return new Error("Gift.InvalidPolicy", ex.Message);
         }
 
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "Organization.PolicyChanged",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
@@ -232,6 +230,8 @@ public sealed class OrganizationService : IOrganizationService
             entityId: org.Id.ToString(),
             detailsJson: AuditDetails.ToJson(new { request.MaxFreeCompanions, request.GiftEnabled, request.GiftValue, request.GiftIntervalDays }),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return org.ToDto();
     }
@@ -251,15 +251,15 @@ public sealed class OrganizationService : IOrganizationService
         }
 
         org.Activate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "OrganizationReactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Organization),
             entityId: org.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

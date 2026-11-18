@@ -25,7 +25,6 @@ public sealed class InactiveEntityUniquenessTests
     private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentWorkstation _currentWorkstation = Substitute.For<ICurrentWorkstation>();
-    private readonly IAuditWriter _auditWriter = Substitute.For<IAuditWriter>();
 
     public InactiveEntityUniquenessTests()
     {
@@ -48,7 +47,6 @@ public sealed class InactiveEntityUniquenessTests
 
         var service = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator,
@@ -77,7 +75,6 @@ public sealed class InactiveEntityUniquenessTests
 
         var service = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator,
@@ -106,7 +103,6 @@ public sealed class InactiveEntityUniquenessTests
         var service = new UserService(
             _uowFactory,
             Substitute.For<IPasswordHasher>(),
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator);
@@ -132,7 +128,6 @@ public sealed class InactiveEntityUniquenessTests
 
         var service = new AgeCategoryService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator,

@@ -20,7 +20,6 @@ public sealed class BeneficiaryServiceTests
     private readonly List<EntryAttempt> _attempts = [];
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeAppSettingRepository _settings = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("DESK-01");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -49,7 +48,6 @@ public sealed class BeneficiaryServiceTests
         _sut = new BeneficiaryService(
             _uowFactory,
             _policy,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new RegisterBeneficiaryRequestValidator(),
@@ -203,7 +201,7 @@ public sealed class BeneficiaryServiceTests
         result.Value.NationalId.ShouldBe("119901234567");
 
         _beneficiaries.Count.ShouldBe(1);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "BeneficiaryRegistered");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "BeneficiaryRegistered");
     }
 
     [Fact]
@@ -285,7 +283,34 @@ public sealed class BeneficiaryServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.FullName.ShouldBe("Updated Name");
         result.Value.CardNumber.ShouldBe("CARD-NEW");
-        _auditWriter.Writes.ShouldContain(w => w.Action == "BeneficiaryUpdated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "BeneficiaryUpdated");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenCardNumberChanges_ShouldAuditOldAndNewCardNumber()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Supervisor", UserRole.Supervisor);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-OLD"), "Name", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.UpdateAsync(new UpdateBeneficiaryRequest(holder.Id, _org.Id, "CARD-NEW", "Name", "0912345678"));
+
+        result.IsSuccess.ShouldBeTrue();
+        var row = _uowFactory.CurrentUow.AuditRowsAtLastSave.Single(w => w.Action == "BeneficiaryUpdated");
+        row.DetailsJson.ShouldBe("{\"OldCardNumber\":\"CARD-OLD\",\"NewCardNumber\":\"CARD-NEW\"}");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenCardNumberIsUnchanged_ShouldAuditWithoutCardDetails()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Supervisor", UserRole.Supervisor);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-SAME"), "Name", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.UpdateAsync(new UpdateBeneficiaryRequest(holder.Id, _org.Id, "CARD-SAME", "New Name", "0912345678"));
+
+        result.IsSuccess.ShouldBeTrue();
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.Single(w => w.Action == "BeneficiaryUpdated").DetailsJson.ShouldBeNull();
     }
 
     [Fact]
@@ -308,7 +333,7 @@ public sealed class BeneficiaryServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.Status.ShouldBe(BeneficiaryStatus.Suspended);
         result.Value.StatusReason.ShouldBe("Suspicious multiple entries reported");
-        _auditWriter.Writes.ShouldContain(w => w.Action == "BeneficiaryStatusChanged");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "BeneficiaryStatusChanged");
     }
 
     [Fact]

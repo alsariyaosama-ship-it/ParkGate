@@ -31,7 +31,6 @@ public sealed class ManagementServicesTests
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeAppSettingRepository _settings = new();
     private readonly FakePasswordHasher _passwordHasher = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("ADMIN-PC");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -68,7 +67,7 @@ public sealed class ManagementServicesTests
     {
         var sut = new SettingsService(
             _settings,
-            _auditWriter,
+            _uowFactory,
             _currentUser,
             _currentWorkstation,
             new UpdateSettingsRequestValidator());
@@ -98,7 +97,7 @@ public sealed class ManagementServicesTests
         updated.MaxGroupSize.ShouldBe(15);
         updated.ParkName.ShouldBe("New Park Name");
 
-        _auditWriter.Writes.ShouldContain(w => w.Action == "SettingsUpdated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "SettingsUpdated");
     }
 
     [Fact]
@@ -106,7 +105,6 @@ public sealed class ManagementServicesTests
     {
         var sut = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
@@ -124,7 +122,6 @@ public sealed class ManagementServicesTests
     {
         var sut = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
@@ -151,7 +148,6 @@ public sealed class ManagementServicesTests
     {
         var sut = new AgeCategoryService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new CreateAgeCategoryRequestValidator(),
@@ -175,7 +171,6 @@ public sealed class ManagementServicesTests
         var sut = new UserService(
             _uowFactory,
             _passwordHasher,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new CreateUserRequestValidator());
@@ -205,7 +200,6 @@ public sealed class ManagementServicesTests
     {
         var sut = new WorkstationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new UpdateWorkstationRequestValidator());

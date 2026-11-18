@@ -17,7 +17,6 @@ public sealed class OrganizationPolicyTests
 {
     private readonly List<Organization> _organizations = [];
     private readonly List<AgeCategory> _categories = [];
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _workstation = new("WS-1");
     private readonly FakeUnitOfWorkFactory _uowFactory;
@@ -41,7 +40,6 @@ public sealed class OrganizationPolicyTests
 
         _orgSut = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _workstation,
             new CreateOrganizationRequestValidator(),
@@ -50,7 +48,6 @@ public sealed class OrganizationPolicyTests
 
         _catSut = new AgeCategoryService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _workstation,
             new CreateAgeCategoryRequestValidator(),
@@ -74,7 +71,7 @@ public sealed class OrganizationPolicyTests
         result.Value.GiftEnabled.ShouldBeTrue();
         result.Value.GiftValue.ShouldBe(50m);
         result.Value.GiftIntervalDays.ShouldBe(30);
-        _auditWriter.Writes.ShouldContain(w => w.Action == "Organization.PolicyChanged");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "Organization.PolicyChanged");
     }
 
     [Fact]

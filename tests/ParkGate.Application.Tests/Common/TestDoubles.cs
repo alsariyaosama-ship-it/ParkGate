@@ -24,28 +24,6 @@ public sealed class FakePasswordHasher : IPasswordHasher
     }
 }
 
-public sealed class FakeAuditWriter : IAuditWriter
-{
-    public List<(string Action, int? UserId, int? WorkstationId, string? EntityName, string? EntityId)> Writes { get; } = [];
-
-    /// <summary>The details JSON of each write, in the same order as <see cref="Writes"/>.</summary>
-    public List<string?> Details { get; } = [];
-
-    public Task WriteAsync(
-        string action,
-        int? userId = null,
-        int? workstationId = null,
-        string? entityName = null,
-        string? entityId = null,
-        string? detailsJson = null,
-        CancellationToken cancellationToken = default)
-    {
-        Writes.Add((action, userId, workstationId, entityName, entityId));
-        Details.Add(detailsJson);
-        return Task.CompletedTask;
-    }
-}
-
 public sealed class FakeUserRepository : IUserRepository
 {
     private readonly List<User> _users;
@@ -545,9 +523,14 @@ public sealed class FakeUnitOfWork : IUnitOfWork
 
     public Task RollbackAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
+    /// <summary>Audit rows that the last <see cref="SaveChangesAsync"/> call persisted (R6.11: same unit of work).</summary>
+    public List<AuditLog> AuditRowsAtLastSave { get; } = [];
+
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveChangesCalls++;
+        AuditRowsAtLastSave.Clear();
+        AuditRowsAtLastSave.AddRange(AuditLogRows);
         return Task.FromResult(1);
     }
 
@@ -640,7 +623,7 @@ public static class TestSettings
     public static ISettingsService Over(FakeAppSettingRepository store) =>
         new SettingsService(
             store,
-            new FakeAuditWriter(),
+            new FakeUnitOfWorkFactory(appSettings: store),
             new CurrentUserContext(),
             new CurrentWorkstationContext("TEST"),
             new UpdateSettingsRequestValidator());
