@@ -177,13 +177,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
                     }
                     else
                     {
-                        MessageBox.Show(
-                            Strings.Msg_EditBeneficiarySuccess,
-                            Strings.Title_Info,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                        Notify.Info(Strings.Msg_EditBeneficiarySuccess, Strings.Title_Info);
                     }
 
                     DialogResult = DialogResult.OK;
@@ -198,13 +192,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
                     }
                     else
                     {
-                        MessageBox.Show(
-                            msg,
-                            Strings.Title_Warning,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                        Notify.Warning(msg, Strings.Title_Warning);
                     }
                 }
             }
@@ -218,13 +206,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
                 }
                 else
                 {
-                    MessageBox.Show(
-                        msg,
-                        Strings.Title_Error,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error,
-                        MessageBoxDefaultButton.Button1,
-                        MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                    Notify.Error(msg, Strings.Title_Error);
                 }
             }
         }

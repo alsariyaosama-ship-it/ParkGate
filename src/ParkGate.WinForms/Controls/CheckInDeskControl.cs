@@ -1334,15 +1334,9 @@ public partial class CheckInDeskControl : UserControl
             voidReason = reasonDialog.Reason;
         }
 
-        var confirmResult = MessageBox.Show(
-            Strings.Msg_ConfirmVoid,
-            Strings.Title_Confirm,
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Question,
-            MessageBoxDefaultButton.Button2,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        var confirmed = Notify.Confirm(Strings.Msg_ConfirmVoid, Strings.Title_Confirm);
 
-        if (confirmResult != DialogResult.Yes)
+        if (!confirmed)
         {
             return;
         }
@@ -1362,13 +1356,7 @@ public partial class CheckInDeskControl : UserControl
                     }
                     else
                     {
-                        MessageBox.Show(
-                            Strings.Msg_VoidSuccess,
-                            Strings.Title_Info,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                        Notify.Info(Strings.Msg_VoidSuccess, Strings.Title_Info);
                     }
 
                     await RefreshTodayDeskSummaryAsync();
@@ -1387,13 +1375,7 @@ public partial class CheckInDeskControl : UserControl
                     }
                     else
                     {
-                        MessageBox.Show(
-                            msg,
-                            Strings.Title_Warning,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                        Notify.Warning(msg, Strings.Title_Warning);
                     }
                 }
             }
@@ -1407,13 +1389,7 @@ public partial class CheckInDeskControl : UserControl
                 }
                 else
                 {
-                    MessageBox.Show(
-                        msg,
-                        Strings.Title_Error,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error,
-                        MessageBoxDefaultButton.Button1,
-                        MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                    Notify.Error(msg, Strings.Title_Error);
                 }
             }
         }

@@ -266,13 +266,7 @@ public partial class OrganizationsForm : RtlFormBase
             : Strings.Msg_ConfirmReactivateOrg;
 
         var confirmed = _notifyService?.Confirm(confirmMsg, Strings.Title_Confirm) ??
-                        (MessageBox.Show(
-                            confirmMsg,
-                            Strings.Title_Confirm,
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Question,
-                            MessageBoxDefaultButton.Button2,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign) == DialogResult.Yes);
+                        Notify.Confirm(confirmMsg, Strings.Title_Confirm);
 
         if (!confirmed)
         {

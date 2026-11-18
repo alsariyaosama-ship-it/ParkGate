@@ -60,13 +60,7 @@ public partial class VoidReasonDialog : RtlFormBase
             }
             else
             {
-                MessageBox.Show(
-                    msg,
-                    Strings.Title_Warning,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning,
-                    MessageBoxDefaultButton.Button1,
-                    MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+                Notify.Warning(msg, Strings.Title_Warning);
             }
             _txtReason.Focus();
             return;

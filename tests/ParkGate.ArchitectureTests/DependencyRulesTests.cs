@@ -123,6 +123,25 @@ public sealed class DependencyRulesTests
     }
 
     [Fact]
+    public void WinFormsSource_ShowsMessageBoxesOnlyThroughNotify()
+    {
+        // R7.7 / AGENTS.md §5.6: one place sets the RTL options, icons and default buttons.
+        var root = FindRepoRoot();
+        var winForms = Path.Combine(root, "src", "ParkGate.WinForms");
+        var notify = Path.Combine("Common", "Notify.cs");
+        var offenders = Directory
+            .EnumerateFiles(winForms, "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") &&
+                        !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            .Where(f => Path.GetRelativePath(winForms, f) != notify)
+            .Where(f => File.ReadAllText(f).Contains("MessageBox.Show(", StringComparison.Ordinal))
+            .Select(f => Path.GetRelativePath(root, f))
+            .ToList();
+
+        offenders.ShouldBeEmpty("Use Notify or INotifyService instead of MessageBox.Show.");
+    }
+
+    [Fact]
     public void ProgramMain_IsSynchronousAndSta()
     {
         // R7.11: [STAThread] is ignored on an async Main; after the first await the UI ran on an MTA

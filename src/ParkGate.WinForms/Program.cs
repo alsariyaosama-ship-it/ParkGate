@@ -123,23 +123,11 @@ internal static class Program
     {
         Log.Error(exception, "Unhandled exception captured in {Source}", source);
 
-        MessageBox.Show(
-            Strings.Msg_UnexpectedError,
-            Strings.Ui_Program_01,
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Error,
-            MessageBoxDefaultButton.Button1,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        Notify.Error(Strings.Msg_UnexpectedError, Strings.Ui_Program_01);
     }
 
     private static void ShowFatalErrorMessage(Exception exception)
     {
-        MessageBox.Show(
-            $"{Strings.Msg_StartupFailed}{Environment.NewLine}{UserMessages.Describe(exception)}",
-            Strings.Ui_Program_02,
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Stop,
-            MessageBoxDefaultButton.Button1,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        Notify.Error($"{Strings.Msg_StartupFailed}{Environment.NewLine}{UserMessages.Describe(exception)}", Strings.Ui_Program_02);
     }
 }

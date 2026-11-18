@@ -719,15 +719,9 @@ public partial class BeneficiariesControl : UserControl
 
         // Confirm prompt
         var confirmMsg = Strings.Msg_ConfirmVoid;
-        var confirmResult = MessageBox.Show(
-            confirmMsg,
-            Strings.Title_Confirm,
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Question,
-            MessageBoxDefaultButton.Button2,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        var confirmed = Notify.Confirm(confirmMsg, Strings.Title_Confirm);
 
-        if (confirmResult != DialogResult.Yes)
+        if (!confirmed)
         {
             return;
         }

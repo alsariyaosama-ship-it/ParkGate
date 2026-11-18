@@ -547,13 +547,7 @@ public partial class MainForm : RtlFormBase
     private async Task OnLogoutClickedAsync()
     {
         var confirm = _notifyService?.Confirm(Strings.Msg_ConfirmLogout, Strings.Title_Logout)
-            ?? (MessageBox.Show(
-                Strings.Msg_ConfirmLogout,
-                Strings.Title_Logout,
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button2,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign) == DialogResult.Yes);
+            ?? Notify.Confirm(Strings.Msg_ConfirmLogout, Strings.Title_Logout);
 
         if (!confirm)
         {
@@ -597,13 +591,7 @@ public partial class MainForm : RtlFormBase
         }
         else
         {
-            MessageBox.Show(
-                message,
-                Strings.About_Title,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+            Notify.Info(message, Strings.About_Title);
         }
     }
 
@@ -700,13 +688,7 @@ public partial class MainForm : RtlFormBase
         }
         else
         {
-            MessageBox.Show(
-                message,
-                featureName,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+            Notify.Info(message, featureName);
         }
     }
 
@@ -720,13 +702,7 @@ public partial class MainForm : RtlFormBase
         if (e.CloseReason == CloseReason.UserClosing)
         {
             var confirm = _notifyService?.Confirm(Strings.Msg_ConfirmExit, Strings.Title_Exit)
-                ?? (MessageBox.Show(
-                    Strings.Msg_ConfirmExit,
-                    Strings.Title_Exit,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button2,
-                    MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign) == DialogResult.Yes);
+                ?? Notify.Confirm(Strings.Msg_ConfirmExit, Strings.Title_Exit);
 
             if (!confirm)
             {

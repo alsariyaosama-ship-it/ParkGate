@@ -146,13 +146,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
         }
         else
         {
-            MessageBox.Show(
-                message,
-                Strings.Title_Warning,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+            Notify.Warning(message, Strings.Title_Warning);
         }
     }
 
@@ -164,13 +158,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
         }
         else
         {
-            MessageBox.Show(
-                message,
-                Strings.Title_Error,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+            Notify.Error(message, Strings.Title_Error);
         }
     }
 }

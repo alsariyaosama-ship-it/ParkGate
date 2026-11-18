@@ -251,11 +251,12 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R7.4 Dialog conventions: `AcceptButton`, `CancelButton`, tab order, `Theme` button styles
 - [ ] R7.5 Web UI: same glossary, park-local times, empty states, no phone or national ID
 - [x] R7.6 Remove the Infrastructure reference from `IssueQrDialog`; architecture test
-- [ ] R7.7 All message boxes through `Notify`; architecture test
+- [x] R7.7 All message boxes through `Notify`; architecture test
 - [ ] R7.8 All designers on `AutoScaleMode.Dpi`; extend `DesignerScalingTests`
 - [ ] R7.9 Resolve forms and controls through `IFormFactory`; required services, no null fallbacks
 - [ ] R7.10 Split `CheckInDeskControl` into smaller user controls
 - [x] R7.11 UI thread is STA: synchronous `Main`, async startup inside the message loop (file/print dialogs threw `ThreadStateException`)
+- [ ] R7.12 Entry-card QR print layout needs design work (Osama, 2026-11-18: save and print work, the printed style does not)
 
 ### R8 — Build, packaging and deployment · branch `phase/r8-release`
 - [ ] R8.1 Fix the doubled backslash in the published `appsettings.json` server path
