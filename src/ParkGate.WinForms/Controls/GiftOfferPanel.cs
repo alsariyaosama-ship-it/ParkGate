@@ -22,7 +22,7 @@ public partial class GiftOfferPanel : UserControl
 
     private Guid? _currentBeneficiaryId;
     private GiftEligibilityDto? _eligibility;
-    private string? _timeZoneId = "Libya Standard Time";
+    private string? _timeZoneId; // set by the desk from Park.TimeZoneId (R7.10)
 
     public GiftOfferPanel()
     {

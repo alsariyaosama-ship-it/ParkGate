@@ -254,7 +254,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R7.7 All message boxes through `Notify`; architecture test
 - [x] R7.8 All designers on `AutoScaleMode.Dpi`; extend `DesignerScalingTests`
 - [x] R7.9 Resolve forms and controls through `IFormFactory`; required services, no null fallbacks
-- [ ] R7.10 Split `CheckInDeskControl` into smaller user controls
+- [x] R7.10 Split `CheckInDeskControl` into smaller user controls
 - [x] R7.11 UI thread is STA: synchronous `Main`, async startup inside the message loop (file/print dialogs threw `ThreadStateException`)
 - [ ] R7.12 Entry-card QR print layout needs design work (Osama, 2026-11-18: save and print work, the printed style does not)
 - [ ] R7.13 Text still clipped at 125 % (found in R7.8, older than it): `ResetUserPasswordDialog` prompt and button, `UsersForm` add button, `SelectOrganizationDialog` and `VoidReasonDialog` long texts, `GiftReceiptsForm` export/print buttons outside the filter panel, `BeneficiariesControl` details rows 8-9 and void button, `ConnectionSettingsForm` labels, `EditAgeCategoryDialog` description label, page headers in `LoginForm`/`OrganizationsForm`/`AgeCategoriesForm`

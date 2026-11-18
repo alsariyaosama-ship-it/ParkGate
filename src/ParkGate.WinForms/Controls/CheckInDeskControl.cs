@@ -43,8 +43,6 @@ public partial class CheckInDeskControl : UserControl
     private readonly List<CounterInput> _counterInputs = [];
     private readonly List<OrganizationDto> _organizations = [];
     private readonly List<AgeCategoryDto> _ageCategories = [];
-    private readonly ContextMenuStrip _todayContextMenu = new();
-    private readonly ToolStripMenuItem _menuVoidToday = new();
     private BeneficiaryDto? _activeHolder;
     private EligibilityPreviewDto? _activeEligibility;
     private bool _companionsBlockEntry;
@@ -106,7 +104,6 @@ public partial class CheckInDeskControl : UserControl
             _timeZoneId);
 
         InitializeControlText();
-        Theme.ApplyGridStyle(_gridToday);
         WireEvents();
     }
 
@@ -128,15 +125,6 @@ public partial class CheckInDeskControl : UserControl
         _lblHolderStatusTitle.Text = Strings.Label_HolderStatus;
 
         // Inline Registration
-        _grpRegistration.Text = Strings.Title_InlineRegistration;
-        _lblRegOrganization.Text = Strings.Label_RegOrganization;
-        _lblRegFullName.Text = Strings.Label_RegFullName;
-        _lblRegPhone.Text = Strings.Label_RegPhone;
-        _lblRegNationalId.Text = Strings.Label_RegNationalId;
-        _lblRegExpiry.Text = Strings.Label_RegExpiry;
-        _lblRegNotes.Text = Strings.Label_RegNotes;
-        _btnSaveReg.Text = Strings.Btn_SaveAndContinue;
-        _btnCancelReg.Text = Strings.Btn_CancelReg;
 
         // Companions Panel
         _grpCompanions.Text = Strings.Title_Companions;
@@ -150,14 +138,6 @@ public partial class CheckInDeskControl : UserControl
         _btnClear.Text = Strings.Btn_Clear;
 
         // Today Grid
-        _grpToday.Text = Strings.Title_TodayDesk;
-        _colTime.HeaderText = Strings.Col_Time;
-        _colCard.HeaderText = Strings.Col_CardNumber;
-        _colName.HeaderText = Strings.Col_HolderName;
-        _colOrg.HeaderText = Strings.Col_Org;
-        _colPersons.HeaderText = Strings.Col_Persons;
-        _colResult.HeaderText = Strings.Col_Result;
-        _lblTodaySummary.Text = string.Format(Strings.Summary_TodayStats, 0, 0, 0, 0);
 
         _statusBanner.Reset();
         _btnRecordEntry.Enabled = false;
@@ -176,7 +156,7 @@ public partial class CheckInDeskControl : UserControl
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 await LookupCardAsync();
-                if (!_grpRegistration.Visible)
+                if (!_registrationPanel.Visible)
                 {
                     FocusCardNumberBox();
                 }
@@ -203,47 +183,19 @@ public partial class CheckInDeskControl : UserControl
         _btnSearch.Click += async (_, _) =>
         {
             await LookupCardAsync();
-            if (!_grpRegistration.Visible)
+            if (!_registrationPanel.Visible)
             {
                 FocusCardNumberBox();
             }
         };
         _btnClear.Click += (_, _) => ResetDesk();
         _btnNewHolder.Click += (_, _) => StartManualRegistration();
-        _btnCancelReg.Click += (_, _) => HideInlineRegistration();
-        _btnSaveReg.Click += async (_, _) => await SaveInlineRegistrationAsync();
+        _registrationPanel.CancelRequested += (_, _) => HideInlineRegistration();
+        _registrationPanel.SaveRequested += async (_, _) => await SaveInlineRegistrationAsync();
         _btnRecordEntry.Click += async (_, _) => await RecordEntryAsync();
         _btnOverride.Click += async (_, _) => await OverrideEntryAsync();
 
-        // Today grid context menu for voiding (SPEC §7.2 FR-CHK-09)
-        _menuVoidToday.Text = Strings.Menu_VoidTodayEntry;
-        _menuVoidToday.Click += async (_, _) => await VoidSelectedTodayEntryAsync();
-        _todayContextMenu.Items.Add(_menuVoidToday);
-        _gridToday.ContextMenuStrip = _todayContextMenu;
-
-        _gridToday.MouseDown += (s, e) =>
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                var hit = _gridToday.HitTest(e.X, e.Y);
-                if (hit.RowIndex >= 0)
-                {
-                    _gridToday.ClearSelection();
-                    _gridToday.Rows[hit.RowIndex].Selected = true;
-                }
-            }
-        };
-
-        _todayContextMenu.Opening += (_, e) =>
-        {
-            if (_gridToday.SelectedRows.Count == 0 ||
-                _gridToday.SelectedRows[0].Tag is not TodayDeskAttemptDto attempt ||
-                attempt.IsVoided ||
-                attempt.Result == EntryResult.Denied)
-            {
-                e.Cancel = true;
-            }
-        };
+        _todayPanel.VoidRequested += async (_, _) => await VoidSelectedTodayEntryAsync();
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -287,7 +239,7 @@ public partial class CheckInDeskControl : UserControl
                 break;
 
             case Keys.Escape:
-                if (_cmbOrganization.DroppedDown || _cmbRegOrganization.DroppedDown)
+                if (_cmbOrganization.DroppedDown || _registrationPanel.IsOrganizationListOpen)
                 {
                     // Esc closes the open list; it must not also reset the desk (R4.5).
                     break;
@@ -311,12 +263,7 @@ public partial class CheckInDeskControl : UserControl
     /// </summary>
     private bool ConfirmDiscardRegistration()
     {
-        var hasInput = _grpRegistration.Visible &&
-            (!string.IsNullOrWhiteSpace(_txtRegFullName.Text) ||
-             !string.IsNullOrWhiteSpace(_txtRegPhone.Text) ||
-             !string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ||
-             !string.IsNullOrWhiteSpace(_txtRegNotes.Text) ||
-             _dtpRegExpiry.Checked);
+        var hasInput = _registrationPanel.Visible && _registrationPanel.HasInput;
 
         return !hasInput || (_notifyService.Confirm(Strings.Confirm_DiscardRegistration, Strings.Title_Warning));
     }
@@ -366,11 +313,10 @@ public partial class CheckInDeskControl : UserControl
             _cmbOrganization.Items.Add(new OrgComboItem(null, Strings.Filter_AllOrganizations));
 
             // The registration panel offers real organizations only, never «الكل» (R4.3).
-            _cmbRegOrganization.Items.Clear();
+            _registrationPanel.SetOrganizations(orgs.Select(o => (o.Id, o.NameAr)));
             foreach (var org in orgs)
             {
                 _cmbOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
-                _cmbRegOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
             }
 
             _cmbOrganization.SelectedIndex = 0;
@@ -538,12 +484,7 @@ public partial class CheckInDeskControl : UserControl
         ClearHolderInfo();
         HideInlineRegistration();
         _giftPanel.Clear();
-
-        _txtRegFullName.Clear();
-        _txtRegPhone.Clear();
-        _txtRegNationalId.Clear();
-        _dtpRegExpiry.Checked = false;
-        _txtRegNotes.Clear();
+        _registrationPanel.ClearFields();
 
         foreach (var counter in _counterInputs)
         {
@@ -663,20 +604,15 @@ public partial class CheckInDeskControl : UserControl
     public void ShowInlineRegistration(string cardNumber, int? orgId = null)
     {
         _grpHolder.Visible = false;
-        _grpRegistration.Visible = true;
-
-        _txtRegFullName.Clear();
-        _txtRegPhone.Clear();
-        _txtRegNationalId.Clear();
-        _dtpRegExpiry.Checked = false;
-        _txtRegNotes.Clear();
+        _registrationPanel.Visible = true;
+        _registrationPanel.ClearFields();
         SelectRegistrationOrganization(orgId ?? (_cmbOrganization.SelectedItem as OrgComboItem)?.Id);
 
         _statusBanner.SetWarning(Strings.Ui_CheckInDesk_03, Strings.Ui_CheckInDesk_04);
         _btnRecordEntry.Enabled = false;
         _btnOverride.Enabled = false;
 
-        _txtRegFullName.Focus();
+        _registrationPanel.FocusFullName();
     }
 
     /// <summary>
@@ -686,8 +622,7 @@ public partial class CheckInDeskControl : UserControl
     private void SelectRegistrationOrganization(int? preferredOrgId)
     {
         var targetId = preferredOrgId ?? _organizations.FirstOrDefault(o => o.IsDefault)?.Id;
-        var match = _cmbRegOrganization.Items.OfType<OrgComboItem>().FirstOrDefault(i => i.Id == targetId);
-        _cmbRegOrganization.SelectedItem = match;
+        _registrationPanel.SelectOrganization(targetId);
     }
 
     private void SelectFilterOrganization(int? orgId)
@@ -701,7 +636,7 @@ public partial class CheckInDeskControl : UserControl
 
     public void HideInlineRegistration()
     {
-        _grpRegistration.Visible = false;
+        _registrationPanel.Visible = false;
         _grpHolder.Visible = true;
     }
 
@@ -894,7 +829,7 @@ public partial class CheckInDeskControl : UserControl
             }
         }
 
-        if (!_grpRegistration.Visible)
+        if (!_registrationPanel.Visible)
         {
             FocusCardNumberBox();
         }
@@ -966,41 +901,41 @@ public partial class CheckInDeskControl : UserControl
 
     internal async Task SaveInlineRegistrationAsync()
     {
-        var fullName = _txtRegFullName.Text.Trim();
-        var phone = _txtRegPhone.Text.Trim();
+        var fullName = _registrationPanel.FullName;
+        var phone = _registrationPanel.Phone;
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
-        var registrationOrgId = (_cmbRegOrganization.SelectedItem as OrgComboItem)?.Id;
+        var registrationOrgId = _registrationPanel.SelectedOrganizationId;
 
         if (registrationOrgId is null)
         {
             _notifyService.Warning(Strings.Val_RegOrganizationRequired, Strings.Title_Warning);
-            _cmbRegOrganization.Focus();
+            _registrationPanel.FocusOrganization();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(fullName))
         {
             _notifyService.Warning(Strings.Ui_CheckInDesk_08, Strings.Title_Warning);
-            _txtRegFullName.Focus();
+            _registrationPanel.FocusFullName();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(phone))
         {
             _notifyService.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
-            _txtRegPhone.Focus();
+            _registrationPanel.FocusPhone();
             return;
         }
 
-        using (new BusyScope(this, _btnSaveReg, _btnCancelReg))
+        using (new BusyScope(this, _registrationPanel.ActionButtons))
         {
             try
             {
                 var orgId = registrationOrgId.Value;
 
-                DateOnly? expiry = _dtpRegExpiry.Checked ? DateOnly.FromDateTime(_dtpRegExpiry.Value) : null;
-                var natId = string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ? null : _txtRegNationalId.Text.Trim();
-                var notes = string.IsNullOrWhiteSpace(_txtRegNotes.Text) ? null : _txtRegNotes.Text.Trim();
+                var expiry = _registrationPanel.ExpiryDate;
+                var natId = _registrationPanel.NationalId;
+                var notes = _registrationPanel.Notes;
 
                 var regRequest = new RegisterBeneficiaryRequest(
                     OrganizationId: orgId,
@@ -1150,81 +1085,7 @@ public partial class CheckInDeskControl : UserControl
             var summaryResult = await _checkInService.GetTodayDeskEntriesAsync(_currentWorkstation.WorkstationId);
             if (summaryResult.IsSuccess)
             {
-                var summary = summaryResult.Value;
-
-                var baseStats = string.Format(
-                    Strings.Summary_TodayStats,
-                    summary.TotalGranted,
-                    summary.TotalOverridden,
-                    summary.TotalDenied,
-                    summary.TotalPersons);
-
-                if (summary.PersonsPerCategory.Count > 0)
-                {
-                    var categoryBreakdown = string.Join(" · ", summary.PersonsPerCategory.Select(c => $"{c.CategoryName}: {c.Count}"));
-                    _lblTodaySummary.Text = $"{baseStats}   |   {categoryBreakdown}";
-                }
-                else
-                {
-                    _lblTodaySummary.Text = baseStats;
-                }
-
-                if (IsHandleCreated || _gridToday.IsHandleCreated)
-                {
-                    _gridToday.SuspendLayout();
-                    _gridToday.Rows.Clear();
-
-                foreach (var item in summary.RecentAttempts)
-                {
-                    var localTime = DateTimeDisplayHelper.ToParkLocalTime(item.AttemptedAtUtc, _timeZoneId);
-                    var timeStr = DateTimeDisplayHelper.FormatTime(localTime);
-
-                    string resultText;
-                    if (item.IsVoided)
-                    {
-                        resultText = Strings.Result_Voided;
-                    }
-                    else
-                    {
-                        resultText = item.Result switch
-                        {
-                            EntryResult.Allowed => Strings.Result_Allowed,
-                            EntryResult.Denied => Strings.Result_Denied,
-                            EntryResult.Overridden => Strings.Result_Overridden,
-                            _ => item.Result.ToString()
-                        };
-                    }
-
-                    var rowIndex = _gridToday.Rows.Add(
-                        timeStr,
-                        item.CardNumber,
-                        item.BeneficiaryFullName,
-                        item.OrganizationName,
-                        item.TotalPersons,
-                        resultText);
-
-                    var row = _gridToday.Rows[rowIndex];
-                    row.Tag = item;
-                    if (item.IsVoided)
-                    {
-                        row.DefaultCellStyle.ForeColor = Color.Gray;
-                    }
-                    else if (item.Result == EntryResult.Allowed)
-                    {
-                        row.DefaultCellStyle.ForeColor = StatusBanner.ColorGranted;
-                    }
-                    else if (item.Result == EntryResult.Denied)
-                    {
-                        row.DefaultCellStyle.ForeColor = StatusBanner.ColorDenied;
-                    }
-                    else if (item.Result == EntryResult.Overridden)
-                    {
-                        row.DefaultCellStyle.ForeColor = StatusBanner.ColorWarning;
-                    }
-                }
-
-                _gridToday.ResumeLayout(true);
-            }
+                _todayPanel.ShowSummary(summaryResult.Value, _timeZoneId, IsHandleCreated);
             }
         }
         catch (Exception ex)
@@ -1245,14 +1106,7 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task VoidSelectedTodayEntryAsync()
     {
-        if (_gridToday.SelectedRows.Count == 0)
-        {
-            return;
-        }
-
-        if (_gridToday.SelectedRows[0].Tag is not TodayDeskAttemptDto attempt ||
-            attempt.IsVoided ||
-            attempt.Result == EntryResult.Denied)
+        if (_todayPanel.SelectedVoidableAttempt is not { } attempt)
         {
             return;
         }

@@ -36,12 +36,12 @@ public sealed class CheckInDeskControlTests
         var cmbOrg = GetField<ComboBox>(control, "_cmbOrganization");
         var banner = GetField<StatusBanner>(control, "_statusBanner");
         var grpHolder = GetField<GroupBox>(control, "_grpHolder");
-        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        var grpReg = GetField<InlineRegistrationPanel>(control, "_registrationPanel");
         var grpCompanions = GetField<GroupBox>(control, "_grpCompanions");
         var btnRecord = GetField<Button>(control, "_btnRecordEntry");
         var btnOverride = GetField<Button>(control, "_btnOverride");
-        var grpToday = GetField<GroupBox>(control, "_grpToday");
-        var gridToday = GetField<DataGridView>(control, "_gridToday");
+        var grpToday = GetField<GroupBox>(GetField<TodayEntriesPanel>(control, "_todayPanel"), "_grpToday");
+        var gridToday = GetField<DataGridView>(GetField<TodayEntriesPanel>(control, "_todayPanel"), "_gridToday");
         var lblTotalPersons = GetField<Label>(control, "_lblTotalPersons");
 
         txtCard.Text.ShouldBeEmpty();
@@ -163,7 +163,7 @@ public sealed class CheckInDeskControlTests
         using var control = TestUi.Create<CheckInDeskControl>();
 
         var grpHolder = GetField<GroupBox>(control, "_grpHolder");
-        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        var grpReg = GetField<InlineRegistrationPanel>(control, "_registrationPanel");
 
         control.ShowInlineRegistration("999888", 1);
         grpHolder.Visible.ShouldBeFalse();
@@ -353,7 +353,7 @@ public sealed class CheckInDeskControlTests
         await control.LookupCardAsync();
 
         var grpHolder = GetField<GroupBox>(control, "_grpHolder");
-        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        var grpReg = GetField<InlineRegistrationPanel>(control, "_registrationPanel");
         var banner = GetField<StatusBanner>(control, "_statusBanner");
 
         grpHolder.Visible.ShouldBeFalse();
@@ -419,7 +419,7 @@ public sealed class CheckInDeskControlTests
         await control.LookupCardAsync();
 
         var grpHolder = GetField<GroupBox>(control, "_grpHolder");
-        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        var grpReg = GetField<InlineRegistrationPanel>(control, "_registrationPanel");
         var lblName = GetField<Label>(control, "_lblHolderName");
         var banner = GetField<StatusBanner>(control, "_statusBanner");
         var btnRecord = GetField<Button>(control, "_btnRecordEntry");
@@ -521,8 +521,8 @@ public sealed class CheckInDeskControlTests
 
     private static async Task FillAndSaveRegistrationAsync(CheckInDeskControl control)
     {
-        GetField<TextBox>(control, "_txtRegFullName").Text = "سالم محمود علي الورفلي";
-        GetField<TextBox>(control, "_txtRegPhone").Text = "0912345678";
+        GetField<TextBox>(GetField<InlineRegistrationPanel>(control, "_registrationPanel"), "_txtRegFullName").Text = "سالم محمود علي الورفلي";
+        GetField<TextBox>(GetField<InlineRegistrationPanel>(control, "_registrationPanel"), "_txtRegPhone").Text = "0912345678";
         await control.SaveInlineRegistrationAsync();
     }
 
@@ -565,7 +565,7 @@ public sealed class CheckInDeskControlTests
         GetField<TextBox>(control, "_txtCardNumber").Text = "557";
 
         control.ShowInlineRegistration("557");
-        GetField<ComboBox>(control, "_cmbRegOrganization").SelectedIndex = 0; // first item: هيئة الشهداء (id 1)
+        GetField<ComboBox>(GetField<InlineRegistrationPanel>(control, "_registrationPanel"), "_cmbRegOrganization").SelectedIndex = 0; // first item: هيئة الشهداء (id 1)
         await FillAndSaveRegistrationAsync(control);
 
         beneficiaries.LastRegisterRequest!.OrganizationId.ShouldBe(1);
@@ -598,7 +598,7 @@ public sealed class CheckInDeskControlTests
         var banner = GetField<StatusBanner>(control, "_statusBanner");
         banner.State.ShouldBe(BannerState.Warning);
         banner.Title.ShouldContain("صندوق التضامن");
-        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBeFalse();
+        GetField<InlineRegistrationPanel>(control, "_registrationPanel").Visible.ShouldBeFalse();
 
         await control.LookupCardAsync();
 
@@ -622,13 +622,13 @@ public sealed class CheckInDeskControlTests
         var notify = new FakeNotifyService(confirm);
         using var control = TestUi.Create<CheckInDeskControl>(notify);
         control.ShowInlineRegistration("888");
-        GetField<TextBox>(control, "_txtRegFullName").Text = "سالم محمود";
+        GetField<TextBox>(GetField<InlineRegistrationPanel>(control, "_registrationPanel"), "_txtRegFullName").Text = "سالم محمود";
 
         PressEscape(control).ShouldBeTrue();
 
         notify.ConfirmCalls.ShouldBe(1);
-        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBe(formStays);
-        GetField<TextBox>(control, "_txtRegFullName").Text.ShouldBe(formStays ? "سالم محمود" : string.Empty);
+        GetField<InlineRegistrationPanel>(control, "_registrationPanel").Visible.ShouldBe(formStays);
+        GetField<TextBox>(GetField<InlineRegistrationPanel>(control, "_registrationPanel"), "_txtRegFullName").Text.ShouldBe(formStays ? "سالم محمود" : string.Empty);
     }
 
     [Fact]
@@ -641,7 +641,7 @@ public sealed class CheckInDeskControlTests
         PressEscape(control).ShouldBeTrue();
 
         notify.ConfirmCalls.ShouldBe(0);
-        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBeFalse();
+        GetField<InlineRegistrationPanel>(control, "_registrationPanel").Visible.ShouldBeFalse();
     }
 
     // ── R4.6: choosing among several organizations ─────────────────────────
@@ -847,7 +847,7 @@ public sealed class CheckInDeskControlTests
 
         await control.RefreshTodayDeskSummaryAsync();
 
-        var lblTodaySummary = GetField<Label>(control, "_lblTodaySummary");
+        var lblTodaySummary = GetField<Label>(GetField<TodayEntriesPanel>(control, "_todayPanel"), "_lblTodaySummary");
         lblTodaySummary.Text.ShouldContain("المقبول:");
         lblTodaySummary.Text.ShouldContain("إجمالي الأفراد:");
     }
@@ -865,7 +865,7 @@ public sealed class CheckInDeskControlTests
             .Invoke(control, [msg, Keys.F2]);
 
         handled.ShouldBe(true);
-        var grpReg = GetField<GroupBox>(control, "_grpRegistration");
+        var grpReg = GetField<InlineRegistrationPanel>(control, "_registrationPanel");
         grpReg.Visible.ShouldBeTrue();
     }
 
