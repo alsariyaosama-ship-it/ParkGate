@@ -29,7 +29,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Consequences:** One extra lightweight query per check-in; correct results regardless of client clocks; cloud-ready timestamps.
 
 ### ADR-005 — Cooldown concurrency via row lock + denormalized `LastGrantedEntryUtc`
-- **Status:** Accepted
+- **Status:** Accepted; the row lock is superseded by ADR-026 when R6.13 ships (the denormalized `LastGrantedEntryUtc` stays)
 - **Context:** Two desks could check in the same holder at the same moment.
 - **Decision:** Transaction with `UPDLOCK, ROWLOCK` on the holder row, evaluate policy in Domain, insert attempt, update `LastGrantedEntryUtc`, commit (DATABASE.md §4).
 - **Consequences:** Business rule stays in C# and unit-testable; correctness guaranteed by the DB lock; an integration test guards it.
@@ -152,6 +152,22 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Context:** `OverrideEntryAsync`, `VoidEntryAsync` and the gift override and void accepted a bare `SupervisorUserId` from the UI and trusted it after a role lookup. Any caller could name a supervisor without their password, and `SupervisorAuthDialog` approved as user 1 when no auth service was injected.
 - **Decision:** `IAuthService.AuthorizeSupervisorAsync(userName, password)` (replacing `ValidateSupervisorCredentialsAsync`) checks the credentials and issues a token from `SupervisorApprovalStore`: 32 random bytes, in memory, valid for two minutes, bound to the current workstation, consumed on first use (also on a wrong desk). The four use cases take the token, resolve the approver from it, and still check the approver's role and active state in the database. A user who holds the permission approves themselves without a token, as before. The token is spent only after the request passes validation. An invalid, expired, reused or foreign token returns `Auth.SupervisorRequired`. The dialog's fallback is removed.
 - **Consequences:** No schema change. Tokens do not survive a restart of the desk app (the supervisor signs in again). Approvals cannot move between desks.
+
+---
+
+### ADR-025 — Data access is EF Core only
+- **Status:** Accepted (Osama, 2026-11-18)
+- **Context:** The entry-card feature added raw-SQL tables, a view and stored procedures created at runtime, and a few repositories use SQL text. Two ways of defining the schema drift apart and need DDL rights on the app login.
+- **Decision:** All data access goes through EF Core LINQ and EF migrations. Forbidden in `src/`: `FromSql*`, `SqlQuery*`, `ExecuteSql*`, ADO `DbCommand`, stored procedures, views, and `migrationBuilder.Sql` in new migrations. Allowed: SQL fragments that are part of the EF model configuration (`HasDefaultValueSql`, `HasCheckConstraint`, `HasFilter`) and built-in functions mapped with `HasDbFunction`. The only runtime exception is the `BACKUP DATABASE` command in `DatabaseBackupService`, which EF cannot express. Migrations pushed before this decision stay unchanged. An architecture test enforces it (R6.14).
+- **Consequences:** R6.1 (entry cards), R6.12 (database clock) and R6.13 (row lock) remove the existing SQL. Existing entry-card data is test data and is not preserved.
+
+---
+
+### ADR-026 — Optimistic concurrency instead of the row lock
+- **Status:** Accepted (Osama, 2026-11-18); takes effect with R6.13
+- **Context:** ADR-005 serialises check-ins with `UPDLOCK, ROWLOCK`, which needs SQL text (ADR-025).
+- **Decision:** `Beneficiaries.RowVersion` is the concurrency token. Every grant updates `LastGrantedEntryUtc` and every gift issue updates the new `LastGiftIssuedUtc`, so two desks writing the same holder always conflict. The use case catches `DbUpdateConcurrencyException`, discards the unit of work and runs again from the start, at most 3 times; the retry sees the winner's write and is denied by the normal rules. After the last try it returns `General.ConcurrencyConflict`.
+- **Consequences:** No lock waits and no SQL. A losing desk does a second short round trip. The existing parallel check-in integration test stays the guard and must pass unchanged. DATABASE.md §4 is rewritten when R6.13 ships.
 
 ---
 
