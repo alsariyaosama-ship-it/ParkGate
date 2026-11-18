@@ -29,6 +29,7 @@ public class ParkGateDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ParkGateDbContext).Assembly);
+        DatabaseClock.MapFunctions(modelBuilder);
         modelBuilder.SeedInitialData();
     }
 

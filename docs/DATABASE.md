@@ -324,7 +324,7 @@ COMMIT;
 
 EF Core shape (Infrastructure):
 - `IBeneficiaryRepository.GetForUpdateAsync(id)` → `FromSqlInterpolated($"SELECT * FROM dbo.Beneficiaries WITH (UPDLOCK, ROWLOCK) WHERE Id = {id}")`.
-- `IUnitOfWork.GetDbUtcNowAsync()` → `SELECT SYSUTCDATETIME()`.
+- `IUnitOfWork.GetDbUtcNowAsync()` → `SYSUTCDATETIME()` mapped as a built-in EF function (`DatabaseClock`, R6.12), queried over the always-present default organization row.
 - The policy itself lives in Domain and is unit-tested without a database.
 - Integration test (required): two parallel check-ins for the same holder → exactly one `Allowed`, one `Denied/CooldownActive`.
 
