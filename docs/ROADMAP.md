@@ -232,7 +232,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R6.3 Audit columns from the database clock, not the client clock (BR-05)
 - [x] R6.4 Bring `DATABASE.md` up to the model; test the documented table list against it
 - [ ] R6.5 Least-privilege `parkgate_app` login; restrict the firewall rules — blocked on Q-R6
-- [ ] R6.6 Re-measure the `LIKE '%term%'` name search at 100 000 holders
+- [x] R6.6 Re-measure the `LIKE '%term%'` name search at 100 000 holders
 - [ ] R6.7 ~~Business-day cutoff~~ — cancelled (Q-R5): the park closes at midnight
 - [ ] R6.8 Database size warning on the Admin backup screen; propose a retention policy
 - [ ] R6.9 ACL-restricted backup folder; document an encrypted off-site copy

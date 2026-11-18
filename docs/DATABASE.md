@@ -72,6 +72,8 @@ CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 
 Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_Beneficiaries_CardNumber (CardNumber)` (cross-org lookup) · `IX_Beneficiaries_Phone` · `UX_Beneficiaries_NationalId` unique filtered `WHERE NationalId IS NOT NULL` · `IX_Beneficiaries_FullName`.
 
+Name search uses `LIKE '%term%'`, so it scans `IX_Beneficiaries_FullName` instead of seeking it. Measured on LocalDB with 100 000 holders (R6.6, 2026-11-18): about 350 ms for a term matched by one row and for no match, under the 1 s target; `PerformanceBenchmarkTests` keeps the check. Revisit (prefix search on name tokens or full-text) if the holder count grows well past that.
+
 ### 3.3 `AgeCategories` — الفئات العمرية
 | Column | Type | Notes |
 |---|---|---|

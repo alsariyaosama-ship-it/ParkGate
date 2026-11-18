@@ -6,6 +6,7 @@ using ParkGate.Domain.Policies;
 using ParkGate.Domain.ValueObjects;
 using ParkGate.Infrastructure.Data;
 using ParkGate.Infrastructure.Repositories;
+using Xunit.Abstractions;
 
 namespace ParkGate.Infrastructure.Tests.Integration;
 
@@ -14,10 +15,12 @@ public sealed class PerformanceBenchmarkTests : IClassFixture<LocalDbTestFixture
 {
     private readonly LocalDbTestFixture _fixture;
     private readonly IEntryEligibilityPolicy _policy = new RollingWindowEligibilityPolicy();
+    private readonly ITestOutputHelper _output;
 
-    public PerformanceBenchmarkTests(LocalDbTestFixture fixture)
+    public PerformanceBenchmarkTests(LocalDbTestFixture fixture, ITestOutputHelper output)
     {
         _fixture = fixture;
+        _output = output;
     }
 
     [Fact]
@@ -156,6 +159,19 @@ public sealed class PerformanceBenchmarkTests : IClassFixture<LocalDbTestFixture
 
             // Benchmark Assertion: T8.5 specifies lookup < 1 s (1000 ms)
             // With indexed seeks, execution is well under 100 ms
+            stopwatch.ElapsedMilliseconds.ShouldBeLessThan(1000);
+        }
+
+        // 5. R6.6: the holder search uses LIKE '%term%', which cannot seek IX_Beneficiaries_FullName.
+        // Measure the worst cases at 100 000 holders: a term matched only by the last row, and no match.
+        _ = await beneficiaryRepo.SearchAsync("تجريبي");
+        foreach (var term in new[] { "رقم 100000", "اسم غير موجود" })
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var matches = await beneficiaryRepo.SearchAsync(term);
+            stopwatch.Stop();
+
+            _output.WriteLine($"Name search '{term}': {matches.Count} rows in {stopwatch.ElapsedMilliseconds} ms");
             stopwatch.ElapsedMilliseconds.ShouldBeLessThan(1000);
         }
     }
