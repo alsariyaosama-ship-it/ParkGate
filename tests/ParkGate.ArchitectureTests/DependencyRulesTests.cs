@@ -104,6 +104,36 @@ public sealed class DependencyRulesTests
     }
 
     [Fact]
+    public void WinFormsSource_OnlyCompositionRootMentionsInfrastructure()
+    {
+        // R7.6 / AGENTS.md §3: reflection above misses static calls inside method bodies, so scan the source too.
+        var root = FindRepoRoot();
+        var winForms = Path.Combine(root, "src", "ParkGate.WinForms");
+        string[] compositionRoot = ["Program.cs", "DependencyInjection.cs"];
+        var offenders = Directory
+            .EnumerateFiles(winForms, "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") &&
+                        !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            .Where(f => !compositionRoot.Contains(Path.GetRelativePath(winForms, f)))
+            .Where(f => File.ReadAllText(f).Contains("ParkGate.Infrastructure", StringComparison.Ordinal))
+            .Select(f => Path.GetRelativePath(root, f))
+            .ToList();
+
+        offenders.ShouldBeEmpty("Use an Application port; only the composition root may reference Infrastructure.");
+    }
+
+    private static string FindRepoRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir != null && !File.Exists(Path.Combine(dir.FullName, "ParkGate.sln")))
+        {
+            dir = dir.Parent;
+        }
+
+        return dir?.FullName ?? throw new InvalidOperationException("ParkGate.sln not found above the test output.");
+    }
+
+    [Fact]
     public void Solution_ShouldNotExceedApprovedProductionProjects()
     {
         // Enforce maximum 5 production projects approved by ADR-018 (Domain, Application, Infrastructure, WinForms, SyncAgent)

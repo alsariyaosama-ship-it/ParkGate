@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.EntryCards;
-using ParkGate.Infrastructure.EntryCards;
+using ParkGate.Application.Ports.EntryCards;
 using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
@@ -13,18 +13,20 @@ namespace ParkGate.WinForms.Forms;
 public partial class IssueQrDialog : RtlFormBase
 {
     private readonly EntryCardIssuer? _issuer;
+    private readonly IQrImageRenderer? _qrRenderer;
     private readonly INotifyService? _notifyService;
     private BeneficiaryDto? _beneficiary;
     private IssuedEntryCard? _issuedCard;
 
-    public IssueQrDialog() : this(null, null)
+    public IssueQrDialog() : this(null, null, null)
     {
     }
 
-    public IssueQrDialog(EntryCardIssuer? issuer, INotifyService? notifyService)
+    public IssueQrDialog(EntryCardIssuer? issuer, IQrImageRenderer? qrRenderer, INotifyService? notifyService)
     {
         InitializeComponent();
         _issuer = issuer;
+        _qrRenderer = qrRenderer;
         _notifyService = notifyService;
 
         Theme.ApplyPrimaryButtonStyle(_btnPrint);
@@ -41,7 +43,7 @@ public partial class IssueQrDialog : RtlFormBase
         _beneficiary = beneficiary;
         _lblCustomerName.Text = beneficiary.FullName;
 
-        if (_issuer == null)
+        if (_issuer == null || _qrRenderer == null)
         {
             _notifyService?.Error(Strings.Ui_IssueQr_01);
             return;
@@ -52,10 +54,9 @@ public partial class IssueQrDialog : RtlFormBase
             _lblInstruction.Text = Strings.Ui_IssueQr_02;
             var card = await _issuer.IssueAsync(beneficiary.Id);
             _issuedCard = card;
-            
-            // Generate QR Image using QrImageRenderer
-            byte[] qrPngBytes = QrImageRenderer.RenderPng(card.QrText);
-            
+
+            byte[] qrPngBytes = _qrRenderer.RenderPng(card.QrText);
+
             using var ms = new MemoryStream(qrPngBytes);
             using var rawImage = Image.FromStream(ms);
             _picQrCode.Image?.Dispose();

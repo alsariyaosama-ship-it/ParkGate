@@ -250,7 +250,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R7.3 One neutral palette; test against `Color.FromArgb` literals outside `Theme.cs`
 - [ ] R7.4 Dialog conventions: `AcceptButton`, `CancelButton`, tab order, `Theme` button styles
 - [ ] R7.5 Web UI: same glossary, park-local times, empty states, no phone or national ID
-- [ ] R7.6 Remove the Infrastructure reference from `IssueQrDialog`; architecture test
+- [x] R7.6 Remove the Infrastructure reference from `IssueQrDialog`; architecture test
 - [ ] R7.7 All message boxes through `Notify`; architecture test
 - [ ] R7.8 All designers on `AutoScaleMode.Dpi`; extend `DesignerScalingTests`
 - [ ] R7.9 Resolve forms and controls through `IFormFactory`; required services, no null fallbacks
