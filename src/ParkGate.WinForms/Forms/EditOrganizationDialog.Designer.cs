@@ -147,7 +147,7 @@ partial class EditOrganizationDialog
         this._chkCustomCooldown.Name = "_chkCustomCooldown";
         this._chkCustomCooldown.Size = new System.Drawing.Size(138, 23);
         this._chkCustomCooldown.TabIndex = 4;
-        this._chkCustomCooldown.Text = "فترة سماح خاصة:";
+        this._chkCustomCooldown.Text = "فترة انتظار خاصة:";
         this._chkCustomCooldown.UseVisualStyleBackColor = true;
         // 
         // _numCooldownHours

@@ -203,7 +203,7 @@ partial class BeneficiariesControl
         this._grpResults.Size = new System.Drawing.Size(984, 232);
         this._grpResults.TabIndex = 0;
         this._grpResults.TabStop = false;
-        this._grpResults.Text = "قائمة المستفيدين المطابقين";
+        this._grpResults.Text = "قائمة الزوار المطابقين";
         // 
         // _gridBeneficiaries
         // 
@@ -321,7 +321,7 @@ partial class BeneficiariesControl
         this._grpHolderDetails.Size = new System.Drawing.Size(376, 332);
         this._grpHolderDetails.TabIndex = 0;
         this._grpHolderDetails.TabStop = false;
-        this._grpHolderDetails.Text = "تفاصيل الزبون";
+        this._grpHolderDetails.Text = "تفاصيل الزائر";
         // 
         // _tblDetails
         // 

@@ -221,7 +221,7 @@ partial class CheckInDeskControl
         this._grpHolder.Size = new System.Drawing.Size(500, 254);
         this._grpHolder.TabIndex = 0;
         this._grpHolder.TabStop = false;
-        this._grpHolder.Text = "بيانات الزبون";
+        this._grpHolder.Text = "بيانات الزائر";
         // 
         // _tblHolder
         // 
@@ -266,7 +266,7 @@ partial class CheckInDeskControl
         this._lblHolderNameTitle.Name = "_lblHolderNameTitle";
         this._lblHolderNameTitle.Size = new System.Drawing.Size(77, 17);
         this._lblHolderNameTitle.TabIndex = 0;
-        this._lblHolderNameTitle.Text = "اسم الزبون:";
+        this._lblHolderNameTitle.Text = "اسم الزائر:";
         // 
         // _lblHolderName
         // 
@@ -420,7 +420,7 @@ partial class CheckInDeskControl
         this._grpCompanions.Size = new System.Drawing.Size(484, 254);
         this._grpCompanions.TabIndex = 0;
         this._grpCompanions.TabStop = false;
-        this._grpCompanions.Text = "المرافقون مع الزبون";
+        this._grpCompanions.Text = "المرافقون مع الزائر";
         // 
         // _flowCounters
         // 
@@ -514,7 +514,7 @@ partial class CheckInDeskControl
         this._btnNewHolder.Name = "_btnNewHolder";
         this._btnNewHolder.Size = new System.Drawing.Size(140, 42);
         this._btnNewHolder.TabIndex = 2;
-        this._btnNewHolder.Text = "زبون جديد (F2)";
+        this._btnNewHolder.Text = "زائر جديد (F2)";
         this._btnNewHolder.UseVisualStyleBackColor = false;
         // 
         // _btnClear
@@ -559,7 +559,7 @@ partial class CheckInDeskControl
         this._lblTotalPersons.Name = "_lblTotalPersons";
         this._lblTotalPersons.Size = new System.Drawing.Size(190, 38);
         this._lblTotalPersons.TabIndex = 0;
-        this._lblTotalPersons.Text = "الإجمالي مع الزبون: 1 فرد";
+        this._lblTotalPersons.Text = "الإجمالي مع الزائر: 1 فرد";
         this._lblTotalPersons.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
         // 
         // _lblFreeCompanions
@@ -585,7 +585,7 @@ partial class CheckInDeskControl
         this._lblCompanionsNotice.Name = "_lblCompanionsNotice";
         this._lblCompanionsNotice.Size = new System.Drawing.Size(155, 38);
         this._lblCompanionsNotice.TabIndex = 1;
-        this._lblCompanionsNotice.Text = "(الزبون محتسب تلقائياً +1 فرد)";
+        this._lblCompanionsNotice.Text = "(الزائر محتسب تلقائياً +1 فرد)";
         this._lblCompanionsNotice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _giftPanel

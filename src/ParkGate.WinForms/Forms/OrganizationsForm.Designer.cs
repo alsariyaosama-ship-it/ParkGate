@@ -260,7 +260,7 @@ partial class OrganizationsForm
         // _colCooldown
         // 
         this._colCooldown.FillWeight = 20F;
-        this._colCooldown.HeaderText = "فترة السماح";
+        this._colCooldown.HeaderText = "فترة الانتظار";
         this._colCooldown.MinimumWidth = 100;
         this._colCooldown.Name = "_colCooldown";
         this._colCooldown.ReadOnly = true;

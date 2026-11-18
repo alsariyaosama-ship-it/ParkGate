@@ -60,7 +60,7 @@ partial class GiftQrDialog
         this._lblHeader.Padding = new System.Windows.Forms.Padding(16, 0, 16, 0);
         this._lblHeader.Size = new System.Drawing.Size(540, 50);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "وصل قسيمة ألعاب الأطفال";
+        this._lblHeader.Text = "قسيمة ألعاب الأطفال";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _tblMain
@@ -126,7 +126,7 @@ partial class GiftQrDialog
         this._lblReceiptNo.Name = "_lblReceiptNo";
         this._lblReceiptNo.Size = new System.Drawing.Size(109, 26);
         this._lblReceiptNo.TabIndex = 0;
-        this._lblReceiptNo.Text = "رقم الوصل: -";
+        this._lblReceiptNo.Text = "رقم القسيمة: -";
         // 
         // _lblCustomerName
         // 
@@ -137,7 +137,7 @@ partial class GiftQrDialog
         this._lblCustomerName.Name = "_lblCustomerName";
         this._lblCustomerName.Size = new System.Drawing.Size(69, 24);
         this._lblCustomerName.TabIndex = 1;
-        this._lblCustomerName.Text = "الزبون: -";
+        this._lblCustomerName.Text = "الزائر: -";
         // 
         // _lblCardNumber
         // 

@@ -33,18 +33,19 @@ A Windows desktop application used at the park entrance desk to:
 | Arabic (UI term) | Code term | Meaning |
 |---|---|---|
 | الجهة | `Organization` | Body issuing the membership card (default: صندوق التضامن الاجتماعي) |
-| حامل البطاقة / المستفيد | `Beneficiary` | Registered card holder |
+| الزائر (الجمع: الزوار) | `Beneficiary` | Registered card holder. UI never says «الزبون» or «المستفيد» (R7.1) |
 | رقم البطاقة | `CardNumber` | Card identifier, unique per organization |
 | المرافقون | `Companions` | People entering with the holder |
 | الفئة العمرية | `AgeCategory` | بالغ / طفل / رضيع (configurable list) |
 | محاولة دخول | `EntryAttempt` | One check-in attempt: granted, denied or overridden |
-| فترة الانتظار / مدة السماح بالعودة | `Cooldown` | Minimum time between two granted entries |
+| فترة الانتظار | `Cooldown` | Minimum time between two granted entries. Not «فترة السماح» / «فترة التهدئة» |
 | تجاوز | `Override` | Supervisor grants entry despite a denial |
 | إلغاء عملية | `Void` | Supervisor cancels a mistaken entry record |
 | موظف الشباك | `Operator` role | Desk employee |
 | مشرف | `Supervisor` role | Shift supervisor |
 | مدير النظام | `Admin` role | System administrator |
-| نقطة الدخول / الشباك | `Workstation` | A desk PC (later: a gate device) |
+| قسيمة الهدية | `GiftVoucher` | The printed gift QR slip; its number is «رقم القسيمة». Not «كوبون» / «وصل» |
+| الشباك (الجمع: الشبابيك) | `Workstation` | A desk PC (later: a gate device). Not «المحطة» |
 
 ## 4. Actors and permissions
 

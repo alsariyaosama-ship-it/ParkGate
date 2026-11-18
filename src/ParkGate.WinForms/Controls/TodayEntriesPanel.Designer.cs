@@ -49,7 +49,7 @@ partial class TodayEntriesPanel
         this._grpToday.Size = new System.Drawing.Size(988, 213);
         this._grpToday.TabIndex = 4;
         this._grpToday.TabStop = false;
-        this._grpToday.Text = "سجل الدخول لهذا اليوم بالمحطة (آخر 20 محاولة)";
+        this._grpToday.Text = "سجل الدخول لهذا اليوم بهذا الشباك (آخر 20 محاولة)";
         // 
         // _gridToday
         // 
@@ -117,7 +117,7 @@ partial class TodayEntriesPanel
         // _colName
         // 
         this._colName.FillWeight = 120F;
-        this._colName.HeaderText = "اسم الزبون";
+        this._colName.HeaderText = "اسم الزائر";
         this._colName.Name = "_colName";
         this._colName.ReadOnly = true;
         // 

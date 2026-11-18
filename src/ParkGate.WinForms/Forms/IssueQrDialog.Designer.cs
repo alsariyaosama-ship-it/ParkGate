@@ -44,7 +44,7 @@ partial class IssueQrDialog
         _lblCustomerName.Name = "_lblCustomerName";
         _lblCustomerName.Size = new Size(350, 40);
         _lblCustomerName.TabIndex = 0;
-        _lblCustomerName.Text = "اسم الزبون";
+        _lblCustomerName.Text = "اسم الزائر";
         _lblCustomerName.TextAlign = ContentAlignment.MiddleCenter;
         
         // _picQrCode

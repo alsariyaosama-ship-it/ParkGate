@@ -117,7 +117,7 @@ partial class LoginForm
         lblWorkstation.Name = "lblWorkstation";
         lblWorkstation.Size = new Size(355, 31);
         lblWorkstation.TabIndex = 0;
-        lblWorkstation.Text = "محطة العمل";
+        lblWorkstation.Text = "الشباك";
         lblWorkstation.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _pnlCard

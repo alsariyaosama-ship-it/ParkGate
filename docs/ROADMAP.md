@@ -245,7 +245,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R6.16 Mask national IDs for operators in Application (`ViewFullNationalId` for supervisors and admins); remove the UI copies of the rule and the unused `Ui.MaskNationalIdForOperators` seed row (Osama: hide)
 
 ### R7 — Wording and visual consistency · branch `phase/r7-consistency`
-- [ ] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b
+- [x] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b
 - [ ] R7.2 One type scale mapped to `Theme` (Caption 9, Body 10, Section 12, Title 14, Banner 20)
 - [ ] R7.3 One neutral palette; test against `Color.FromArgb` literals outside `Theme.cs`
 - [ ] R7.4 Dialog conventions: `AcceptButton`, `CancelButton`, tab order, `Theme` button styles

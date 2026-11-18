@@ -58,7 +58,7 @@ partial class WorkstationsForm
         this._lblHeader.Padding = new System.Windows.Forms.Padding(16, 0, 16, 0);
         this._lblHeader.Size = new System.Drawing.Size(784, 56);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "إدارة محطات العمل ونقاط الدخول";
+        this._lblHeader.Text = "إدارة الشبابيك ونقاط الدخول";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _pnlToolbar
@@ -155,7 +155,7 @@ partial class WorkstationsForm
         // _colDisplayName
         // 
         this._colDisplayName.FillWeight = 30F;
-        this._colDisplayName.HeaderText = "اسم المحطة";
+        this._colDisplayName.HeaderText = "اسم الشباك";
         this._colDisplayName.Name = "_colDisplayName";
         this._colDisplayName.ReadOnly = true;
         // 
@@ -200,7 +200,7 @@ partial class WorkstationsForm
         this._lblCount.Name = "_lblCount";
         this._lblCount.Size = new System.Drawing.Size(102, 19);
         this._lblCount.TabIndex = 0;
-        this._lblCount.Text = "عدد المحطات: 0";
+        this._lblCount.Text = "عدد الشبابيك: 0";
         // 
         // _btnClose
         // 
@@ -231,7 +231,7 @@ partial class WorkstationsForm
         this.Name = "WorkstationsForm";
         this.ShowInTaskbar = false;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        this.Text = "إدارة محطات العمل ونقاط الدخول";
+        this.Text = "إدارة الشبابيك ونقاط الدخول";
         this._pnlHeader.ResumeLayout(false);
         this._pnlToolbar.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)(this._gridWorkstations)).EndInit();

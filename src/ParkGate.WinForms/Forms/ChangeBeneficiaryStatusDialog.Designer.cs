@@ -58,7 +58,7 @@ partial class ChangeBeneficiaryStatusDialog
         this._lblHeader.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
         this._lblHeader.Size = new System.Drawing.Size(500, 50);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "تغيير حالة المستفيد";
+        this._lblHeader.Text = "تغيير حالة الزائر";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _tblLayout
@@ -93,7 +93,7 @@ partial class ChangeBeneficiaryStatusDialog
         this._lblBeneficiaryInfo.Name = "_lblBeneficiaryInfo";
         this._lblBeneficiaryInfo.Size = new System.Drawing.Size(116, 19);
         this._lblBeneficiaryInfo.TabIndex = 0;
-        this._lblBeneficiaryInfo.Text = "المستفيد: - (بطاقة: -)";
+        this._lblBeneficiaryInfo.Text = "الزائر: - (بطاقة: -)";
         // 
         // _lblCurrentStatus
         // 
@@ -243,7 +243,7 @@ partial class ChangeBeneficiaryStatusDialog
         this.Name = "ChangeBeneficiaryStatusDialog";
         this.ShowInTaskbar = false;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        this.Text = "تغيير حالة المستفيد";
+        this.Text = "تغيير حالة الزائر";
         this._pnlHeader.ResumeLayout(false);
         this._tblLayout.ResumeLayout(false);
         this._tblLayout.PerformLayout();

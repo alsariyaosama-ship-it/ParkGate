@@ -54,7 +54,7 @@ partial class EditWorkstationDialog
         this._lblHeader.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
         this._lblHeader.Size = new System.Drawing.Size(460, 50);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "تعديل محطة العمل";
+        this._lblHeader.Text = "تعديل الشباك";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _tblLayout
@@ -108,7 +108,7 @@ partial class EditWorkstationDialog
         this._lblDisplayName.Name = "_lblDisplayName";
         this._lblDisplayName.Size = new System.Drawing.Size(126, 19);
         this._lblDisplayName.TabIndex = 2;
-        this._lblDisplayName.Text = "الاسم التعريفي للمحطة:";
+        this._lblDisplayName.Text = "الاسم التعريفي للشباك:";
         // 
         // _txtDisplayName
         // 
@@ -127,7 +127,7 @@ partial class EditWorkstationDialog
         this._lblType.Name = "_lblType";
         this._lblType.Size = new System.Drawing.Size(73, 19);
         this._lblType.TabIndex = 4;
-        this._lblType.Text = "نوع المحطة:";
+        this._lblType.Text = "نوع الشباك:";
         // 
         // _cmbType
         // 
@@ -198,7 +198,7 @@ partial class EditWorkstationDialog
         this.Name = "EditWorkstationDialog";
         this.ShowInTaskbar = false;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        this.Text = "تعديل محطة العمل";
+        this.Text = "تعديل الشباك";
         this._pnlHeader.ResumeLayout(false);
         this._tblLayout.ResumeLayout(false);
         this._tblLayout.PerformLayout();

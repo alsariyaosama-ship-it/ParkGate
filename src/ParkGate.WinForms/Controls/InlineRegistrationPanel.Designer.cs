@@ -55,7 +55,7 @@ partial class InlineRegistrationPanel
         this._grpRegistration.Size = new System.Drawing.Size(500, 289);
         this._grpRegistration.TabIndex = 1;
         this._grpRegistration.TabStop = false;
-        this._grpRegistration.Text = "تسجيل زبون جديد (فوري)";
+        this._grpRegistration.Text = "تسجيل زائر جديد (فوري)";
         // 
         // _tblRegistration
         // 

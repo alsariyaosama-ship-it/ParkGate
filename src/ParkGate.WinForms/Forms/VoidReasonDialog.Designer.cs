@@ -93,7 +93,7 @@ partial class VoidReasonDialog
         this._lblWarning.Name = "_lblWarning";
         this._lblWarning.Size = new System.Drawing.Size(438, 38);
         this._lblWarning.TabIndex = 1;
-        this._lblWarning.Text = "تنبيه: سيؤدي إلغاء الحركة إلى إعادة احتساب آخر دخول مسموح للمستفيد تلقائياً والسماح بالدخول إذا استوفى الشروط.";
+        this._lblWarning.Text = "تنبيه: سيؤدي إلغاء الحركة إلى إعادة احتساب آخر دخول مسموح للزائر تلقائياً والسماح بالدخول إذا استوفى الشروط.";
         // 
         // _lblReasonPrompt
         // 

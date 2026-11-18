@@ -124,7 +124,7 @@ partial class GiftRedeemControl
         this._lblScan.Name = "_lblScan";
         this._lblScan.Size = new System.Drawing.Size(275, 26);
         this._lblScan.TabIndex = 0;
-        this._lblScan.Text = "امسح رمز QR الخاص بالهدية أو أدخل رقم الوصل:";
+        this._lblScan.Text = "امسح رمز QR الخاص بالهدية أو أدخل رقم القسيمة:";
         // 
         // _txtScan
         // 
@@ -233,7 +233,7 @@ partial class GiftRedeemControl
         this._lblReceiptNoTitle.Name = "_lblReceiptNoTitle";
         this._lblReceiptNoTitle.Size = new System.Drawing.Size(69, 24);
         this._lblReceiptNoTitle.TabIndex = 0;
-        this._lblReceiptNoTitle.Text = "رقم الوصل:";
+        this._lblReceiptNoTitle.Text = "رقم القسيمة:";
         // 
         // _lblReceiptNo
         // 
@@ -257,7 +257,7 @@ partial class GiftRedeemControl
         this._lblHolderNameTitle.Name = "_lblHolderNameTitle";
         this._lblHolderNameTitle.Size = new System.Drawing.Size(76, 24);
         this._lblHolderNameTitle.TabIndex = 2;
-        this._lblHolderNameTitle.Text = "اسم المستفيد:";
+        this._lblHolderNameTitle.Text = "اسم الزائر:";
         // 
         // _lblHolderName
         // 
@@ -439,14 +439,14 @@ partial class GiftRedeemControl
         // _colReceiptNo
         // 
         this._colReceiptNo.FillWeight = 80F;
-        this._colReceiptNo.HeaderText = "رقم الوصل";
+        this._colReceiptNo.HeaderText = "رقم القسيمة";
         this._colReceiptNo.Name = "_colReceiptNo";
         this._colReceiptNo.ReadOnly = true;
         // 
         // _colHolderName
         // 
         this._colHolderName.FillWeight = 140F;
-        this._colHolderName.HeaderText = "اسم الزبون";
+        this._colHolderName.HeaderText = "اسم الزائر";
         this._colHolderName.Name = "_colHolderName";
         this._colHolderName.ReadOnly = true;
         // 
