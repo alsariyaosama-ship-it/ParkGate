@@ -24,14 +24,14 @@ partial class ChangeBeneficiaryStatusDialog
         this._lblCurrentStatus = new System.Windows.Forms.Label();
         this._lblTargetStatusPrompt = new System.Windows.Forms.Label();
         this._pnlStatusOptions = new System.Windows.Forms.FlowLayoutPanel();
-        this._radActive = new System.Windows.Forms.RadioButton();
-        this._radSuspended = new System.Windows.Forms.RadioButton();
-        this._radBlocked = new System.Windows.Forms.RadioButton();
+        this._radActive = new ParkGate.WinForms.Controls.RtlRadioButton();
+        this._radSuspended = new ParkGate.WinForms.Controls.RtlRadioButton();
+        this._radBlocked = new ParkGate.WinForms.Controls.RtlRadioButton();
         this._lblReasonPrompt = new System.Windows.Forms.Label();
         this._txtReason = new System.Windows.Forms.TextBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnConfirm = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnConfirm = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         this._pnlStatusOptions.SuspendLayout();
@@ -260,12 +260,12 @@ partial class ChangeBeneficiaryStatusDialog
     private System.Windows.Forms.Label _lblCurrentStatus;
     private System.Windows.Forms.Label _lblTargetStatusPrompt;
     private System.Windows.Forms.FlowLayoutPanel _pnlStatusOptions;
-    private System.Windows.Forms.RadioButton _radActive;
-    private System.Windows.Forms.RadioButton _radSuspended;
-    private System.Windows.Forms.RadioButton _radBlocked;
+    private ParkGate.WinForms.Controls.RtlRadioButton _radActive;
+    private ParkGate.WinForms.Controls.RtlRadioButton _radSuspended;
+    private ParkGate.WinForms.Controls.RtlRadioButton _radBlocked;
     private System.Windows.Forms.Label _lblReasonPrompt;
     private System.Windows.Forms.TextBox _txtReason;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnConfirm;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnConfirm;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

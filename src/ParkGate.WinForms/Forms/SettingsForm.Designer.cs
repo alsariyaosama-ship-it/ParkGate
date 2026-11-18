@@ -19,7 +19,7 @@ partial class SettingsForm
     {
         _pnlHeader = new Panel();
         _lblHeader = new Label();
-        _tabSettings = new TabControl();
+        _tabSettings = new ParkGate.WinForms.Controls.RtlTabControl();
         _tabGeneral = new TabPage();
         _tblGeneral = new TableLayoutPanel();
         _lblParkName = new Label();
@@ -34,9 +34,9 @@ partial class SettingsForm
         _numMaxGroupSize = new NumericUpDown();
         _lblDenialDedupMinutes = new Label();
         _numDenialDedupMinutes = new NumericUpDown();
-        _chkPrefillCompanions = new CheckBox();
-        _chkDenialSound = new CheckBox();
-        _chkSuccessSound = new CheckBox();
+        _chkPrefillCompanions = new ParkGate.WinForms.Controls.RtlCheckBox();
+        _chkDenialSound = new ParkGate.WinForms.Controls.RtlCheckBox();
+        _chkSuccessSound = new ParkGate.WinForms.Controls.RtlCheckBox();
         _tabSecurity = new TabPage();
         _tblSecurity = new TableLayoutPanel();
         _lblMaxFailedLogins = new Label();
@@ -46,9 +46,9 @@ partial class SettingsForm
         _lblAutoLockMinutes = new Label();
         _numAutoLockMinutes = new NumericUpDown();
         _pnlButtons = new FlowLayoutPanel();
-        _btnSave = new Button();
-        _btnReload = new Button();
-        _btnClose = new Button();
+        _btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        _btnReload = new ParkGate.WinForms.Controls.RtlButton();
+        _btnClose = new ParkGate.WinForms.Controls.RtlButton();
         _pnlHeader.SuspendLayout();
         _tabSettings.SuspendLayout();
         _tabGeneral.SuspendLayout();
@@ -182,7 +182,7 @@ partial class SettingsForm
         // _tblEntry
         // 
         _tblEntry.ColumnCount = 2;
-        _tblEntry.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 360F));
+        _tblEntry.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 430F));
         _tblEntry.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         _tblEntry.Controls.Add(_lblCooldownHours, 0, 0);
         _tblEntry.Controls.Add(_numCooldownHours, 1, 0);
@@ -497,7 +497,7 @@ partial class SettingsForm
 
     private System.Windows.Forms.Panel _pnlHeader;
     private System.Windows.Forms.Label _lblHeader;
-    private System.Windows.Forms.TabControl _tabSettings;
+    private ParkGate.WinForms.Controls.RtlTabControl _tabSettings;
     private System.Windows.Forms.TabPage _tabGeneral;
     private System.Windows.Forms.TableLayoutPanel _tblGeneral;
     private System.Windows.Forms.Label _lblParkName;
@@ -512,9 +512,9 @@ partial class SettingsForm
     private System.Windows.Forms.NumericUpDown _numMaxGroupSize;
     private System.Windows.Forms.Label _lblDenialDedupMinutes;
     private System.Windows.Forms.NumericUpDown _numDenialDedupMinutes;
-    private System.Windows.Forms.CheckBox _chkPrefillCompanions;
-    private System.Windows.Forms.CheckBox _chkDenialSound;
-    private System.Windows.Forms.CheckBox _chkSuccessSound;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkPrefillCompanions;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDenialSound;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkSuccessSound;
     private System.Windows.Forms.TabPage _tabSecurity;
     private System.Windows.Forms.TableLayoutPanel _tblSecurity;
     private System.Windows.Forms.Label _lblMaxFailedLogins;
@@ -524,7 +524,7 @@ partial class SettingsForm
     private System.Windows.Forms.Label _lblAutoLockMinutes;
     private System.Windows.Forms.NumericUpDown _numAutoLockMinutes;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnSave;
-    private System.Windows.Forms.Button _btnReload;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnReload;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
 }

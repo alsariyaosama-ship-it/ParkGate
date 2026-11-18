@@ -21,9 +21,9 @@ partial class CounterInput
     {
         this._layoutPanel = new System.Windows.Forms.TableLayoutPanel();
         this._lblTitle = new System.Windows.Forms.Label();
-        this._btnDecrement = new System.Windows.Forms.Button();
+        this._btnDecrement = new ParkGate.WinForms.Controls.RtlButton();
         this._txtValue = new System.Windows.Forms.TextBox();
-        this._btnIncrement = new System.Windows.Forms.Button();
+        this._btnIncrement = new ParkGate.WinForms.Controls.RtlButton();
         this._layoutPanel.SuspendLayout();
         this.SuspendLayout();
         // 
@@ -130,7 +130,7 @@ partial class CounterInput
 
     private System.Windows.Forms.TableLayoutPanel _layoutPanel;
     private System.Windows.Forms.Label _lblTitle;
-    private System.Windows.Forms.Button _btnDecrement;
+    private ParkGate.WinForms.Controls.RtlButton _btnDecrement;
     private System.Windows.Forms.TextBox _txtValue;
-    private System.Windows.Forms.Button _btnIncrement;
+    private ParkGate.WinForms.Controls.RtlButton _btnIncrement;
 }

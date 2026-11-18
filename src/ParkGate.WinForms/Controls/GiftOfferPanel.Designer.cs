@@ -20,8 +20,8 @@ partial class GiftOfferPanel
         this._grpMain = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblContent = new System.Windows.Forms.TableLayoutPanel();
         this._flowButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnIssue = new System.Windows.Forms.Button();
-        this._btnIssueOverride = new System.Windows.Forms.Button();
+        this._btnIssue = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnIssueOverride = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlInfo = new System.Windows.Forms.Panel();
         this._lblDetails = new System.Windows.Forms.Label();
         this._lblStatus = new System.Windows.Forms.Label();
@@ -168,6 +168,6 @@ partial class GiftOfferPanel
     private System.Windows.Forms.Label _lblStatus;
     private System.Windows.Forms.Label _lblDetails;
     private System.Windows.Forms.FlowLayoutPanel _flowButtons;
-    private System.Windows.Forms.Button _btnIssue;
-    private System.Windows.Forms.Button _btnIssueOverride;
+    private ParkGate.WinForms.Controls.RtlButton _btnIssue;
+    private ParkGate.WinForms.Controls.RtlButton _btnIssueOverride;
 }

@@ -26,9 +26,9 @@ partial class EditAgeCategoryDialog
     private System.Windows.Forms.Label _lblSortOrder;
     private System.Windows.Forms.NumericUpDown _numSortOrder;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnSave;
-    private System.Windows.Forms.Button _btnCancel;
-    private System.Windows.Forms.CheckBox _chkIsCompanionLimitExempt;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkIsCompanionLimitExempt;
 
     private void InitializeComponent()
     {
@@ -43,9 +43,9 @@ partial class EditAgeCategoryDialog
         this._lblSortOrder = new System.Windows.Forms.Label();
         this._numSortOrder = new System.Windows.Forms.NumericUpDown();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSave = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
-        this._chkIsCompanionLimitExempt = new System.Windows.Forms.CheckBox();
+        this._btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
+        this._chkIsCompanionLimitExempt = new ParkGate.WinForms.Controls.RtlCheckBox();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._numSortOrder)).BeginInit();

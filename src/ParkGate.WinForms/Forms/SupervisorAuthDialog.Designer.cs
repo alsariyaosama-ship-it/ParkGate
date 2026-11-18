@@ -28,8 +28,8 @@ partial class SupervisorAuthDialog
         this._lblReason = new System.Windows.Forms.Label();
         this._txtReason = new System.Windows.Forms.TextBox();
         this._lblError = new System.Windows.Forms.Label();
-        this._btnApprove = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnApprove = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this.SuspendLayout();
         // 
@@ -193,6 +193,6 @@ partial class SupervisorAuthDialog
     private System.Windows.Forms.Label _lblReason;
     private System.Windows.Forms.TextBox _txtReason;
     private System.Windows.Forms.Label _lblError;
-    private System.Windows.Forms.Button _btnApprove;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnApprove;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

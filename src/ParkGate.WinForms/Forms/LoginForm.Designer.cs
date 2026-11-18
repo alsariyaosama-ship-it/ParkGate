@@ -48,8 +48,8 @@ partial class LoginForm
         lblPassword = new Label();
         txtPassword = new TextBox();
         lblError = new Label();
-        btnLogin = new Button();
-        btnExit = new Button();
+        btnLogin = new ParkGate.WinForms.Controls.RtlButton();
+        btnExit = new ParkGate.WinForms.Controls.RtlButton();
         _pnlHeader.SuspendLayout();
         _pnlWorkstationChip.SuspendLayout();
         _pnlCard.SuspendLayout();

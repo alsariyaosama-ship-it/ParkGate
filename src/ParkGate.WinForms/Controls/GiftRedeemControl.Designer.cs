@@ -26,8 +26,8 @@ partial class GiftRedeemControl
         this._tblScan = new System.Windows.Forms.TableLayoutPanel();
         this._lblScan = new System.Windows.Forms.Label();
         this._txtScan = new System.Windows.Forms.TextBox();
-        this._btnRedeem = new System.Windows.Forms.Button();
-        this._btnClear = new System.Windows.Forms.Button();
+        this._btnRedeem = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnClear = new ParkGate.WinForms.Controls.RtlButton();
         this._statusBanner = new ParkGate.WinForms.Controls.StatusBanner();
         this._grpDetails = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblDetails = new System.Windows.Forms.TableLayoutPanel();
@@ -514,8 +514,8 @@ partial class GiftRedeemControl
     private System.Windows.Forms.TableLayoutPanel _tblScan;
     private System.Windows.Forms.Label _lblScan;
     private System.Windows.Forms.TextBox _txtScan;
-    private System.Windows.Forms.Button _btnRedeem;
-    private System.Windows.Forms.Button _btnClear;
+    private ParkGate.WinForms.Controls.RtlButton _btnRedeem;
+    private ParkGate.WinForms.Controls.RtlButton _btnClear;
     private ParkGate.WinForms.Controls.StatusBanner _statusBanner;
     private ParkGate.WinForms.Controls.RtlGroupBox _grpDetails;
     private System.Windows.Forms.TableLayoutPanel _tblDetails;

@@ -25,8 +25,8 @@ partial class VoidReasonDialog
         this._lblReasonPrompt = new System.Windows.Forms.Label();
         this._txtReason = new System.Windows.Forms.TextBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnConfirm = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnConfirm = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         this._pnlButtons.SuspendLayout();
@@ -191,6 +191,6 @@ partial class VoidReasonDialog
     private System.Windows.Forms.Label _lblReasonPrompt;
     private System.Windows.Forms.TextBox _txtReason;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnConfirm;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnConfirm;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

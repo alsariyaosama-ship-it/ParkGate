@@ -10,9 +10,9 @@ partial class IssueQrDialog
     private IContainer components = null;
     private PictureBox _picQrCode;
     private Label _lblInstruction;
-    private Button _btnPrint;
-    private Button _btnSave;
-    private Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnPrint;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
     private Label _lblCustomerName;
 
     protected override void Dispose(bool disposing)
@@ -29,9 +29,9 @@ partial class IssueQrDialog
     {
         _picQrCode = new PictureBox();
         _lblInstruction = new Label();
-        _btnPrint = new Button();
-        _btnSave = new Button();
-        _btnClose = new Button();
+        _btnPrint = new ParkGate.WinForms.Controls.RtlButton();
+        _btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        _btnClose = new ParkGate.WinForms.Controls.RtlButton();
         _lblCustomerName = new Label();
         ((ISupportInitialize)_picQrCode).BeginInit();
         SuspendLayout();

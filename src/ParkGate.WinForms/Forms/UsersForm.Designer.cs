@@ -20,11 +20,11 @@ partial class UsersForm
         this._pnlHeader = new System.Windows.Forms.Panel();
         this._lblHeader = new System.Windows.Forms.Label();
         this._pnlToolbar = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnAddUser = new System.Windows.Forms.Button();
-        this._btnChangeRole = new System.Windows.Forms.Button();
-        this._btnResetPassword = new System.Windows.Forms.Button();
-        this._btnToggleActive = new System.Windows.Forms.Button();
-        this._btnRefresh = new System.Windows.Forms.Button();
+        this._btnAddUser = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnChangeRole = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnResetPassword = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnToggleActive = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnRefresh = new ParkGate.WinForms.Controls.RtlButton();
         this._gridUsers = new System.Windows.Forms.DataGridView();
         this._colUsername = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colFullName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -34,7 +34,7 @@ partial class UsersForm
         this._colLastLogin = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._pnlFooter = new System.Windows.Forms.Panel();
         this._lblCount = new System.Windows.Forms.Label();
-        this._btnClose = new System.Windows.Forms.Button();
+        this._btnClose = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._pnlToolbar.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._gridUsers)).BeginInit();
@@ -288,11 +288,11 @@ partial class UsersForm
     private System.Windows.Forms.Panel _pnlHeader;
     private System.Windows.Forms.Label _lblHeader;
     private System.Windows.Forms.FlowLayoutPanel _pnlToolbar;
-    private System.Windows.Forms.Button _btnAddUser;
-    private System.Windows.Forms.Button _btnChangeRole;
-    private System.Windows.Forms.Button _btnResetPassword;
-    private System.Windows.Forms.Button _btnToggleActive;
-    private System.Windows.Forms.Button _btnRefresh;
+    private ParkGate.WinForms.Controls.RtlButton _btnAddUser;
+    private ParkGate.WinForms.Controls.RtlButton _btnChangeRole;
+    private ParkGate.WinForms.Controls.RtlButton _btnResetPassword;
+    private ParkGate.WinForms.Controls.RtlButton _btnToggleActive;
+    private ParkGate.WinForms.Controls.RtlButton _btnRefresh;
     private System.Windows.Forms.DataGridView _gridUsers;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colUsername;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colFullName;
@@ -302,5 +302,5 @@ partial class UsersForm
     private System.Windows.Forms.DataGridViewTextBoxColumn _colLastLogin;
     private System.Windows.Forms.Panel _pnlFooter;
     private System.Windows.Forms.Label _lblCount;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
 }

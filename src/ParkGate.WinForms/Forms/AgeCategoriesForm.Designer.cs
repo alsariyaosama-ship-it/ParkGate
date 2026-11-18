@@ -26,10 +26,10 @@ partial class AgeCategoriesForm
         this._lblHeader = new System.Windows.Forms.Label();
         this._lblHeaderSubtitle = new System.Windows.Forms.Label();
         this._pnlToolbar = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnAdd = new System.Windows.Forms.Button();
-        this._btnEdit = new System.Windows.Forms.Button();
-        this._btnToggleActive = new System.Windows.Forms.Button();
-        this._btnRefresh = new System.Windows.Forms.Button();
+        this._btnAdd = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnEdit = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnToggleActive = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnRefresh = new ParkGate.WinForms.Controls.RtlButton();
         this._gridAgeCategories = new System.Windows.Forms.DataGridView();
         this._colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -39,7 +39,7 @@ partial class AgeCategoriesForm
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyleExempt = new System.Windows.Forms.DataGridViewCellStyle();
         this._pnlFooter = new System.Windows.Forms.Panel();
         this._lblCount = new System.Windows.Forms.Label();
-        this._btnClose = new System.Windows.Forms.Button();
+        this._btnClose = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._pnlToolbar.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._gridAgeCategories)).BeginInit();
@@ -333,10 +333,10 @@ partial class AgeCategoriesForm
     private System.Windows.Forms.Label _lblHeader;
     private System.Windows.Forms.Label _lblHeaderSubtitle;
     private System.Windows.Forms.FlowLayoutPanel _pnlToolbar;
-    private System.Windows.Forms.Button _btnAdd;
-    private System.Windows.Forms.Button _btnEdit;
-    private System.Windows.Forms.Button _btnToggleActive;
-    private System.Windows.Forms.Button _btnRefresh;
+    private ParkGate.WinForms.Controls.RtlButton _btnAdd;
+    private ParkGate.WinForms.Controls.RtlButton _btnEdit;
+    private ParkGate.WinForms.Controls.RtlButton _btnToggleActive;
+    private ParkGate.WinForms.Controls.RtlButton _btnRefresh;
     private System.Windows.Forms.DataGridView _gridAgeCategories;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colName;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colDescription;
@@ -345,5 +345,5 @@ partial class AgeCategoriesForm
     private System.Windows.Forms.DataGridViewTextBoxColumn _colStatus;
     private System.Windows.Forms.Panel _pnlFooter;
     private System.Windows.Forms.Label _lblCount;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
 }

@@ -42,8 +42,8 @@ partial class FirstRunAdminForm
         this.lblConfirmPassword = new System.Windows.Forms.Label();
         this.txtConfirmPassword = new System.Windows.Forms.TextBox();
         this.flowLayoutPanelButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this.btnCreate = new System.Windows.Forms.Button();
-        this.btnCancel = new System.Windows.Forms.Button();
+        this.btnCreate = new ParkGate.WinForms.Controls.RtlButton();
+        this.btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this.tableLayoutPanelMain.SuspendLayout();
         this.flowLayoutPanelButtons.SuspendLayout();
         this.SuspendLayout();

@@ -32,7 +32,7 @@ partial class TodayEntriesPanel
         this._colResult = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._lblTodaySummary = new System.Windows.Forms.Label();
         this._pnlTodayActions = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnVoid = new System.Windows.Forms.Button();
+        this._btnVoid = new ParkGate.WinForms.Controls.RtlButton();
         this._grpToday.SuspendLayout();
         this._pnlTodayActions.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._gridToday)).BeginInit();
@@ -214,5 +214,5 @@ partial class TodayEntriesPanel
     private System.Windows.Forms.DataGridViewTextBoxColumn _colResult;
     private System.Windows.Forms.Label _lblTodaySummary;
     private System.Windows.Forms.FlowLayoutPanel _pnlTodayActions;
-    private System.Windows.Forms.Button _btnVoid;
+    private ParkGate.WinForms.Controls.RtlButton _btnVoid;
 }

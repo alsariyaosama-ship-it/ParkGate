@@ -35,8 +35,8 @@ partial class InlineRegistrationPanel
         this._lblRegNotes = new System.Windows.Forms.Label();
         this._txtRegNotes = new System.Windows.Forms.TextBox();
         this._pnlRegActions = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSaveReg = new System.Windows.Forms.Button();
-        this._btnCancelReg = new System.Windows.Forms.Button();
+        this._btnSaveReg = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancelReg = new ParkGate.WinForms.Controls.RtlButton();
         this._grpRegistration.SuspendLayout();
         this._tblRegistration.SuspendLayout();
         this._pnlRegActions.SuspendLayout();
@@ -288,6 +288,6 @@ partial class InlineRegistrationPanel
     private System.Windows.Forms.Label _lblRegNotes;
     private System.Windows.Forms.TextBox _txtRegNotes;
     private System.Windows.Forms.FlowLayoutPanel _pnlRegActions;
-    private System.Windows.Forms.Button _btnSaveReg;
-    private System.Windows.Forms.Button _btnCancelReg;
+    private ParkGate.WinForms.Controls.RtlButton _btnSaveReg;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancelReg;
 }

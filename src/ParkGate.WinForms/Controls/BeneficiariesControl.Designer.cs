@@ -20,8 +20,8 @@ partial class BeneficiariesControl
         this._pnlSearch = new System.Windows.Forms.Panel();
         this._lblSearch = new System.Windows.Forms.Label();
         this._txtSearch = new System.Windows.Forms.TextBox();
-        this._btnSearch = new System.Windows.Forms.Button();
-        this._btnClearSearch = new System.Windows.Forms.Button();
+        this._btnSearch = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnClearSearch = new ParkGate.WinForms.Controls.RtlButton();
         this._lblSearchResultCount = new System.Windows.Forms.Label();
         this._splitMain = new System.Windows.Forms.SplitContainer();
         this._grpResults = new ParkGate.WinForms.Controls.RtlGroupBox();
@@ -56,10 +56,10 @@ partial class BeneficiariesControl
         this._lblDetailNotesTitle = new System.Windows.Forms.Label();
         this._lblDetailNotes = new System.Windows.Forms.Label();
         this._pnlDetailsActions = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnEdit = new System.Windows.Forms.Button();
-        this._btnChangeStatus = new System.Windows.Forms.Button();
-        this._btnCheckInDirect = new System.Windows.Forms.Button();
-        this._btnIssueQr = new System.Windows.Forms.Button();
+        this._btnEdit = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnChangeStatus = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCheckInDirect = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnIssueQr = new ParkGate.WinForms.Controls.RtlButton();
         this._grpHistory = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridHistory = new System.Windows.Forms.DataGridView();
         this._colHistTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -71,7 +71,7 @@ partial class BeneficiariesControl
         this._colHistStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colHistVoidReason = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._pnlHistoryActions = new System.Windows.Forms.Panel();
-        this._btnVoidHistoryEntry = new System.Windows.Forms.Button();
+        this._btnVoidHistoryEntry = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlSearch.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._splitMain)).BeginInit();
         this._splitMain.Panel1.SuspendLayout();
@@ -761,8 +761,8 @@ partial class BeneficiariesControl
     private System.Windows.Forms.Panel _pnlSearch;
     private System.Windows.Forms.Label _lblSearch;
     private System.Windows.Forms.TextBox _txtSearch;
-    private System.Windows.Forms.Button _btnSearch;
-    private System.Windows.Forms.Button _btnClearSearch;
+    private ParkGate.WinForms.Controls.RtlButton _btnSearch;
+    private ParkGate.WinForms.Controls.RtlButton _btnClearSearch;
     private System.Windows.Forms.Label _lblSearchResultCount;
     private System.Windows.Forms.SplitContainer _splitMain;
     private ParkGate.WinForms.Controls.RtlGroupBox _grpResults;
@@ -797,10 +797,10 @@ partial class BeneficiariesControl
     private System.Windows.Forms.Label _lblDetailNotesTitle;
     private System.Windows.Forms.Label _lblDetailNotes;
     private System.Windows.Forms.FlowLayoutPanel _pnlDetailsActions;
-    private System.Windows.Forms.Button _btnEdit;
-    private System.Windows.Forms.Button _btnChangeStatus;
-    private System.Windows.Forms.Button _btnCheckInDirect;
-    private System.Windows.Forms.Button _btnIssueQr;
+    private ParkGate.WinForms.Controls.RtlButton _btnEdit;
+    private ParkGate.WinForms.Controls.RtlButton _btnChangeStatus;
+    private ParkGate.WinForms.Controls.RtlButton _btnCheckInDirect;
+    private ParkGate.WinForms.Controls.RtlButton _btnIssueQr;
     private ParkGate.WinForms.Controls.RtlGroupBox _grpHistory;
     private System.Windows.Forms.DataGridView _gridHistory;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colHistTime;
@@ -812,5 +812,5 @@ partial class BeneficiariesControl
     private System.Windows.Forms.DataGridViewTextBoxColumn _colHistStatus;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colHistVoidReason;
     private System.Windows.Forms.Panel _pnlHistoryActions;
-    private System.Windows.Forms.Button _btnVoidHistoryEntry;
+    private ParkGate.WinForms.Controls.RtlButton _btnVoidHistoryEntry;
 }

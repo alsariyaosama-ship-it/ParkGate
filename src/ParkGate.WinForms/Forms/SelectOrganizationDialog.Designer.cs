@@ -20,8 +20,8 @@ partial class SelectOrganizationDialog
         this._lblHeader = new System.Windows.Forms.Label();
         this._lstOrganizations = new System.Windows.Forms.ListBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSelect = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnSelect = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlButtons.SuspendLayout();
         this.SuspendLayout();
         //
@@ -116,6 +116,6 @@ partial class SelectOrganizationDialog
     private System.Windows.Forms.Label _lblHeader;
     private System.Windows.Forms.ListBox _lstOrganizations;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnSelect;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnSelect;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

@@ -24,7 +24,7 @@ partial class CheckInDeskControl
         this._mainLayout = new System.Windows.Forms.TableLayoutPanel();
         this._pnlSearch = new System.Windows.Forms.Panel();
         this._tblSearch = new System.Windows.Forms.TableLayoutPanel();
-        this._btnSearch = new System.Windows.Forms.Button();
+        this._btnSearch = new ParkGate.WinForms.Controls.RtlButton();
         this._cmbOrganization = new System.Windows.Forms.ComboBox();
         this._lblOrganization = new System.Windows.Forms.Label();
         this._txtCardNumber = new System.Windows.Forms.TextBox();
@@ -55,10 +55,10 @@ partial class CheckInDeskControl
         this._flowCounters = new System.Windows.Forms.FlowLayoutPanel();
         this._pnlActions = new System.Windows.Forms.TableLayoutPanel();
         this._flowActions = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnRecordEntry = new System.Windows.Forms.Button();
-        this._btnOverride = new System.Windows.Forms.Button();
-        this._btnNewHolder = new System.Windows.Forms.Button();
-        this._btnClear = new System.Windows.Forms.Button();
+        this._btnRecordEntry = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnOverride = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnNewHolder = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnClear = new ParkGate.WinForms.Controls.RtlButton();
         this._giftPanel = new ParkGate.WinForms.Controls.GiftOfferPanel();
         this._mainLayout.SuspendLayout();
         this._pnlSearch.SuspendLayout();
@@ -685,7 +685,7 @@ partial class CheckInDeskControl
     private System.Windows.Forms.TextBox _txtCardNumber;
     private System.Windows.Forms.Label _lblOrganization;
     private System.Windows.Forms.ComboBox _cmbOrganization;
-    private System.Windows.Forms.Button _btnSearch;
+    private ParkGate.WinForms.Controls.RtlButton _btnSearch;
     private ParkGate.WinForms.Controls.StatusBanner _statusBanner;
     private System.Windows.Forms.SplitContainer _splitMiddle;
     private ParkGate.WinForms.Controls.RtlGroupBox _grpHolder;
@@ -713,8 +713,8 @@ partial class CheckInDeskControl
     private ParkGate.WinForms.Controls.GiftOfferPanel _giftPanel;
     private System.Windows.Forms.TableLayoutPanel _pnlActions;
     private System.Windows.Forms.FlowLayoutPanel _flowActions;
-    private System.Windows.Forms.Button _btnRecordEntry;
-    private System.Windows.Forms.Button _btnOverride;
-    private System.Windows.Forms.Button _btnNewHolder;
-    private System.Windows.Forms.Button _btnClear;
+    private ParkGate.WinForms.Controls.RtlButton _btnRecordEntry;
+    private ParkGate.WinForms.Controls.RtlButton _btnOverride;
+    private ParkGate.WinForms.Controls.RtlButton _btnNewHolder;
+    private ParkGate.WinForms.Controls.RtlButton _btnClear;
 }

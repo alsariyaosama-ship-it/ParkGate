@@ -16,12 +16,12 @@ partial class GiftReceiptsForm
     private System.Windows.Forms.ComboBox _cmbOrganization;
     private System.Windows.Forms.Label _lblStatus;
     private System.Windows.Forms.ComboBox _cmbStatus;
-    private System.Windows.Forms.Button _btnRefresh;
-    private System.Windows.Forms.Button _btnExportExcel;
-    private System.Windows.Forms.Button _btnPrintPreview;
+    private ParkGate.WinForms.Controls.RtlButton _btnRefresh;
+    private ParkGate.WinForms.Controls.RtlButton _btnExportExcel;
+    private ParkGate.WinForms.Controls.RtlButton _btnPrintPreview;
     private System.Windows.Forms.DataGridView _gridReceipts;
     private System.Windows.Forms.Panel _summaryPanel;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
     private System.Windows.Forms.Label _lblSummary;
 
     protected override void Dispose(bool disposing)
@@ -45,12 +45,12 @@ partial class GiftReceiptsForm
         _cmbOrganization = new System.Windows.Forms.ComboBox();
         _lblStatus = new System.Windows.Forms.Label();
         _cmbStatus = new System.Windows.Forms.ComboBox();
-        _btnRefresh = new System.Windows.Forms.Button();
-        _btnExportExcel = new System.Windows.Forms.Button();
-        _btnPrintPreview = new System.Windows.Forms.Button();
+        _btnRefresh = new ParkGate.WinForms.Controls.RtlButton();
+        _btnExportExcel = new ParkGate.WinForms.Controls.RtlButton();
+        _btnPrintPreview = new ParkGate.WinForms.Controls.RtlButton();
         _gridReceipts = new System.Windows.Forms.DataGridView();
         _summaryPanel = new System.Windows.Forms.Panel();
-        _btnClose = new System.Windows.Forms.Button();
+        _btnClose = new ParkGate.WinForms.Controls.RtlButton();
         _lblSummary = new System.Windows.Forms.Label();
 
         _mainLayout.SuspendLayout();
