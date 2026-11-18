@@ -225,7 +225,8 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
 - [ ] R5.9 Fix amber banner contrast (below 4.5:1)
 - [ ] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
-- [ ] R5.11 Search row in a `TableLayoutPanel` (card box and its label overlap at 125 %)
+- [x] R5.11 Search row in a `TableLayoutPanel` (card box and its label overlap at 125 %)
+- [ ] R5.12 Group box captions lose their last letters in RTL («بيانات الزا»), on every screen
 
 ### R6 — Database design · branch `phase/r6-database`
 - [x] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script

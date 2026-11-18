@@ -175,7 +175,8 @@ All in `src/ParkGate.WinForms/Controls/CheckInDeskControl.cs` unless stated. UI 
 - [ ] **R5.8 [Blocked: Q-R7] Layout at the minimum resolution.** Set `MinimumSize` on `MainForm`. At 1366×768 the today grid must show at least 5 rows: make the gift panel collapse to one line when no gift applies, and reduce the fixed rows. Verify at 100 % and 150 % scaling.
 - [ ] **R5.9 Banner contrast.** Detail text on the amber banner (`#F0F0F0` on `#B26A00`) is below 4.5:1. Use white and darken amber to `#9A5B00`. Keep the SPEC colors for green and red.
 - [ ] **R5.10 Idle auto-lock (FR-AUTH-06)** if not implemented: verify, then implement with a setting.
-- [ ] **R5.11 Search row layout** (found in R5.3). `_pnlSearch` places the card box, its label, the organization combo and the search button at absolute positions. At 125 % the card box (710–1190 px) runs under its label (1041–1167 px). Use a `TableLayoutPanel` (AGENTS.md §5.3), as R4.12 did for the gift scan row.
+- [x] **R5.11 Search row layout** (found in R5.3). `_pnlSearch` places the card box, its label, the organization combo and the search button at absolute positions. At 125 % the card box (710–1190 px) runs under its label (1041–1167 px). Use a `TableLayoutPanel` (AGENTS.md §5.3), as R4.12 did for the gift scan row.
+- [ ] **R5.12 Group box captions** (found in R5.11). Every `GroupBox` drawn by WinForms in RTL cuts the last two letters of an Arabic caption («بيانات الزائر» shows «بيانات الزا»), at any back colour and font style; checked on the real screen, not only with `DrawToBitmap`. `FlatStyle.System` draws it whole. Fix it once for every group box and guard it with a test.
 
 **Done when:** Osama walks through the desk flow keyboard-only on the smallest desk screen.
 

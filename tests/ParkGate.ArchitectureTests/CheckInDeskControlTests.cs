@@ -115,6 +115,40 @@ public sealed class CheckInDeskControlTests
         btnOverride.Enabled.ShouldBeFalse();
     }
 
+    [Theory]
+    [InlineData(1024)]
+    [InlineData(1366)]
+    [InlineData(1920)]
+    public void CheckInDeskControl_SearchRow_ControlsNeverOverlap(int width)
+    {
+        // R5.11: the row used absolute positions, and at 125 % the card box ran under its label.
+        using var host = new Form { ClientSize = new Size(width, 700) };
+        using var control = TestUi.Create<CheckInDeskControl>();
+        control.Dock = DockStyle.Fill;
+        host.Controls.Add(control);
+        host.PerformLayout();
+
+        var row = GetField<TableLayoutPanel>(control, "_tblSearch");
+        GetField<Panel>(control, "_pnlSearch").Controls.Cast<Control>().ShouldBe([row]);
+
+        Control[] inOrder =
+        [
+            GetField<Label>(control, "_lblCardNumber"),
+            GetField<TextBox>(control, "_txtCardNumber"),
+            GetField<Label>(control, "_lblOrganization"),
+            GetField<ComboBox>(control, "_cmbOrganization"),
+            GetField<Button>(control, "_btnSearch"),
+        ];
+        for (var i = 0; i < inOrder.Length; i++)
+        {
+            row.GetColumn(inOrder[i]).ShouldBe(i, inOrder[i].Name);
+            for (var j = i + 1; j < inOrder.Length; j++)
+            {
+                inOrder[i].Bounds.IntersectsWith(inOrder[j].Bounds).ShouldBeFalse($"{inOrder[i].Name} / {inOrder[j].Name}");
+            }
+        }
+    }
+
     [Fact]
     public void CheckInDeskControl_IdentityText_IsLargerThanBodyText()
     {

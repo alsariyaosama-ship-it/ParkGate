@@ -23,6 +23,7 @@ partial class CheckInDeskControl
         this._todayPanel = new ParkGate.WinForms.Controls.TodayEntriesPanel();
         this._mainLayout = new System.Windows.Forms.TableLayoutPanel();
         this._pnlSearch = new System.Windows.Forms.Panel();
+        this._tblSearch = new System.Windows.Forms.TableLayoutPanel();
         this._btnSearch = new System.Windows.Forms.Button();
         this._cmbOrganization = new System.Windows.Forms.ComboBox();
         this._lblOrganization = new System.Windows.Forms.Label();
@@ -61,6 +62,7 @@ partial class CheckInDeskControl
         this._giftPanel = new ParkGate.WinForms.Controls.GiftOfferPanel();
         this._mainLayout.SuspendLayout();
         this._pnlSearch.SuspendLayout();
+        this._tblSearch.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._splitMiddle)).BeginInit();
         this._splitMiddle.Panel1.SuspendLayout();
         this._splitMiddle.Panel2.SuspendLayout();
@@ -102,18 +104,36 @@ partial class CheckInDeskControl
         // 
         this._pnlSearch.BackColor = System.Drawing.Color.White;
         this._pnlSearch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-        this._pnlSearch.Controls.Add(this._btnSearch);
-        this._pnlSearch.Controls.Add(this._cmbOrganization);
-        this._pnlSearch.Controls.Add(this._lblOrganization);
-        this._pnlSearch.Controls.Add(this._txtCardNumber);
-        this._pnlSearch.Controls.Add(this._lblCardNumber);
+        this._pnlSearch.Controls.Add(this._tblSearch);
         this._pnlSearch.Dock = System.Windows.Forms.DockStyle.Fill;
         this._pnlSearch.Location = new System.Drawing.Point(0, 0);
         this._pnlSearch.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
         this._pnlSearch.Name = "_pnlSearch";
-        this._pnlSearch.Padding = new System.Windows.Forms.Padding(8, 6, 8, 6);
+        this._pnlSearch.Padding = new System.Windows.Forms.Padding(8, 2, 8, 2);
         this._pnlSearch.Size = new System.Drawing.Size(988, 50);
         this._pnlSearch.TabIndex = 0;
+        // 
+        // _tblSearch
+        // 
+        this._tblSearch.ColumnCount = 5;
+        this._tblSearch.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblSearch.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
+        this._tblSearch.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblSearch.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
+        this._tblSearch.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblSearch.Controls.Add(this._lblCardNumber, 0, 0);
+        this._tblSearch.Controls.Add(this._txtCardNumber, 1, 0);
+        this._tblSearch.Controls.Add(this._lblOrganization, 2, 0);
+        this._tblSearch.Controls.Add(this._cmbOrganization, 3, 0);
+        this._tblSearch.Controls.Add(this._btnSearch, 4, 0);
+        this._tblSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._tblSearch.Location = new System.Drawing.Point(8, 6);
+        this._tblSearch.Margin = new System.Windows.Forms.Padding(0);
+        this._tblSearch.Name = "_tblSearch";
+        this._tblSearch.RowCount = 1;
+        this._tblSearch.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._tblSearch.Size = new System.Drawing.Size(970, 50);
+        this._tblSearch.TabIndex = 0;
         // 
         // _btnSearch
         // 
@@ -123,7 +143,9 @@ partial class CheckInDeskControl
         this._btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSearch.ForeColor = System.Drawing.Color.White;
-        this._btnSearch.Location = new System.Drawing.Point(8, 7);
+        this._btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this._btnSearch.Location = new System.Drawing.Point(845, 8);
+        this._btnSearch.Margin = new System.Windows.Forms.Padding(12, 0, 0, 0);
         this._btnSearch.Name = "_btnSearch";
         this._btnSearch.Size = new System.Drawing.Size(125, 34);
         this._btnSearch.TabIndex = 4;
@@ -132,21 +154,23 @@ partial class CheckInDeskControl
         // 
         // _cmbOrganization
         // 
-        this._cmbOrganization.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+        this._cmbOrganization.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
         this._cmbOrganization.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
         this._cmbOrganization.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._cmbOrganization.FormattingEnabled = true;
-        this._cmbOrganization.Location = new System.Drawing.Point(145, 8);
+        this._cmbOrganization.Location = new System.Drawing.Point(560, 9);
+        this._cmbOrganization.Margin = new System.Windows.Forms.Padding(0);
         this._cmbOrganization.Name = "_cmbOrganization";
         this._cmbOrganization.Size = new System.Drawing.Size(260, 32);
         this._cmbOrganization.TabIndex = 3;
         // 
         // _lblOrganization
         // 
-        this._lblOrganization.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+        this._lblOrganization.Anchor = System.Windows.Forms.AnchorStyles.None;
         this._lblOrganization.AutoSize = true;
         this._lblOrganization.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblOrganization.Location = new System.Drawing.Point(412, 11);
+        this._lblOrganization.Location = new System.Drawing.Point(498, 13);
+        this._lblOrganization.Margin = new System.Windows.Forms.Padding(16, 0, 8, 0);
         this._lblOrganization.Name = "_lblOrganization";
         this._lblOrganization.Size = new System.Drawing.Size(52, 24);
         this._lblOrganization.TabIndex = 2;
@@ -154,9 +178,10 @@ partial class CheckInDeskControl
         // 
         // _txtCardNumber
         // 
-        this._txtCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+        this._txtCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
         this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._txtCardNumber.Location = new System.Drawing.Point(475, 6);
+        this._txtCardNumber.Location = new System.Drawing.Point(103, 3);
+        this._txtCardNumber.Margin = new System.Windows.Forms.Padding(0);
         this._txtCardNumber.MaxLength = 50;
         this._txtCardNumber.Name = "_txtCardNumber";
         this._txtCardNumber.Size = new System.Drawing.Size(385, 36);
@@ -164,11 +189,12 @@ partial class CheckInDeskControl
         // 
         // _lblCardNumber
         // 
-        this._lblCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+        this._lblCardNumber.Anchor = System.Windows.Forms.AnchorStyles.None;
         this._lblCardNumber.AutoSize = true;
         this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblCardNumber.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-        this._lblCardNumber.Location = new System.Drawing.Point(866, 11);
+        this._lblCardNumber.Location = new System.Drawing.Point(0, 12);
+        this._lblCardNumber.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
         this._lblCardNumber.Name = "_lblCardNumber";
         this._lblCardNumber.Size = new System.Drawing.Size(95, 26);
         this._lblCardNumber.TabIndex = 0;
@@ -630,7 +656,8 @@ partial class CheckInDeskControl
         this.Size = new System.Drawing.Size(1008, 661);
         this._mainLayout.ResumeLayout(false);
         this._pnlSearch.ResumeLayout(false);
-        this._pnlSearch.PerformLayout();
+        this._tblSearch.ResumeLayout(false);
+        this._tblSearch.PerformLayout();
         this._splitMiddle.Panel1.ResumeLayout(false);
         this._splitMiddle.Panel2.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)(this._splitMiddle)).EndInit();
@@ -653,6 +680,7 @@ partial class CheckInDeskControl
     private ParkGate.WinForms.Controls.TodayEntriesPanel _todayPanel;
     private System.Windows.Forms.TableLayoutPanel _mainLayout;
     private System.Windows.Forms.Panel _pnlSearch;
+    private System.Windows.Forms.TableLayoutPanel _tblSearch;
     private System.Windows.Forms.Label _lblCardNumber;
     private System.Windows.Forms.TextBox _txtCardNumber;
     private System.Windows.Forms.Label _lblOrganization;
