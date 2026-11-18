@@ -1444,6 +1444,9 @@
   <data name="Label_GiftNotEligible" xml:space="preserve">
     <value>الزائر غير مؤهل لاستلام قسيمة هدية: {0}</value>
   </data>
+  <data name="Label_GiftForVisitor" xml:space="preserve">
+    <value>للزائر: {0}</value>
+  </data>
   <data name="Label_GiftNextEligible" xml:space="preserve">
     <value>(موعد الاستحقاق القادم: {0})</value>
   </data>

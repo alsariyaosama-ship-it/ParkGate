@@ -483,6 +483,78 @@ public sealed class CheckInDeskControlTests
         txtCard.SelectionLength.ShouldBe(txtCard.Text.Length);
     }
 
+    [Theory]
+    [InlineData(0)]   // the desk is freed for the next visitor
+    [InlineData(-1)]  // the holder stays on screen
+    public async Task CheckInDeskControl_AfterAGrantedEntry_OffersTheGiftWithoutASecondScan(int autoResetDelayMs)
+    {
+        // R5.14: BR-30 needs today's granted entry, so before the entry the gift is not offered; after it the
+        // operator presses F6 for the same visitor instead of scanning the card again.
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 1, OrganizationName: "صندوق التضامن", CardNumber: "100200",
+            FullName: "محمد أحمد علي", Phone: "0912345678", NationalId: null, CardExpiryDate: null,
+            Status: BeneficiaryStatus.Active, StatusReason: null, LastGrantedEntryUtc: null, Notes: null,
+            CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var gifts = new CountingGiftService();
+        using var control = TestUi.Create<CheckInDeskControl>(new FakeCheckInService(), gifts);
+        control.AutoResetDelayMs = autoResetDelayMs;
+        control.ShowHolderInfo(holder, eligibility);
+        gifts.EntryRecorded = true;
+
+        await control.RecordEntryAsync();
+
+        gifts.LastBeneficiaryId.ShouldBe(holder.Id);
+        var panel = GetField<GiftOfferPanel>(control, "_giftPanel");
+        GetField<Button>(panel, "_btnIssue").Enabled.ShouldBeTrue();
+        GetField<Label>(panel, "_lblDetails").Text.ShouldContain(holder.FullName);
+    }
+
+    [Fact]
+    public async Task GiftOfferPanel_StaleLoadAfterANewScan_IsDiscarded()
+    {
+        var gifts = new CountingGiftService { EntryRecorded = true, Gate = new TaskCompletionSource() };
+        var panel = TestUi.CreateGiftPanel(gifts);
+
+        var stale = panel.LoadAsync(Guid.NewGuid(), "زائر سابق");
+        panel.Clear(); // the next visitor's lookup clears the panel
+        gifts.Gate.SetResult();
+        await stale;
+
+        GetField<Button>(panel, "_btnIssue").Enabled.ShouldBeFalse();
+        GetField<Label>(panel, "_lblDetails").Text.ShouldNotContain("زائر سابق");
+    }
+
+    private sealed class CountingGiftService : ParkGate.Application.GiftVouchers.Services.IGiftVoucherService
+    {
+        public bool EntryRecorded { get; set; }
+
+        public Guid? LastBeneficiaryId { get; private set; }
+
+        public TaskCompletionSource? Gate { get; set; }
+
+        public async Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto>> GetEligibilityAsync(Guid beneficiaryId, CancellationToken ct = default)
+        {
+            LastBeneficiaryId = beneficiaryId;
+            if (Gate != null)
+            {
+                await Gate.Task;
+            }
+
+            return ParkGate.Application.Common.Result.Success(EntryRecorded
+                ? new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(true, null, null, null, false, 10m, null)
+                : new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(false, GiftDenialReason.NoEntryToday, "Gift.NoEntryToday", null, false, 10m, null));
+        }
+
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.IssuedGiftVoucherDto>> IssueAsync(ParkGate.Application.GiftVouchers.DTOs.IssueGiftVoucherRequest request, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.IssuedGiftVoucherDto>> IssueOverrideAsync(ParkGate.Application.GiftVouchers.DTOs.IssueGiftOverrideRequest request, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.GiftRedemptionDto>> RedeemAsync(string? scannedText, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> VoidAsync(ParkGate.Application.GiftVouchers.DTOs.VoidGiftVoucherRequest request, string? supervisorUserId = null, CancellationToken ct = default) => throw new NotImplementedException();
+    }
+
     [Fact]
     public async Task CheckInDeskControl_RecordEntryAsync_SendsRequestAndRefreshesDesk()
     {

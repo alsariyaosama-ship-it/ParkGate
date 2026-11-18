@@ -23,6 +23,10 @@ public partial class GiftOfferPanel : UserControl
     private Guid? _currentBeneficiaryId;
     private GiftEligibilityDto? _eligibility;
     private string? _timeZoneId; // set by the desk from Park.TimeZoneId (R7.10)
+    private string? _visitorName;
+
+    // Each Load/Clear starts a new version; a load that finishes after a newer one (a new scan) is dropped (R5.14).
+    private int _loadVersion;
 
     public GiftOfferPanel()
     {
@@ -79,7 +83,9 @@ public partial class GiftOfferPanel : UserControl
 
     public void Clear()
     {
+        _loadVersion++;
         _currentBeneficiaryId = null;
+        _visitorName = null;
         _eligibility = null;
         Visible = false;
         _btnIssue.Enabled = false;
@@ -87,12 +93,28 @@ public partial class GiftOfferPanel : UserControl
         _btnIssueOverride.Visible = false;
     }
 
-    public async Task LoadAsync(Guid beneficiaryId)
+    /// <param name="beneficiaryId">The visitor the gift is for.</param>
+    /// <param name="visitorName">
+    /// Shown with the offer when the desk has already moved on from this visitor (after a granted entry, R5.14);
+    /// kept when the same visitor is reloaded after an issue.
+    /// </param>
+    public async Task LoadAsync(Guid beneficiaryId, string? visitorName = null)
     {
         var services = Services;
+        var version = ++_loadVersion;
+        if (visitorName != null || _currentBeneficiaryId != beneficiaryId)
+        {
+            _visitorName = visitorName;
+        }
+
         try
         {
             var result = await services.GiftVouchers.GetEligibilityAsync(beneficiaryId);
+            if (version != _loadVersion)
+            {
+                return;
+            }
+
             if (!result.IsSuccess)
             {
                 // Any error or failure (e.g. Forbidden) hides the panel and never blocks entry
@@ -118,7 +140,7 @@ public partial class GiftOfferPanel : UserControl
                 _grpMain.BackColor = Theme.SuccessTint;
                 _lblStatus.Text = string.Format(Strings.Label_GiftEligible, eligibility.GiftValue.ToString("0.###"), Strings.Unit_Currency);
                 _lblStatus.ForeColor = Theme.Success;
-                _lblDetails.Text = string.Empty;
+                _lblDetails.Text = _visitorName is null ? string.Empty : string.Format(Strings.Label_GiftForVisitor, _visitorName);
 
                 _btnIssue.Enabled = true;
                 _btnIssueOverride.Enabled = false;

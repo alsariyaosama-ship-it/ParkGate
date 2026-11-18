@@ -857,10 +857,11 @@ public partial class CheckInDeskControl : UserControl
     /// After a granted entry: free the desk at once and keep the success banner for the delay. A card scanned during
     /// the delay is looked up as usual and is not wiped when the delay ends (R4.2). A negative delay keeps the desk.
     /// </summary>
-    private async Task FinishSuccessfulEntryAsync()
+    private async Task FinishSuccessfulEntryAsync(BeneficiaryDto entered)
     {
         if (AutoResetDelayMs < 0)
         {
+            await _giftPanel.LoadAsync(entered.Id, entered.FullName);
             return;
         }
 
@@ -868,6 +869,10 @@ public partial class CheckInDeskControl : UserControl
         ClearPreviousHolderData();
         _txtCardNumber.Clear();
         FocusCardNumberBox();
+
+        // R5.14: the gift needs today's granted entry (BR-30), so offer it now for the visitor who just entered:
+        // F6 issues it without a second scan. A new scan clears the panel and drops this load.
+        await _giftPanel.LoadAsync(entered.Id, entered.FullName);
 
         if (AutoResetDelayMs > 0)
         {
@@ -985,6 +990,8 @@ public partial class CheckInDeskControl : UserControl
             return;
         }
 
+        var entered = _activeHolder;
+
         var companions = _counterInputs
             .Where(c => c.Value > 0)
             .Select(c => new CompanionRequestDto((int)c.Tag!, c.Value))
@@ -1005,7 +1012,7 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted(Strings.Ui_CheckInDesk_13, string.Format(Strings.Ui_CheckInDesk_14, companions.Sum(c => c.Count), result.Value.TotalPersons));
                     await RefreshTodayDeskSummaryAsync();
 
-                    await FinishSuccessfulEntryAsync();
+                    await FinishSuccessfulEntryAsync(entered);
                 }
                 else
                 {
@@ -1032,6 +1039,8 @@ public partial class CheckInDeskControl : UserControl
         {
             return;
         }
+
+        var entered = _activeHolder;
 
         var supervisorDialog = _formFactory.Create<SupervisorAuthDialog>();
 
@@ -1064,7 +1073,7 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted(Strings.Ui_CheckInDesk_18, string.Format(Strings.Ui_CheckInDesk_19, supervisorDialog.SupervisorFullName, supervisorDialog.Reason));
                     await RefreshTodayDeskSummaryAsync();
 
-                    await FinishSuccessfulEntryAsync();
+                    await FinishSuccessfulEntryAsync(entered);
                 }
                 else
                 {

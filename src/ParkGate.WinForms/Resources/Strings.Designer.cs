@@ -590,6 +590,7 @@ internal class Strings
     internal static string Title_GiftOffer => GetString(nameof(Title_GiftOffer));
     internal static string Label_GiftEligible => GetString(nameof(Label_GiftEligible));
     internal static string Label_GiftNotEligible => GetString(nameof(Label_GiftNotEligible));
+    internal static string Label_GiftForVisitor => GetString(nameof(Label_GiftForVisitor));
     internal static string Label_GiftNextEligible => GetString(nameof(Label_GiftNextEligible));
     internal static string Btn_IssueGift => GetString(nameof(Btn_IssueGift));
     internal static string Btn_IssueGiftOverride => GetString(nameof(Btn_IssueGiftOverride));
