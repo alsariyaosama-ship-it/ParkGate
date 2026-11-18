@@ -40,6 +40,8 @@ public partial class ConnectionSettingsForm : RtlFormBase
         btnSave.Text = Strings.Btn_SaveAndConnect;
         btnTest.Text = Strings.Btn_TestConnection;
         btnCancel.Text = Strings.Btn_Cancel;
+        Theme.ApplySecondaryButtonStyle(btnTest);
+        Theme.ApplySecondaryButtonStyle(btnCancel);
 
         cmbAuthType.Items.Clear();
         cmbAuthType.Items.Add(Strings.Auth_Windows);

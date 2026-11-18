@@ -30,6 +30,7 @@ public partial class FirstRunAdminForm : RtlFormBase
         lblConfirmPassword.Text = Strings.Label_AdminConfirmPassword;
         btnCreate.Text = Strings.Btn_CreateAdmin;
         btnCancel.Text = Strings.Btn_Cancel;
+        Theme.ApplySecondaryButtonStyle(btnCancel);
     }
 
     private async Task OnCreateAdminAsync()

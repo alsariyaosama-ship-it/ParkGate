@@ -63,10 +63,12 @@ public partial class GiftReceiptsForm : RtlFormBase
         _btnRefresh.Text = Strings.Btn_Refresh;
         _btnExportExcel.Text = Strings.Btn_ExportExcel;
         _btnPrintPreview.Text = Strings.Btn_Print;
+        _btnClose.Text = Strings.Btn_Close;
 
         Theme.ApplyPrimaryButtonStyle(_btnRefresh);
         Theme.ApplyPrimaryButtonStyle(_btnExportExcel);
         Theme.ApplySecondaryButtonStyle(_btnPrintPreview);
+        Theme.ApplySecondaryButtonStyle(_btnClose);
     }
 
     private void SetupColumns()
@@ -174,6 +176,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         _btnRefresh.Click += async (_, _) => await LoadReportAsync();
         _btnExportExcel.Click += async (_, _) => await ExportExcelAsync();
         _btnPrintPreview.Click += (_, _) => ShowPrintPreview();
+        _btnClose.Click += (_, _) => Close();
     }
 
     private async Task OnFormLoadAsync()

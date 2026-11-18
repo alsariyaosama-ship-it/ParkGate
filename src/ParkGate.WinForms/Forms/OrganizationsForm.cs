@@ -51,6 +51,7 @@ public partial class OrganizationsForm : RtlFormBase
         _btnToggleActive.Text = Strings.Btn_Deactivate;
         _btnRefresh.Text = Strings.Btn_Refresh;
         _btnClose.Text = Strings.Btn_Close;
+        Theme.ApplySecondaryButtonStyle(_btnClose);
 
         _colCode.HeaderText = Strings.Col_Org_Code;
         _colName.HeaderText = Strings.Col_Org_Name;

@@ -45,6 +45,7 @@ public partial class ChangePasswordForm : RtlFormBase
         lblConfirmNewPassword.Text = Strings.Label_ConfirmNewPassword;
         btnChange.Text = Strings.Btn_ChangePassword;
         btnCancel.Text = Strings.Btn_Cancel;
+        Theme.ApplySecondaryButtonStyle(btnCancel);
     }
 
     private async Task OnChangePasswordAsync()

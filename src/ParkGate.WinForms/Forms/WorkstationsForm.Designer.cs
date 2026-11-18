@@ -222,6 +222,7 @@ partial class WorkstationsForm
         // 
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+        this.CancelButton = this._btnClose;
         this.ClientSize = new System.Drawing.Size(784, 512);
         this.Controls.Add(this._gridWorkstations);
         this.Controls.Add(this._pnlFooter);

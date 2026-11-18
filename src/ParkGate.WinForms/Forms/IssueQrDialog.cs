@@ -12,14 +12,14 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class IssueQrDialog : RtlFormBase
 {
-    private readonly EntryCardIssuer _issuer;
+    private readonly IEntryCardIssuer _issuer;
     private readonly IQrImageRenderer _qrRenderer;
     private readonly INotifyService _notifyService;
     private BeneficiaryDto? _beneficiary;
     private IssuedEntryCard? _issuedCard;
 
     public IssueQrDialog(
-        EntryCardIssuer issuer,
+        IEntryCardIssuer issuer,
         IQrImageRenderer qrRenderer,
         INotifyService notifyService)
     {

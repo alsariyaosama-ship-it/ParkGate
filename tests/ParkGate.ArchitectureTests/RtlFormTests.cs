@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Windows.Forms;
 using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Forms;
@@ -7,6 +8,70 @@ namespace ParkGate.ArchitectureTests;
 
 public sealed class RtlFormTests
 {
+    public static TheoryData<Type> Dialogs()
+    {
+        var data = new TheoryData<Type>();
+        foreach (var type in UiCompositionTests.DesignerTypes().Where(t => typeof(Form).IsAssignableFrom(t) && t != typeof(MainForm)))
+        {
+            data.Add(type);
+        }
+
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(Dialogs))]
+    public void Dialog_SetsAcceptAndCancelButtons(Type dialogType)
+    {
+        // R7.4: Enter confirms and Esc closes in every dialog (AGENTS.md §5.11).
+        // Management lists have no single confirm action: Enter stays with the grid, Esc still closes.
+        Type[] lists = [typeof(OrganizationsForm), typeof(AgeCategoriesForm), typeof(UsersForm), typeof(WorkstationsForm)];
+        using var dialog = (Form)TestUi.Create(dialogType);
+
+        if (!lists.Contains(dialogType))
+        {
+            dialog.AcceptButton.ShouldNotBeNull($"{dialogType.Name}.AcceptButton");
+        }
+
+        dialog.CancelButton.ShouldNotBeNull($"{dialogType.Name}.CancelButton");
+    }
+
+    [Theory]
+    [MemberData(nameof(Dialogs))]
+    public void Dialog_HasExplicitTabOrder(Type dialogType)
+    {
+        // R7.4: no two focusable siblings share a TabIndex, so the order is the one the designer states.
+        using var dialog = (Form)TestUi.Create(dialogType);
+        var clashes = AllControls(dialog)
+            .Where(c => c.Controls.Count > 1)
+            .SelectMany(parent => parent.Controls.Cast<Control>()
+                .Where(c => c.TabStop || c.Controls.Count > 0)
+                .GroupBy(c => c.TabIndex)
+                .Where(g => g.Count() > 1)
+                .Select(g => $"{parent.Name}: {string.Join(", ", g.Select(c => c.Name))} share {g.Key}"))
+            .ToList();
+
+        clashes.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [MemberData(nameof(Dialogs))]
+    public void Dialog_ButtonsUseThemeStyles(Type dialogType)
+    {
+        // R7.4: Theme.ApplyPrimaryButtonStyle / ApplySecondaryButtonStyle (or the danger/warning variant of primary).
+        Color[] themed = [Theme.Primary, Theme.SurfaceMuted, Theme.Danger, Theme.Warning];
+        using var dialog = (Form)TestUi.Create(dialogType);
+        var offenders = AllControls(dialog).OfType<Button>()
+            .Where(b => b.FlatStyle != FlatStyle.Flat || !themed.Any(c => c.ToArgb() == b.BackColor.ToArgb()))
+            .Select(b => $"{b.Name}: {b.FlatStyle} {b.BackColor}")
+            .ToList();
+
+        offenders.ShouldBeEmpty();
+    }
+
+    private static IEnumerable<Control> AllControls(Control root) =>
+        root.Controls.Cast<Control>().SelectMany(c => new[] { c }.Concat(AllControls(c)));
+
     [Fact]
     public void RtlFormBase_ShouldHaveCorrectRtlProperties()
     {

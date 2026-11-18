@@ -89,7 +89,9 @@ partial class IssueQrDialog
         
         // IssueQrDialog
         AutoScaleDimensions = new SizeF(96F, 96F);
+        AcceptButton = _btnPrint;
         AutoScaleMode = AutoScaleMode.Dpi;
+        CancelButton = _btnClose;
         BackColor = Theme.Surface;
         ClientSize = new Size(390, 435);
         Controls.Add(_btnPrint);

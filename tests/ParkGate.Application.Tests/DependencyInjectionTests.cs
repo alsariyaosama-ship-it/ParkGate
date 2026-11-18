@@ -105,7 +105,7 @@ public sealed class DependencyInjectionTests
                                      sd.ImplementationType == typeof(CardScanService) &&
                                      sd.Lifetime == ServiceLifetime.Transient);
 
-        services.ShouldContain(sd => sd.ServiceType == typeof(EntryCardIssuer) &&
+        services.ShouldContain(sd => sd.ServiceType == typeof(IEntryCardIssuer) &&
                                      sd.ImplementationType == typeof(EntryCardIssuer) &&
                                      sd.Lifetime == ServiceLifetime.Transient);
     }

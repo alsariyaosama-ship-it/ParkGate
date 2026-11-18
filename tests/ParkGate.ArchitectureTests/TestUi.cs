@@ -11,13 +11,15 @@ namespace ParkGate.ArchitectureTests;
 /// </summary>
 internal static class TestUi
 {
-    public static T Create<T>(params object[] services) where T : class
+    public static T Create<T>(params object[] services) where T : class => (T)Create(typeof(T), services);
+
+    public static object Create(Type type, params object[] services)
     {
-        var ctor = typeof(T).GetConstructors().Single();
+        var ctor = type.GetConstructors().Single();
         var args = ctor.GetParameters().Select(p => Resolve(p.ParameterType, services)).ToArray();
         try
         {
-            return (T)ctor.Invoke(args);
+            return ctor.Invoke(args);
         }
         catch (TargetInvocationException ex) when (ex.InnerException != null)
         {

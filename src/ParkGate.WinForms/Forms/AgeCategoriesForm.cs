@@ -59,6 +59,7 @@ public partial class AgeCategoriesForm : RtlFormBase
         _btnToggleActive.Text = Strings.Btn_Deactivate;
         _btnRefresh.Text = Strings.Btn_Refresh;
         _btnClose.Text = Strings.Btn_Close;
+        Theme.ApplySecondaryButtonStyle(_btnClose);
 
         _colName.HeaderText = Strings.Col_Age_Name;
         _colDescription.HeaderText = Strings.Col_Age_Description;
