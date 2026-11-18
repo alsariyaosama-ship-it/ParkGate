@@ -120,8 +120,8 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-**S35 (2026-11-18, `phase/r6-database`): R6.1, R6.2 and R6.12 done and pushed.** Entry-card tables are EF entities (migration `20261118130617_AdoptEntryCards`); initializer, view, procedures and `scripts/001_EntryCards.sql` removed; DB clock via mapped `SYSUTCDATETIME` (`DatabaseClock`). Tests: 743 green (202 domain, 218 application, 139 infrastructure incl. 52 integration, 184 architecture).
-**Blocked on Osama:** the dev databases `ParkGate` (SQLEXPRESS) and `ParkGate_Dev` (LocalDB) still hold the old raw-SQL entry-card objects (test data only), so `dotnet ef database update` fails until they are dropped. Next: R6.13 (optimistic concurrency), then R6.11, R6.3, R6.14.
+**S35 (2026-11-18, `phase/r6-database`): R6.1, R6.2, R6.12, R6.13, R6.14 done and pushed.** Entry-card tables are EF entities (migration `AdoptEntryCards`); the DB clock is a mapped `SYSUTCDATETIME`; optimistic concurrency with `ConcurrencyRetry` replaced `UPDLOCK` (migration `AddBeneficiaryLastGiftIssuedUtc`); `EfOnlyDataAccessTests` guards ADR-025. The three concurrency integration tests now call the real services. Tests: 755 green (207 domain, 222 application, 185 architecture, 141 infrastructure incl. 54 integration). Both dev databases (`ParkGate` on SQLEXPRESS, `ParkGate_Dev` on LocalDB) were cleaned of the old entry-card objects with Osama's approval (option A) and migrated. `ParkGate_Dev` on SQLEXPRESS is an old, unused copy and was not touched.
+**Next in R6:** R6.11 (management audit in the unit of work), R6.3 (audit columns from the DB clock), R6.4, R6.6, R6.8, R6.9, R6.10; R6.5 is blocked on Q-R6. Then open the R6 PR.
 
 1. PR #15 (R4) is open. Osama passed TC-14–TC-19 and TC-21 on the desk; **TC-20 (Cairo missing) is still untried**. TC-21's F7 gift override must be re-run on the fixed gift screen (R4.11/R4.12).
 2. Branch `docs/entry-identity` (pushed, no PR yet): ADR-024, SPEC F6/F7 recommendations, F8 design (BR-27..BR-29, DATABASE §3.13-3.14, ROADMAP Phase F8). Osama reviews it, then open its PR.
