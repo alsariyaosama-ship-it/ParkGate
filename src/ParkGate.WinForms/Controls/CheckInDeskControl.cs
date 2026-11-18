@@ -949,8 +949,12 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
-                    _notifyService.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
+                    // R5.2: no message box — the operator goes straight on to the holder panel.
                     await LookupCardAsync();
+                    if (_activeHolder is not null)
+                    {
+                        _statusBanner.SetStatus(_statusBanner.State, _statusBanner.Title, Strings.Ui_CheckInDesk_10);
+                    }
                 }
                 else
                 {

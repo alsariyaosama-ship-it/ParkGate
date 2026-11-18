@@ -216,7 +216,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
 - [x] R5.1 Show the remaining time on denial (SPEC A3)
-- [ ] R5.2 Banner instead of a message box after registration
+- [x] R5.2 Banner instead of a message box after registration
 - [ ] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
 - [ ] R5.4 Keyboard access to the companion counters
 - [ ] R5.5 Mark companion counts prefilled from the last visit

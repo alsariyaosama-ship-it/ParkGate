@@ -545,6 +545,37 @@ public sealed class CheckInDeskControlTests
     }
 
     [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_Success_SaysSoInTheBannerWithoutAMessageBox()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 2, OrganizationName: "صندوق التضامن", CardNumber: "560",
+            FullName: "سالم محمود علي الورفلي", Phone: "0912345678", NationalId: null,
+            CardExpiryDate: null, Status: BeneficiaryStatus.Active, StatusReason: null,
+            LastGrantedEntryUtc: null, Notes: null, CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var beneficiaries = new FakeBeneficiaryService { RegisterSucceedsWith = new BeneficiaryLookupResultDto(holder, eligibility, []) };
+        var notify = new FakeNotifyService(confirmAnswer: true);
+        var orgs = new FakeOrganizationService(
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries, orgs, notify);
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "560";
+
+        control.ShowInlineRegistration("560", orgId: 2);
+        await FillAndSaveRegistrationAsync(control);
+
+        notify.InfoCalls.ShouldBe(0);
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        banner.State.ShouldBe(BannerState.Granted);
+        banner.Details.ShouldBe(Strings.Ui_CheckInDesk_10);
+        GetField<GroupBox>(control, "_grpHolder").Visible.ShouldBeTrue();
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task CheckInDeskControl_InlineRegistration_PreselectsTheFilteredOrganization()
     {
         var (control, beneficiaries) = DeskWithTwoOrganizations();
@@ -1028,9 +1059,18 @@ public sealed class CheckInDeskControlTests
 
         public RegisterBeneficiaryRequest? LastRegisterRequest { get; private set; }
 
+        /// <summary>When set, registration succeeds and the holder is found on the next lookup.</summary>
+        public BeneficiaryLookupResultDto? RegisterSucceedsWith { get; set; }
+
         public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> RegisterAsync(RegisterBeneficiaryRequest request, CancellationToken cancellationToken = default)
         {
             LastRegisterRequest = request;
+            if (RegisterSucceedsWith is { } registered)
+            {
+                LookupReturnResult = [registered];
+                return Task.FromResult(ParkGate.Application.Common.Result.Success(registered.Beneficiary));
+            }
+
             return Task.FromResult(ParkGate.Application.Common.Result.Failure<BeneficiaryDto>(ParkGate.Application.Common.Errors.General.NotFound));
         }
 
@@ -1065,7 +1105,9 @@ public sealed class CheckInDeskControlTests
     {
         public int ConfirmCalls { get; private set; }
 
-        public void Info(string message, string? title = null) { }
+        public int InfoCalls { get; private set; }
+
+        public void Info(string message, string? title = null) => InfoCalls++;
         public void Warning(string message, string? title = null) { }
         public void Error(string message, string? title = null) { }
 

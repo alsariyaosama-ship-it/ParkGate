@@ -1750,9 +1750,6 @@
   <data name="Ui_CheckInDesk_10" xml:space="preserve">
     <value>تم تسجيل الزائر بنجاح.</value>
   </data>
-  <data name="Ui_CheckInDesk_11" xml:space="preserve">
-    <value>تم التسجيل</value>
-  </data>
   <data name="Ui_CheckInDesk_12" xml:space="preserve">
     <value>فشل التسجيل</value>
   </data>

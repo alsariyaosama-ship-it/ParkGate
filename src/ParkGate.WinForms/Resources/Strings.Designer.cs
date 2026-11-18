@@ -719,7 +719,6 @@ internal class Strings
     internal static string Ui_CheckInDesk_08 => GetString(nameof(Ui_CheckInDesk_08));
     internal static string Ui_CheckInDesk_09 => GetString(nameof(Ui_CheckInDesk_09));
     internal static string Ui_CheckInDesk_10 => GetString(nameof(Ui_CheckInDesk_10));
-    internal static string Ui_CheckInDesk_11 => GetString(nameof(Ui_CheckInDesk_11));
     internal static string Ui_CheckInDesk_12 => GetString(nameof(Ui_CheckInDesk_12));
     internal static string Ui_CheckInDesk_13 => GetString(nameof(Ui_CheckInDesk_13));
     internal static string Ui_CheckInDesk_14 => GetString(nameof(Ui_CheckInDesk_14));
