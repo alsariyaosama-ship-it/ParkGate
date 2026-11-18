@@ -75,6 +75,17 @@ public sealed partial class DatabaseDocumentationTests
         missing.ShouldBeEmpty();
     }
 
+    [Fact]
+    public void SeedData_ShouldNotSeedTheSoundKeyThatNothingReads()
+    {
+        // R6.15: the app reads and writes Entry.DenialSoundEnabled; the seeded Entry.PlaySoundOnDenial row was dead.
+        var seeded = Model.Value.FindEntityType(typeof(AppSetting))!.GetSeedData()
+            .Select(row => (string)row[nameof(AppSetting.Key)]!)
+            .ToList();
+
+        seeded.ShouldNotContain("Entry.PlaySoundOnDenial");
+    }
+
     private static Dictionary<string, HashSet<string>> ModelTables() =>
         Model.Value.GetEntityTypes()
             .Where(e => e.GetTableName() is not null && !e.IsOwned())

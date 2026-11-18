@@ -330,12 +330,11 @@ EF Core shape (Infrastructure):
 | `Entry.MaxGroupSize` | `10` | BR-07 (holder included) |
 | `Entry.DenialDedupMinutes` | `5` | BR-10 |
 | `Entry.PrefillCompanionsFromLastVisit` | `true` | §5.1 step 5 |
-| `Entry.PlaySoundOnDenial` | `true` | Seeded but never read: the app reads and writes `Entry.DenialSoundEnabled` (R6.15) |
-| `Entry.DenialSoundEnabled` | `true` (not seeded) | FR-CHK-08. Written on the first settings save |
+| `Entry.DenialSoundEnabled` | `true` (not seeded) | FR-CHK-08. Written on the first settings save. The old seed row `Entry.PlaySoundOnDenial` was never read and is deleted by migration `RemoveUnreadSoundSetting` (R6.15) |
 | `Security.MaxFailedLogins` | `5` | BR-18 |
 | `Security.LockoutMinutes` | `15` | BR-18 |
 | `Security.AutoLockMinutes` | `0` (not seeded) | Minutes of inactivity before the desk locks; 0 = never. Written on the first settings save |
-| `Ui.MaskNationalIdForOperators` | `true` | §8 Security |
+| `Ui.MaskNationalIdForOperators` | `true` | §8 Security. Seeded, but no code reads it yet (R6.16) |
 | `SyncAgent.LastHeartbeatUtc`, `SyncAgent.PendingCount`, `SyncAgent.FailedCount` | (not seeded) | Written by the sync agent's heartbeat; read by the admin status bar (R2.5) |
 | `CardPattern.MinSample` | `10` | F8, proposed, BR-29: cards needed before a pattern is proposed |
 | `CardPattern.NewSeriesThreshold` | `5` | F8, proposed, BR-29: alerts with one shape before it is proposed as a new series |

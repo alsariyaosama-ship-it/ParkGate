@@ -241,7 +241,8 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R6.12 Read the database clock through a mapped `SYSUTCDATETIME` function instead of SQL text
 - [x] R6.13 Optimistic concurrency on `Beneficiaries.RowVersion` replaces `UPDLOCK` (ADR-026); add `LastGiftIssuedUtc`
 - [x] R6.14 Architecture test: no raw SQL in `src/` except the backup command
-- [ ] R6.15 Seeded `Entry.PlaySoundOnDenial` is never read; the app uses `Entry.DenialSoundEnabled` (found in R6.4). Rename the seed in a new migration — needs Osama (renames data)
+- [x] R6.15 Remove the seeded `Entry.PlaySoundOnDenial` row that nothing reads (migration `RemoveUnreadSoundSetting`); the app uses `Entry.DenialSoundEnabled`
+- [ ] R6.16 `Ui.MaskNationalIdForOperators` is seeded but never read: check whether national IDs are masked for operators (SPEC §8) and wire the setting or remove it — needs Osama
 
 ### R7 — Wording and visual consistency · branch `phase/r7-consistency`
 - [ ] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b

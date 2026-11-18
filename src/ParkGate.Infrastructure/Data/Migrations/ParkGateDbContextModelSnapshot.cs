@@ -151,12 +151,6 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         },
                         new
                         {
-                            Key = "Entry.PlaySoundOnDenial",
-                            UpdatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Value = "true"
-                        },
-                        new
-                        {
                             Key = "Security.MaxFailedLogins",
                             UpdatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Value = "5"
