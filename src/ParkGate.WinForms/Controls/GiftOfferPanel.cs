@@ -214,7 +214,7 @@ public partial class GiftOfferPanel : UserControl
         var supervisorDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
                                new SupervisorAuthDialog(null, _currentUser);
 
-        supervisorDialog.SetContext(defaultReason: "تجاوز مدة انتظار الهدية استثنائياً");
+        supervisorDialog.SetContext(defaultReason: Strings.Ui_GiftOffer_01);
 
         if (supervisorDialog.ShowDialog(this.FindForm()) != DialogResult.OK)
         {

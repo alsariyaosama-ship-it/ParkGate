@@ -29,7 +29,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Consequences:** One extra lightweight query per check-in; correct results regardless of client clocks; cloud-ready timestamps.
 
 ### ADR-005 — Cooldown concurrency via row lock + denormalized `LastGrantedEntryUtc`
-- **Status:** Accepted
+- **Status:** Accepted; the row lock is superseded by ADR-026 when R6.13 ships (the denormalized `LastGrantedEntryUtc` stays)
 - **Context:** Two desks could check in the same holder at the same moment.
 - **Decision:** Transaction with `UPDLOCK, ROWLOCK` on the holder row, evaluate policy in Domain, insert attempt, update `LastGrantedEntryUtc`, commit (DATABASE.md §4).
 - **Consequences:** Business rule stays in C# and unit-testable; correctness guaranteed by the DB lock; an integration test guards it.
@@ -165,6 +165,22 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
   4. Mitigations (SPEC §9 F8): entry only on the organization's allowed weekdays (BR-27, gifts too, BR-28), and a non-blocking alert when a card number does not match the organization's usual numbering pattern (BR-29). A new numbering pattern is accepted only by an Admin, never automatically, so a forger cannot teach the system a forged pattern.
   5. Two stronger measures are recommendations to the park management and are not built: phone verification (SPEC §9 F6) and the organization's card-number list (SPEC §9 F7).
 - **Consequences:** F8 adds two columns to `Organizations`, two tables and two enum values (DATABASE.md §3.1, §3.13, §3.14). Staff noticing a card that does not look genuine stays the first line of defence.
+
+---
+
+### ADR-025 — Data access is EF Core only
+- **Status:** Accepted (Osama, 2026-11-18)
+- **Context:** The entry-card feature added raw-SQL tables, a view and stored procedures created at runtime, and a few repositories use SQL text. Two ways of defining the schema drift apart and need DDL rights on the app login.
+- **Decision:** All data access goes through EF Core LINQ and EF migrations. Forbidden in `src/`: `FromSql*`, `SqlQuery*`, `ExecuteSql*`, ADO `DbCommand`, stored procedures, views, and `migrationBuilder.Sql` in new migrations. Allowed: SQL fragments that are part of the EF model configuration (`HasDefaultValueSql`, `HasCheckConstraint`, `HasFilter`) and built-in functions mapped with `HasDbFunction`. The only runtime exception is the `BACKUP DATABASE` command in `DatabaseBackupService`, which EF cannot express. Migrations pushed before this decision stay unchanged. An architecture test enforces it (R6.14).
+- **Consequences:** R6.1 (entry cards), R6.12 (database clock) and R6.13 (row lock) remove the existing SQL. Existing entry-card data is test data and is not preserved.
+
+---
+
+### ADR-026 — Optimistic concurrency instead of the row lock
+- **Status:** Accepted (Osama, 2026-11-18); takes effect with R6.13
+- **Context:** ADR-005 serialises check-ins with `UPDLOCK, ROWLOCK`, which needs SQL text (ADR-025).
+- **Decision:** `Beneficiaries.RowVersion` is the concurrency token. Every grant updates `LastGrantedEntryUtc` and every gift issue updates the new `LastGiftIssuedUtc`, so two desks writing the same holder always conflict. The use case catches `DbUpdateConcurrencyException`, discards the unit of work and runs again from the start, at most 3 times; the retry sees the winner's write and is denied by the normal rules. After the last try it returns `General.ConcurrencyConflict`.
+- **Consequences:** No lock waits and no SQL. A losing desk does a second short round trip. The existing parallel check-in integration test stays the guard and must pass unchanged. DATABASE.md §4 is rewritten when R6.13 ships.
 
 ---
 

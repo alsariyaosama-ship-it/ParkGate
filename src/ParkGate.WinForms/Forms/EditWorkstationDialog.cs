@@ -94,7 +94,7 @@ public partial class EditWorkstationDialog : RtlFormBase
         var displayName = _txtDisplayName.Text.Trim();
         if (string.IsNullOrWhiteSpace(displayName))
         {
-            ShowWarning("الاسم التعريفي للمحطة مطلوب.");
+            ShowWarning(Strings.Ui_EditWorkstation_01);
             _txtDisplayName.Focus();
             return;
         }
@@ -122,7 +122,7 @@ public partial class EditWorkstationDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error updating workstation.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

@@ -44,7 +44,7 @@ public partial class VoidReasonDialog : RtlFormBase
 
     public void SetContext(string cardNumber, string holderName, string attemptTime, int totalPersons)
     {
-        _lblAttemptInfo.Text = $"العملية: بطاقة {cardNumber} · {holderName} · {attemptTime} · {totalPersons} أفراد";
+        _lblAttemptInfo.Text = string.Format(Strings.Ui_VoidReason_01, cardNumber, holderName, attemptTime, totalPersons);
         _txtReason.Focus();
     }
 
@@ -53,7 +53,7 @@ public partial class VoidReasonDialog : RtlFormBase
         var reason = _txtReason.Text.Trim();
         if (reason.Length < 5)
         {
-            var msg = "سبب الإلغاء مطلوب ويجب ألا يقل عن 5 أحرف.";
+            var msg = Strings.Ui_VoidReason_02;
             if (_notifyService != null)
             {
                 _notifyService.Warning(msg);

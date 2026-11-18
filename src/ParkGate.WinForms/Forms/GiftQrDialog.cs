@@ -223,7 +223,7 @@ public partial class GiftQrDialog : RtlFormBase
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Failed to print gift voucher receipt.");
-            _notifyService?.Error(string.Format(Strings.Msg_PrintFailed, ex.Message));
+            _notifyService?.Error(string.Format(Strings.Msg_PrintFailed, UserMessages.Describe(ex)));
         }
     }
 }

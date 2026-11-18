@@ -10,17 +10,34 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-14 |
-| Last session | S32 — Phase R3 complete (R3.1–R3.10); R3 PR opened |
-| Current phase | Phase R — Remediation (`docs/REMEDIATION_PLAN.md`). R0 (PR #11), R1 (PR #12), R2 (PR #13) merged. R3 done, PR open; R4 next |
-| Working branch | `phase/r3-application` (PR to `main` open, awaiting Osama's review) |
+| Last session | S34 — PR #15 opened; TC-14–TC-21 run by Osama (all passed except TC-20, Cairo, not yet tried); gift screen fixed (R4.11, R4.12) |
+| Current phase | Phase R — Remediation. R0–R2 merged (PR #11–#13). R3 PR #14 open. R4 code done on `phase/r4-desk-ui`, PR not opened yet |
+| Working branch | `phase/r4-desk-ui` (branched from `phase/r3-application`, because PR #14 was still open) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
-| .NET Unit tests | 662 passed: 202 domain + 218 application + 87 infrastructure + 155 architecture |
-| .NET Integration tests | 42 passed on LocalDB (S32) |
+| .NET Unit tests | 690 passed: 202 domain + 218 application + 87 infrastructure + 183 architecture |
+| .NET Integration tests | 42 passed on LocalDB (S32; R4 did not touch Infrastructure) |
 | Web tests | `php artisan test` (PHP 8.4): 96 passed on SQLite and on MySQL 8 strict mode (no web change in S32) |
-| Total tests | 800 (704 .NET + 96 web), all green |
+| Total tests | 828 (732 .NET + 96 web), all green |
 | Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (no migration in S32). Applied on LocalDB and on SQLEXPRESS |
 
 ## State of the work
+
+**Completed in S33 (on `phase/r4-desk-ui`), one commit per task, each test-first:**
+
+- R4.1 `BusyScope` restores each control's previous state; `UpdateActionButtons()` is the one place that decides
+  record/override.
+- R4.3 Registration panel has a required organization combo (`_cmbRegOrganization`), preselected: filter, else default.
+- R4.4 Card only in another organization: amber «البطاقة مسجلة لدى جهة: X»; a second Enter switches the filter and loads it.
+- R4.5 Esc asks before discarding a half-filled registration; with an open dropdown it only closes the list.
+- R4.6 New designer-backed `SelectOrganizationDialog`; cancelling picks nobody (neutral banner).
+- R4.9 No invented age categories: a load failure blocks recording and the next lookup retries.
+- R4.7 `UserMessages.Describe/LogAndDescribe`: no `ex.Message` anywhere in WinForms (architecture test).
+- R4.2 Desk is freed right after a granted entry; a scan during the 1.2 s banner is kept; lookups are queued.
+  **Deviation (needs Osama):** text typed by hand without Enter during the banner is kept but not looked up.
+- R4.8 117 Arabic literals moved to `Strings.resx` (new keys `Ui_<Class>_<NN>`; R7.1 may rename them). Architecture
+  test fails on Arabic in non-designer, non-comment WinForms code.
+- R4.10 `AppFont.IsCairoInstalled` + `FontInstallWarning`: log always, show admins once per run.
+- `docs/TEST_SCRIPT.md`: TC-14 to TC-21 (R4 flows and R3.2 supervisor tokens).
 
 **Completed in S32 (on `phase/r3-application`), one commit per task, each test-first:**
 
@@ -103,12 +120,14 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. The R3 PR is open. If Osama merged it, branch `phase/r4-desk-ui` from `main`; otherwise wait or continue R4 on a
-   branch from `phase/r3-application` and say so. Baseline first (AGENTS.md §1.1).
-2. R4 (desk UI defects). R4.4 should use `CardLookupDto.RegisteredElsewhere` (R3.8). R4.8 moves the Arabic literals;
-   the ones touched in R3 (`SupervisorAuthDialog`, `CheckInDeskControl`) were not moved.
-3. Line endings (see S27 log): renormalize `IssueQrDialog.cs` and the `w/mixed` files in a dedicated `chore` commit.
-   Edit files with `newline=''` in Python: text mode turns CRLF into LF (happened in S32, fixed by re-checkout).
+1. PR #15 (R4) is open. Osama passed TC-14–TC-19 and TC-21 on the desk; **TC-20 (Cairo missing) is still untried**. TC-21's F7 gift override must be re-run on the fixed gift screen (R4.11/R4.12).
+2. Branch `docs/entry-identity` (pushed, no PR yet): ADR-024, SPEC F6/F7 recommendations, F8 design (BR-27..BR-29, DATABASE §3.13-3.14, ROADMAP Phase F8). Osama reviews it, then open its PR.
+3. Agreed session order after PR #15 is merged (review 2026-11-18): **R6** (database: entry-card tables into migrations, DB-clock audit columns, R6.11 audit in the unit of work) -> **R7.6-R7.9** (UI-layer conformance: no Infrastructure in WinForms, Notify only, Dpi everywhere, no null-service fallbacks) -> **R5** (desk UX, with R7.10 split of `CheckInDeskControl` first) -> rest of **R7** -> **R8** (release) -> **F8** (only on Osama's go-ahead) -> **R9** (docs last). Reason: F8 adds a migration and organization fields, so the schema conventions (R6) and the UI layer (R7) should be settled first.
+   Gift decisions confirmed 2026-11-18: the interval starts when the voucher is issued, and the gift voucher stays a separate QR slip (current F5 behaviour, no change).
+4. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
+   hangs the test host. Use synchronous fakes or a seam (`SuccessDelay`, `ChooseOrganizationOverride`), and run
+   `dotnet test` with `timeout`.
+5. Edit files with byte-level Python (or the Edit tool); text mode turns CRLF into LF.
 
 Carried over from S25 (do it when a printer is available; it does not block Phase R):
 - Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
@@ -132,12 +151,31 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
   workgroup/domain, R6.5), Q-R7 (lowest desk resolution, R5.8).
 - **Approve ADR-022** (gift token excluded from the cloud) **and ADR-023** (single-use supervisor approval tokens).
 - **Confirm the one-minute settings cache** (R3.6): a setting saved on one desk reaches the others within a minute.
+- **Confirm the R4.2 deviation:** a card number typed by hand during the success banner is not looked up until Enter.
+- **Run the manual test script** (TC-01 to TC-21); R4 is not done until it passes.
 - Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
 
 ---
 
 ## Session Log (last 10 sessions)
 
+### S34 — 2026-11-15 — PR #15, manual tests, gift screen fix
+
+- Merged `main` (PR #14) into `phase/r4-desk-ui`, opened PR #15, ticked R0, R1 and R2.7 in the remediation plan, ignored VS-generated `.resx` files.
+- Osama ran TC-14–TC-21; the F7 step of TC-21 could not run because the gift screen rendered broken.
+- R4.11: `GiftRedeemControl` had `AutoScaleDimensions` 7x17 with `AutoScaleMode.Dpi` (sizes multiplied by about 7). Fixed to 96x96; new `DesignerScalingTests` guards every designer.
+- R4.12: the scan row overlapped on wide windows; now a `TableLayoutPanel`. Both verified by rendering the control headless (before: one huge button; after: correct rows).
+- R4.13: Osama reported the gift panel and the registration buttons clipped on the desk. Cause: `GiftOfferPanel` in Font scaling mode inside a Dpi parent, and too little height for the registration group. Fixed and verified by rendering at 1920x890 and 1366x640. Gifts are disabled for every organization in the dev databases (`GiftEnabled = 0`), which is why the offer panel never showed; enable it per organization in Management > Organizations.
+- Tests: 691 unit/architecture, 42 integration, all green. Tip: if the app is running it locks `bin\`; build with `--artifacts-path artifacts/verify` (git-ignored).
+
+### S33 — 2026-11-14 — Phase R4 code complete
+- PR #14 was still open, so `phase/r4-desk-ui` was branched from `phase/r3-application` (handoff option).
+- Order: R4.1, R4.3, R4.4, R4.5, R4.6, R4.9, R4.7, R4.2, R4.8, R4.10, then TEST_SCRIPT TC-14..TC-21.
+- Two test hangs: `Task.Yield`/`Task.Delay` continuations touched controls owned by the test thread. Fixed with seams.
+- A heredoc with Arabic and quotes broke Bash parsing once; files with Arabic are written with the Write tool now.
+- Line endings: 18 working files with `eol=crlf` were LF or mixed (the S27 item included); re-checked out, no commit
+  needed because the blobs were already LF. Helper scripts `addstr.py` and `extract_arabic.py` live in the scratchpad only.
+- Test counts: architecture 155 → 183 (unit 662 → 690). No Application or Infrastructure change.
 ### S32 — 2026-11-14 — Phase R3 complete
 - Baseline green. Did R3.1, R3.3, R3.4, R3.5, R3.6, R3.7, R3.9, R3.10, R3.8, R3.2 in that order, one commit each.
 - R3.10 (EntryCardIssuer client clock) was found in R3.7 and added to the roadmap before doing it.
@@ -226,11 +264,4 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Commits:
   - `fix(winforms): fix print dialog combase crash and font rendering on qr card print`
 - All 588 unit/arch tests pass (100% green).
-
-### S24 — 2026-11-05 — Database migration on SQLEXPRESS & Beneficiaries Window Fix
-- Applied pending migration `20261102125339_AddGiftVouchersAndCompanionLimit` on SQLEXPRESS instance.
-- Fixed `BeneficiariesControl` row tag lifecycle and selection event handling to ensure customer details populate and buttons enable.
-- Commits:
-  - `fix(winforms): ensure beneficiary details populate and buttons enable on grid load`
-- All 588 unit/arch tests and 34 integration tests pass (100% green).
 

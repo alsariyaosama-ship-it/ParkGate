@@ -139,14 +139,14 @@ public partial class EditOrganizationDialog : RtlFormBase
 
         if (string.IsNullOrWhiteSpace(code))
         {
-            ShowWarning("رمز الجهة مطلوب.");
+            ShowWarning(Strings.Ui_EditOrganization_01);
             _txtCode.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(nameAr))
         {
-            ShowWarning("اسم الجهة بالعربية مطلوب.");
+            ShowWarning(Strings.Ui_EditOrganization_02);
             _txtNameAr.Focus();
             return;
         }
@@ -222,7 +222,7 @@ public partial class EditOrganizationDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error saving organization.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

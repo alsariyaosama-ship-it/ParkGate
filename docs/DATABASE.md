@@ -290,6 +290,8 @@ EF Core shape (Infrastructure):
 
 **Void recalculation (BR-13):** in one transaction, lock the holder row, mark the attempt voided, then set `LastGrantedEntryUtc = MAX(AttemptedAtUtc)` over that holder's non-voided `Allowed/Overridden` attempts (NULL if none).
 
+**Planned change (R6.13, ADR-026):** the `UPDLOCK` read is replaced by optimistic concurrency on `Beneficiaries.RowVersion` with up to 3 retries, `Beneficiaries.LastGiftIssuedUtc` is added for gifts, and the database clock is read through a mapped `SYSUTCDATETIME` function (R6.12). This section is rewritten when R6.13 ships; until then the steps above describe the code.
+
 ## 5. Settings keys and defaults (seeded)
 
 | Key | Default | Meaning |

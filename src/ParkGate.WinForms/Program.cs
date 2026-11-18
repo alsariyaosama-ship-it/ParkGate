@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ParkGate.WinForms.Common;
+using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
 using Serilog;
 using WinFormsApp = System.Windows.Forms.Application;
@@ -109,8 +110,8 @@ internal static class Program
         Log.Error(exception, "Unhandled exception captured in {Source}", source);
 
         MessageBox.Show(
-            "حدث خطأ غير متوقع في النظام. تم تسجيل تفاصيل الخطأ في ملف السجل.",
-            "خطأ في النظام",
+            Strings.Msg_UnexpectedError,
+            Strings.Ui_Program_01,
             MessageBoxButtons.OK,
             MessageBoxIcon.Error,
             MessageBoxDefaultButton.Button1,
@@ -120,8 +121,8 @@ internal static class Program
     private static void ShowFatalErrorMessage(Exception exception)
     {
         MessageBox.Show(
-            $"تعذر بدء تشغيل البرنامج:\n{exception.Message}",
-            "خطأ حرج",
+            $"{Strings.Msg_StartupFailed}{Environment.NewLine}{UserMessages.Describe(exception)}",
+            Strings.Ui_Program_02,
             MessageBoxButtons.OK,
             MessageBoxIcon.Stop,
             MessageBoxDefaultButton.Button1,

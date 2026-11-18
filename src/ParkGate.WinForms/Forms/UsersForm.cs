@@ -150,7 +150,7 @@ public partial class UsersForm : RtlFormBase
             };
 
             var statusText = user.IsActive ? Strings.Status_Active : Strings.Status_Inactive;
-            var mustChangePassText = user.MustChangePassword ? "نعم" : "لا";
+            var mustChangePassText = user.MustChangePassword ? Strings.Ui_AgeCategories_01 : Strings.Ui_AgeCategories_02;
 
             var lastLoginText = user.LastLoginUtc.HasValue
                 ? DateTimeDisplayHelper.FormatDateTime(DateTimeDisplayHelper.ToParkLocalTime(user.LastLoginUtc.Value, _timeZoneId))
@@ -180,7 +180,7 @@ public partial class UsersForm : RtlFormBase
         _gridUsers.ResumeLayout(true);
         var activeCount = list.Count(u => u.IsActive);
         var inactiveCount = list.Count - activeCount;
-        _lblCount.Text = $"إجمالي المستخدمين: {list.Count} (نشط: {activeCount} | معطل: {inactiveCount})";
+        _lblCount.Text = string.Format(Strings.Ui_Users_01, list.Count, activeCount, inactiveCount);
 
         if (_gridUsers.Rows.Count > 0)
         {

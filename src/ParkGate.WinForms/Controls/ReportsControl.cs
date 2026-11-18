@@ -330,7 +330,7 @@ public partial class ReportsControl : UserControl
         _btnRunReport.Enabled = !isBusy;
         _btnExportExcel.Enabled = !isBusy;
         _btnPrintPreview.Enabled = !isBusy;
-        _lblStatus.Text = isBusy ? "جاري استخراج بيانات التقرير..." : string.Empty;
+        _lblStatus.Text = isBusy ? Strings.Ui_Reports_01 : string.Empty;
     }
 
     // 1. Daily Summary
@@ -366,8 +366,8 @@ public partial class ReportsControl : UserControl
 
         // Populate Categories grid
         _gridDailyCategories.Columns.Clear();
-        _gridDailyCategories.Columns.Add("CategoryName", "الفئة العمرية");
-        _gridDailyCategories.Columns.Add("Count", "عدد المرافقين");
+        _gridDailyCategories.Columns.Add("CategoryName", Strings.Ui_Reports_02);
+        _gridDailyCategories.Columns.Add("Count", Strings.Ui_Reports_03);
         _gridDailyCategories.Rows.Clear();
 
         foreach (var cat in report.AgeCategoryBreakdown)
@@ -496,7 +496,7 @@ public partial class ReportsControl : UserControl
         }
 
         _lblDateRangeTotals.Text = string.Format(
-            "الإجمالي العام: {0:N0} زيارة مقبولة | {1:N0} زبون | {2:N0} مرافق | {3:N0} إجمالي الأفراد | {4:N0} محاولة مرفوضة | {5:N0} ملغاة",
+            Strings.Ui_Reports_04,
             report.Totals.TotalVisits,
             report.Totals.TotalHolders,
             report.Totals.TotalCompanions,
@@ -563,7 +563,7 @@ public partial class ReportsControl : UserControl
         }
 
         _lblOrgStatsTotals.Text = string.Format(
-            "الإجمالي: {0:N0} زيارة مقبولة | {1:N0} مستفيد فريد | {2:N0} مرافق | {3:N0} إجمالي الأفراد المستفيدين (تمثل {4} من زوار الحديقة)",
+            Strings.Ui_Reports_05,
             report.Totals.TotalVisits,
             report.Totals.UniqueBeneficiariesCount,
             report.Totals.TotalCompanions,
@@ -675,7 +675,7 @@ public partial class ReportsControl : UserControl
         foreach (var item in report.Items)
         {
             var localTime = DateTimeDisplayHelper.ToParkLocalTime(item.AttemptedAtUtc, _timeZoneId);
-            var resultText = item.Result == EntryResult.Denied ? "مرفوض" : "استثناء";
+            var resultText = item.Result == EntryResult.Denied ? Strings.Banner_Denied : Strings.Col_Overridden;
             var reasonText = item.DenialReason.HasValue ? GetDenialReasonArabic(item.DenialReason.Value) : "-";
 
             var rowIdx = _gridDenials.Rows.Add(
@@ -702,7 +702,7 @@ public partial class ReportsControl : UserControl
             }
         }
 
-        _lblDenialsCount.Text = $"إجمالي السجلات المعروضة: {report.Items.Count:N0}";
+        _lblDenialsCount.Text = string.Format(Strings.Ui_Reports_06, report.Items.Count);
     }
 
     // 6. Hourly Distribution
@@ -742,7 +742,7 @@ public partial class ReportsControl : UserControl
         }
 
         _lblHourlyTotals.Text = string.Format(
-            "الإجمالي: {0:N0} زيارة | {1:N0} فرد | متوسط حجم المجموعة: {2:F1}",
+            Strings.Ui_Reports_07,
             report.TotalVisits,
             report.TotalPersons,
             report.TotalVisits > 0 ? (double)report.TotalPersons / report.TotalVisits : 0.0);
@@ -821,7 +821,7 @@ public partial class ReportsControl : UserControl
         {
             Filter = "Excel Workbooks (*.xlsx)|*.xlsx",
             FileName = defaultFileName,
-            Title = "تصدير التقرير إلى Excel"
+            Title = Strings.Ui_Reports_08
         };
 
         if (sfd.ShowDialog(this) == DialogResult.OK)
@@ -834,7 +834,7 @@ public partial class ReportsControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to save exported excel file.");
-                _notifyService?.Error("تعذر حفظ ملف Excel. تحقق من صلاحيات المجلد أو عدم فتح الملف في برنامج آخر.");
+                _notifyService?.Error(Strings.Ui_Reports_09);
             }
         }
     }
@@ -862,7 +862,7 @@ public partial class ReportsControl : UserControl
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Error opening print preview.");
-            _notifyService?.Error("تعذر فتح معاينة الطباعة.");
+            _notifyService?.Error(Strings.Ui_Reports_10);
         }
     }
 
@@ -892,10 +892,10 @@ public partial class ReportsControl : UserControl
         y += 35;
 
         // Subtitle / Date range
-        string sub = $"الفترة: {_dtpFromDate.Value:dd/MM/yyyy} إلى {_dtpToDate.Value:dd/MM/yyyy}";
+        string sub = string.Format(Strings.Ui_Reports_11, _dtpFromDate.Value, _dtpToDate.Value);
         if (_cboOrganization.SelectedItem is ComboBoxItem<int?> orgItem && orgItem.Value.HasValue)
         {
-            sub += $" | الجهة: {orgItem.Text}";
+            sub += string.Format(Strings.Ui_Reports_12, orgItem.Text);
         }
         g.DrawString(sub, fontSubtitle, Brushes.DarkSlateGray, new RectangleF(left, y, width, 22), sfCenter);
         y += 30;
@@ -918,7 +918,7 @@ public partial class ReportsControl : UserControl
 
         if (gridToPrint == null || gridToPrint.Rows.Count == 0)
         {
-            g.DrawString("لا توجد بيانات متاحة في هذا التقرير.", fontSubtitle, Brushes.Gray, new RectangleF(left, y, width, 30), sfCenter);
+            g.DrawString(Strings.Ui_Reports_13, fontSubtitle, Brushes.Gray, new RectangleF(left, y, width, 30), sfCenter);
             return;
         }
 
@@ -961,16 +961,16 @@ public partial class ReportsControl : UserControl
 
         // Footer note
         y += 15;
-        g.DrawString($"طُبع من منظومة ParkGate بتاريخ {DateTime.Now:dd/MM/yyyy hh:mm tt}", fontSubtitle, Brushes.Gray, new RectangleF(left, y, width, 20), sfCenter);
+        g.DrawString(string.Format(Strings.Ui_Reports_14, DateTime.Now), fontSubtitle, Brushes.Gray, new RectangleF(left, y, width, 20), sfCenter);
     }
 
     private static string GetDenialReasonArabic(DenialReason reason) => reason switch
     {
-        DenialReason.HolderBlocked => "المستفيد محظور",
-        DenialReason.HolderSuspended => "المستفيد موقوف",
-        DenialReason.CardExpired => "البطاقة منتهية الصلاحية",
-        DenialReason.OrganizationInactive => "الجهة غير نشطة",
-        DenialReason.CooldownActive => "فترة التهدئة نشطة (سبق الدخول)",
+        DenialReason.HolderBlocked => Strings.Ui_Reports_15,
+        DenialReason.HolderSuspended => Strings.Ui_Reports_16,
+        DenialReason.CardExpired => Strings.Ui_Reports_17,
+        DenialReason.OrganizationInactive => Strings.Ui_Reports_18,
+        DenialReason.CooldownActive => Strings.Denial_CooldownActive,
         _ => reason.ToString()
     };
 

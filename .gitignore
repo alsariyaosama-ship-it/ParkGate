@@ -75,3 +75,8 @@ artifacts/
 
 # Graphify knowledge graph
 graphify-out/
+
+# Empty .resx files Visual Studio creates when a form is opened in the designer.
+# Already tracked .resx files stay tracked; Resources/Strings.resx is not matched.
+src/ParkGate.WinForms/Forms/*.resx
+src/ParkGate.WinForms/Controls/*.resx

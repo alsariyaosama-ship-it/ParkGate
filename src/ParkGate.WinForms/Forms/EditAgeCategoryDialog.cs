@@ -87,7 +87,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
 
         if (string.IsNullOrWhiteSpace(nameAr))
         {
-            ShowWarning("اسم الفئة العمرية مطلوب.");
+            ShowWarning(Strings.Ui_EditAgeCategory_01);
             _txtNameAr.Focus();
             return;
         }
@@ -133,7 +133,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error saving age category.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

@@ -133,14 +133,14 @@ public partial class OrganizationsForm : RtlFormBase
         foreach (var org in list)
         {
             var cooldownText = org.CooldownMinutes.HasValue
-                ? $"{org.CooldownMinutes.Value / 60} ساعة"
-                : "افتراضي";
+                ? string.Format(Strings.Ui_Organizations_01, org.CooldownMinutes.Value / 60)
+                : Strings.Ui_Organizations_02;
 
             var maxCompanionsText = org.MaxFreeCompanions.HasValue
                 ? org.MaxFreeCompanions.Value.ToString()
                 : "-";
 
-            var giftEnabledText = org.GiftEnabled ? "مفعلة" : "معطلة";
+            var giftEnabledText = org.GiftEnabled ? Strings.Ui_Organizations_03 : Strings.Ui_Organizations_04;
 
             var giftValueText = org.GiftEnabled
                 ? $"{org.GiftValue:0.###} {Strings.Unit_Currency}"
@@ -150,7 +150,7 @@ public partial class OrganizationsForm : RtlFormBase
                 ? $"{org.GiftIntervalDays} {Strings.Unit_Days}"
                 : "-";
 
-            var defaultText = org.IsDefault ? "نعم" : "لا";
+            var defaultText = org.IsDefault ? Strings.Ui_AgeCategories_01 : Strings.Ui_AgeCategories_02;
             var statusText = org.IsActive ? Strings.Status_Active : Strings.Status_Inactive;
 
             var rowIndex = _gridOrganizations.Rows.Add(
@@ -180,7 +180,7 @@ public partial class OrganizationsForm : RtlFormBase
         _gridOrganizations.ResumeLayout(true);
         var activeCount = list.Count(c => c.IsActive);
         var inactiveCount = list.Count - activeCount;
-        _lblCount.Text = $"إجمالي الجهات: {list.Count}  (النشطة: {activeCount} | المعطلة: {inactiveCount})";
+        _lblCount.Text = string.Format(Strings.Ui_Organizations_05, list.Count, activeCount, inactiveCount);
 
         if (_gridOrganizations.Rows.Count > 0)
         {

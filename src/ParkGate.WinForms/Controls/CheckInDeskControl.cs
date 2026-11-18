@@ -47,11 +47,21 @@ public partial class CheckInDeskControl : UserControl
     private readonly ToolStripMenuItem _menuVoidToday = new();
     private BeneficiaryDto? _activeHolder;
     private EligibilityPreviewDto? _activeEligibility;
+    private bool _companionsBlockEntry;
+    private bool _ageCategoriesUnavailable;
+
+    // R4.4: the card last reported as registered under other organizations, so a second Enter can load it there.
+    private string? _registeredElsewhereCard;
+    private IReadOnlyList<int> _registeredElsewhereOrgIds = [];
     private int _maxGroupSize = 10;
     private bool _prefillFromLastVisit;
     private bool _denialSoundEnabled;
     private string? _timeZoneId = "Libya Standard Time";
     private bool _isSearching;
+
+    // R4.2: a lookup asked for while one runs is queued; the counter tells the success delay a lookup happened.
+    private bool _lookupQueued;
+    private int _lookupCount;
 
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -122,6 +132,7 @@ public partial class CheckInDeskControl : UserControl
 
         // Inline Registration
         _grpRegistration.Text = Strings.Title_InlineRegistration;
+        _lblRegOrganization.Text = Strings.Label_RegOrganization;
         _lblRegFullName.Text = Strings.Label_RegFullName;
         _lblRegPhone.Text = Strings.Label_RegPhone;
         _lblRegNationalId.Text = Strings.Label_RegNationalId;
@@ -279,11 +290,38 @@ public partial class CheckInDeskControl : UserControl
                 break;
 
             case Keys.Escape:
+                if (_cmbOrganization.DroppedDown || _cmbRegOrganization.DroppedDown)
+                {
+                    // Esc closes the open list; it must not also reset the desk (R4.5).
+                    break;
+                }
+
+                if (!ConfirmDiscardRegistration())
+                {
+                    return true;
+                }
+
                 ResetDesk();
                 return true;
         }
 
         return base.ProcessCmdKey(ref msg, keyData);
+    }
+
+    /// <summary>
+    /// True when nothing would be lost, or the operator agreed to discard a half-filled registration (R4.5).
+    /// Without a notify service nothing is discarded.
+    /// </summary>
+    private bool ConfirmDiscardRegistration()
+    {
+        var hasInput = _grpRegistration.Visible &&
+            (!string.IsNullOrWhiteSpace(_txtRegFullName.Text) ||
+             !string.IsNullOrWhiteSpace(_txtRegPhone.Text) ||
+             !string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ||
+             !string.IsNullOrWhiteSpace(_txtRegNotes.Text) ||
+             _dtpRegExpiry.Checked);
+
+        return !hasInput || (_notifyService?.Confirm(Strings.Confirm_DiscardRegistration, Strings.Title_Warning) ?? false);
     }
 
     public async Task OnDeskLoadedAsync()
@@ -340,9 +378,12 @@ public partial class CheckInDeskControl : UserControl
             _cmbOrganization.Items.Clear();
             _cmbOrganization.Items.Add(new OrgComboItem(null, Strings.Filter_AllOrganizations));
 
+            // The registration panel offers real organizations only, never «الكل» (R4.3).
+            _cmbRegOrganization.Items.Clear();
             foreach (var org in orgs)
             {
                 _cmbOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
+                _cmbRegOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
             }
 
             _cmbOrganization.SelectedIndex = 0;
@@ -357,37 +398,24 @@ public partial class CheckInDeskControl : UserControl
     {
         if (_ageCategoryService == null)
         {
-            CreateDefaultAgeCategories();
             return;
         }
 
         try
         {
-            var categories = await _ageCategoryService.GetActiveAsync();
-            if (categories.Count == 0)
-            {
-                CreateDefaultAgeCategories();
-            }
-            else
-            {
-                PopulateAgeCategories(categories);
-            }
+            // No categories configured is valid: the holder enters alone. Never invent categories (R4.9).
+            PopulateAgeCategories(await _ageCategoryService.GetActiveAsync());
+            _ageCategoriesUnavailable = false;
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load age categories. Using defaults.");
-            CreateDefaultAgeCategories();
+            _logger?.LogWarning(ex, "Failed to load age categories. Recording is disabled until they load.");
+            PopulateAgeCategories([]);
+            _ageCategoriesUnavailable = true;
+            _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_AgeCategoriesUnavailable);
         }
-    }
 
-    private void CreateDefaultAgeCategories()
-    {
-        PopulateAgeCategories(
-        [
-            new AgeCategoryDto(1, "بالغ", "12 سنة فما فوق", 1, true),
-            new AgeCategoryDto(2, "طفل", "من 3 إلى 12 سنة", 2, true),
-            new AgeCategoryDto(3, "رضيع", "أقل من 3 سنوات", 3, true, IsCompanionLimitExempt: true)
-        ]);
+        UpdateActionButtons();
     }
 
     public void PopulateAgeCategories(IReadOnlyList<AgeCategoryDto> categories)
@@ -481,17 +509,16 @@ public partial class CheckInDeskControl : UserControl
             _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
         }
 
+        _companionsBlockEntry = totalPersons > _maxGroupSize || limitExceeded;
+        UpdateActionButtons();
+
         if (totalPersons > _maxGroupSize)
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorDenied;
-            _btnRecordEntry.Enabled = false;
-            _btnOverride.Enabled = false;
         }
         else if (limitExceeded)
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorDenied;
-            _btnRecordEntry.Enabled = false;
-            _btnOverride.Enabled = false;
             _statusBanner.SetWarning(
                 string.Format(Strings.Error_FreeCompanionsExceededBanner, maxFreeLimit),
                 Strings.Error_CheckIn_ExceedsFreeCompanionLimit);
@@ -499,9 +526,18 @@ public partial class CheckInDeskControl : UserControl
         else
         {
             _lblTotalPersons.ForeColor = StatusBanner.ColorGranted;
-            _btnRecordEntry.Enabled = _activeHolder != null && (_activeEligibility?.IsEligible ?? false);
-            _btnOverride.Enabled = _activeHolder != null && (_activeEligibility != null && !_activeEligibility.IsEligible && _activeEligibility.CanBeOverridden);
         }
+    }
+
+    /// <summary>
+    /// The one place that decides whether «تسجيل الدخول» and «تجاوز المشرف» are available: a holder is shown, the
+    /// companions fit the limits, and the eligibility allows it. Called after every operation (R4.1).
+    /// </summary>
+    private void UpdateActionButtons()
+    {
+        var holderShown = _activeHolder != null && _activeEligibility != null && !_companionsBlockEntry && !_ageCategoriesUnavailable;
+        _btnRecordEntry.Enabled = holderShown && _activeEligibility!.IsEligible;
+        _btnOverride.Enabled = holderShown && !_activeEligibility!.IsEligible && _activeEligibility.CanBeOverridden;
     }
 
     public void ResetDesk()
@@ -606,7 +642,7 @@ public partial class CheckInDeskControl : UserControl
                 _statusBanner.SetGranted(
                     message: Strings.Banner_Granted,
                     details: holder.LastGrantedEntryUtc.HasValue
-                        ? $"آخر دخول: {DateTimeDisplayHelper.FormatDateTime(DateTimeDisplayHelper.ToParkLocalTime(holder.LastGrantedEntryUtc.Value, _timeZoneId))}"
+                        ? string.Format(Strings.Ui_CheckInDesk_01, DateTimeDisplayHelper.FormatDateTime(DateTimeDisplayHelper.ToParkLocalTime(holder.LastGrantedEntryUtc.Value, _timeZoneId)))
                         : null);
 
                 _btnRecordEntry.Enabled = true;
@@ -625,7 +661,7 @@ public partial class CheckInDeskControl : UserControl
                 if (eligibility.NextAllowedEntryUtc.HasValue)
                 {
                     var nextLocal = DateTimeDisplayHelper.ToParkLocalTime(eligibility.NextAllowedEntryUtc.Value, _timeZoneId);
-                    details = $"يسمح بالدخول بعد: {DateTimeDisplayHelper.FormatDateTime(nextLocal)} (فترة الانتظار: {eligibility.EffectiveCooldownMinutes / 60} ساعة)";
+                    details = string.Format(Strings.Ui_CheckInDesk_02, DateTimeDisplayHelper.FormatDateTime(nextLocal), eligibility.EffectiveCooldownMinutes / 60);
                 }
 
                 _statusBanner.SetDenied(reasonText, details);
@@ -659,12 +695,33 @@ public partial class CheckInDeskControl : UserControl
         _txtRegNationalId.Clear();
         _dtpRegExpiry.Checked = false;
         _txtRegNotes.Clear();
+        SelectRegistrationOrganization(orgId ?? (_cmbOrganization.SelectedItem as OrgComboItem)?.Id);
 
-        _statusBanner.SetWarning("البطاقة غير مسجلة — يرجى تسجيل بيانات المستفيد", "أدخل الاسم الرباعي ورقم الهاتف للمتابعة");
+        _statusBanner.SetWarning(Strings.Ui_CheckInDesk_03, Strings.Ui_CheckInDesk_04);
         _btnRecordEntry.Enabled = false;
         _btnOverride.Enabled = false;
 
         _txtRegFullName.Focus();
+    }
+
+    /// <summary>
+    /// Preselects the organization for a new holder: the one asked for (the filter), else the default organization.
+    /// Leaves it empty when neither exists, so the operator must choose (R4.3).
+    /// </summary>
+    private void SelectRegistrationOrganization(int? preferredOrgId)
+    {
+        var targetId = preferredOrgId ?? _organizations.FirstOrDefault(o => o.IsDefault)?.Id;
+        var match = _cmbRegOrganization.Items.OfType<OrgComboItem>().FirstOrDefault(i => i.Id == targetId);
+        _cmbRegOrganization.SelectedItem = match;
+    }
+
+    private void SelectFilterOrganization(int? orgId)
+    {
+        var item = _cmbOrganization.Items.OfType<OrgComboItem>().FirstOrDefault(i => i.Id == orgId);
+        if (item != null)
+        {
+            _cmbOrganization.SelectedItem = item;
+        }
     }
 
     public void HideInlineRegistration()
@@ -678,7 +735,7 @@ public partial class CheckInDeskControl : UserControl
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
         if (string.IsNullOrWhiteSpace(card))
         {
-            _notifyService?.Warning("يرجى إدخال رقم البطاقة أولاً لتسجيل زبون جديد.", "تنبيه");
+            _notifyService?.Warning(Strings.Ui_CheckInDesk_05, Strings.Title_Warning);
             FocusCardNumberBox();
             return;
         }
@@ -690,10 +747,23 @@ public partial class CheckInDeskControl : UserControl
     {
         if (_isSearching)
         {
+            // R4.2: a scan that arrives during a lookup is looked up right after it, not dropped.
+            _lookupQueued = true;
             return;
         }
 
+        do
+        {
+            _lookupQueued = false;
+            await LookupCardOnceAsync();
+        }
+        while (_lookupQueued);
+    }
+
+    private async Task LookupCardOnceAsync()
+    {
         _isSearching = true;
+        _lookupCount++;
         try
         {
             var rawCard = _txtCardNumber.Text;
@@ -703,7 +773,7 @@ public partial class CheckInDeskControl : UserControl
             if (string.IsNullOrWhiteSpace(normalized))
             {
                 ClearPreviousHolderData();
-                _statusBanner.SetWarning("يرجى إدخال أو مسح رقم البطاقة", null);
+                _statusBanner.SetWarning(Strings.Ui_CheckInDesk_06, null);
                 FocusCardNumberBox();
                 return;
             }
@@ -711,6 +781,17 @@ public partial class CheckInDeskControl : UserControl
             // Always clear previous customer data and reset banner when initiating a new search
             ClearPreviousHolderData();
             _statusBanner.Reset();
+
+            if (_ageCategoriesUnavailable)
+            {
+                // R4.9: retry the companion categories before showing a holder; on failure the banner says so.
+                await LoadAgeCategoriesAsync();
+                if (_ageCategoriesUnavailable)
+                {
+                    FocusCardNumberBox();
+                    return;
+                }
+            }
 
         // 1. Check if scanned input is a signed QR token (203 digits per QrTokenFormat.DigitLength)
         if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength && _cardScanService != null)
@@ -722,7 +803,7 @@ public partial class CheckInDeskControl : UserControl
                     var scanResult = await _cardScanService.ScanAsync(normalized);
                     if (!scanResult.IsAccepted)
                     {
-                        _statusBanner.SetDenied(scanResult.MessageAr, "رمز QR غير صالح أو ملغى");
+                        _statusBanner.SetDenied(scanResult.MessageAr, Strings.Ui_CheckInDesk_07);
                         if (_denialSoundEnabled)
                         {
                             System.Media.SystemSounds.Exclamation.Play();
@@ -751,7 +832,7 @@ public partial class CheckInDeskControl : UserControl
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Error scanning QR card token.");
-                    _statusBanner.SetDenied("حدث خطأ أثناء فحص رمز QR: " + ex.Message);
+                    _statusBanner.SetDenied(Strings.Banner_QrScanFailed, UserMessages.Describe(ex));
                     FocusCardNumberBox();
                     return;
                 }
@@ -767,6 +848,15 @@ public partial class CheckInDeskControl : UserControl
         {
             try
             {
+                if (_registeredElsewhereCard == normalized && _registeredElsewhereOrgIds.Count > 0)
+                {
+                    // Second Enter on the same card: follow it to its organization (several: «الكل», then choose).
+                    SelectFilterOrganization(_registeredElsewhereOrgIds.Count == 1 ? _registeredElsewhereOrgIds[0] : null);
+                }
+
+                _registeredElsewhereCard = null;
+                _registeredElsewhereOrgIds = [];
+
                 var selectedOrgId = (_cmbOrganization.SelectedItem as OrgComboItem)?.Id;
                 var lookupResult = await _beneficiaryService.LookupByCardNumberAsync(normalized, selectedOrgId);
 
@@ -779,6 +869,19 @@ public partial class CheckInDeskControl : UserControl
 
                 // The organization filter is applied by the service (R3.8). RegisteredElsewhere is shown by R4.4.
                 var matches = lookupResult.Value.Matches;
+
+                if (matches.Count == 0 && lookupResult.Value.RegisteredElsewhere.Count > 0)
+                {
+                    // R4.4: not "unregistered" — it belongs to another organization. Registration stays on F2.
+                    var elsewhere = lookupResult.Value.RegisteredElsewhere;
+                    _registeredElsewhereCard = normalized;
+                    _registeredElsewhereOrgIds = elsewhere.Select(o => o.Id).ToList();
+                    _statusBanner.SetWarning(
+                        string.Format(Strings.Banner_CardRegisteredElsewhere, string.Join(Strings.Text_ListSeparator, elsewhere.Select(o => o.NameAr))),
+                        Strings.Banner_CardRegisteredElsewhereHint);
+                    FocusCardNumberBox();
+                    return;
+                }
 
                 if (matches.Count == 0)
                 {
@@ -794,8 +897,16 @@ public partial class CheckInDeskControl : UserControl
                 }
                 else
                 {
-                    // Flow A2: Card found in multiple organizations
-                    matched = DisambiguateOrganization(matches) ?? matches[0];
+                    // Flow A2: Card found in multiple organizations. Cancelling picks nobody (R4.6).
+                    var chosen = DisambiguateOrganization(matches);
+                    if (chosen is null)
+                    {
+                        _statusBanner.Reset(Strings.Banner_OrganizationNotChosen);
+                        FocusCardNumberBox();
+                        return;
+                    }
+
+                    matched = chosen;
                 }
 
                 ShowHolderInfo(matched.Beneficiary, matched.Eligibility);
@@ -808,7 +919,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error occurred during card lookup.");
-                _statusBanner.SetDenied("تعذّر الاتصال بقاعدة البيانات", "يرجى التحقق من الاتصال بالخادم والمحاولة مرة أخرى.");
+                _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_ConnectionRetryHint);
                 FocusCardNumberBox();
             }
         }
@@ -824,58 +935,51 @@ public partial class CheckInDeskControl : UserControl
     }
 }
 
+    /// <summary>Test seam for the success delay; production waits <see cref="AutoResetDelayMs"/> milliseconds.</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    internal Func<int, Task> SuccessDelay { get; set; } = milliseconds => Task.Delay(milliseconds);
+
+    /// <summary>
+    /// After a granted entry: free the desk at once and keep the success banner for the delay. A card scanned during
+    /// the delay is looked up as usual and is not wiped when the delay ends (R4.2). A negative delay keeps the desk.
+    /// </summary>
+    private async Task FinishSuccessfulEntryAsync()
+    {
+        if (AutoResetDelayMs < 0)
+        {
+            return;
+        }
+
+        var lookupsBefore = _lookupCount;
+        ClearPreviousHolderData();
+        _txtCardNumber.Clear();
+        FocusCardNumberBox();
+
+        if (AutoResetDelayMs > 0)
+        {
+            await SuccessDelay(AutoResetDelayMs);
+        }
+
+        if (_lookupCount == lookupsBefore && _statusBanner.State == BannerState.Granted)
+        {
+            _statusBanner.Reset();
+        }
+    }
+
+    /// <summary>Test seam: replaces the chooser dialog. Returns null for "cancelled".</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    internal Func<IReadOnlyList<BeneficiaryLookupResultDto>, BeneficiaryLookupResultDto?>? ChooseOrganizationOverride { get; set; }
+
     private BeneficiaryLookupResultDto? DisambiguateOrganization(IReadOnlyList<BeneficiaryLookupResultDto> matches)
     {
-        // Simple prompt or selection
-        using var form = new RtlFormBase
+        if (ChooseOrganizationOverride != null)
         {
-            Text = Strings.Title_SelectOrganization,
-            Width = 400,
-            Height = 250,
-            StartPosition = FormStartPosition.CenterParent,
-            FormBorderStyle = FormBorderStyle.FixedDialog,
-            MaximizeBox = false,
-            MinimizeBox = false
-        };
-
-        var lbl = new Label
-        {
-            Text = Strings.Header_SelectOrganization,
-            Dock = DockStyle.Top,
-            Height = 40,
-            Padding = new Padding(8)
-        };
-
-        var list = new ListBox
-        {
-            Dock = DockStyle.Fill,
-            Font = new Font("Cairo", 10.5F)
-        };
-
-        foreach (var m in matches)
-        {
-            list.Items.Add($"{m.Beneficiary.OrganizationName} — {m.Beneficiary.FullName}");
+            return ChooseOrganizationOverride(matches);
         }
-        list.SelectedIndex = 0;
 
-        var btn = new Button
-        {
-            Text = Strings.Btn_SelectOrg,
-            Dock = DockStyle.Bottom,
-            Height = 40,
-            BackColor = StatusBanner.ColorGranted,
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat
-        };
-        btn.Click += (_, _) => form.DialogResult = DialogResult.OK;
-
-        form.Controls.Add(list);
-        form.Controls.Add(btn);
-        form.Controls.Add(lbl);
-
-        return form.ShowDialog(this) == DialogResult.OK && list.SelectedIndex >= 0
-            ? matches[list.SelectedIndex]
-            : matches[0];
+        using var dialog = _formFactory?.Create<SelectOrganizationDialog>() ?? new SelectOrganizationDialog();
+        dialog.SetMatches(matches);
+        return dialog.ShowDialog(this) == DialogResult.OK ? dialog.SelectedMatch : null;
     }
 
     private void PrefillCompanions(IReadOnlyList<CompanionCountDto> companions)
@@ -890,23 +994,30 @@ public partial class CheckInDeskControl : UserControl
         }
     }
 
-    private async Task SaveInlineRegistrationAsync()
+    internal async Task SaveInlineRegistrationAsync()
     {
         var fullName = _txtRegFullName.Text.Trim();
         var phone = _txtRegPhone.Text.Trim();
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
-        var selectedOrgId = (_cmbOrganization.SelectedItem as OrgComboItem)?.Id;
+        var registrationOrgId = (_cmbRegOrganization.SelectedItem as OrgComboItem)?.Id;
+
+        if (registrationOrgId is null)
+        {
+            _notifyService?.Warning(Strings.Val_RegOrganizationRequired, Strings.Title_Warning);
+            _cmbRegOrganization.Focus();
+            return;
+        }
 
         if (string.IsNullOrWhiteSpace(fullName))
         {
-            _notifyService?.Warning("الاسم الرباعي مطلوب.", "تنبيه");
+            _notifyService?.Warning(Strings.Ui_CheckInDesk_08, Strings.Title_Warning);
             _txtRegFullName.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(phone))
         {
-            _notifyService?.Warning("رقم الهاتف مطلوب.", "تنبيه");
+            _notifyService?.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
             _txtRegPhone.Focus();
             return;
         }
@@ -920,16 +1031,7 @@ public partial class CheckInDeskControl : UserControl
         {
             try
             {
-                int orgId;
-                if (selectedOrgId.HasValue)
-                {
-                    orgId = selectedOrgId.Value;
-                }
-                else
-                {
-                    var orgs = await _orgService?.GetAllAsync(activeOnly: true)!;
-                    orgId = orgs?.FirstOrDefault()?.Id ?? 1;
-                }
+                var orgId = registrationOrgId.Value;
 
                 DateOnly? expiry = _dtpRegExpiry.Checked ? DateOnly.FromDateTime(_dtpRegExpiry.Value) : null;
                 var natId = string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ? null : _txtRegNationalId.Text.Trim();
@@ -947,18 +1049,18 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
-                    _notifyService?.Info("تم تسجيل الزبون بنجاح.", "تم التسجيل");
+                    _notifyService?.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
                     await LookupCardAsync();
                 }
                 else
                 {
-                    _notifyService?.Error(ErrorMessages.GetMessage(regResult.Error), "فشل التسجيل");
+                    _notifyService?.Error(ErrorMessages.GetMessage(regResult.Error), Strings.Ui_CheckInDesk_12);
                 }
             }
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to register beneficiary.");
-                _notifyService?.Error(ex.Message, "خطأ في التسجيل");
+                _notifyService?.Error(UserMessages.Describe(ex), Strings.Title_Error);
             }
         }
     }
@@ -987,18 +1089,10 @@ public partial class CheckInDeskControl : UserControl
                 var result = await _checkInService.RecordEntryAsync(request);
                 if (result.IsSuccess)
                 {
-                    _statusBanner.SetGranted("تم تسجيل الدخول بنجاح!", $"المرافقون: {companions.Sum(c => c.Count)} · الإجمالي: {result.Value.TotalPersons} فرد");
+                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_13, string.Format(Strings.Ui_CheckInDesk_14, companions.Sum(c => c.Count), result.Value.TotalPersons));
                     await RefreshTodayDeskSummaryAsync();
 
-                    if (AutoResetDelayMs > 0)
-                    {
-                        await Task.Delay(AutoResetDelayMs);
-                    }
-
-                    if (AutoResetDelayMs >= 0)
-                    {
-                        ResetDesk();
-                    }
+                    await FinishSuccessfulEntryAsync();
                 }
                 else
                 {
@@ -1012,9 +1106,11 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error recording entry.");
-                _statusBanner.SetDenied("فشل تسجيل الدخول", "حدث خطأ غير متوقع أثناء معالجة العملية.");
+                _statusBanner.SetDenied(Strings.Ui_CheckInDesk_15, Strings.Ui_CheckInDesk_16);
             }
         }
+
+        UpdateActionButtons();
     }
 
     public async Task OverrideEntryAsync()
@@ -1027,7 +1123,7 @@ public partial class CheckInDeskControl : UserControl
         var supervisorDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
                                new SupervisorAuthDialog(null, _currentUser);
 
-        supervisorDialog.SetContext(defaultReason: "تجاوز فترة الانتظار استثنائياً");
+        supervisorDialog.SetContext(defaultReason: Strings.Ui_CheckInDesk_17);
 
         if (supervisorDialog.ShowDialog(this) != DialogResult.OK)
         {
@@ -1053,18 +1149,10 @@ public partial class CheckInDeskControl : UserControl
                 var result = await _checkInService.OverrideEntryAsync(request);
                 if (result.IsSuccess)
                 {
-                    _statusBanner.SetGranted("تم تسجيل الدخول بموافقة المشرف (تجاوز)", $"المشرف: {supervisorDialog.SupervisorFullName} · السبب: {supervisorDialog.Reason}");
+                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_18, string.Format(Strings.Ui_CheckInDesk_19, supervisorDialog.SupervisorFullName, supervisorDialog.Reason));
                     await RefreshTodayDeskSummaryAsync();
 
-                    if (AutoResetDelayMs > 0)
-                    {
-                        await Task.Delay(AutoResetDelayMs);
-                    }
-
-                    if (AutoResetDelayMs >= 0)
-                    {
-                        ResetDesk();
-                    }
+                    await FinishSuccessfulEntryAsync();
                 }
                 else
                 {
@@ -1074,18 +1162,20 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error performing override.");
-                _statusBanner.SetDenied("فشل التجاوز", "حدث خطأ غير متوقع أثناء معالجة التجاوز.");
+                _statusBanner.SetDenied(Strings.Ui_CheckInDesk_20, Strings.Ui_CheckInDesk_21);
             }
         }
+
+        UpdateActionButtons();
     }
 
     private static string GetDenialReasonArabic(DenialReason reason) => reason switch
     {
-        DenialReason.CooldownActive => "فترة التهدئة نشطة (سبق الدخول)",
-        DenialReason.CardExpired => "صلاحية البطاقة منتهية",
-        DenialReason.HolderSuspended => "حساب الزبون موقوف مؤقتاً",
-        DenialReason.HolderBlocked => "حساب الزبون محظور",
-        DenialReason.OrganizationInactive => "الجهة الراعية غير نشطة",
+        DenialReason.CooldownActive => Strings.Denial_CooldownActive,
+        DenialReason.CardExpired => Strings.Denial_CardExpired,
+        DenialReason.HolderSuspended => Strings.Denial_HolderSuspended,
+        DenialReason.HolderBlocked => Strings.Denial_HolderBlocked,
+        DenialReason.OrganizationInactive => Strings.Denial_OrganizationInactive,
         _ => Strings.Banner_Denied
     };
 
@@ -1219,7 +1309,7 @@ public partial class CheckInDeskControl : UserControl
             var authDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
                              new SupervisorAuthDialog(null, _currentUser);
 
-            authDialog.SetContext(defaultReason: "إلغاء عملية دخول مسجلة خطأً");
+            authDialog.SetContext(defaultReason: Strings.Ui_Beneficiaries_09);
 
             if (authDialog.ShowDialog(this) != DialogResult.OK)
             {
@@ -1317,7 +1407,7 @@ public partial class CheckInDeskControl : UserControl
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error voiding today entry.");
-                var msg = Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message;
+                var msg = UserMessages.Describe(ex);
                 if (_notifyService != null)
                 {
                     _notifyService.Error(msg);

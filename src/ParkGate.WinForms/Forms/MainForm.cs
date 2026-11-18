@@ -381,6 +381,21 @@ public partial class MainForm : RtlFormBase
         _reportsControl.SelectReportTab(tabIndex);
     }
 
+    private void WarnIfCairoNotInstalled()
+    {
+        var warning = FontInstallWarning.ForThisProcess;
+        if (!warning.IsMissing)
+        {
+            return;
+        }
+
+        _logger?.LogWarning("Cairo is not installed for GDI+; designer fonts fall back to the default font. Install it with the installer or scripts/install-cairo-font.ps1.");
+        if (warning.ShouldNotify(_currentUser?.IsInRole(UserRole.Admin) ?? false))
+        {
+            _notifyService?.Warning(Strings.Msg_CairoNotInstalled, Strings.Title_Warning);
+        }
+    }
+
     private async Task OnMainFormLoadedAsync()
     {
         try
@@ -402,6 +417,7 @@ public partial class MainForm : RtlFormBase
 
         await SyncServerTimeAsync();
         UpdateLiveClockDisplay();
+        WarnIfCairoNotInstalled();
 
         _clockTimer.Start();
         _syncTimer.Start();
@@ -730,7 +746,7 @@ public partial class MainForm : RtlFormBase
 
         if (_databaseBackupService == null)
         {
-            _notifyService?.Error("خدمة النسخ الاحتياطي غير متوفرة.");
+            _notifyService?.Error(Strings.Ui_Main_01);
             return;
         }
 
@@ -753,7 +769,7 @@ public partial class MainForm : RtlFormBase
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Unexpected error during database backup.");
-            _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, ex.Message), Strings.App_Title);
+            _notifyService?.Error(string.Format(Strings.Msg_BackupFailed, UserMessages.Describe(ex)), Strings.App_Title);
         }
         finally
         {

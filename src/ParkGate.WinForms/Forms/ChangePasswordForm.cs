@@ -86,7 +86,7 @@ public partial class ChangePasswordForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            Notify.Error(ex.Message, Strings.Title_Error, this);
+            Notify.Error(UserMessages.LogAndDescribe(ex, "Change password"), Strings.Title_Error, this);
         }
         finally
         {

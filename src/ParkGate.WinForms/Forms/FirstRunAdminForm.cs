@@ -72,7 +72,7 @@ public partial class FirstRunAdminForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            Notify.Error(ex.Message, Strings.Title_Error, this);
+            Notify.Error(UserMessages.LogAndDescribe(ex, "First-run admin setup"), Strings.Title_Error, this);
         }
         finally
         {

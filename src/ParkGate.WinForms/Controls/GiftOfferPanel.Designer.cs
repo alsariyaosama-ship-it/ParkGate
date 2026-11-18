@@ -42,7 +42,7 @@ partial class GiftOfferPanel
         this._grpMain.Name = "_grpMain";
         this._grpMain.Padding = new System.Windows.Forms.Padding(8, 4, 8, 4);
         this._grpMain.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this._grpMain.Size = new System.Drawing.Size(988, 70);
+        this._grpMain.Size = new System.Drawing.Size(988, 84);
         this._grpMain.TabIndex = 0;
         this._grpMain.TabStop = false;
         this._grpMain.Text = "قسيمة هدية الألعاب";
@@ -147,13 +147,13 @@ partial class GiftOfferPanel
         // 
         // GiftOfferPanel
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.Controls.Add(this._grpMain);
         this.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.Name = "GiftOfferPanel";
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this.Size = new System.Drawing.Size(988, 70);
+        this.Size = new System.Drawing.Size(988, 84);
         this._grpMain.ResumeLayout(false);
         this._tblContent.ResumeLayout(false);
         this._tblContent.PerformLayout();

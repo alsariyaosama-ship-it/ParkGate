@@ -176,7 +176,7 @@ public partial class GiftRedeemControl : UserControl
 
         if (_giftVoucherService == null)
         {
-            _statusBanner.SetDenied("خدمة قسائم الهدايا غير متصلة", null);
+            _statusBanner.SetDenied(Strings.Ui_GiftRedeem_01, null);
             return;
         }
 
