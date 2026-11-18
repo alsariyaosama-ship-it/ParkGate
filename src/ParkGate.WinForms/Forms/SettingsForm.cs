@@ -48,6 +48,7 @@ public partial class SettingsForm : RtlFormBase
         _lblDenialDedupMinutes.Text = Strings.Label_DenialDedupMinutes;
         _chkPrefillCompanions.Text = Strings.Label_PrefillCompanions;
         _chkDenialSound.Text = Strings.Label_DenialSound;
+        _chkSuccessSound.Text = Strings.Label_SuccessSound;
 
         _tabSecurity.Text = Strings.Tab_SecuritySettings;
         _lblMaxFailedLogins.Text = Strings.Label_MaxFailedLogins;
@@ -82,6 +83,7 @@ public partial class SettingsForm : RtlFormBase
             _numDenialDedupMinutes.Value = Math.Max(1, Math.Min(60, s.DenialDedupMinutes));
             _chkPrefillCompanions.Checked = s.PrefillCompanionsFromLastVisit;
             _chkDenialSound.Checked = s.DenialSoundEnabled;
+            _chkSuccessSound.Checked = s.SuccessSoundEnabled;
 
             _numMaxFailedLogins.Value = Math.Max(3, Math.Min(20, s.MaxFailedLogins));
             _numLockoutMinutes.Value = Math.Max(1, Math.Min(120, s.LockoutMinutes));
@@ -132,7 +134,8 @@ public partial class SettingsForm : RtlFormBase
             lockoutMinutes,
             autoLockMinutes,
             parkName,
-            timeZoneId);
+            timeZoneId,
+            SuccessSoundEnabled: _chkSuccessSound.Checked);
 
         using (new BusyScope(this, _btnSave, _btnReload))
         {

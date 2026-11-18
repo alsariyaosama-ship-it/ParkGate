@@ -478,6 +478,7 @@ internal class Strings
     internal static string Label_MaxGroupSize => GetString(nameof(Label_MaxGroupSize));
     internal static string Label_DenialDedupMinutes => GetString(nameof(Label_DenialDedupMinutes));
     internal static string Label_PrefillCompanions => GetString(nameof(Label_PrefillCompanions));
+    internal static string Label_SuccessSound => GetString(nameof(Label_SuccessSound));
     internal static string Label_DenialSound => GetString(nameof(Label_DenialSound));
     internal static string Label_MaxFailedLogins => GetString(nameof(Label_MaxFailedLogins));
     internal static string Label_LockoutMinutes => GetString(nameof(Label_LockoutMinutes));

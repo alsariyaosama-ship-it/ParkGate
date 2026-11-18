@@ -56,6 +56,8 @@ public partial class CheckInDeskControl : UserControl
     private bool _companionsPrefilled; // R5.5: counts came from the last visit and nobody has touched them yet
     private bool _isPrefilling;
     private bool _denialSoundEnabled;
+    private bool _successSoundEnabled;
+    private readonly IDeskSounds _deskSounds;
     private string? _timeZoneId = "Libya Standard Time";
     private bool _isSearching;
 
@@ -80,7 +82,8 @@ public partial class CheckInDeskControl : UserControl
         ILogger<CheckInDeskControl> logger,
         ParkGate.Application.EntryCards.ICardScanService cardScanService,
         IGiftVoucherService giftVoucherService,
-        ILogger<GiftOfferPanel> giftPanelLogger)
+        ILogger<GiftOfferPanel> giftPanelLogger,
+        IDeskSounds deskSounds)
     {
         InitializeComponent();
 
@@ -93,6 +96,7 @@ public partial class CheckInDeskControl : UserControl
         _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
         _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
         _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _deskSounds = deskSounds ?? throw new ArgumentNullException(nameof(deskSounds));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _cardScanService = cardScanService ?? throw new ArgumentNullException(nameof(cardScanService));
         _giftVoucherService = giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService));
@@ -308,6 +312,7 @@ public partial class CheckInDeskControl : UserControl
             _maxGroupSize = settings.MaxGroupSize;
             _prefillFromLastVisit = settings.PrefillCompanionsFromLastVisit;
             _denialSoundEnabled = settings.DenialSoundEnabled;
+            _successSoundEnabled = settings.SuccessSoundEnabled;
             _timeZoneId = settings.TimeZoneId;
             _giftPanel.SetTimeZone(_timeZoneId);
         }
@@ -400,6 +405,23 @@ public partial class CheckInDeskControl : UserControl
     }
 
     private const int MaxCounterShortcut = 9;
+
+    // R5.7: each cue has its own setting (Entry.SuccessSoundEnabled, Entry.DenialSoundEnabled).
+    private void PlayGrantedSound()
+    {
+        if (_successSoundEnabled)
+        {
+            _deskSounds.PlayGranted();
+        }
+    }
+
+    private void PlayDeniedSound()
+    {
+        if (_denialSoundEnabled)
+        {
+            _deskSounds.PlayDenied();
+        }
+    }
 
     /// <summary>Enter in a counter records the entry when it may be recorded (same rule as F5).</summary>
     private async Task RecordEntryFromCounterAsync()
@@ -658,10 +680,7 @@ public partial class CheckInDeskControl : UserControl
                 _btnRecordEntry.Enabled = false;
                 _btnOverride.Enabled = eligibility.CanBeOverridden;
 
-                if (_denialSoundEnabled)
-                {
-                    System.Media.SystemSounds.Exclamation.Play();
-                }
+                PlayDeniedSound();
             }
         }
         else
@@ -788,10 +807,7 @@ public partial class CheckInDeskControl : UserControl
                     if (!scanResult.IsAccepted)
                     {
                         _statusBanner.SetDenied(scanResult.MessageAr, Strings.Ui_CheckInDesk_07);
-                        if (_denialSoundEnabled)
-                        {
-                            System.Media.SystemSounds.Exclamation.Play();
-                        }
+                        PlayDeniedSound();
                         FocusCardNumberBox();
                         return;
                     }
@@ -1088,15 +1104,13 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted(Strings.Ui_CheckInDesk_13, string.Format(Strings.Ui_CheckInDesk_14, companions.Sum(c => c.Count), result.Value.TotalPersons));
                     await RefreshTodayDeskSummaryAsync();
 
+                    PlayGrantedSound();
                     await FinishSuccessfulEntryAsync(entered);
                 }
                 else
                 {
                     _statusBanner.SetDenied(ErrorMessages.GetMessage(result.Error));
-                    if (_denialSoundEnabled)
-                    {
-                        System.Media.SystemSounds.Hand.Play();
-                    }
+                    PlayDeniedSound();
                 }
             }
             catch (Exception ex)
@@ -1149,6 +1163,7 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted(Strings.Ui_CheckInDesk_18, string.Format(Strings.Ui_CheckInDesk_19, supervisorDialog.SupervisorFullName, supervisorDialog.Reason));
                     await RefreshTodayDeskSummaryAsync();
 
+                    PlayGrantedSound();
                     await FinishSuccessfulEntryAsync(entered);
                 }
                 else

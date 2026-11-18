@@ -36,6 +36,7 @@ partial class SettingsForm
         _numDenialDedupMinutes = new NumericUpDown();
         _chkPrefillCompanions = new CheckBox();
         _chkDenialSound = new CheckBox();
+        _chkSuccessSound = new CheckBox();
         _tabSecurity = new TabPage();
         _tblSecurity = new TableLayoutPanel();
         _lblMaxFailedLogins = new Label();
@@ -191,16 +192,18 @@ partial class SettingsForm
         _tblEntry.Controls.Add(_numDenialDedupMinutes, 1, 2);
         _tblEntry.Controls.Add(_chkPrefillCompanions, 0, 3);
         _tblEntry.Controls.Add(_chkDenialSound, 0, 4);
+        _tblEntry.Controls.Add(_chkSuccessSound, 0, 5);
         _tblEntry.Dock = DockStyle.Top;
         _tblEntry.Location = new Point(12, 12);
         _tblEntry.Name = "_tblEntry";
-        _tblEntry.RowCount = 5;
+        _tblEntry.RowCount = 6;
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
-        _tblEntry.Size = new Size(618, 190);
+        _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
+        _tblEntry.Size = new Size(618, 228);
         _tblEntry.TabIndex = 0;
         // 
         // _lblCooldownHours
@@ -289,6 +292,18 @@ partial class SettingsForm
         _chkDenialSound.TabIndex = 7;
         _chkDenialSound.Text = "تشغيل تنبيه صوتي عند رفض الدخول";
         _chkDenialSound.UseVisualStyleBackColor = true;
+        // 
+        // _chkSuccessSound
+        // 
+        _chkSuccessSound.Anchor = AnchorStyles.Left;
+        _chkSuccessSound.AutoSize = true;
+        _tblEntry.SetColumnSpan(_chkSuccessSound, 2);
+        _chkSuccessSound.Location = new Point(329, 193);
+        _chkSuccessSound.Name = "_chkSuccessSound";
+        _chkSuccessSound.Size = new Size(286, 32);
+        _chkSuccessSound.TabIndex = 8;
+        _chkSuccessSound.Text = "تشغيل تنبيه صوتي عند قبول الدخول";
+        _chkSuccessSound.UseVisualStyleBackColor = true;
         // 
         // _tabSecurity
         // 
@@ -499,6 +514,7 @@ partial class SettingsForm
     private System.Windows.Forms.NumericUpDown _numDenialDedupMinutes;
     private System.Windows.Forms.CheckBox _chkPrefillCompanions;
     private System.Windows.Forms.CheckBox _chkDenialSound;
+    private System.Windows.Forms.CheckBox _chkSuccessSound;
     private System.Windows.Forms.TabPage _tabSecurity;
     private System.Windows.Forms.TableLayoutPanel _tblSecurity;
     private System.Windows.Forms.Label _lblMaxFailedLogins;

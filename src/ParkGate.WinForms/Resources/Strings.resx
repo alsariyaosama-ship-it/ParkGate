@@ -1105,6 +1105,9 @@
   <data name="Label_PrefillCompanions" xml:space="preserve">
     <value>تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للزائر</value>
   </data>
+  <data name="Label_SuccessSound" xml:space="preserve">
+    <value>تشغيل تنبيه صوتي عند قبول الدخول</value>
+  </data>
   <data name="Label_DenialSound" xml:space="preserve">
     <value>تشغيل تنبيه صوتي عند رفض الدخول</value>
   </data>

@@ -70,7 +70,8 @@ public sealed class SettingsService : ISettingsService
                 LockoutMinutes: GetInt(dict, "Security.LockoutMinutes", 15),
                 AutoLockMinutes: GetInt(dict, "Security.AutoLockMinutes", 0),
                 ParkName: GetString(dict, "Park.Name", "صندوق التضامن الاجتماعي — متنزه العائلة"),
-                TimeZoneId: GetString(dict, "Park.TimeZoneId", "Libya Standard Time")
+                TimeZoneId: GetString(dict, "Park.TimeZoneId", "Libya Standard Time"),
+                SuccessSoundEnabled: GetBool(dict, "Entry.SuccessSoundEnabled", true)
             );
 
             _cached = new CachedSettings(settings, _timeProvider.GetUtcNow());
@@ -114,6 +115,7 @@ public sealed class SettingsService : ISettingsService
             ("Entry.DenialDedupMinutes", request.DenialDedupMinutes.ToString(CultureInfo.InvariantCulture)),
             ("Entry.PrefillCompanionsFromLastVisit", request.PrefillCompanionsFromLastVisit.ToString()),
             ("Entry.DenialSoundEnabled", request.DenialSoundEnabled.ToString()),
+            ("Entry.SuccessSoundEnabled", request.SuccessSoundEnabled.ToString()),
             ("Security.MaxFailedLogins", request.MaxFailedLogins.ToString(CultureInfo.InvariantCulture)),
             ("Security.LockoutMinutes", request.LockoutMinutes.ToString(CultureInfo.InvariantCulture)),
             ("Security.AutoLockMinutes", request.AutoLockMinutes.ToString(CultureInfo.InvariantCulture)),

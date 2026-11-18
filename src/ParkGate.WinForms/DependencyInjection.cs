@@ -30,6 +30,7 @@ public static class DependencyInjection
 
         // 4. WinForms presentation services & forms (Transient per AGENTS.md §4.5)
         services.AddSingleton<INotifyService, NotifyService>();
+        services.AddSingleton<IDeskSounds, DeskSounds>();
         services.AddSingleton<IFormFactory, FormFactory>();
         services.AddTransient<IStartupCoordinator, StartupCoordinator>();
 
