@@ -32,7 +32,13 @@ public sealed class RollingIntervalGiftEligibilityPolicy : IGiftEligibilityPolic
             return GiftEligibilityDecision.Denied(GiftDenialReason.HolderSuspended);
         }
 
-        // 5. Interval check
+        // 5. The gift goes with today's visit: no entry today, no gift, and a supervisor cannot override it.
+        if (!context.HasEntryToday)
+        {
+            return GiftEligibilityDecision.Denied(GiftDenialReason.NoEntryToday);
+        }
+
+        // 6. Interval check
         if (context.LastGiftIssuedUtc.HasValue)
         {
             var nextEligibleAtUtc = context.LastGiftIssuedUtc.Value.AddDays(context.GiftIntervalDays);

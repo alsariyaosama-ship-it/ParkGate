@@ -75,6 +75,13 @@ public sealed class GiftVoucherServiceTests : IDisposable
             PhoneNumber.Create("0912345678"));
         _beneficiaries.Add(_holder);
 
+        // A gift needs a granted entry today (owner, 2026-11-18). The main holder entered on every day the
+        // tests move the clock to; tests of the rule itself use a holder who did not enter.
+        for (var day = new DateOnly(2026, 9, 25); day <= new DateOnly(2026, 11, 30); day = day.AddDays(1))
+        {
+            _attempts.Add(Granted(_holder, day));
+        }
+
         _settings.Add(new Domain.Entities.AppSetting("Park.TimeZoneId", "Libya Standard Time", DateTime.UtcNow, null));
 
         _uowFactory = new FakeUnitOfWorkFactory(
@@ -99,6 +106,76 @@ public sealed class GiftVoucherServiceTests : IDisposable
     }
 
     // ── Eligibility ─────────────────────────────────────────────────────────
+
+    private EntryAttempt Granted(Beneficiary holder, DateOnly businessDate, bool voided = false)
+    {
+        var at = businessDate.ToDateTime(new TimeOnly(9, 0), DateTimeKind.Utc);
+        var attempt = EntryAttempt.CreateAllowed(Guid.NewGuid(), holder.Id, _org.Id, at, businessDate, 1440, at.AddDays(1), 1, 1, EntryChannel.Desk);
+        if (voided)
+        {
+            attempt.Void(2, "mistake entry", at.AddMinutes(5));
+        }
+
+        return attempt;
+    }
+
+    private Beneficiary HolderWithoutEntryToday()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-NEW"), "Salem Ali", PhoneNumber.Create("0923456789"));
+        _beneficiaries.Add(holder);
+        return holder;
+    }
+
+    [Fact]
+    public async Task GetEligibilityAsync_WhenHolderDidNotEnterToday_ShouldReturnNoEntryTodayNotOverridable()
+    {
+        var holder = HolderWithoutEntryToday();
+
+        var result = await _sut.GetEligibilityAsync(holder.Id);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.IsEligible.ShouldBeFalse();
+        result.Value.Reason.ShouldBe(GiftDenialReason.NoEntryToday);
+        result.Value.ReasonCode.ShouldBe(Errors.Gift.NoEntryToday.Code);
+        result.Value.CanBeOverridden.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task IssueAsync_WhenHolderDidNotEnterToday_ShouldReturnNoEntryTodayAndIssueNothing()
+    {
+        var holder = HolderWithoutEntryToday();
+        _attempts.Add(Granted(holder, new DateOnly(2026, 10, 4)));           // yesterday does not count
+        _attempts.Add(Granted(holder, new DateOnly(2026, 10, 5), voided: true)); // nor a voided entry today
+
+        var result = await _sut.IssueAsync(new IssueGiftVoucherRequest(holder.Id));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ShouldBe(Errors.Gift.NoEntryToday);
+        _giftRepo.Vouchers.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task IssueAsync_WhenHolderEnteredToday_ShouldIssue()
+    {
+        var holder = HolderWithoutEntryToday();
+        _attempts.Add(Granted(holder, new DateOnly(2026, 10, 5)));
+
+        var result = await _sut.IssueAsync(new IssueGiftVoucherRequest(holder.Id));
+
+        result.IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task IssueOverrideAsync_WhenHolderDidNotEnterToday_CannotBeOverridden()
+    {
+        _currentUser.SetUser(_supervisorUser);
+        var holder = HolderWithoutEntryToday();
+
+        var result = await _sut.IssueOverrideAsync(new IssueGiftOverrideRequest(holder.Id, "استثناء من الإدارة", null));
+
+        result.Error.ShouldBe(Errors.Gift.OverrideNotAllowed);
+        _giftRepo.Vouchers.ShouldBeEmpty();
+    }
 
     [Fact]
     public async Task GetEligibilityAsync_WhenEligible_ShouldReturnEligibleDto()

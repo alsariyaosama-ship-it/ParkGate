@@ -2023,4 +2023,7 @@
   <data name="Slip_GiftNumber" xml:space="preserve">
     <value>رقم القسيمة: {0}</value>
   </data>
+  <data name="Error_Gift_NoEntryToday" xml:space="preserve">
+    <value>لم يسجّل الزائر دخولاً اليوم</value>
+  </data>
 </root>

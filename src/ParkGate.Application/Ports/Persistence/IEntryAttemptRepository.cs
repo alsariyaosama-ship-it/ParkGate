@@ -14,6 +14,9 @@ public interface IEntryAttemptRepository
     /// Aggregates every attempt of one workstation on one business date (R3.1). Granted, overridden, persons and
     /// companions exclude voided rows; denied attempts cannot be voided and are all counted.
     /// </summary>
+    /// <summary>True when the holder has a granted or overridden, non-voided entry on <paramref name="businessDate"/>.</summary>
+    Task<bool> HasGrantedEntryOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken cancellationToken = default);
+
     Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default);
 
     void Add(EntryAttempt attempt);

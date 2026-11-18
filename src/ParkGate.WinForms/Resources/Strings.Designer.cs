@@ -573,6 +573,7 @@ internal class Strings
     internal static string Error_Gift_HolderBlocked => GetString(nameof(Error_Gift_HolderBlocked));
     internal static string Error_Gift_HolderSuspended => GetString(nameof(Error_Gift_HolderSuspended));
     internal static string Error_Gift_IntervalNotElapsed => GetString(nameof(Error_Gift_IntervalNotElapsed));
+    internal static string Error_Gift_NoEntryToday => GetString(nameof(Error_Gift_NoEntryToday));
     internal static string Error_Gift_OverrideReasonRequired => GetString(nameof(Error_Gift_OverrideReasonRequired));
     internal static string Error_Gift_OverrideNotAllowed => GetString(nameof(Error_Gift_OverrideNotAllowed));
     internal static string Error_Gift_NotFound => GetString(nameof(Error_Gift_NotFound));

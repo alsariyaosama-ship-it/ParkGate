@@ -70,6 +70,7 @@ public static class ErrorMessages
             "Gift.HolderBlocked" => Strings.GetString("Error_Gift_HolderBlocked"),
             "Gift.HolderSuspended" => Strings.GetString("Error_Gift_HolderSuspended"),
             "Gift.IntervalNotElapsed" => Strings.GetString("Error_Gift_IntervalNotElapsed"),
+            "Gift.NoEntryToday" => Strings.GetString("Error_Gift_NoEntryToday"),
             "Gift.OverrideReasonRequired" => Strings.GetString("Error_Gift_OverrideReasonRequired"),
             "Gift.OverrideNotAllowed" => Strings.GetString("Error_Gift_OverrideNotAllowed"),
             "Gift.NotFound" => Strings.GetString("Error_Gift_NotFound"),
