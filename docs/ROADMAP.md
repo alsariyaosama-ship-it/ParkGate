@@ -236,7 +236,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R6.7 ~~Business-day cutoff~~ — cancelled (Q-R5): the park closes at midnight
 - [ ] R6.8 Database size warning on the Admin backup screen; propose a retention policy
 - [ ] R6.9 ACL-restricted backup folder; document an encrypted off-site copy
-- [ ] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
+- [x] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
 - [x] R6.11 Write management audit rows in the same unit of work; record old and new card number
 - [x] R6.12 Read the database clock through a mapped `SYSUTCDATETIME` function instead of SQL text
 - [x] R6.13 Optimistic concurrency on `Beneficiaries.RowVersion` replaces `UPDLOCK` (ADR-026); add `LastGiftIssuedUtc`
