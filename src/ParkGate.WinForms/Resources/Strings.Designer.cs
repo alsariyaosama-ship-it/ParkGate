@@ -299,6 +299,7 @@ internal class Strings
     internal static string Btn_CancelReg => GetString(nameof(Btn_CancelReg));
 
     internal static string Title_Companions => GetString(nameof(Title_Companions));
+    internal static string Label_CounterWithShortcut => GetString(nameof(Label_CounterWithShortcut));
     internal static string Label_FromLastVisit => GetString(nameof(Label_FromLastVisit));
     internal static string Label_TotalPersons => GetString(nameof(Label_TotalPersons));
     internal static string Notice_HolderCounted => GetString(nameof(Notice_HolderCounted));

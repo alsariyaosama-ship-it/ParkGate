@@ -218,7 +218,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R5.1 Show the remaining time on denial (SPEC A3)
 - [x] R5.2 Banner instead of a message box after registration
 - [x] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
-- [ ] R5.4 Keyboard access to the companion counters
+- [x] R5.4 Keyboard access to the companion counters
 - [x] R5.5 Mark companion counts prefilled from the last visit
 - [x] R5.6 Visible «إلغاء العملية…» button above the today grid
 - [ ] R5.7 Distinct success and denial sounds, with separate settings

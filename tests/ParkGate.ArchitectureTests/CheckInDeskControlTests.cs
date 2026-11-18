@@ -282,7 +282,7 @@ public sealed class CheckInDeskControlTests
         flowCounters.Controls.Count.ShouldBe(2);
 
         var firstCounter = flowCounters.Controls[0].ShouldBeOfType<CounterInput>();
-        firstCounter.Title.ShouldBe("بالغ:");
+        firstCounter.Title.ShouldBe("بالغ (Alt+1):");
         firstCounter.Value.ShouldBe(0);
     }
 

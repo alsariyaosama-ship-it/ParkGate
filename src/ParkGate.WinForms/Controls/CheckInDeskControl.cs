@@ -202,6 +202,11 @@ public partial class CheckInDeskControl : UserControl
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
+        if (FocusCounter(keyData))
+        {
+            return true;
+        }
+
         switch (keyData)
         {
             case Keys.F5:
@@ -368,9 +373,13 @@ public partial class CheckInDeskControl : UserControl
 
         foreach (var cat in categories.OrderBy(c => c.SortOrder))
         {
+            // R5.4: Alt+1…9 goes to counter n; the title shows its shortcut.
+            var number = _counterInputs.Count + 1;
             var counter = new CounterInput
             {
-                Title = $"{cat.NameAr}:",
+                Title = number <= MaxCounterShortcut
+                    ? string.Format(Strings.Label_CounterWithShortcut, cat.NameAr, number)
+                    : $"{cat.NameAr}:",
                 Tag = cat.Id,
                 Width = Math.Max(260, _flowCounters.ClientSize.Width - 12),
                 Height = 56,
@@ -381,12 +390,45 @@ public partial class CheckInDeskControl : UserControl
             };
 
             counter.ValueChanged += (_, _) => OnCounterChanged();
+            counter.ConfirmRequested += async (_, _) => await RecordEntryFromCounterAsync();
             _counterInputs.Add(counter);
             _flowCounters.Controls.Add(counter);
         }
 
         _flowCounters.ResumeLayout(true);
         UpdateLiveTotalPersons();
+    }
+
+    private const int MaxCounterShortcut = 9;
+
+    /// <summary>Enter in a counter records the entry when it may be recorded (same rule as F5).</summary>
+    private async Task RecordEntryFromCounterAsync()
+    {
+        if (_btnRecordEntry.Enabled)
+        {
+            await RecordEntryAsync();
+        }
+    }
+
+    /// <summary>Alt+1…9: focus counter n (R5.4). False when there is no such counter.</summary>
+    private bool FocusCounter(Keys keyData)
+    {
+        if ((keyData & Keys.Modifiers) != Keys.Alt)
+        {
+            return false;
+        }
+
+        var key = keyData & Keys.KeyCode;
+        var number = key is >= Keys.D1 and <= Keys.D9 ? key - Keys.D1 + 1
+            : key is >= Keys.NumPad1 and <= Keys.NumPad9 ? key - Keys.NumPad1 + 1
+            : 0;
+        if (number == 0 || number > _counterInputs.Count)
+        {
+            return false;
+        }
+
+        _counterInputs[number - 1].FocusValue();
+        return true;
     }
 
     private void OnCounterChanged()
