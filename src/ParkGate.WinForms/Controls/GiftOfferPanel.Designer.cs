@@ -17,7 +17,7 @@ partial class GiftOfferPanel
 
     private void InitializeComponent()
     {
-        this._grpMain = new System.Windows.Forms.GroupBox();
+        this._grpMain = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblContent = new System.Windows.Forms.TableLayoutPanel();
         this._flowButtons = new System.Windows.Forms.FlowLayoutPanel();
         this._btnIssue = new System.Windows.Forms.Button();
@@ -162,7 +162,7 @@ partial class GiftOfferPanel
         this.ResumeLayout(false);
     }
 
-    private System.Windows.Forms.GroupBox _grpMain;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpMain;
     private System.Windows.Forms.TableLayoutPanel _tblContent;
     private System.Windows.Forms.Panel _pnlInfo;
     private System.Windows.Forms.Label _lblStatus;

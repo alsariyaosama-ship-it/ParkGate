@@ -31,7 +31,7 @@ partial class CheckInDeskControl
         this._lblCardNumber = new System.Windows.Forms.Label();
         this._statusBanner = new ParkGate.WinForms.Controls.StatusBanner();
         this._splitMiddle = new System.Windows.Forms.SplitContainer();
-        this._grpHolder = new System.Windows.Forms.GroupBox();
+        this._grpHolder = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblHolder = new System.Windows.Forms.TableLayoutPanel();
         this._lblHolderNameTitle = new System.Windows.Forms.Label();
         this._lblHolderName = new System.Windows.Forms.Label();
@@ -47,7 +47,7 @@ partial class CheckInDeskControl
         this._lblHolderLastEntry = new System.Windows.Forms.Label();
         this._lblHolderStatusTitle = new System.Windows.Forms.Label();
         this._lblHolderStatus = new System.Windows.Forms.Label();
-        this._grpCompanions = new System.Windows.Forms.GroupBox();
+        this._grpCompanions = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._pnlCompanionsTotal = new System.Windows.Forms.Panel();
         this._lblFreeCompanions = new System.Windows.Forms.Label();
         this._lblCompanionsNotice = new System.Windows.Forms.Label();
@@ -688,7 +688,7 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Button _btnSearch;
     private ParkGate.WinForms.Controls.StatusBanner _statusBanner;
     private System.Windows.Forms.SplitContainer _splitMiddle;
-    private System.Windows.Forms.GroupBox _grpHolder;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpHolder;
     private System.Windows.Forms.TableLayoutPanel _tblHolder;
     private System.Windows.Forms.Label _lblHolderNameTitle;
     private System.Windows.Forms.Label _lblHolderName;
@@ -704,7 +704,7 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Label _lblHolderLastEntry;
     private System.Windows.Forms.Label _lblHolderStatusTitle;
     private System.Windows.Forms.Label _lblHolderStatus;
-    private System.Windows.Forms.GroupBox _grpCompanions;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpCompanions;
     private System.Windows.Forms.FlowLayoutPanel _flowCounters;
     private System.Windows.Forms.Panel _pnlCompanionsTotal;
     private System.Windows.Forms.Label _lblTotalPersons;

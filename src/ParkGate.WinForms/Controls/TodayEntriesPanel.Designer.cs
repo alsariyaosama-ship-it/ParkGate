@@ -22,7 +22,7 @@ partial class TodayEntriesPanel
     {
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-        this._grpToday = new System.Windows.Forms.GroupBox();
+        this._grpToday = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridToday = new System.Windows.Forms.DataGridView();
         this._colTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colCard = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -171,7 +171,7 @@ partial class TodayEntriesPanel
         this.ResumeLayout(false);
     }
 
-    private System.Windows.Forms.GroupBox _grpToday;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpToday;
     private System.Windows.Forms.DataGridView _gridToday;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colTime;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colCard;

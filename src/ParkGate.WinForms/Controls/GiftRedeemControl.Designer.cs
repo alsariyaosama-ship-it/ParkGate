@@ -29,7 +29,7 @@ partial class GiftRedeemControl
         this._btnRedeem = new System.Windows.Forms.Button();
         this._btnClear = new System.Windows.Forms.Button();
         this._statusBanner = new ParkGate.WinForms.Controls.StatusBanner();
-        this._grpDetails = new System.Windows.Forms.GroupBox();
+        this._grpDetails = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblDetails = new System.Windows.Forms.TableLayoutPanel();
         this._lblReceiptNoTitle = new System.Windows.Forms.Label();
         this._lblReceiptNo = new System.Windows.Forms.Label();
@@ -43,7 +43,7 @@ partial class GiftRedeemControl
         this._lblValue = new System.Windows.Forms.Label();
         this._lblRedeemedAtTitle = new System.Windows.Forms.Label();
         this._lblRedeemedAt = new System.Windows.Forms.Label();
-        this._grpToday = new System.Windows.Forms.GroupBox();
+        this._grpToday = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridToday = new System.Windows.Forms.DataGridView();
         this._colRedeemedTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colReceiptNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -517,7 +517,7 @@ partial class GiftRedeemControl
     private System.Windows.Forms.Button _btnRedeem;
     private System.Windows.Forms.Button _btnClear;
     private ParkGate.WinForms.Controls.StatusBanner _statusBanner;
-    private System.Windows.Forms.GroupBox _grpDetails;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpDetails;
     private System.Windows.Forms.TableLayoutPanel _tblDetails;
     private System.Windows.Forms.Label _lblReceiptNoTitle;
     private System.Windows.Forms.Label _lblReceiptNo;
@@ -531,7 +531,7 @@ partial class GiftRedeemControl
     private System.Windows.Forms.Label _lblValue;
     private System.Windows.Forms.Label _lblRedeemedAtTitle;
     private System.Windows.Forms.Label _lblRedeemedAt;
-    private System.Windows.Forms.GroupBox _grpToday;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpToday;
     private System.Windows.Forms.DataGridView _gridToday;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colRedeemedTime;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colReceiptNo;

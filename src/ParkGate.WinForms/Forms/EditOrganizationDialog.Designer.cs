@@ -27,7 +27,7 @@ partial class EditOrganizationDialog
         this._chkCustomCooldown = new System.Windows.Forms.CheckBox();
         this._numCooldownHours = new System.Windows.Forms.NumericUpDown();
         this._chkIsDefault = new System.Windows.Forms.CheckBox();
-        this._grpPolicy = new System.Windows.Forms.GroupBox();
+        this._grpPolicy = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblPolicyLayout = new System.Windows.Forms.TableLayoutPanel();
         this._chkMaxFreeCompanions = new System.Windows.Forms.CheckBox();
         this._numMaxFreeCompanions = new System.Windows.Forms.NumericUpDown();
@@ -372,7 +372,7 @@ partial class EditOrganizationDialog
     private System.Windows.Forms.CheckBox _chkCustomCooldown;
     private System.Windows.Forms.NumericUpDown _numCooldownHours;
     private System.Windows.Forms.CheckBox _chkIsDefault;
-    private System.Windows.Forms.GroupBox _grpPolicy;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpPolicy;
     private System.Windows.Forms.TableLayoutPanel _tblPolicyLayout;
     private System.Windows.Forms.CheckBox _chkMaxFreeCompanions;
     private System.Windows.Forms.NumericUpDown _numMaxFreeCompanions;

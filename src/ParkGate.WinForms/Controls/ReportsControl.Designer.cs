@@ -41,9 +41,9 @@ partial class ReportsControl
         this._tabDaily = new System.Windows.Forms.TabPage();
         this._pnlDailyKpi = new System.Windows.Forms.FlowLayoutPanel();
         this._splitDaily = new System.Windows.Forms.SplitContainer();
-        this._grpDailyOrgs = new System.Windows.Forms.GroupBox();
+        this._grpDailyOrgs = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridDailyOrgs = new System.Windows.Forms.DataGridView();
-        this._grpDailyCategories = new System.Windows.Forms.GroupBox();
+        this._grpDailyCategories = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridDailyCategories = new System.Windows.Forms.DataGridView();
         this._tabDateRange = new System.Windows.Forms.TabPage();
         this._gridDateRange = new System.Windows.Forms.DataGridView();
@@ -53,9 +53,9 @@ partial class ReportsControl
         this._lblOrgStatsTotals = new System.Windows.Forms.Label();
         this._tabOperatorWs = new System.Windows.Forms.TabPage();
         this._splitOperatorWs = new System.Windows.Forms.SplitContainer();
-        this._grpOperators = new System.Windows.Forms.GroupBox();
+        this._grpOperators = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridOperators = new System.Windows.Forms.DataGridView();
-        this._grpWorkstations = new System.Windows.Forms.GroupBox();
+        this._grpWorkstations = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridWorkstations = new System.Windows.Forms.DataGridView();
         this._tabDenials = new System.Windows.Forms.TabPage();
         this._gridDenials = new System.Windows.Forms.DataGridView();
@@ -495,9 +495,9 @@ partial class ReportsControl
     private System.Windows.Forms.TabPage _tabDaily;
     private System.Windows.Forms.FlowLayoutPanel _pnlDailyKpi;
     private System.Windows.Forms.SplitContainer _splitDaily;
-    private System.Windows.Forms.GroupBox _grpDailyOrgs;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpDailyOrgs;
     private System.Windows.Forms.DataGridView _gridDailyOrgs;
-    private System.Windows.Forms.GroupBox _grpDailyCategories;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpDailyCategories;
     private System.Windows.Forms.DataGridView _gridDailyCategories;
     private System.Windows.Forms.TabPage _tabDateRange;
     private System.Windows.Forms.DataGridView _gridDateRange;
@@ -507,9 +507,9 @@ partial class ReportsControl
     private System.Windows.Forms.Label _lblOrgStatsTotals;
     private System.Windows.Forms.TabPage _tabOperatorWs;
     private System.Windows.Forms.SplitContainer _splitOperatorWs;
-    private System.Windows.Forms.GroupBox _grpOperators;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpOperators;
     private System.Windows.Forms.DataGridView _gridOperators;
-    private System.Windows.Forms.GroupBox _grpWorkstations;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpWorkstations;
     private System.Windows.Forms.DataGridView _gridWorkstations;
     private System.Windows.Forms.TabPage _tabDenials;
     private System.Windows.Forms.DataGridView _gridDenials;

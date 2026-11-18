@@ -20,7 +20,7 @@ partial class InlineRegistrationPanel
 
     private void InitializeComponent()
     {
-        this._grpRegistration = new System.Windows.Forms.GroupBox();
+        this._grpRegistration = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblRegistration = new System.Windows.Forms.TableLayoutPanel();
         this._lblRegOrganization = new System.Windows.Forms.Label();
         this._cmbRegOrganization = new System.Windows.Forms.ComboBox();
@@ -273,7 +273,7 @@ partial class InlineRegistrationPanel
         this.ResumeLayout(false);
     }
 
-    private System.Windows.Forms.GroupBox _grpRegistration;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpRegistration;
     private System.Windows.Forms.TableLayoutPanel _tblRegistration;
     private System.Windows.Forms.Label _lblRegOrganization;
     private System.Windows.Forms.ComboBox _cmbRegOrganization;

@@ -24,7 +24,7 @@ partial class BeneficiariesControl
         this._btnClearSearch = new System.Windows.Forms.Button();
         this._lblSearchResultCount = new System.Windows.Forms.Label();
         this._splitMain = new System.Windows.Forms.SplitContainer();
-        this._grpResults = new System.Windows.Forms.GroupBox();
+        this._grpResults = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridBeneficiaries = new System.Windows.Forms.DataGridView();
         this._colCardNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colOrganization = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -35,7 +35,7 @@ partial class BeneficiariesControl
         this._colLastEntry = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colExpiryDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._splitBottom = new System.Windows.Forms.SplitContainer();
-        this._grpHolderDetails = new System.Windows.Forms.GroupBox();
+        this._grpHolderDetails = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblDetails = new System.Windows.Forms.TableLayoutPanel();
         this._lblDetailNameTitle = new System.Windows.Forms.Label();
         this._lblDetailName = new System.Windows.Forms.Label();
@@ -60,7 +60,7 @@ partial class BeneficiariesControl
         this._btnChangeStatus = new System.Windows.Forms.Button();
         this._btnCheckInDirect = new System.Windows.Forms.Button();
         this._btnIssueQr = new System.Windows.Forms.Button();
-        this._grpHistory = new System.Windows.Forms.GroupBox();
+        this._grpHistory = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridHistory = new System.Windows.Forms.DataGridView();
         this._colHistTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colHistBusinessDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -765,7 +765,7 @@ partial class BeneficiariesControl
     private System.Windows.Forms.Button _btnClearSearch;
     private System.Windows.Forms.Label _lblSearchResultCount;
     private System.Windows.Forms.SplitContainer _splitMain;
-    private System.Windows.Forms.GroupBox _grpResults;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpResults;
     private System.Windows.Forms.DataGridView _gridBeneficiaries;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colCardNumber;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colOrganization;
@@ -776,7 +776,7 @@ partial class BeneficiariesControl
     private System.Windows.Forms.DataGridViewTextBoxColumn _colLastEntry;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colExpiryDate;
     private System.Windows.Forms.SplitContainer _splitBottom;
-    private System.Windows.Forms.GroupBox _grpHolderDetails;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpHolderDetails;
     private System.Windows.Forms.TableLayoutPanel _tblDetails;
     private System.Windows.Forms.Label _lblDetailNameTitle;
     private System.Windows.Forms.Label _lblDetailName;
@@ -801,7 +801,7 @@ partial class BeneficiariesControl
     private System.Windows.Forms.Button _btnChangeStatus;
     private System.Windows.Forms.Button _btnCheckInDirect;
     private System.Windows.Forms.Button _btnIssueQr;
-    private System.Windows.Forms.GroupBox _grpHistory;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpHistory;
     private System.Windows.Forms.DataGridView _gridHistory;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colHistTime;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colHistBusinessDate;
