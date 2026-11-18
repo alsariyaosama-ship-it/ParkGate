@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using ParkGate.Application.GiftVouchers.DTOs;
 using ParkGate.Application.Ports.EntryCards;
 using ParkGate.WinForms.Common;
+using ParkGate.WinForms.Printing;
 using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
 
@@ -131,78 +132,11 @@ public partial class GiftQrDialog : RtlFormBase
                 return;
             }
 
-            using var doc = new PrintDocument();
+            using var doc = ReceiptPrinter.CreateDocument(ReceiptSlips.GiftVoucher(_voucher.OrganizationName, _voucher.ReceiptNo), _picQr.Image);
             if (!doc.PrinterSettings.IsValid && PrinterSettings.InstalledPrinters.Count > 0)
             {
                 doc.PrinterSettings.PrinterName = PrinterSettings.InstalledPrinters[0];
             }
-            doc.PrintPage += (s, e) =>
-            {
-                var g = e.Graphics;
-                if (g == null)
-                {
-                    return;
-                }
-
-                using var titleFont = new Font("Cairo", 12F, FontStyle.Bold);
-                using var boldFont = new Font("Cairo", 10F, FontStyle.Bold);
-                using var regularFont = new Font("Cairo", 9F, FontStyle.Regular);
-                using var smallFont = new Font("Cairo", 9F, FontStyle.Regular);
-
-                // Card rectangle (approx A6 receipt card)
-                var cardRect = new Rectangle(40, 40, 360, 220);
-                using var borderPen = new Pen(Theme.Success, 2);
-                using var fillBrush = new SolidBrush(Color.White);
-                g.FillRectangle(fillBrush, cardRect);
-                g.DrawRectangle(borderPen, cardRect);
-
-                // Header banner
-                var headerRect = new Rectangle(cardRect.Left, cardRect.Top, cardRect.Width, 36);
-                using var headerBrush = new SolidBrush(Theme.Success);
-                g.FillRectangle(headerBrush, headerRect);
-
-                using var sfCenter = new StringFormat
-                {
-                    Alignment = StringAlignment.Center,
-                    LineAlignment = StringAlignment.Center
-                };
-                g.DrawString(Strings.Header_GiftVoucher, titleFont, Brushes.White, headerRect, sfCenter);
-
-                // Customer info on the right (RTL layout)
-                var infoRect = new Rectangle(cardRect.Left + 160, cardRect.Top + 44, 190, 165);
-                using var sfRtl = new StringFormat
-                {
-                    FormatFlags = StringFormatFlags.DirectionRightToLeft,
-                    Alignment = StringAlignment.Near
-                };
-
-                g.DrawString(string.Format(Strings.Label_ReceiptNo, _voucher.ReceiptNo), boldFont, Brushes.DarkGreen, infoRect, sfRtl);
-
-                infoRect.Y += 26;
-                g.DrawString($"{Strings.Col_BeneficiaryName}: {_voucher.HolderName}", regularFont, Brushes.Black, infoRect, sfRtl);
-
-                infoRect.Y += 24;
-                g.DrawString($"{Strings.Label_CardNumber}: {_voucher.CardNumber}", regularFont, Brushes.Black, infoRect, sfRtl);
-
-                infoRect.Y += 24;
-                g.DrawString($"{Strings.Label_Organization}: {_voucher.OrganizationName}", smallFont, Brushes.DimGray, infoRect, sfRtl);
-
-                infoRect.Y += 24;
-                g.DrawString(string.Format(Strings.Label_GiftValueDisplay, _voucher.Value, Strings.Unit_Currency), boldFont, Brushes.Black, infoRect, sfRtl);
-
-                infoRect.Y += 24;
-                g.DrawString(string.Format(Strings.Label_GiftExpiresOn, _voucher.ExpiresOn.ToDateTime(TimeOnly.MinValue)), smallFont, Brushes.DimGray, infoRect, sfRtl);
-
-                if (_voucher.IsOverride)
-                {
-                    infoRect.Y += 20;
-                    g.DrawString(Strings.Label_GiftOverrideBadge, smallFont, Brushes.DarkOrange, infoRect, sfRtl);
-                }
-
-                // QR Code on the left
-                var qrRect = new Rectangle(cardRect.Left + 15, cardRect.Top + 48, 140, 140);
-                g.DrawImage(_picQr.Image, qrRect);
-            };
 
             using var dlg = new PrintDialog
             {

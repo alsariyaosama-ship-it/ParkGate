@@ -1972,4 +1972,55 @@
   <data name="Msg_CairoNotInstalled" xml:space="preserve">
     <value>خط Cairo غير مثبّت على هذا الجهاز، لذلك قد تظهر بعض الشاشات بخط مختلف. ثبّت الخط من برنامج التثبيت أو بالسكربت install-cairo-font.ps1.</value>
   </data>
+  <data name="Slip_CompanyName" xml:space="preserve">
+    <value>شركة دار المرح المساهمة للخدمات والاستثمار السياحي</value>
+  </data>
+  <data name="Slip_ParkName" xml:space="preserve">
+    <value>منتزه المرح العائلي</value>
+  </data>
+  <data name="Slip_Welcome" xml:space="preserve">
+    <value>أهلاً وسهلاً بكم في منتزه المرح العائلي</value>
+  </data>
+  <data name="Slip_EntryTitle" xml:space="preserve">
+    <value>بطاقة دخول مجاني لمنتزه المرح العائلي</value>
+  </data>
+  <data name="Slip_EntryRule" xml:space="preserve">
+    <value>يمكن الدخول بها للمنتزه {0} مرة واحدة مجاناً.</value>
+  </data>
+  <data name="Slip_Every_Day" xml:space="preserve">
+    <value>كل يوم</value>
+  </data>
+  <data name="Slip_Every_TwoDays" xml:space="preserve">
+    <value>كل يومين</value>
+  </data>
+  <data name="Slip_Every_FewDays" xml:space="preserve">
+    <value>كل {0} أيام</value>
+  </data>
+  <data name="Slip_Every_ManyDays" xml:space="preserve">
+    <value>كل {0} يوماً</value>
+  </data>
+  <data name="Slip_Every_Hour" xml:space="preserve">
+    <value>كل ساعة</value>
+  </data>
+  <data name="Slip_Every_TwoHours" xml:space="preserve">
+    <value>كل ساعتين</value>
+  </data>
+  <data name="Slip_Every_FewHours" xml:space="preserve">
+    <value>كل {0} ساعات</value>
+  </data>
+  <data name="Slip_Every_ManyHours" xml:space="preserve">
+    <value>كل {0} ساعة</value>
+  </data>
+  <data name="Slip_GiftCongrats" xml:space="preserve">
+    <value>ألف مبروك! تحصلت على قسيمة مجانية للحصول على كروت ألعاب مجانية.</value>
+  </data>
+  <data name="Slip_GiftValidToday" xml:space="preserve">
+    <value>البطاقة صالحة لهذا اليوم فقط.</value>
+  </data>
+  <data name="Slip_GiftPickup" xml:space="preserve">
+    <value>يمكنك استلام هديتك من شباك التذاكر الخاص بالألعاب.</value>
+  </data>
+  <data name="Slip_GiftNumber" xml:space="preserve">
+    <value>رقم القسيمة: {0}</value>
+  </data>
 </root>
