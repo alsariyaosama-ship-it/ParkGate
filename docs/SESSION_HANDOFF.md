@@ -10,15 +10,15 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-18 |
-| Last session | S36 — R6.11, R6.3, R6.4, R6.6, R6.10, R6.9 done and pushed on `phase/r6-database` |
-| Current phase | Phase R — Remediation. R0–R2 merged (PR #11–#13). R3 PR #14 open, R4 PR #15 open. R6 on `phase/r6-database`: all done except R6.8 (needs Osama), R6.5 (blocked Q-R6), R6.15 (needs Osama) |
+| Last session | S36 — R6 complete except R6.5 (blocked Q-R6) and R6.16 (needs Osama); R6 PR opened |
+| Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 PR open from `phase/r6-database` |
 | Working branch | `phase/r6-database` |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 710 passed (non-integration): 207 domain + 224 application + 94 infrastructure + 185 architecture |
+| .NET Unit tests | 717 passed (non-integration): 207 domain + 230 application + 95 infrastructure + 185 architecture |
 | .NET Integration tests | 56 passed on LocalDB |
 | Web tests | `php artisan test` (PHP 8.4): 98 passed on SQLite (MySQL job runs in CI) |
-| Total tests | 864 (766 .NET + 98 web), all green |
-| Latest migration | `20261118131823_AddBeneficiaryLastGiftIssuedUtc` (no migration in S36) |
+| Total tests | 871 (773 .NET + 98 web), all green |
+| Latest migration | `MapDatabaseFilesView` (S36; snapshot only), after `RemoveUnreadSoundSetting`. Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
 
 ## State of the work
 
@@ -120,20 +120,18 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-**S36 (2026-11-18, `phase/r6-database`): R6.11, R6.3, R6.4, R6.6, R6.10, R6.9 done and pushed.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search measured at ~350 ms for 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`.
-**Next in R6:** R6.8 needs Osama's choice (see Blockers), R6.15 needs his approval, R6.5 is blocked on Q-R6. Then open the R6 PR (R6.8 and R6.15 can follow in the same branch if he answers first).
+**S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
+**Next:** Osama reviews and merges the R6 PR. Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6; R6.16 waits on Osama.
 
 **S35 (2026-11-18): R6.1, R6.2, R6.12, R6.13, R6.14.** Entry-card tables are EF entities (migration `AdoptEntryCards`); the DB clock is a mapped `SYSUTCDATETIME`; optimistic concurrency with `ConcurrencyRetry` replaced `UPDLOCK` (migration `AddBeneficiaryLastGiftIssuedUtc`); `EfOnlyDataAccessTests` guards ADR-025. Both dev databases were cleaned of the old entry-card objects with Osama's approval (option A) and migrated.
-**Next in R6:** R6.11 (management audit in the unit of work), R6.3 (audit columns from the DB clock), R6.4, R6.6, R6.8, R6.9, R6.10; R6.5 is blocked on Q-R6. Then open the R6 PR.
 
-1. PR #15 (R4) is open. Osama passed TC-14–TC-19 and TC-21 on the desk; **TC-20 (Cairo missing) is still untried**. TC-21's F7 gift override must be re-run on the fixed gift screen (R4.11/R4.12).
-2. Branch `docs/entry-identity` (pushed, no PR yet): ADR-024, SPEC F6/F7 recommendations, F8 design (BR-27..BR-29, DATABASE §3.13-3.14, ROADMAP Phase F8). Osama reviews it, then open its PR.
-3. Agreed session order after PR #15 is merged (review 2026-11-18): **R6** (database: entry-card tables into migrations, DB-clock audit columns, R6.11 audit in the unit of work) -> **R7.6-R7.9** (UI-layer conformance: no Infrastructure in WinForms, Notify only, Dpi everywhere, no null-service fallbacks) -> **R5** (desk UX, with R7.10 split of `CheckInDeskControl` first) -> rest of **R7** -> **R8** (release) -> **F8** (only on Osama's go-ahead) -> **R9** (docs last). Reason: F8 adds a migration and organization fields, so the schema conventions (R6) and the UI layer (R7) should be settled first.
+1. TC-20 (Cairo missing) is still untried, and TC-21's F7 gift override should be re-run on the fixed gift screen. New TC-22 (database size after backup).
+2. Agreed session order (review 2026-11-18): **R6** (done) (database: entry-card tables into migrations, DB-clock audit columns, R6.11 audit in the unit of work) -> **R7.6-R7.9** (UI-layer conformance: no Infrastructure in WinForms, Notify only, Dpi everywhere, no null-service fallbacks) -> **R5** (desk UX, with R7.10 split of `CheckInDeskControl` first) -> rest of **R7** -> **R8** (release) -> **F8** (only on Osama's go-ahead) -> **R9** (docs last). Reason: F8 adds a migration and organization fields, so the schema conventions (R6) and the UI layer (R7) should be settled first.
    Gift decisions confirmed 2026-11-18: the interval starts when the voucher is issued, and the gift voucher stays a separate QR slip (current F5 behaviour, no change).
-4. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
+3. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
    hangs the test host. Use synchronous fakes or a seam (`SuccessDelay`, `ChooseOrganizationOverride`), and run
    `dotnet test` with `timeout`.
-5. Edit files with byte-level Python (or the Edit tool); text mode turns CRLF into LF.
+4. Edit files with byte-level Python (or the Edit tool); text mode turns CRLF into LF.
 
 Carried over from S25 (do it when a printer is available; it does not block Phase R):
 - Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
@@ -141,9 +139,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **R6.8 database size warning — choose how to read the size.** SQL Server reports file size only through `sys.database_files` / `FILEPROPERTY`. Options: (A) map a read-only keyless entity to `sys.database_files` with `ToView` (EF model configuration, no SQL text; needs an ADR-025 note); (B) allow a second narrow SQL exception next to `BACKUP DATABASE`; (C) skip the screen warning and rely on the backup log size (DEPLOYMENT.md §9.3). Recommendation: A. Also needed: the retention policy (how long to keep `AuditLogs`, `CardScanLog`, denied attempts).
-- **R6.15 (approve):** the seed row `Entry.PlaySoundOnDenial` is never read; the app uses `Entry.DenialSoundEnabled`. Fix = a migration that replaces the seed row (renames data in released databases).
-- **`IAuditWriter` has no caller any more** after R6.11 (still registered, `AuditWriterTests` still pass). AGENTS.md §4.2/§4.3 name it. Remove it and reword AGENTS.md, or keep it for future out-of-transaction events? Recommendation: remove (needs your OK because AGENTS.md changes).
+- **R6.16 (decide):** `Ui.MaskNationalIdForOperators` is seeded but no code reads it. Should operators see full national IDs? Then wire the setting or drop it.
+- **Retention policy (approve or change):** proposal in DEPLOYMENT.md §9.3 — `CardScanLog` 12 months, denied attempts 24 months, `AuditLogs` 36 months, business data never. Nothing is deleted until you approve, and then only by an explicit admin action.
 - **R6.9 manual check:** run `scripts\backup.ps1` once as Administrator on the server (or the dev PC) and confirm the folder ACL and the `.bak` file; the agent could not elevate. Delete the empty test folder `C:\ParkGate_R69_Test` left by the non-elevated test run (the tool blocks deletes at `C:\`).
 - **Behaviour change (R6.3):** `CreatedByUserId`, `UpdatedAtUtc` and `UpdatedByUserId` are now filled on holders, organizations and users; they were always NULL before.
 - ~~Apply the three migrations on SQLEXPRESS~~ **Done in S31** (backup first: `C:\ProgramData\ParkGateackups\ParkGate_before_R2.bak`). The 7 pending outbox rows got sequences 1–11 with the re-queued ones and contain no phone, national ID, token or key id. Install the new SyncAgent build before it runs again (still the old one until R8.4).
@@ -170,7 +167,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Session Log (last 10 sessions)
 
-### S36 — 2026-11-18 — Phase R6: R6.11, R6.3, R6.4, R6.6, R6.10, R6.9
+### S36 — 2026-11-18 — Phase R6 complete (except R6.5, R6.16); R6 PR
 - Baseline green (701 unit). One commit per task, test-first.
 - R6.11: 30 audit calls in 7 services moved into the unit of work; creates that audit a new identity id save twice in one transaction; settings saved in one save (the store did ten saves with the client clock). Card number change audits old and new number.
 - R6.3 finding: the audit interceptor was never added to the context options. Registered in `DynamicParkGateDbContextFactory` (one shared instance: EF caches internal services per interceptor instance).
@@ -178,7 +175,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - R6.6: no query change needed (~350 ms). R6.10: `gift_vouchers` already existed (R2.7); only indexes changed.
 - R6.9 finding: `backup.ps1` used `COMPRESSION`, which Express rejects, so the scheduled backup could never succeed on the target edition.
 - Tip: the Write tool strips trailing spaces in text it writes; byte-exact Python edits need care with blank lines that hold spaces.
-- Tests: .NET 755 → 766 (integration 54 → 56), web 96 → 98.
+- After Osama agreed: R6.15 (migration `RemoveUnreadSoundSetting`; the new key is not seeded because saved desks already have it), `IAuditWriter` removed, R6.8 (option A). Found R6.16 (mask setting never read).
+- Tests: .NET 755 → 773 (integration 54 → 56), web 96 → 98.
 
 ### S35 — 2026-11-18 — Phase R6: R6.1, R6.2, R6.12, R6.13, R6.14
 - See "Next session" for the summary. Tests 755 green.
