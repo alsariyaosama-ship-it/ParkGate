@@ -251,6 +251,10 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<DateTime?>("LastGiftIssuedUtc")
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)");
+
                     b.Property<DateTime?>("LastGrantedEntryUtc")
                         .HasPrecision(3)
                         .HasColumnType("datetime2(3)");

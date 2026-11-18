@@ -16,6 +16,11 @@ public interface IUnitOfWork : IAsyncDisposable, IDisposable
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitAsync(CancellationToken cancellationToken = default);
     Task RollbackAsync(CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Saves tracked changes. Throws <see cref="ParkGate.Application.Common.ConcurrencyConflictException"/> when
+    /// another desk changed one of the rows first (ADR-026); run the use case through
+    /// <see cref="ParkGate.Application.Common.ConcurrencyRetry"/>.
+    /// </summary>
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task<DateTime> GetDbUtcNowAsync(CancellationToken cancellationToken = default);
 }

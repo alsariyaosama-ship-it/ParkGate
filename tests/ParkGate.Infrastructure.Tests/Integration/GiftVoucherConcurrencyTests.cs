@@ -1,16 +1,15 @@
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using ParkGate.Application.Ports.Persistence;
+using ParkGate.Application.Common;
+using ParkGate.Application.GiftVouchers.DTOs;
 using ParkGate.Domain.Entities;
 using ParkGate.Domain.Enums;
-using ParkGate.Domain.Policies;
 using ParkGate.Domain.ValueObjects;
 
 namespace ParkGate.Infrastructure.Tests.Integration;
 
 /// <summary>
-/// Verifies the two atomic gift flows (BR-22 issue, BR-24 redeem) under real parallel load
-/// against SQL Server, mirroring <see cref="ParallelCheckInConcurrencyTests"/>.
+/// The two atomic gift flows (BR-22 issue, BR-24 redeem) under real parallel load against SQL Server. Since R6.13
+/// they run the real <c>GiftVoucherService</c>, whose optimistic concurrency and retry replace the row lock (ADR-026).
 /// </summary>
 [Trait("Category", "Integration")]
 public sealed class GiftVoucherConcurrencyTests : IClassFixture<LocalDbTestFixture>
@@ -19,7 +18,6 @@ public sealed class GiftVoucherConcurrencyTests : IClassFixture<LocalDbTestFixtu
     private const int Runs = 20;
 
     private readonly LocalDbTestFixture _fixture;
-    private readonly IGiftEligibilityPolicy _policy = new RollingIntervalGiftEligibilityPolicy();
 
     public GiftVoucherConcurrencyTests(LocalDbTestFixture fixture)
     {
@@ -29,203 +27,95 @@ public sealed class GiftVoucherConcurrencyTests : IClassFixture<LocalDbTestFixtu
     [Fact]
     public async Task ParallelRedeem_SameToken_ExactlyOneSucceeds_20Runs()
     {
-        var factory = new SimpleUnitOfWorkFactory(_fixture);
-
-        await using var setupContext = _fixture.CreateDbContext();
-        var org = new Organization($"RED_{Guid.NewGuid():N}"[..10], "جهة الاسترداد");
-        org.ConfigureGift(true, 10m, 30);
-        var user = new User($"red_{Guid.NewGuid():N}"[..12], "موظف الاسترداد", "hash", UserRole.Supervisor);
-        var ws = new Workstation($"RWS_{Guid.NewGuid():N}"[..10], "شباك الألعاب");
-        setupContext.Organizations.Add(org);
-        setupContext.Users.Add(user);
-        setupContext.Workstations.Add(ws);
-        await setupContext.SaveChangesAsync();
-
-        var holder = new Beneficiary(
-            Guid.NewGuid(),
-            org.Id,
-            CardNumber.Create($"RED-{Guid.NewGuid():N}"[..12]),
-            "زبون الاسترداد",
-            PhoneNumber.Create($"091{Random.Shared.Next(1_000_000):D7}"));
-        setupContext.Beneficiaries.Add(holder);
-        await setupContext.SaveChangesAsync();
+        using var harness = new ServiceHarness(_fixture);
+        var (org, user, desk) = await SeedAsync("RED", 10m);
+        var gifts = harness.Gifts(user, desk);
 
         for (var run = 1; run <= Runs; run++)
         {
-            var token = Guid.NewGuid();
-            var nowUtc = DateTime.UtcNow;
-            var voucher = GiftVoucher.Issue(
-                token, 1, holder.Id, org.Id, 10m, nowUtc, DateOnly.FromDateTime(nowUtc), user.Id, ws.Id);
+            var holder = await AddHolderAsync(org, $"زبون الاسترداد {run}");
+            var issued = await gifts.IssueAsync(new IssueGiftVoucherRequest(holder.Id));
+            issued.IsSuccess.ShouldBeTrue($"Run {run}: the voucher must be issued");
 
-            await using (var issueContext = _fixture.CreateDbContext())
-            {
-                issueContext.GiftVouchers.Add(voucher);
-                await issueContext.SaveChangesAsync();
-            }
+            var results = await ServiceHarness.RunTogetherAsync(Parallelism, _ => gifts.RedeemAsync(issued.Value.QrText));
 
-            var results = await RunInParallelAsync(
-                () => RedeemOnceAsync(factory, token, user.Id, ws.Id));
+            results.Count(r => r.IsSuccess).ShouldBe(1, $"Run {run}: exactly one redemption must succeed");
+            results.Where(r => r.IsFailure).ShouldAllBe(r => r.Error.Code == Errors.Gift.AlreadyRedeemed.Code);
 
-            results.Count(success => success).ShouldBe(
-                1, $"Run {run}: exactly one redemption must succeed, got {results.Count(s => s)}");
-
-            await using var verifyContext = _fixture.CreateDbContext();
-            var stored = await verifyContext.GiftVouchers.SingleAsync(v => v.Token == token);
-            stored.Status.ShouldBe(GiftVoucherStatus.Redeemed);
+            await using var verify = _fixture.CreateDbContext();
+            var voucher = await verify.GiftVouchers.SingleAsync(v => v.Id == issued.Value.ReceiptNo);
+            voucher.Status.ShouldBe(GiftVoucherStatus.Redeemed);
         }
     }
 
     [Fact]
     public async Task ParallelIssue_SameHolder_ExactlyOneVoucher_20Runs()
     {
-        var factory = new SimpleUnitOfWorkFactory(_fixture);
-
-        await using var setupContext = _fixture.CreateDbContext();
-        var org = new Organization($"ISS_{Guid.NewGuid():N}"[..10], "جهة الإصدار");
-        org.ConfigureGift(true, 15m, 30);
-        var user = new User($"iss_{Guid.NewGuid():N}"[..12], "موظف الإصدار", "hash", UserRole.Supervisor);
-        var ws = new Workstation($"IWS_{Guid.NewGuid():N}"[..10], "شباك البوابة");
-        setupContext.Organizations.Add(org);
-        setupContext.Users.Add(user);
-        setupContext.Workstations.Add(ws);
-        await setupContext.SaveChangesAsync();
+        using var harness = new ServiceHarness(_fixture);
+        var (org, user, desk) = await SeedAsync("ISS", 15m);
+        var gifts = harness.Gifts(user, desk);
 
         for (var run = 1; run <= Runs; run++)
         {
-            var holder = new Beneficiary(
-                Guid.NewGuid(),
-                org.Id,
-                CardNumber.Create($"ISS-{Guid.NewGuid():N}"[..12]),
-                $"زبون الإصدار {run}",
-                PhoneNumber.Create($"092{Random.Shared.Next(1_000_000):D7}"));
+            var holder = await AddHolderAsync(org, $"زبون الإصدار {run}");
 
-            setupContext.Beneficiaries.Add(holder);
-            await setupContext.SaveChangesAsync();
+            var results = await ServiceHarness.RunTogetherAsync(
+                Parallelism, _ => gifts.IssueAsync(new IssueGiftVoucherRequest(holder.Id)));
 
-            var results = await RunInParallelAsync(
-                () => IssueOnceAsync(factory, holder.Id, user.Id, ws.Id));
+            results.Count(r => r.IsSuccess).ShouldBe(1, $"Run {run}: exactly one voucher must be issued");
+            results.Where(r => r.IsFailure).ShouldAllBe(r => r.Error.Code == Errors.Gift.IntervalNotElapsed.Code);
 
-            results.Count(success => success).ShouldBe(
-                1, $"Run {run}: exactly one voucher must be issued, got {results.Count(s => s)}");
-
-            await using var verifyContext = _fixture.CreateDbContext();
-            var count = await verifyContext.GiftVouchers.CountAsync(v => v.BeneficiaryId == holder.Id);
-            count.ShouldBe(1, $"Run {run}: the database must hold exactly one voucher for the holder");
+            await using var verify = _fixture.CreateDbContext();
+            var vouchers = await verify.GiftVouchers.Where(v => v.BeneficiaryId == holder.Id).ToListAsync();
+            vouchers.Count.ShouldBe(1, $"Run {run}: the database must hold exactly one voucher for the holder");
+            var stored = await verify.Beneficiaries.SingleAsync(b => b.Id == holder.Id);
+            stored.LastGiftIssuedUtc.ShouldBe(vouchers[0].IssuedAtUtc);
         }
     }
 
-    private static async Task<bool[]> RunInParallelAsync(Func<Task<bool>> action)
+    [Fact]
+    public async Task VoidGift_ResetsLastGiftIssuedToTheRemainingVoucher()
     {
-        var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var harness = new ServiceHarness(_fixture);
+        var (org, supervisor, desk) = await SeedAsync("VGF", 5m, UserRole.Supervisor);
+        var gifts = harness.Gifts(supervisor, desk);
+        var holder = await AddHolderAsync(org, "زبون إلغاء الهدية");
 
-        var tasks = Enumerable.Range(0, Parallelism)
-            .Select(_ => Task.Run(async () =>
-            {
-                await gate.Task;
-                return await action();
-            }))
-            .ToArray();
+        var issued = await gifts.IssueAsync(new IssueGiftVoucherRequest(holder.Id));
+        issued.IsSuccess.ShouldBeTrue();
 
-        // Give every worker time to park on the gate so the database work really overlaps.
-        await Task.Delay(100);
-        gate.SetResult();
+        var voided = await gifts.VoidAsync(new VoidGiftVoucherRequest(issued.Value.ReceiptNo, "إصدار بالخطأ"));
 
-        return await Task.WhenAll(tasks);
+        voided.IsSuccess.ShouldBeTrue();
+        await using var verify = _fixture.CreateDbContext();
+        (await verify.Beneficiaries.SingleAsync(b => b.Id == holder.Id)).LastGiftIssuedUtc.ShouldBeNull();
     }
 
-    private static async Task<bool> RedeemOnceAsync(
-        IUnitOfWorkFactory factory,
-        Guid token,
-        int userId,
-        int workstationId)
+    private async Task<(Organization Org, User User, Workstation Desk)> SeedAsync(string prefix, decimal value, UserRole role = UserRole.Operator)
     {
-        await using var uow = factory.Create();
-        await uow.BeginTransactionAsync();
-
-        try
-        {
-            var voucher = await uow.GiftVouchers.GetByTokenForUpdateAsync(token);
-            if (voucher is null || voucher.Status != GiftVoucherStatus.Issued)
-            {
-                await uow.RollbackAsync();
-                return false;
-            }
-
-            var nowUtc = await uow.GetDbUtcNowAsync();
-            voucher.Redeem(userId, workstationId, nowUtc, DateOnly.FromDateTime(nowUtc));
-
-            await uow.SaveChangesAsync();
-            await uow.CommitAsync();
-            return true;
-        }
-        catch (SqlException ex) when (ex.Number == 1205)
-        {
-            // Deadlock victim: the winner already redeemed the voucher.
-            await uow.RollbackAsync();
-            return false;
-        }
+        await using var context = _fixture.CreateDbContext();
+        var org = new Organization($"{prefix}_{Guid.NewGuid():N}"[..10], $"جهة {prefix}");
+        org.ConfigureGift(true, value, 30);
+        var user = new User($"{prefix.ToLowerInvariant()}_{Guid.NewGuid():N}"[..12], $"موظف {prefix}", "hash", role);
+        var desk = new Workstation($"{prefix}W_{Guid.NewGuid():N}"[..10], $"شباك {prefix}");
+        context.Organizations.Add(org);
+        context.Users.Add(user);
+        context.Workstations.Add(desk);
+        await context.SaveChangesAsync();
+        return (org, user, desk);
     }
 
-    private async Task<bool> IssueOnceAsync(
-        IUnitOfWorkFactory factory,
-        Guid holderId,
-        int userId,
-        int workstationId)
+    private async Task<Beneficiary> AddHolderAsync(Organization org, string name)
     {
-        await using var uow = factory.Create();
-        await uow.BeginTransactionAsync();
-
-        try
-        {
-            var holder = await uow.Beneficiaries.GetForUpdateAsync(holderId);
-            if (holder is null)
-            {
-                await uow.RollbackAsync();
-                return false;
-            }
-
-            var org = await uow.Organizations.GetByIdAsync(holder.OrganizationId);
-            if (org is null)
-            {
-                await uow.RollbackAsync();
-                return false;
-            }
-
-            var nowUtc = await uow.GetDbUtcNowAsync();
-            var lastIssuedUtc = await uow.GiftVouchers.GetLatestIssuedUtcAsync(holderId);
-            var decision = _policy.Evaluate(new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc));
-
-            if (!decision.IsEligible)
-            {
-                await uow.RollbackAsync();
-                return false;
-            }
-
-            var voucher = GiftVoucher.Issue(
-                Guid.NewGuid(), 1, holderId, org.Id, org.GiftValue,
-                nowUtc, DateOnly.FromDateTime(nowUtc), userId, workstationId);
-
-            uow.GiftVouchers.Add(voucher);
-            await uow.SaveChangesAsync();
-            await uow.CommitAsync();
-            return true;
-        }
-        catch (SqlException ex) when (ex.Number == 1205)
-        {
-            await uow.RollbackAsync();
-            return false;
-        }
-    }
-
-    private sealed class SimpleUnitOfWorkFactory : IUnitOfWorkFactory
-    {
-        private readonly LocalDbTestFixture _fixture;
-
-        public SimpleUnitOfWorkFactory(LocalDbTestFixture fixture)
-        {
-            _fixture = fixture;
-        }
-
-        public IUnitOfWork Create() => _fixture.CreateUnitOfWork();
+        await using var context = _fixture.CreateDbContext();
+        var holder = new Beneficiary(
+            Guid.NewGuid(),
+            org.Id,
+            CardNumber.Create($"G-{Guid.NewGuid():N}"[..12]),
+            name,
+            PhoneNumber.Create($"092{Random.Shared.Next(1_000_000):D7}"));
+        context.Beneficiaries.Add(holder);
+        await context.SaveChangesAsync();
+        return holder;
     }
 }

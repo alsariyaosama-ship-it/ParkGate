@@ -29,7 +29,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Consequences:** One extra lightweight query per check-in; correct results regardless of client clocks; cloud-ready timestamps.
 
 ### ADR-005 — Cooldown concurrency via row lock + denormalized `LastGrantedEntryUtc`
-- **Status:** Accepted; the row lock is superseded by ADR-026 when R6.13 ships (the denormalized `LastGrantedEntryUtc` stays)
+- **Status:** Accepted; the row lock is superseded by ADR-026 since R6.13 (the denormalized `LastGrantedEntryUtc` stays)
 - **Context:** Two desks could check in the same holder at the same moment.
 - **Decision:** Transaction with `UPDLOCK, ROWLOCK` on the holder row, evaluate policy in Domain, insert attempt, update `LastGrantedEntryUtc`, commit (DATABASE.md §4).
 - **Consequences:** Business rule stays in C# and unit-testable; correctness guaranteed by the DB lock; an integration test guards it.
@@ -177,7 +177,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 ---
 
 ### ADR-026 — Optimistic concurrency instead of the row lock
-- **Status:** Accepted (Osama, 2026-11-18); takes effect with R6.13
+- **Status:** Accepted (Osama, 2026-11-18); in effect since R6.13
 - **Context:** ADR-005 serialises check-ins with `UPDLOCK, ROWLOCK`, which needs SQL text (ADR-025).
 - **Decision:** `Beneficiaries.RowVersion` is the concurrency token. Every grant updates `LastGrantedEntryUtc` and every gift issue updates the new `LastGiftIssuedUtc`, so two desks writing the same holder always conflict. The use case catches `DbUpdateConcurrencyException`, discards the unit of work and runs again from the start, at most 3 times; the retry sees the winner's write and is denied by the normal rules. After the last try it returns `General.ConcurrencyConflict`.
 - **Consequences:** No lock waits and no SQL. A losing desk does a second short round trip. The existing parallel check-in integration test stays the guard and must pass unchanged. DATABASE.md §4 is rewritten when R6.13 ships.

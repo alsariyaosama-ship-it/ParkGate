@@ -1,18 +1,22 @@
 using Microsoft.EntityFrameworkCore;
-using ParkGate.Application.Ports.Persistence;
+using ParkGate.Application.CheckIn.DTOs;
+using ParkGate.Application.Common;
 using ParkGate.Domain.Entities;
 using ParkGate.Domain.Enums;
-using ParkGate.Domain.Policies;
 using ParkGate.Domain.ValueObjects;
-using ParkGate.Infrastructure.Data;
 
 namespace ParkGate.Infrastructure.Tests.Integration;
 
+/// <summary>
+/// BR-12: two desks checking in the same holder at the same moment never both get in. Since R6.13 this runs the
+/// real <c>CheckInService</c>, whose optimistic concurrency and retry replace the row lock (ADR-026).
+/// </summary>
 [Trait("Category", "Integration")]
 public sealed class ParallelCheckInConcurrencyTests : IClassFixture<LocalDbTestFixture>
 {
+    private const int Runs = 20;
+
     private readonly LocalDbTestFixture _fixture;
-    private readonly IEntryEligibilityPolicy _policy = new RollingWindowEligibilityPolicy();
 
     public ParallelCheckInConcurrencyTests(LocalDbTestFixture fixture)
     {
@@ -22,154 +26,92 @@ public sealed class ParallelCheckInConcurrencyTests : IClassFixture<LocalDbTestF
     [Fact]
     public async Task TwoDesks_CheckingInSameHolderConcurrently_ExactlyOneAllowedAndOneDenied_20Runs()
     {
-        var uowFactory = new SimpleUnitOfWorkFactory(_fixture);
+        using var harness = new ServiceHarness(_fixture);
 
-        // Pre-create shared Org, Workstations, and Users once
         await using var setupContext = _fixture.CreateDbContext();
         var org = new Organization($"CONC_{Guid.NewGuid():N}"[..10], "جهة التزامن", cooldownMinutes: 720);
         var ws1 = new Workstation($"WS1_{Guid.NewGuid():N}"[..10], "شباك 1");
         var ws2 = new Workstation($"WS2_{Guid.NewGuid():N}"[..10], "شباك 2");
         var user1 = new User($"op1_{Guid.NewGuid():N}"[..10], "مشغل 1", "hash", UserRole.Operator);
         var user2 = new User($"op2_{Guid.NewGuid():N}"[..10], "مشغل 2", "hash", UserRole.Operator);
-
         setupContext.Organizations.Add(org);
         setupContext.Workstations.AddRange(ws1, ws2);
         setupContext.Users.AddRange(user1, user2);
         await setupContext.SaveChangesAsync();
 
-        // Run 20 consecutive concurrency trials per ROADMAP.md T2.6
-        for (var run = 1; run <= 20; run++)
+        var desks = new[] { harness.CheckIn(user1, ws1), harness.CheckIn(user2, ws2) };
+
+        for (var run = 1; run <= Runs; run++)
         {
-            // Create a fresh holder for each trial with no prior entries
-            var holderId = Guid.NewGuid();
             var holder = new Beneficiary(
-                holderId,
+                Guid.NewGuid(),
                 org.Id,
                 CardNumber.Create($"CARD-CONC-{run:D2}"),
                 $"حامل التزامن {run}",
                 PhoneNumber.Create($"091000{run:D4}"));
-
             setupContext.Beneficiaries.Add(holder);
             await setupContext.SaveChangesAsync();
 
-            // Launch two parallel check-in requests competing for the same holder row
-            using var barrier = new Barrier(2);
+            var results = await ServiceHarness.RunTogetherAsync(
+                2, desk => desks[desk].RecordEntryAsync(new RecordEntryRequest(holder.Id)));
 
-            var task1 = Task.Run(async () =>
-            {
-                barrier.SignalAndWait();
-                return await ExecuteCheckInAsync(uowFactory, _policy, holderId, ws1.Id, user1.Id, 720);
-            });
+            results.Count(r => r.IsSuccess && r.Value.Result == EntryResult.Allowed)
+                .ShouldBe(1, $"Run {run}: expected exactly one Allowed");
+            results.Count(r => r.IsFailure && r.Error.Code == Errors.CheckIn.CooldownActive.Code)
+                .ShouldBe(1, $"Run {run}: expected exactly one denial for the active cooldown");
 
-            var task2 = Task.Run(async () =>
-            {
-                barrier.SignalAndWait();
-                return await ExecuteCheckInAsync(uowFactory, _policy, holderId, ws2.Id, user2.Id, 720);
-            });
+            await using var verify = _fixture.CreateDbContext();
+            var attempts = await verify.EntryAttempts.Where(a => a.BeneficiaryId == holder.Id).ToListAsync();
+            attempts.Count(a => a.Result == EntryResult.Allowed).ShouldBe(1, $"Run {run}: one Allowed row");
+            attempts.Count(a => a.Result == EntryResult.Denied && a.DenialReason == DenialReason.CooldownActive)
+                .ShouldBe(1, $"Run {run}: one Denied/CooldownActive row");
 
-            var results = await Task.WhenAll(task1, task2);
-
-            // Assert: Exactly one Allowed, and exactly one Denied (CooldownActive)
-            results.Count(r => r.Result == EntryResult.Allowed).ShouldBe(1, $"Run {run}: Expected exactly one Allowed");
-            results.Count(r => r.Result == EntryResult.Denied).ShouldBe(1, $"Run {run}: Expected exactly one Denied");
-
-            var deniedResult = results.Single(r => r.Result == EntryResult.Denied);
-            deniedResult.DenialReason.ShouldBe(DenialReason.CooldownActive, $"Run {run}: Expected DenialReason.CooldownActive");
+            var stored = await verify.Beneficiaries.SingleAsync(b => b.Id == holder.Id);
+            stored.LastGrantedEntryUtc.ShouldBe(attempts.Single(a => a.Result == EntryResult.Allowed).AttemptedAtUtc);
         }
     }
 
-    private static async Task<(EntryResult Result, DenialReason? DenialReason)> ExecuteCheckInAsync(
-        IUnitOfWorkFactory uowFactory,
-        IEntryEligibilityPolicy policy,
-        Guid beneficiaryId,
-        int workstationId,
-        int userId,
-        int defaultCooldownMinutes)
+    [Fact]
+    public async Task VoidAndCheckIn_AtTheSameTime_LeaveLastGrantedEntryConsistent()
     {
-        await using var uow = uowFactory.Create();
-        await uow.BeginTransactionAsync();
+        using var harness = new ServiceHarness(_fixture);
 
-        // 1) Lock the holder row with UPDLOCK, ROWLOCK per DATABASE.md §4
-        var holder = await uow.Beneficiaries.GetForUpdateAsync(beneficiaryId);
-        if (holder == null)
-        {
-            throw new InvalidOperationException("Holder not found");
-        }
+        await using var setupContext = _fixture.CreateDbContext();
+        var org = new Organization($"VCI_{Guid.NewGuid():N}"[..10], "جهة الإلغاء المتزامن", cooldownMinutes: 1);
+        var desk = new Workstation($"VCD_{Guid.NewGuid():N}"[..10], "شباك الإلغاء");
+        var supervisor = new User($"vsp_{Guid.NewGuid():N}"[..10], "مشرف", "hash", UserRole.Supervisor);
+        setupContext.Organizations.Add(org);
+        setupContext.Workstations.Add(desk);
+        setupContext.Users.Add(supervisor);
+        await setupContext.SaveChangesAsync();
 
-        var org = await uow.Organizations.GetByIdAsync(holder.OrganizationId);
-        if (org == null)
-        {
-            throw new InvalidOperationException("Organization not found");
-        }
+        var holder = new Beneficiary(
+            Guid.NewGuid(), org.Id, CardNumber.Create($"VCI-{Guid.NewGuid():N}"[..12]), "حامل الإلغاء", PhoneNumber.Create("0913334444"));
+        setupContext.Beneficiaries.Add(holder);
+        await setupContext.SaveChangesAsync();
 
-        // 2) Authoritative DB time per ADR-004 & BR-05
-        var nowUtc = await uow.GetDbUtcNowAsync();
-        var businessDate = DateOnly.FromDateTime(nowUtc);
+        var service = harness.CheckIn(supervisor, desk);
+        var first = await service.RecordEntryAsync(new RecordEntryRequest(holder.Id));
+        first.IsSuccess.ShouldBeTrue();
 
-        // 3) Domain policy evaluation
-        var eligibilityContext = new EligibilityContext(org, holder, defaultCooldownMinutes, nowUtc, businessDate);
-        var effectiveCooldown = org.CooldownMinutes ?? defaultCooldownMinutes;
+        // Void the entry on one desk while a supervisor overrides the cooldown on another.
+        var outcomes = await ServiceHarness.RunTogetherAsync<Result>(2, i => i == 0
+            ? service.VoidEntryAsync(new VoidEntryRequest(first.Value.AttemptId, "إدخال بالخطأ"))
+            : OverrideAsync(service, holder.Id));
 
-        var decision = policy.Evaluate(eligibilityContext);
+        outcomes.ShouldAllBe(r => r.IsSuccess);
 
-        if (decision.IsEligible)
-        {
-            var attempt = EntryAttempt.CreateAllowed(
-                id: Guid.NewGuid(),
-                beneficiaryId: holder.Id,
-                organizationId: org.Id,
-                attemptedAtUtc: nowUtc,
-                businessDate: businessDate,
-                cooldownMinutesApplied: effectiveCooldown,
-                nextEligibleAtUtc: decision.NextEligibleAtUtc!.Value,
-                workstationId: workstationId,
-                userId: userId,
-                channel: EntryChannel.Desk);
-
-            uow.EntryAttempts.Add(attempt);
-            holder.RecordGrantedEntry(nowUtc);
-
-            await uow.SaveChangesAsync();
-            await uow.CommitAsync();
-
-            return (EntryResult.Allowed, null);
-        }
-        else
-        {
-            var attempt = EntryAttempt.CreateDenied(
-                id: Guid.NewGuid(),
-                beneficiaryId: holder.Id,
-                organizationId: org.Id,
-                attemptedAtUtc: nowUtc,
-                businessDate: businessDate,
-                denialReason: decision.DenialReason!.Value,
-                cooldownMinutesApplied: effectiveCooldown,
-                nextEligibleAtUtc: decision.NextEligibleAtUtc,
-                workstationId: workstationId,
-                userId: userId,
-                channel: EntryChannel.Desk);
-
-            uow.EntryAttempts.Add(attempt);
-
-            await uow.SaveChangesAsync();
-            await uow.CommitAsync();
-
-            return (EntryResult.Denied, decision.DenialReason);
-        }
+        await using var verify = _fixture.CreateDbContext();
+        var latestGranted = await verify.EntryAttempts
+            .Where(a => a.BeneficiaryId == holder.Id && !a.IsVoided && a.Result != EntryResult.Denied)
+            .MaxAsync(a => (DateTime?)a.AttemptedAtUtc);
+        var stored = await verify.Beneficiaries.SingleAsync(b => b.Id == holder.Id);
+        stored.LastGrantedEntryUtc.ShouldBe(latestGranted);
     }
 
-    private sealed class SimpleUnitOfWorkFactory : IUnitOfWorkFactory
+    private static async Task<Result> OverrideAsync(Application.CheckIn.Services.CheckInService service, Guid holderId)
     {
-        private readonly LocalDbTestFixture _fixture;
-
-        public SimpleUnitOfWorkFactory(LocalDbTestFixture fixture)
-        {
-            _fixture = fixture;
-        }
-
-        public IUnitOfWork Create()
-        {
-            return _fixture.CreateUnitOfWork();
-        }
+        var result = await service.OverrideEntryAsync(new OverrideEntryRequest(holderId, "زيارة استثنائية"));
+        return result.IsSuccess ? Result.Success() : result.Error;
     }
 }

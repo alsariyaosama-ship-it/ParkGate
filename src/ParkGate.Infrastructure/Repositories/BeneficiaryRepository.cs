@@ -31,9 +31,8 @@ public sealed class BeneficiaryRepository : IBeneficiaryRepository
 
     public async Task<Beneficiary?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _context.Beneficiaries
-            .FromSqlInterpolated($"SELECT * FROM dbo.Beneficiaries WITH (UPDLOCK, ROWLOCK) WHERE Id = {id}")
-            .SingleOrDefaultAsync(cancellationToken);
+        // Tracked read; RowVersion makes a concurrent write by another desk fail at save (ADR-026).
+        return await _context.Beneficiaries.SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
     }
 
     public async Task<IReadOnlyList<Beneficiary>> GetByCardNumberAsync(CardNumber cardNumber, CancellationToken cancellationToken = default)

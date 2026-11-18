@@ -92,6 +92,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return actor.Error;
         }
 
+        return await ConcurrencyRetry.RunAsync(retryCt => IssueOnceAsync(request, actor.Value, retryCt), ct);
+    }
+
+    /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
+    private async Task<Result<IssuedGiftVoucherDto>> IssueOnceAsync(IssueGiftVoucherRequest request, Actor actor, CancellationToken ct)
+    {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
@@ -132,13 +138,14 @@ public sealed class GiftVoucherService : IGiftVoucherService
             org.GiftValue,
             nowUtc,
             businessDate,
-            actor.Value.UserId,
-            actor.Value.WorkstationId);
+            actor.UserId,
+            actor.WorkstationId);
 
         uow.GiftVouchers.Add(voucher);
+        holder.RecordGiftIssued(nowUtc);
         await uow.SaveChangesAsync(ct);
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Issued", actor.Value.UserId, actor.Value.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Issued", actor.UserId, actor.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
 
@@ -188,6 +195,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return Errors.Auth.SupervisorRequired;
         }
 
+        return await ConcurrencyRetry.RunAsync(retryCt => IssueOverrideOnceAsync(request, actor.Value, canApproveSelf, approverUserId, retryCt), ct);
+    }
+
+    /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
+    private async Task<Result<IssuedGiftVoucherDto>> IssueOverrideOnceAsync(IssueGiftOverrideRequest request, Actor actor, bool canApproveSelf, int approverUserId, CancellationToken ct)
+    {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
@@ -242,16 +255,17 @@ public sealed class GiftVoucherService : IGiftVoucherService
             org.GiftValue,
             nowUtc,
             businessDate,
-            actor.Value.UserId,
-            actor.Value.WorkstationId,
+            actor.UserId,
+            actor.WorkstationId,
             overrideByUserId,
             overrideReason);
 
         uow.GiftVouchers.Add(voucher);
+        holder.RecordGiftIssued(nowUtc);
         await uow.SaveChangesAsync(ct);
         var auditAction = isActualOverride ? "Gift.IssuedOverride" : "Gift.Issued";
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, auditAction, approverUserId, actor.Value.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        uow.AuditLogs.Add(new AuditLog(nowUtc, auditAction, approverUserId, actor.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
 
@@ -297,6 +311,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         var token = verifyResult.Token!;
 
+        return await ConcurrencyRetry.RunAsync(retryCt => RedeemOnceAsync(token, actor.Value, retryCt), ct);
+    }
+
+    /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
+    private async Task<Result<GiftRedemptionDto>> RedeemOnceAsync(EntryCardToken token, Actor actor, CancellationToken ct)
+    {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
@@ -330,7 +350,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return Errors.Gift.Expired;
         }
 
-        var (userId, workstationId) = actor.Value;
+        var (userId, workstationId) = actor;
 
         voucher.Redeem(userId, workstationId, nowUtc, businessDate);
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
@@ -389,6 +409,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
             }
         }
 
+        return await ConcurrencyRetry.RunAsync(retryCt => VoidOnceAsync(request, voidedByUserId, retryCt), ct);
+    }
+
+    /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
+    private async Task<Result> VoidOnceAsync(VoidGiftVoucherRequest request, int voidedByUserId, CancellationToken ct)
+    {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
 
@@ -398,7 +424,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             return Errors.Gift.NotFound;
         }
 
-        await uow.Beneficiaries.GetForUpdateAsync(voucher.BeneficiaryId, ct);
+        var holder = await uow.Beneficiaries.GetForUpdateAsync(voucher.BeneficiaryId, ct);
 
         if (voucher.Status == GiftVoucherStatus.Redeemed)
         {
@@ -413,6 +439,8 @@ public sealed class GiftVoucherService : IGiftVoucherService
         var nowUtc = await uow.GetDbUtcNowAsync(ct);
 
         voucher.Void(voidedByUserId, request.Reason, nowUtc);
+        await uow.SaveChangesAsync(ct);
+        holder?.RecalculateLastGiftIssued(await uow.GiftVouchers.GetLatestIssuedUtcAsync(voucher.BeneficiaryId, ct));
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
         uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Voided", voidedByUserId, _currentWorkstation.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, request.Reason })));
         await uow.SaveChangesAsync(ct);

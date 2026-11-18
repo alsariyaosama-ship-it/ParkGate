@@ -100,7 +100,7 @@ Maximum 4 production projects. Do not add a project without an ADR (the future F
   ```csharp
   await using var uow = _uowFactory.Create();      // fresh DbContext from IDbContextFactory
   await uow.BeginTransactionAsync(ct);
-  var holder = await uow.Beneficiaries.GetForUpdateAsync(id, ct);   // UPDLOCK until R6.13, then RowVersion (ADR-026)
+  var holder = await uow.Beneficiaries.GetForUpdateAsync(id, ct);   // tracked; RowVersion conflict → retry (ADR-026)
   var nowUtc = await uow.GetDbUtcNowAsync(ct);                       // DB clock (BR-05)
   var decision = _policy.Evaluate(new EligibilityContext(...));
   ...
@@ -170,7 +170,7 @@ Maximum 4 production projects. Do not add a project without an ADR (the future F
 
 - Follow `docs/DATABASE.md` exactly. Schema change = update DATABASE.md + new migration + ask the user if it touches a released table.
 - Business time = DB time (BR-05). Store UTC; compute `BusinessDate` with `Park.TimeZoneId`.
-- The check-in path must use the concurrency algorithm in DATABASE.md §4 (ADR-005, replaced by ADR-026 in R6.13). Do not "optimize" it away.
+- The check-in path must use the concurrency algorithm in DATABASE.md §4 (ADR-026: optimistic concurrency with `ConcurrencyRetry`). Do not "optimize" it away.
 - **EF Core only (ADR-025).** No `FromSql*`, `SqlQuery*`, `ExecuteSql*`, ADO commands, stored procedures, views, or `migrationBuilder.Sql` in new migrations. Allowed: EF model configuration fragments (`HasDefaultValueSql`, `HasCheckConstraint`, `HasFilter`) and built-in functions mapped with `HasDbFunction`. The only exception is the `BACKUP DATABASE` command in `DatabaseBackupService`. Existing SQL is removed in R6.1, R6.12 and R6.13.
 - Connection strings: `appsettings.json` contains a LocalDB dev default only. Real connection settings are stored in `%ProgramData%\ParkGate\connection.dat`, protected with DPAPI (`ProtectedData`, `LocalMachine`). Never commit real servers, logins or passwords.
 - No default admin password anywhere (ADR-012).

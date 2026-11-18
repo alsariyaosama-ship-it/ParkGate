@@ -66,7 +66,8 @@ CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 | Status | tinyint NOT NULL | `BeneficiaryStatus`, default 1 |
 | StatusReason | nvarchar(250) NULL | Required when status ≠ Active |
 | Notes | nvarchar(500) NULL | |
-| LastGrantedEntryUtc | datetime2(3) NULL | Denormalized for atomic cooldown check (ADR-005) |
+| LastGrantedEntryUtc | datetime2(3) NULL | Denormalized for atomic cooldown check (ADR-005, ADR-026) |
+| LastGiftIssuedUtc | datetime2(3) NULL | R6.13. Latest non-voided gift issue; written on every issue and recalculated on void so that two gift issues for one holder conflict (ADR-026). Not backfilled (no SQL in migrations, ADR-025): NULL until the holder's next gift. Eligibility still reads `GiftVouchers` |
 | audit columns, RowVersion | | |
 
 Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_Beneficiaries_CardNumber (CardNumber)` (cross-org lookup) · `IX_Beneficiaries_Phone` · `UX_Beneficiaries_NationalId` unique filtered `WHERE NationalId IS NOT NULL` · `IX_Beneficiaries_FullName`.
@@ -297,40 +298,25 @@ Unique `UX_OrganizationCardPatterns_Org_Shape_Prefix` on (`OrganizationId`, `Sha
 
 Index `IX_CardPatternAlerts_Org_Status_Shape` on (`OrganizationId`, `Status`, `Shape`).
 
-## 4. Atomic check-in (BR-12, ADR-005)
+## 4. Atomic check-in (BR-12, ADR-026)
 
-All steps run in **one transaction** inside a single unit of work:
+Optimistic concurrency on `Beneficiaries.RowVersion` (ADR-026, since R6.13). Each attempt runs in **one transaction** inside a fresh unit of work:
 
-```sql
-BEGIN TRANSACTION;  -- READ COMMITTED
+1. Read the holder (tracked, no lock hint) and its organization; read the database clock (`SYSUTCDATETIME()` mapped in EF, R6.12).
+2. C#: the Domain policy evaluates → `EligibilityDecision` (no SQL here).
+3. Insert the attempt (+ companions). If granted, set `LastGrantedEntryUtc = nowUtc` on the holder.
+4. `SaveChanges` updates the holder `WHERE Id = @Id AND RowVersion = @Original`. If another desk changed the holder first, no row matches, EF throws `DbUpdateConcurrencyException`, the unit of work translates it to `ConcurrencyConflictException`, and the transaction is rolled back.
+5. `ConcurrencyRetry` runs the whole use case again from step 1 (at most 3 attempts). The retry sees the winner's entry and is denied by the normal rules (`CooldownActive`). After the last attempt the use case returns `General.ConcurrencyConflict`.
 
--- 1) lock the holder row; a second desk blocks here until we commit
-SELECT b.Id, b.Status, b.CardExpiryDate, b.LastGrantedEntryUtc, b.OrganizationId,
-       o.IsActive AS OrgActive, o.CooldownMinutes
-FROM dbo.Beneficiaries b WITH (UPDLOCK, ROWLOCK)
-JOIN dbo.Organizations o ON o.Id = b.OrganizationId
-WHERE b.Id = @BeneficiaryId;
-
--- 2) authoritative time
-SELECT SYSUTCDATETIME();
-
--- 3) C#: Domain policy evaluates → EligibilityDecision (no SQL here)
-
--- 4) insert attempt (+ companions); if granted:
-UPDATE dbo.Beneficiaries SET LastGrantedEntryUtc = @NowUtc WHERE Id = @BeneficiaryId;
-
-COMMIT;
-```
+A denied attempt does not change the holder, so it never conflicts. The same pattern covers override, void, gift issue and override (the holder's `LastGiftIssuedUtc` is written on every issue), gift void (recalculates `LastGiftIssuedUtc`) and gift redeem (the voucher's own `RowVersion`).
 
 EF Core shape (Infrastructure):
-- `IBeneficiaryRepository.GetForUpdateAsync(id)` → `FromSqlInterpolated($"SELECT * FROM dbo.Beneficiaries WITH (UPDLOCK, ROWLOCK) WHERE Id = {id}")`.
+- `IBeneficiaryRepository.GetForUpdateAsync(id)` → a tracked `SingleOrDefaultAsync`; `IGiftVoucherRepository.GetByTokenForUpdateAsync(token)` likewise.
 - `IUnitOfWork.GetDbUtcNowAsync()` → `SYSUTCDATETIME()` mapped as a built-in EF function (`DatabaseClock`, R6.12), queried over the always-present default organization row.
 - The policy itself lives in Domain and is unit-tested without a database.
-- Integration test (required): two parallel check-ins for the same holder → exactly one `Allowed`, one `Denied/CooldownActive`.
+- Integration tests (required), run against the real services: two parallel check-ins for the same holder → exactly one `Allowed`, one `Denied/CooldownActive` (20 runs); ten parallel gift issues → one voucher; ten parallel redeems → one success; a void racing an override leaves `LastGrantedEntryUtc` equal to the latest remaining granted entry.
 
-**Void recalculation (BR-13):** in one transaction, lock the holder row, mark the attempt voided, then set `LastGrantedEntryUtc = MAX(AttemptedAtUtc)` over that holder's non-voided `Allowed/Overridden` attempts (NULL if none).
-
-**Planned change (R6.13, ADR-026):** the `UPDLOCK` read is replaced by optimistic concurrency on `Beneficiaries.RowVersion` with up to 3 retries, `Beneficiaries.LastGiftIssuedUtc` is added for gifts, and the database clock is read through a mapped `SYSUTCDATETIME` function (R6.12). This section is rewritten when R6.13 ships; until then the steps above describe the code.
+**Void recalculation (BR-13):** in one transaction, mark the attempt voided, then set `LastGrantedEntryUtc = MAX(AttemptedAtUtc)` over that holder's non-voided `Allowed/Overridden` attempts (NULL if none). A concurrent change to the holder makes the void retry.
 
 ## 5. Settings keys and defaults (seeded)
 

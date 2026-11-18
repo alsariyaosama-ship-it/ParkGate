@@ -1,6 +1,8 @@
 using System.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using ParkGate.Application.Common;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Infrastructure.Repositories;
 
@@ -8,6 +10,8 @@ namespace ParkGate.Infrastructure.Data;
 
 public sealed class UnitOfWork : IUnitOfWork
 {
+    private const int DeadlockVictim = 1205;
+
     private readonly ParkGateDbContext _context;
     private IDbContextTransaction? _currentTransaction;
 
@@ -85,7 +89,18 @@ public sealed class UnitOfWork : IUnitOfWork
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new ConcurrencyConflictException("Another operation changed the same row first.", ex);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: DeadlockVictim })
+        {
+            throw new ConcurrencyConflictException("The database chose this operation as a deadlock victim.", ex);
+        }
     }
 
     public async Task<DateTime> GetDbUtcNowAsync(CancellationToken cancellationToken = default)
