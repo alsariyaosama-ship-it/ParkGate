@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Infrastructure.Data;
 
@@ -44,6 +45,13 @@ public sealed class LocalDbTestFixture : IAsyncLifetime
     public ParkGateDbContext CreateDbContext()
     {
         return new ParkGateDbContext(_options);
+    }
+
+    /// <summary>A context with the production audit interceptor, for tests of the audit columns (R6.3).</summary>
+    public ParkGateDbContext CreateDbContext(IInterceptor interceptor)
+    {
+        var options = new DbContextOptionsBuilder<ParkGateDbContext>(_options).AddInterceptors(interceptor).Options;
+        return new ParkGateDbContext(options);
     }
 
     public IUnitOfWork CreateUnitOfWork()

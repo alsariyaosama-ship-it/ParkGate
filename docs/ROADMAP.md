@@ -229,7 +229,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 ### R6 — Database design · branch `phase/r6-database`
 - [x] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script
 - [x] R6.2 Rename to conventions (`Utc` suffix, `datetime2(3)`), `WorkstationId` FK, `IX_CardScanLog_CardId`, audit columns
-- [ ] R6.3 Audit columns from the database clock, not the client clock (BR-05)
+- [x] R6.3 Audit columns from the database clock, not the client clock (BR-05)
 - [ ] R6.4 Bring `DATABASE.md` up to the model; test the documented table list against it
 - [ ] R6.5 Least-privilege `parkgate_app` login; restrict the firewall rules — blocked on Q-R6
 - [ ] R6.6 Re-measure the `LIKE '%term%'` name search at 100 000 holders

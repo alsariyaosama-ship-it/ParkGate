@@ -12,7 +12,7 @@ SQL Server Express (2022 or later), database `ParkGate`, schema `dbo`. Managed b
 | Text | `nvarchar` everywhere (Arabic). No `nvarchar(max)` except JSON/details columns |
 | Enums | Stored as `tinyint`; values listed below must never be renumbered |
 | Concurrency | `RowVersion rowversion` on mutable tables (also used for future F3 sync) |
-| Audit columns | `CreatedAtUtc`, `CreatedByUserId`, `UpdatedAtUtc`, `UpdatedByUserId` on mutable business tables, filled by a `SaveChangesInterceptor` |
+| Audit columns | `CreatedAtUtc`, `CreatedByUserId`, `UpdatedAtUtc`, `UpdatedByUserId` on mutable business tables, filled by a `SaveChangesInterceptor` from the database clock: `CreatedAtUtc` keeps its `SYSUTCDATETIME()` default and `UpdatedAtUtc` reads the clock once per save (BR-05, R6.3) |
 | Deletes | No hard deletes on business data (BR-14) |
 | Defaults | DB time defaults use `SYSUTCDATETIME()` |
 

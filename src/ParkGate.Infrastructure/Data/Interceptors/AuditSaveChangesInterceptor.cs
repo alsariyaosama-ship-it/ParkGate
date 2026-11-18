@@ -5,69 +5,75 @@ using ParkGate.Domain.Common;
 namespace ParkGate.Infrastructure.Data.Interceptors;
 
 /// <summary>
-/// EF Core interceptor that automatically populates audit columns on IAuditableEntity instances.
+/// Fills the audit columns of <see cref="IAuditableEntity"/> rows. Times come from the database clock (BR-05,
+/// R6.3), never from the desk: a new row keeps the <c>SYSUTCDATETIME()</c> column default, and an update reads
+/// the clock once per save, only when a tracked auditable row changed.
 /// </summary>
 public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
 {
-    private readonly TimeProvider _timeProvider;
-    private readonly Func<int?>? _currentUserIdProvider;
+    private readonly Func<int?> _currentUserId;
+    private readonly Func<ParkGateDbContext, CancellationToken, Task<DateTime>> _databaseUtcNow;
 
     public AuditSaveChangesInterceptor(
-        TimeProvider? timeProvider = null,
-        Func<int?>? currentUserIdProvider = null)
+        Func<int?>? currentUserIdProvider = null,
+        Func<ParkGateDbContext, CancellationToken, Task<DateTime>>? databaseUtcNow = null)
     {
-        _timeProvider = timeProvider ?? TimeProvider.System;
-        _currentUserIdProvider = currentUserIdProvider;
+        _currentUserId = currentUserIdProvider ?? (() => null);
+        _databaseUtcNow = databaseUtcNow ?? DatabaseClock.GetUtcNowAsync;
     }
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
         InterceptionResult<int> result)
     {
-        UpdateAuditableEntities(eventData.Context);
+        // ParkGateDbContext routes SaveChanges through SaveChangesAsync; this path serves other callers only.
+        UpdateAuditableEntitiesAsync(eventData.Context, CancellationToken.None).GetAwaiter().GetResult();
         return base.SavingChanges(eventData, result);
     }
 
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        UpdateAuditableEntities(eventData.Context);
-        return base.SavingChangesAsync(eventData, result, cancellationToken);
+        await UpdateAuditableEntitiesAsync(eventData.Context, cancellationToken);
+        return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private void UpdateAuditableEntities(DbContext? context)
+    private async Task UpdateAuditableEntitiesAsync(DbContext? context, CancellationToken cancellationToken)
     {
-        if (context == null)
+        if (context is not ParkGateDbContext parkGate)
         {
             return;
         }
 
-        var nowUtc = _timeProvider.GetUtcNow().UtcDateTime;
-        var currentUserId = _currentUserIdProvider?.Invoke();
+        var entries = context.ChangeTracker.Entries<IAuditableEntity>()
+            .Where(e => e.State is EntityState.Added or EntityState.Modified)
+            .ToList();
+        if (entries.Count == 0)
+        {
+            return;
+        }
 
-        foreach (var entry in context.ChangeTracker.Entries<IAuditableEntity>())
+        var currentUserId = _currentUserId();
+        DateTime? updatedAtUtc = null;
+
+        foreach (var entry in entries)
         {
             if (entry.State == EntityState.Added)
             {
-                if (entry.Entity.CreatedAtUtc == default)
-                {
-                    entry.Entity.CreatedAtUtc = nowUtc;
-                }
-
+                // CreatedAtUtc stays default so the column default SYSUTCDATETIME() sets it.
                 entry.Entity.CreatedByUserId ??= currentUserId;
                 entry.Entity.UpdatedAtUtc = null;
                 entry.Entity.UpdatedByUserId = null;
+                continue;
             }
-            else if (entry.State == EntityState.Modified)
-            {
-                entry.Entity.UpdatedAtUtc = nowUtc;
-                entry.Entity.UpdatedByUserId = currentUserId;
 
-                entry.Property(nameof(IAuditableEntity.CreatedAtUtc)).IsModified = false;
-                entry.Property(nameof(IAuditableEntity.CreatedByUserId)).IsModified = false;
-            }
+            updatedAtUtc ??= await _databaseUtcNow(parkGate, cancellationToken);
+            entry.Entity.UpdatedAtUtc = updatedAtUtc;
+            entry.Entity.UpdatedByUserId = currentUserId;
+            entry.Property(nameof(IAuditableEntity.CreatedAtUtc)).IsModified = false;
+            entry.Property(nameof(IAuditableEntity.CreatedByUserId)).IsModified = false;
         }
     }
 }
