@@ -196,6 +196,7 @@ public partial class CheckInDeskControl : UserControl
         };
         _btnClear.Click += (_, _) => ResetDesk();
         _btnNewHolder.Click += (_, _) => StartManualRegistration();
+        _flowCounters.ClientSizeChanged += (_, _) => ResizeCounters();
         _registrationPanel.CancelRequested += (_, _) => HideInlineRegistration();
         _registrationPanel.SaveRequested += async (_, _) => await SaveInlineRegistrationAsync();
         _btnRecordEntry.Click += async (_, _) => await RecordEntryAsync();
@@ -386,7 +387,7 @@ public partial class CheckInDeskControl : UserControl
                     ? string.Format(Strings.Label_CounterWithShortcut, cat.NameAr, number)
                     : $"{cat.NameAr}:",
                 Tag = cat.Id,
-                Width = Math.Max(260, _flowCounters.ClientSize.Width - 12),
+                Width = CounterWidth(),
                 Height = 56,
                 Margin = new Padding(2, 4, 2, 4),
                 MinValue = 0,
@@ -405,6 +406,20 @@ public partial class CheckInDeskControl : UserControl
     }
 
     private const int MaxCounterShortcut = 9;
+    private const int MinCounterWidth = 220;
+
+    private void ResizeCounters()
+    {
+        var width = CounterWidth();
+        foreach (var counter in _counterInputs)
+        {
+            counter.Width = width;
+        }
+    }
+
+    /// <summary>R5.8: two counters per row, so four categories fit in the compact middle area.</summary>
+    private int CounterWidth() =>
+        Math.Max(LogicalToDeviceUnits(MinCounterWidth), (_flowCounters.ClientSize.Width - LogicalToDeviceUnits(16)) / 2);
 
     // R5.7: each cue has its own setting (Entry.SuccessSoundEnabled, Entry.DenialSoundEnabled).
     private void PlayGrantedSound()

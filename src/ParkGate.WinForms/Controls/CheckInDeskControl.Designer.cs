@@ -88,15 +88,15 @@ partial class CheckInDeskControl
         this._mainLayout.Dock = System.Windows.Forms.DockStyle.Fill;
         this._mainLayout.Location = new System.Drawing.Point(10, 10);
         this._mainLayout.Margin = new System.Windows.Forms.Padding(0);
-        this._mainLayout.MinimumSize = new System.Drawing.Size(0, 690);
+        this._mainLayout.MinimumSize = new System.Drawing.Size(0, 560);
         this._mainLayout.Name = "_mainLayout";
         this._mainLayout.RowCount = 6;
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 76F));
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 62F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 176F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 38F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._mainLayout.Size = new System.Drawing.Size(988, 641);
         this._mainLayout.TabIndex = 0;
         // 
@@ -243,7 +243,7 @@ partial class CheckInDeskControl
         this._grpHolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpHolder.Location = new System.Drawing.Point(0, 0);
         this._grpHolder.Name = "_grpHolder";
-        this._grpHolder.Padding = new System.Windows.Forms.Padding(8);
+        this._grpHolder.Padding = new System.Windows.Forms.Padding(6, 2, 6, 4);
         this._grpHolder.Size = new System.Drawing.Size(500, 254);
         this._grpHolder.TabIndex = 0;
         this._grpHolder.TabStop = false;
@@ -251,35 +251,35 @@ partial class CheckInDeskControl
         // 
         // _tblHolder
         // 
-        this._tblHolder.ColumnCount = 2;
-        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 145F));
-        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._tblHolder.ColumnCount = 4;
+        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
         this._tblHolder.Controls.Add(this._lblHolderNameTitle, 0, 0);
         this._tblHolder.Controls.Add(this._lblHolderName, 1, 0);
         this._tblHolder.Controls.Add(this._lblHolderPhoneTitle, 0, 1);
         this._tblHolder.Controls.Add(this._lblHolderPhone, 1, 1);
-        this._tblHolder.Controls.Add(this._lblHolderOrgTitle, 0, 2);
-        this._tblHolder.Controls.Add(this._lblHolderOrg, 1, 2);
-        this._tblHolder.Controls.Add(this._lblHolderNatIdTitle, 0, 3);
-        this._tblHolder.Controls.Add(this._lblHolderNatId, 1, 3);
-        this._tblHolder.Controls.Add(this._lblHolderExpiryTitle, 0, 4);
-        this._tblHolder.Controls.Add(this._lblHolderExpiry, 1, 4);
-        this._tblHolder.Controls.Add(this._lblHolderLastEntryTitle, 0, 5);
-        this._tblHolder.Controls.Add(this._lblHolderLastEntry, 1, 5);
-        this._tblHolder.Controls.Add(this._lblHolderStatusTitle, 0, 6);
-        this._tblHolder.Controls.Add(this._lblHolderStatus, 1, 6);
+        this._tblHolder.Controls.Add(this._lblHolderOrgTitle, 2, 1);
+        this._tblHolder.Controls.Add(this._lblHolderOrg, 3, 1);
+        this._tblHolder.Controls.Add(this._lblHolderNatIdTitle, 0, 2);
+        this._tblHolder.Controls.Add(this._lblHolderNatId, 1, 2);
+        this._tblHolder.Controls.Add(this._lblHolderExpiryTitle, 2, 2);
+        this._tblHolder.Controls.Add(this._lblHolderExpiry, 3, 2);
+        this._tblHolder.Controls.Add(this._lblHolderLastEntryTitle, 0, 3);
+        this._tblHolder.Controls.Add(this._lblHolderLastEntry, 1, 3);
+        this._tblHolder.Controls.Add(this._lblHolderStatusTitle, 2, 3);
+        this._tblHolder.Controls.Add(this._lblHolderStatus, 3, 3);
+        this._tblHolder.SetColumnSpan(this._lblHolderName, 3);
         this._tblHolder.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblHolder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblHolder.Location = new System.Drawing.Point(8, 26);
         this._tblHolder.Name = "_tblHolder";
-        this._tblHolder.RowCount = 7;
-        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
+        this._tblHolder.RowCount = 4;
+        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+        this._tblHolder.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
         this._tblHolder.Size = new System.Drawing.Size(484, 220);
         this._tblHolder.TabIndex = 0;
         // 
@@ -442,7 +442,7 @@ partial class CheckInDeskControl
         this._grpCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpCompanions.Location = new System.Drawing.Point(0, 0);
         this._grpCompanions.Name = "_grpCompanions";
-        this._grpCompanions.Padding = new System.Windows.Forms.Padding(8);
+        this._grpCompanions.Padding = new System.Windows.Forms.Padding(6, 2, 6, 4);
         this._grpCompanions.Size = new System.Drawing.Size(484, 254);
         this._grpCompanions.TabIndex = 0;
         this._grpCompanions.TabStop = false;
@@ -452,13 +452,13 @@ partial class CheckInDeskControl
         // 
         this._flowCounters.AutoScroll = true;
         this._flowCounters.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._flowCounters.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+        this._flowCounters.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight;
         this._flowCounters.Location = new System.Drawing.Point(8, 26);
         this._flowCounters.Name = "_flowCounters";
-        this._flowCounters.Padding = new System.Windows.Forms.Padding(4);
+        this._flowCounters.Padding = new System.Windows.Forms.Padding(2);
         this._flowCounters.Size = new System.Drawing.Size(468, 220);
         this._flowCounters.TabIndex = 0;
-        this._flowCounters.WrapContents = false;
+        this._flowCounters.WrapContents = true;
         // 
         // _pnlActions
         // 
@@ -620,7 +620,7 @@ partial class CheckInDeskControl
         this._giftPanel.Location = new System.Drawing.Point(0, 428);
         this._giftPanel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
         this._giftPanel.Name = "_giftPanel";
-        this._giftPanel.Size = new System.Drawing.Size(988, 70);
+        this._giftPanel.Size = new System.Drawing.Size(988, 46);
         this._giftPanel.TabIndex = 4;
         this._giftPanel.Visible = false;
         //

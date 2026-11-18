@@ -222,7 +222,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R5.5 Mark companion counts prefilled from the last visit
 - [x] R5.6 Visible «إلغاء العملية…» button above the today grid
 - [x] R5.7 Distinct success and denial sounds, with separate settings
-- [ ] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
+- [x] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
 - [x] R5.9 Fix amber banner contrast (below 4.5:1)
 - [x] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
 - [x] R5.11 Search row in a `TableLayoutPanel` (card box and its label overlap at 125 %)

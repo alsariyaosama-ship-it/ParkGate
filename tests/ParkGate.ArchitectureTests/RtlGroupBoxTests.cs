@@ -50,6 +50,17 @@ public sealed partial class RtlGroupBoxTests
     }
 
     [Fact]
+    public void NoCaption_KeepsNoSpaceForOne()
+    {
+        using var withCaption = new RtlGroupBox { Size = new Size(300, 80), Padding = new Padding(4), Text = "بيانات الزائر", Font = AppFont.CreateFont(10F, FontStyle.Bold) };
+        using var without = new RtlGroupBox { Size = new Size(300, 80), Padding = new Padding(4), Font = AppFont.CreateFont(10F, FontStyle.Bold) };
+
+        without.DisplayRectangle.Top.ShouldBe(5);
+        without.DisplayRectangle.Height.ShouldBe(80 - 8 - 2);
+        withCaption.DisplayRectangle.Top.ShouldBeGreaterThan(without.DisplayRectangle.Top);
+    }
+
+    [Fact]
     public void Designers_UseRtlGroupBox()
     {
         var root = FindRepoRoot();

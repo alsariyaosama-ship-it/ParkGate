@@ -31,9 +31,9 @@ partial class CounterInput
         // 
         this._layoutPanel.ColumnCount = 4;
         this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 56F));
-        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 76F));
-        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 56F));
+        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 46F));
+        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 64F));
+        this._layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 46F));
         this._layoutPanel.Controls.Add(this._lblTitle, 0, 0);
         this._layoutPanel.Controls.Add(this._btnDecrement, 1, 0);
         this._layoutPanel.Controls.Add(this._txtValue, 2, 0);
@@ -73,7 +73,7 @@ partial class CounterInput
         this._btnDecrement.Location = new System.Drawing.Point(135, 3);
         this._btnDecrement.Margin = new System.Windows.Forms.Padding(0);
         this._btnDecrement.Name = "_btnDecrement";
-        this._btnDecrement.Size = new System.Drawing.Size(50, 48);
+        this._btnDecrement.Size = new System.Drawing.Size(42, 48);
         this._btnDecrement.TabIndex = 1;
         this._btnDecrement.Text = "−";
         this._btnDecrement.UseVisualStyleBackColor = false;
@@ -87,7 +87,7 @@ partial class CounterInput
         this._txtValue.Margin = new System.Windows.Forms.Padding(0);
         this._txtValue.MaxLength = 3;
         this._txtValue.Name = "_txtValue";
-        this._txtValue.Size = new System.Drawing.Size(70, 44);
+        this._txtValue.Size = new System.Drawing.Size(58, 44);
         this._txtValue.TabIndex = 2;
         this._txtValue.Text = "0";
         this._txtValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -104,7 +104,7 @@ partial class CounterInput
         this._btnIncrement.Location = new System.Drawing.Point(3, 3);
         this._btnIncrement.Margin = new System.Windows.Forms.Padding(0);
         this._btnIncrement.Name = "_btnIncrement";
-        this._btnIncrement.Size = new System.Drawing.Size(50, 48);
+        this._btnIncrement.Size = new System.Drawing.Size(42, 48);
         this._btnIncrement.TabIndex = 3;
         this._btnIncrement.Text = "+";
         this._btnIncrement.UseVisualStyleBackColor = false;

@@ -382,7 +382,7 @@ partial class MainForm
         Controls.Add(_mainMenuStrip);
         MainMenuStrip = _mainMenuStrip;
         Margin = new Padding(4);
-        MinimumSize = new Size(1196, 788);
+        MinimumSize = new Size(1024, 700);
         Name = "MainForm";
         Text = "بوابة منتزه المرح العائلي";
         _mainMenuStrip.ResumeLayout(false);

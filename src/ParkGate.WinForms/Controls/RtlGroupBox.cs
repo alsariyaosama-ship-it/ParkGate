@@ -87,6 +87,27 @@ public class RtlGroupBox : GroupBox
         TextRenderer.DrawText(g, Text, Font, caption, Enabled ? ForeColor : SystemColors.GrayText, CaptionFlags);
     }
 
+    /// <summary>
+    /// Without a caption no space is kept for one (R5.8): the frame starts at the top, so the content does too.
+    /// </summary>
+    public override Rectangle DisplayRectangle
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(Text))
+            {
+                return base.DisplayRectangle;
+            }
+
+            var client = ClientRectangle;
+            return new Rectangle(
+                client.X + Padding.Left + 1,
+                client.Y + Padding.Top + 1,
+                Math.Max(0, client.Width - Padding.Horizontal - 2),
+                Math.Max(0, client.Height - Padding.Vertical - 2));
+        }
+    }
+
     protected override void OnTextChanged(EventArgs e)
     {
         base.OnTextChanged(e);

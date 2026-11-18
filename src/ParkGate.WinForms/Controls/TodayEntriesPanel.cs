@@ -21,7 +21,11 @@ public partial class TodayEntriesPanel : UserControl
         InitializeComponent();
         Theme.ApplyGridStyle(_gridToday);
 
-        _grpToday.Text = Strings.Title_TodayDesk;
+        // R5.8: compact rows so five fit on a 1366x768 desk at 100 %; the title moved into the totals line.
+        _gridToday.ColumnHeadersHeight = LogicalToDeviceUnits(CompactHeaderHeight);
+        _gridToday.RowTemplate.Height = LogicalToDeviceUnits(CompactRowHeight);
+        _gridToday.DefaultCellStyle.Padding = new Padding(3, 0, 3, 0);
+        _lblTodayTitle.Text = Strings.Title_TodayDesk;
         _colTime.HeaderText = Strings.Col_Time;
         _colCard.HeaderText = Strings.Col_CardNumber;
         _colName.HeaderText = Strings.Col_HolderName;
@@ -65,6 +69,9 @@ public partial class TodayEntriesPanel : UserControl
         };
         _gridToday.SelectionChanged += (_, _) => UpdateVoidButton();
     }
+
+    private const int CompactHeaderHeight = 30;
+    private const int CompactRowHeight = 28;
 
     public event EventHandler? VoidRequested;
 

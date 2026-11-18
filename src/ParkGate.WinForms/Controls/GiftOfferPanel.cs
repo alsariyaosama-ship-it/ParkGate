@@ -66,7 +66,6 @@ public partial class GiftOfferPanel : UserControl
 
     private void InitializeControlText()
     {
-        _grpMain.Text = Strings.Title_GiftOffer;
         _btnIssue.Text = Strings.Btn_IssueGift;
         _btnIssueOverride.Text = Strings.Btn_IssueGiftOverride;
     }
