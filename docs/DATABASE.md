@@ -42,15 +42,15 @@ CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 | Id | int IDENTITY PK | |
 | Code | nvarchar(20) NOT NULL | Unique, e.g. `SSF` |
 | NameAr | nvarchar(150) NOT NULL | |
-| CooldownMinutes | int NULL | NULL = use default setting. CHECK 1..10080 |
+| CooldownMinutes | int NULL | NULL = use default setting. CHECK 1..10080 (`CK_Organizations_CooldownMinutes`) |
 | IsDefault | bit NOT NULL | Exactly one default (filtered unique index on `IsDefault = 1`) |
 | IsActive | bit NOT NULL | |
 | MaxFreeCompanions | int NULL | F5. NULL = no org-specific limit. CHECK 0..50 (`CK_Organizations_MaxFreeCompanions`) |
 | GiftEnabled | bit NOT NULL | F5. Default 0 |
 | GiftValue | decimal(10,3) NOT NULL | F5. Default 0. CHECK `GiftEnabled = 0 OR GiftValue > 0` (`CK_Organizations_GiftValue`) |
 | GiftIntervalDays | int NOT NULL | F5. Default 30. CHECK 1..365 (`CK_Organizations_GiftIntervalDays`) |
-| AllowedEntryDays | tinyint NOT NULL | F8, BR-27. Bit mask, bit 0 = Sunday … bit 6 = Saturday (.NET `DayOfWeek`). Default 127 (all days). CHECK 1..127 (`CK_Organizations_AllowedEntryDays`) |
-| GiftAnyDay | bit NOT NULL | F8, BR-28. Default 0 = gifts only on allowed entry days |
+| AllowedEntryDays | tinyint NOT NULL | F8, proposed (add when F8 starts), BR-27. Bit mask, bit 0 = Sunday … bit 6 = Saturday (.NET `DayOfWeek`). Default 127 (all days). CHECK 1..127 (`CK_Organizations_AllowedEntryDays`) |
+| GiftAnyDay | bit NOT NULL | F8, proposed (add when F8 starts), BR-28. Default 0 = gifts only on allowed entry days |
 | audit columns, RowVersion | | |
 
 ### 3.2 `Beneficiaries` — حاملو البطاقات
@@ -64,7 +64,7 @@ CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 | NationalId | nvarchar(12) NULL | 12 digits (BR-16) |
 | CardExpiryDate | date NULL | |
 | Status | tinyint NOT NULL | `BeneficiaryStatus`, default 1 |
-| StatusReason | nvarchar(250) NULL | Required when status ≠ Active |
+| StatusReason | nvarchar(250) NULL | Required when status ≠ Active (`CK_Beneficiaries_StatusReason`) |
 | Notes | nvarchar(500) NULL | |
 | LastGrantedEntryUtc | datetime2(3) NULL | Denormalized for atomic cooldown check (ADR-005, ADR-026) |
 | LastGiftIssuedUtc | datetime2(3) NULL | R6.13. Latest non-voided gift issue; written on every issue and recalculated on void so that two gift issues for one holder conflict (ADR-026). Not backfilled (no SQL in migrations, ADR-025): NULL until the holder's next gift. Eligibility still reads `GiftVouchers` |
@@ -91,7 +91,7 @@ Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_
 | AttemptedAtUtc | datetime2(3) NOT NULL | DB time |
 | BusinessDate | date NOT NULL | Park-local date of `AttemptedAtUtc` (fast daily reports) |
 | Result | tinyint NOT NULL | `EntryResult` |
-| DenialReason | tinyint NULL | Required when Result = Denied, NULL otherwise (CHECK) |
+| DenialReason | tinyint NULL | Required when Result = Denied, NULL otherwise (`CK_EntryAttempts_DenialReason`) |
 | CooldownMinutesApplied | int NOT NULL | Snapshot of the effective cooldown |
 | NextEligibleAtUtc | datetime2(3) NULL | For denied (cooldown) and granted rows |
 | TotalPersons | int NOT NULL | 1 + Σ companions (0 for Denied rows where companions were not entered) |
@@ -99,11 +99,11 @@ Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_
 | WorkstationId | int FK → Workstations | |
 | UserId | int FK → Users | Operator at the desk |
 | OverrideByUserId | int NULL FK → Users | Set when Result = Overridden |
-| OverrideReason | nvarchar(250) NULL | Required when Overridden (CHECK) |
+| OverrideReason | nvarchar(250) NULL | Required when Overridden; with `OverrideByUserId`, set only when Overridden (`CK_EntryAttempts_Override`) |
 | IsVoided | bit NOT NULL default 0 | BR-13 |
 | VoidedAtUtc | datetime2(3) NULL | |
 | VoidedByUserId | int NULL FK → Users | |
-| VoidReason | nvarchar(250) NULL | |
+| VoidReason | nvarchar(250) NULL | `IsVoided = 1` ⇔ `VoidedAtUtc`, `VoidedByUserId` and `VoidReason` all set (`CK_EntryAttempts_Void`) |
 | RowVersion | rowversion | |
 
 Indexes: `IX_EntryAttempts_Beneficiary_Time (BeneficiaryId, AttemptedAtUtc DESC)` · `IX_EntryAttempts_BusinessDate (BusinessDate) INCLUDE (Result, TotalPersons, OrganizationId, IsVoided)` · `IX_EntryAttempts_Workstation_Time (WorkstationId, AttemptedAtUtc DESC)`.
@@ -113,7 +113,7 @@ Indexes: `IX_EntryAttempts_Beneficiary_Time (BeneficiaryId, AttemptedAtUtc DESC)
 |---|---|---|
 | EntryAttemptId | uniqueidentifier FK | PK part 1, cascade delete not needed (no deletes) |
 | AgeCategoryId | int FK | PK part 2 |
-| Count | int NOT NULL | CHECK ≥ 0. Rows with 0 may be omitted |
+| Count | int NOT NULL | CHECK ≥ 0 (`CK_EntryAttemptCompanions_Count`). Rows with 0 may be omitted |
 
 ### 3.6 `Users` — المستخدمون
 | Column | Type | Notes |
@@ -328,14 +328,19 @@ EF Core shape (Infrastructure):
 | `Entry.MaxGroupSize` | `10` | BR-07 (holder included) |
 | `Entry.DenialDedupMinutes` | `5` | BR-10 |
 | `Entry.PrefillCompanionsFromLastVisit` | `true` | §5.1 step 5 |
-| `Entry.PlaySoundOnDenial` | `true` | FR-CHK-08 |
+| `Entry.PlaySoundOnDenial` | `true` | Seeded but never read: the app reads and writes `Entry.DenialSoundEnabled` (R6.15) |
+| `Entry.DenialSoundEnabled` | `true` (not seeded) | FR-CHK-08. Written on the first settings save |
 | `Security.MaxFailedLogins` | `5` | BR-18 |
 | `Security.LockoutMinutes` | `15` | BR-18 |
+| `Security.AutoLockMinutes` | `0` (not seeded) | Minutes of inactivity before the desk locks; 0 = never. Written on the first settings save |
 | `Ui.MaskNationalIdForOperators` | `true` | §8 Security |
-| `CardPattern.MinSample` | `10` | F8, BR-29: cards needed before a pattern is proposed |
-| `CardPattern.NewSeriesThreshold` | `5` | F8, BR-29: alerts with one shape before it is proposed as a new series |
-| `CardPattern.PrefixLength` | `2` | F8, BR-29 |
-| `CardPattern.PrefixSharePercent` | `90` | F8, BR-29: share of numbers that must start with the prefix |
+| `SyncAgent.LastHeartbeatUtc`, `SyncAgent.PendingCount`, `SyncAgent.FailedCount` | (not seeded) | Written by the sync agent's heartbeat; read by the admin status bar (R2.5) |
+| `CardPattern.MinSample` | `10` | F8, proposed, BR-29: cards needed before a pattern is proposed |
+| `CardPattern.NewSeriesThreshold` | `5` | F8, proposed, BR-29: alerts with one shape before it is proposed as a new series |
+| `CardPattern.PrefixLength` | `2` | F8, proposed, BR-29 |
+| `CardPattern.PrefixSharePercent` | `90` | F8, proposed, BR-29: share of numbers that must start with the prefix |
+
+`DatabaseDocumentationTests` checks that every table, column, check constraint and seeded key here matches the EF model (R6.4).
 
 Settings are read through a typed `ISettingsService` in Application (no raw key strings outside one constants class).
 
