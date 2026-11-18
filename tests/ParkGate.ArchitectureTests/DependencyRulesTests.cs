@@ -122,6 +122,18 @@ public sealed class DependencyRulesTests
         offenders.ShouldBeEmpty("Use an Application port; only the composition root may reference Infrastructure.");
     }
 
+    [Fact]
+    public void ProgramMain_IsSynchronousAndSta()
+    {
+        // R7.11: [STAThread] is ignored on an async Main; after the first await the UI ran on an MTA
+        // thread-pool thread, and SaveFileDialog/PrintDialog threw ThreadStateException.
+        var main = WinFormsAssembly.GetType("ParkGate.WinForms.Program", throwOnError: true)!
+            .GetMethod("Main", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)!;
+
+        main.ReturnType.ShouldBe(typeof(void));
+        main.GetCustomAttribute<STAThreadAttribute>().ShouldNotBeNull();
+    }
+
     private static string FindRepoRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
