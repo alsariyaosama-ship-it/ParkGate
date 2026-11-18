@@ -10,11 +10,11 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-18 |
-| Last session | S36 — R6 complete except R6.5 (blocked Q-R6); R6 PR #17 open |
-| Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 PR open from `phase/r6-database` |
-| Working branch | `phase/r6-database` |
+| Last session | S37 — R7.6 done on `phase/r7-consistency` (PR #17 merged into `main`) |
+| Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 merged (PR #17). R7 in progress on `phase/r7-consistency` |
+| Working branch | `phase/r7-consistency` (from `main` `88c9867`) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 723 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 185 architecture |
+| .NET Unit tests | 724 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 186 architecture |
 | .NET Integration tests | 56 passed on LocalDB |
 | Web tests | `php artisan test` (PHP 8.4): 98 passed on SQLite (MySQL job runs in CI) |
 | Total tests | 877 (779 .NET + 98 web), all green |
@@ -120,6 +120,9 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
+**S37 (2026-11-18, `phase/r7-consistency`): R7.6 done.** `IssueQrDialog` renders the QR through `IQrImageRenderer` (Application port) instead of Infrastructure's `QrImageRenderer`. New `WinFormsSource_OnlyCompositionRootMentionsInfrastructure` scans the source, because the reflection test misses static calls.
+**Next:** R7.7 (all message boxes through `Notify`), then R7.8, R7.9.
+
 **S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
 Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
 **Next:** Osama re-runs `scripts\backup.ps1` as Administrator, then reviews and merges PR #17. Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6. A purge command for the approved retention periods is not built; add it as a task when Osama wants it.
@@ -166,6 +169,11 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S37 — 2026-11-18 — R7.6
+- PR #17 was merged; created `phase/r7-consistency` from `main`. Baseline green (723 unit).
+- R7.6 test-first: the new source-scan test failed on `IssueQrDialog.cs` only, then passed. Tests 723 → 724.
+- No test resolves forms from DI; the new constructor follows `GiftQrDialog`'s pattern. R7.9 makes the services required.
 
 ### S36 — 2026-11-18 — Phase R6 complete (except R6.5, R6.16); R6 PR
 - Baseline green (701 unit). One commit per task, test-first.
@@ -239,22 +247,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Merged PR #11 (R0) at Osama's request after CI went green; `main` = `6a3201e`.
 - R1.1–R1.7 done test-first on `phase/r1-web-security`; web tests 33 → 58. R1.8 deferred to after R2.6.
 - No .NET code changed.
-### S27 — 2026-11-13 — Phase R0 completed (local session)
-- `git fetch origin`: `main` == `origin/main` == `13ec3c6`, nothing unpushed. S26's static result confirmed.
-- Created `phase/r0-baseline`; committed the remediation plan, roadmap Phase R and handoff [R0.1][R0.3].
-- R0.2 baseline (all green): build 0 errors / 16 NU190x warnings; 588 unit + 34 integration; web 33.
-- R0.4: moved `docs/_R0.4-web-workflow.yml` to `.github/workflows/web.yml` (the parked file was untracked,
-  so a plain move + `git add`, not `git mv`).
-- **Line-ending trap for manual verification.** `GiftQrDialog.cs`, `IssueQrDialog.cs`, `Strings.resx` and
-  `Strings.Designer.cs` have the same content as their blobs, but SHA-1 over the raw bytes shows a false
-  difference in three of them. Cause: `.gitattributes` sets `*.cs`/`*.resx` `text eol=crlf`, so the blob
-  is normalized to LF while the working file is CRLF, and the index records the working-file size, not the
-  blob size. Any future manual hash check must normalize CRLF→LF before hashing (or use
-  `git hash-object`, which applies the filters).
-- `git ls-files --eol` (S27) shows more than S26 assumed: `IssueQrDialog.cs` is `w/lf` (pure LF, 193 lines)
-  despite `eol=crlf`; `GiftQrDialog.cs` (16 LF), `Strings.resx` (3 LF) and `Strings.Designer.cs` (1 LF)
-  are `w/mixed`. Git reports them clean now, but the first save from Visual Studio will likely show a
-  whole-file diff for `IssueQrDialog.cs`. Fix: `git rm --cached` + `git checkout` of these files (or
-  `git add --renormalize .`) in a dedicated commit; added to R9 if not done earlier.
-- Untracked, left out of the commit: `Claude outputs/web.yml` (byte-identical duplicate of the workflow)
-  and `scripts/r0-baseline.ps1` (optional helper). Osama to decide: delete or keep.
