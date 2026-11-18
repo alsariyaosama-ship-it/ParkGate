@@ -201,19 +201,19 @@ partial class ReportsControl
 
         this._btnRunReport.BackColor = System.Drawing.Color.FromArgb(27, 135, 63);
         this._btnRunReport.ForeColor = System.Drawing.Color.White;
-        this._btnRunReport.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
+        this._btnRunReport.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold);
         this._btnRunReport.Size = new System.Drawing.Size(120, 34);
         this._btnRunReport.Text = "عرض التقرير";
 
         this._btnExportExcel.BackColor = System.Drawing.Color.FromArgb(46, 125, 50);
         this._btnExportExcel.ForeColor = System.Drawing.Color.White;
-        this._btnExportExcel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
+        this._btnExportExcel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold);
         this._btnExportExcel.Size = new System.Drawing.Size(140, 34);
         this._btnExportExcel.Text = "تصدير إلى Excel";
 
         this._btnPrintPreview.BackColor = System.Drawing.Color.FromArgb(55, 71, 79);
         this._btnPrintPreview.ForeColor = System.Drawing.Color.White;
-        this._btnPrintPreview.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
+        this._btnPrintPreview.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold);
         this._btnPrintPreview.Size = new System.Drawing.Size(130, 34);
         this._btnPrintPreview.Text = "معاينة الطباعة";
 
@@ -382,7 +382,7 @@ partial class ReportsControl
 
         this._lblDenialsCount.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._lblDenialsCount.Height = 35;
-        this._lblDenialsCount.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold);
+        this._lblDenialsCount.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold);
         this._lblDenialsCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         this._lblDenialsCount.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
 

@@ -37,7 +37,8 @@ public static class Theme
     public static Font BodyBold => AppFont.CreateFont(10F, FontStyle.Bold);
     public static Font Section => AppFont.CreateFont(12F, FontStyle.Bold);
     public static Font Title => AppFont.CreateFont(14F, FontStyle.Bold);
-    public static Font Caption => AppFont.CreateFont(8.5F, FontStyle.Regular);
+    public static Font Caption => AppFont.CreateFont(9F, FontStyle.Regular);
+    public static Font Banner => AppFont.CreateFont(20F, FontStyle.Bold);
 
     // Spacing (4 px grid)
     public const int S1 = 4;
@@ -85,7 +86,7 @@ public static class Theme
         g.DefaultCellStyle.ForeColor = TextPrimary;
         g.DefaultCellStyle.SelectionBackColor = Selection;
         g.DefaultCellStyle.SelectionForeColor = SelectionText;
-        g.DefaultCellStyle.Font = AppFont.CreateFont(9.5F, FontStyle.Regular);
+        g.DefaultCellStyle.Font = AppFont.CreateFont(10F, FontStyle.Regular);
         g.DefaultCellStyle.Padding = new Padding(12, 0, 12, 0);
         g.AlternatingRowsDefaultCellStyle.BackColor = SurfaceAlt;
 
@@ -118,6 +119,6 @@ public static class Theme
         b.FlatStyle = FlatStyle.Flat;
         b.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
         b.Cursor = Cursors.Hand;
-        b.Font = AppFont.CreateFont(9.5F, FontStyle.Regular);
+        b.Font = AppFont.CreateFont(10F, FontStyle.Regular);
     }
 }

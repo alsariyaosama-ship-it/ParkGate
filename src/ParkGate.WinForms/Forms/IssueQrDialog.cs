@@ -127,7 +127,7 @@ public partial class IssueQrDialog : RtlFormBase
 
                 using var subFont = new Font("Cairo", 10F, FontStyle.Bold);
                 using var regFont = new Font("Cairo", 9F, FontStyle.Regular);
-                using var smallFont = new Font("Cairo", 8F, FontStyle.Regular);
+                using var smallFont = new Font("Cairo", 9F, FontStyle.Regular);
 
                 // Draw card frame (85mm x 54mm approx in 100dpi is ~320x200)
                 var cardRect = new Rectangle(50, 50, 320, 190);

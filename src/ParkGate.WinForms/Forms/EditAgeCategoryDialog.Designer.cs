@@ -81,7 +81,7 @@ partial class EditAgeCategoryDialog
         // 
         this._lblHeaderSubtitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-        this._lblHeaderSubtitle.Font = new System.Drawing.Font("Cairo", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblHeaderSubtitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblHeaderSubtitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(252)))), ((int)(((byte)(231)))));
         this._lblHeaderSubtitle.Location = new System.Drawing.Point(16, 34);
         this._lblHeaderSubtitle.Name = "_lblHeaderSubtitle";
@@ -129,7 +129,7 @@ partial class EditAgeCategoryDialog
         // _txtNameAr
         // 
         this._txtNameAr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtNameAr.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtNameAr.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._txtNameAr.Location = new System.Drawing.Point(23, 21);
         this._txtNameAr.MaxLength = 100;
         this._txtNameAr.Name = "_txtNameAr";
@@ -151,7 +151,7 @@ partial class EditAgeCategoryDialog
         // _txtDescriptionAr
         // 
         this._txtDescriptionAr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtDescriptionAr.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtDescriptionAr.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._txtDescriptionAr.Location = new System.Drawing.Point(23, 67);
         this._txtDescriptionAr.MaxLength = 250;
         this._txtDescriptionAr.Name = "_txtDescriptionAr";
@@ -173,7 +173,7 @@ partial class EditAgeCategoryDialog
         // _numSortOrder
         // 
         this._numSortOrder.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._numSortOrder.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._numSortOrder.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._numSortOrder.Location = new System.Drawing.Point(227, 113);
         this._numSortOrder.Maximum = new decimal(new int[] { 100, 0, 0, 0 });
         this._numSortOrder.Name = "_numSortOrder";
@@ -185,7 +185,7 @@ partial class EditAgeCategoryDialog
         // 
         this._chkIsCompanionLimitExempt.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._chkIsCompanionLimitExempt.AutoSize = true;
-        this._chkIsCompanionLimitExempt.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._chkIsCompanionLimitExempt.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._chkIsCompanionLimitExempt.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
         this._chkIsCompanionLimitExempt.Location = new System.Drawing.Point(23, 162);
         this._chkIsCompanionLimitExempt.Name = "_chkIsCompanionLimitExempt";

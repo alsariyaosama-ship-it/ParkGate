@@ -417,7 +417,7 @@ partial class SettingsForm
         _btnReload.Cursor = Cursors.Hand;
         _btnReload.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
         _btnReload.FlatStyle = FlatStyle.Flat;
-        _btnReload.Font = new Font("Cairo", 9.5F);
+        _btnReload.Font = new Font("Cairo", 10F);
         _btnReload.ForeColor = Color.FromArgb(30, 41, 59);
         _btnReload.Location = new Point(389, 11);
         _btnReload.Name = "_btnReload";
@@ -433,7 +433,7 @@ partial class SettingsForm
         _btnClose.DialogResult = DialogResult.Cancel;
         _btnClose.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
         _btnClose.FlatStyle = FlatStyle.Flat;
-        _btnClose.Font = new Font("Cairo", 9.5F);
+        _btnClose.Font = new Font("Cairo", 10F);
         _btnClose.ForeColor = Color.FromArgb(30, 41, 59);
         _btnClose.Location = new Point(293, 11);
         _btnClose.Name = "_btnClose";

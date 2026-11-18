@@ -72,7 +72,7 @@ partial class LoginForm
         // _lblAppName
         // 
         _lblAppName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        _lblAppName.Font = new Font("Cairo", 18F, FontStyle.Bold);
+        _lblAppName.Font = new Font("Cairo", 14F, FontStyle.Bold);
         _lblAppName.ForeColor = Color.White;
         _lblAppName.Location = new Point(20, 15);
         _lblAppName.Margin = new Padding(4, 0, 4, 0);
@@ -245,7 +245,7 @@ partial class LoginForm
         // lblError
         // 
         lblError.Dock = DockStyle.Fill;
-        lblError.Font = new Font("Cairo", 9.5F, FontStyle.Bold);
+        lblError.Font = new Font("Cairo", 10F, FontStyle.Bold);
         lblError.ForeColor = Color.FromArgb(198, 40, 40);
         lblError.Location = new Point(0, 256);
         lblError.Margin = new Padding(0);

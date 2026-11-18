@@ -47,7 +47,7 @@ partial class SupervisorAuthDialog
         // _lblHeader
         // 
         this._lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblHeader.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHeader.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(16, 12);
         this._lblHeader.Name = "_lblHeader";
@@ -125,7 +125,7 @@ partial class SupervisorAuthDialog
         this._btnApprove.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnApprove.FlatAppearance.BorderSize = 0;
         this._btnApprove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnApprove.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnApprove.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnApprove.ForeColor = System.Drawing.Color.White;
         this._btnApprove.Location = new System.Drawing.Point(246, 360);
         this._btnApprove.Name = "_btnApprove";

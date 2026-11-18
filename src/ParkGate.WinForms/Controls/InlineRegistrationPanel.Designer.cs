@@ -76,7 +76,7 @@ partial class InlineRegistrationPanel
         this._tblRegistration.Controls.Add(this._txtRegNotes, 1, 5);
         this._tblRegistration.Controls.Add(this._pnlRegActions, 1, 6);
         this._tblRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._tblRegistration.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._tblRegistration.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         this._tblRegistration.Location = new System.Drawing.Point(8, 26);
         this._tblRegistration.Name = "_tblRegistration";
@@ -95,7 +95,7 @@ partial class InlineRegistrationPanel
         // 
         this._lblRegOrganization.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblRegOrganization.AutoSize = true;
-        this._lblRegOrganization.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblRegOrganization.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblRegOrganization.Location = new System.Drawing.Point(437, 7);
         this._lblRegOrganization.Name = "_lblRegOrganization";
         this._lblRegOrganization.Size = new System.Drawing.Size(44, 17);
@@ -117,7 +117,7 @@ partial class InlineRegistrationPanel
         // 
         this._lblRegFullName.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblRegFullName.AutoSize = true;
-        this._lblRegFullName.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblRegFullName.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblRegFullName.Location = new System.Drawing.Point(395, 7);
         this._lblRegFullName.Name = "_lblRegFullName";
         this._lblRegFullName.Size = new System.Drawing.Size(86, 17);
@@ -138,7 +138,7 @@ partial class InlineRegistrationPanel
         // 
         this._lblRegPhone.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblRegPhone.AutoSize = true;
-        this._lblRegPhone.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblRegPhone.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblRegPhone.Location = new System.Drawing.Point(407, 39);
         this._lblRegPhone.Name = "_lblRegPhone";
         this._lblRegPhone.Size = new System.Drawing.Size(74, 17);
@@ -234,7 +234,7 @@ partial class InlineRegistrationPanel
         this._btnSaveReg.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnSaveReg.FlatAppearance.BorderSize = 0;
         this._btnSaveReg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnSaveReg.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnSaveReg.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSaveReg.ForeColor = System.Drawing.Color.White;
         this._btnSaveReg.Location = new System.Drawing.Point(195, 3);
         this._btnSaveReg.Name = "_btnSaveReg";

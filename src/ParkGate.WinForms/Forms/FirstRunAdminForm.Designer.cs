@@ -80,7 +80,7 @@ partial class FirstRunAdminForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblHeader, 2);
         this.lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblHeader.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.lblHeader.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.lblHeader.ForeColor = System.Drawing.Color.FromArgb(45, 55, 72);
         this.lblHeader.Location = new System.Drawing.Point(3, 0);
         this.lblHeader.Name = "lblHeader";

@@ -234,7 +234,7 @@ partial class MainForm
         // 
         // _statusStrip
         // 
-        _statusStrip.Font = new Font("Cairo", 9.5F);
+        _statusStrip.Font = new Font("Cairo", 10F);
         _statusStrip.ImageScalingSize = new Size(20, 20);
         _statusStrip.Items.AddRange(new ToolStripItem[] { _statusUser, _statusWorkstation, _statusServerTime, _statusConnection, _statusSync });
         _statusStrip.Location = new Point(0, 852);
@@ -322,7 +322,7 @@ partial class MainForm
         // _lblQuickInfo
         // 
         _lblQuickInfo.Dock = DockStyle.Fill;
-        _lblQuickInfo.Font = new Font("Cairo", 10.5F);
+        _lblQuickInfo.Font = new Font("Cairo", 10F);
         _lblQuickInfo.ForeColor = Color.FromArgb(69, 90, 100);
         _lblQuickInfo.Location = new Point(40, 190);
         _lblQuickInfo.Margin = new Padding(4, 0, 4, 0);

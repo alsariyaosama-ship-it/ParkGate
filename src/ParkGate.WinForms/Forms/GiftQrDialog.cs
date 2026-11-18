@@ -147,7 +147,7 @@ public partial class GiftQrDialog : RtlFormBase
                 using var titleFont = new Font("Cairo", 12F, FontStyle.Bold);
                 using var boldFont = new Font("Cairo", 10F, FontStyle.Bold);
                 using var regularFont = new Font("Cairo", 9F, FontStyle.Regular);
-                using var smallFont = new Font("Cairo", 8.5F, FontStyle.Regular);
+                using var smallFont = new Font("Cairo", 9F, FontStyle.Regular);
 
                 // Card rectangle (approx A6 receipt card)
                 var cardRect = new Rectangle(40, 40, 360, 220);

@@ -93,7 +93,7 @@ partial class ConnectionSettingsForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblHeader, 2);
         this.lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblHeader.Font = new System.Drawing.Font("Cairo", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.lblHeader.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblHeader.ForeColor = System.Drawing.Color.FromArgb(45, 55, 72);
         this.lblHeader.Location = new System.Drawing.Point(3, 0);
         this.lblHeader.Name = "lblHeader";
@@ -210,7 +210,7 @@ partial class ConnectionSettingsForm
         // 
         this.tableLayoutPanelMain.SetColumnSpan(this.lblStatus, 2);
         this.lblStatus.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lblStatus.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.lblStatus.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblStatus.Location = new System.Drawing.Point(3, 250);
         this.lblStatus.Name = "lblStatus";
         this.lblStatus.Size = new System.Drawing.Size(514, 35);

@@ -120,7 +120,7 @@ partial class BeneficiariesControl
         // _txtSearch
         // 
         this._txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtSearch.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._txtSearch.Location = new System.Drawing.Point(525, 9);
         this._txtSearch.MaxLength = 100;
         this._txtSearch.Name = "_txtSearch";
@@ -135,7 +135,7 @@ partial class BeneficiariesControl
         this._btnSearch.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnSearch.FlatAppearance.BorderSize = 0;
         this._btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnSearch.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSearch.ForeColor = System.Drawing.Color.White;
         this._btnSearch.Location = new System.Drawing.Point(399, 9);
         this._btnSearch.Name = "_btnSearch";
@@ -151,7 +151,7 @@ partial class BeneficiariesControl
         this._btnClearSearch.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnClearSearch.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
         this._btnClearSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClearSearch.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClearSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnClearSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         this._btnClearSearch.Location = new System.Drawing.Point(309, 9);
         this._btnClearSearch.Name = "_btnClearSearch";
@@ -164,7 +164,7 @@ partial class BeneficiariesControl
         // 
         this._lblSearchResultCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
         this._lblSearchResultCount.AutoSize = true;
-        this._lblSearchResultCount.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblSearchResultCount.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblSearchResultCount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this._lblSearchResultCount.Location = new System.Drawing.Point(20, 14);
         this._lblSearchResultCount.Name = "_lblSearchResultCount";
@@ -196,7 +196,7 @@ partial class BeneficiariesControl
         // 
         this._grpResults.Controls.Add(this._gridBeneficiaries);
         this._grpResults.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpResults.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpResults.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpResults.Location = new System.Drawing.Point(8, 4);
         this._grpResults.Name = "_grpResults";
         this._grpResults.Padding = new System.Windows.Forms.Padding(6);
@@ -224,7 +224,7 @@ partial class BeneficiariesControl
             this._colLastEntry,
             this._colExpiryDate});
         this._gridBeneficiaries.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._gridBeneficiaries.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._gridBeneficiaries.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._gridBeneficiaries.Location = new System.Drawing.Point(6, 23);
         this._gridBeneficiaries.MultiSelect = false;
         this._gridBeneficiaries.Name = "_gridBeneficiaries";
@@ -314,7 +314,7 @@ partial class BeneficiariesControl
         this._grpHolderDetails.Controls.Add(this._tblDetails);
         this._grpHolderDetails.Controls.Add(this._pnlDetailsActions);
         this._grpHolderDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpHolderDetails.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpHolderDetails.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpHolderDetails.Location = new System.Drawing.Point(0, 0);
         this._grpHolderDetails.Name = "_grpHolderDetails";
         this._grpHolderDetails.Padding = new System.Windows.Forms.Padding(6);
@@ -609,7 +609,7 @@ partial class BeneficiariesControl
         this._grpHistory.Controls.Add(this._gridHistory);
         this._grpHistory.Controls.Add(this._pnlHistoryActions);
         this._grpHistory.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpHistory.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpHistory.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpHistory.Location = new System.Drawing.Point(4, 0);
         this._grpHistory.Name = "_grpHistory";
         this._grpHistory.Padding = new System.Windows.Forms.Padding(6);

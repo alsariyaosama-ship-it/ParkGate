@@ -246,7 +246,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 
 ### R7 — Wording and visual consistency · branch `phase/r7-consistency`
 - [x] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b
-- [ ] R7.2 One type scale mapped to `Theme` (Caption 9, Body 10, Section 12, Title 14, Banner 20)
+- [x] R7.2 One type scale mapped to `Theme` (Caption 9, Body 10, Section 12, Title 14, Banner 20)
 - [ ] R7.3 One neutral palette; test against `Color.FromArgb` literals outside `Theme.cs`
 - [ ] R7.4 Dialog conventions: `AcceptButton`, `CancelButton`, tab order, `Theme` button styles
 - [ ] R7.5 Web UI: same glossary, park-local times, empty states, no phone or national ID

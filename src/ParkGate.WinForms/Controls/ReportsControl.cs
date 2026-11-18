@@ -390,7 +390,7 @@ public partial class ReportsControl : UserControl
         var lblTitle = new Label
         {
             Text = title,
-            Font = new Font("Cairo", 8.5F, FontStyle.Regular),
+            Font = new Font("Cairo", 9F, FontStyle.Regular),
             ForeColor = Color.FromArgb(100, 116, 139),
             Dock = DockStyle.Top,
             Height = 28,
@@ -400,7 +400,7 @@ public partial class ReportsControl : UserControl
         var lblVal = new Label
         {
             Text = value,
-            Font = new Font("Cairo", 13F, FontStyle.Bold),
+            Font = new Font("Cairo", 12F, FontStyle.Bold),
             ForeColor = accentColor,
             Dock = DockStyle.Fill,
             TextAlign = ContentAlignment.MiddleCenter
@@ -847,9 +847,9 @@ public partial class ReportsControl : UserControl
             return;
         }
 
-        var fontTitle = new Font("Cairo", 16F, FontStyle.Bold);
+        var fontTitle = new Font("Cairo", 14F, FontStyle.Bold);
         var fontSubtitle = new Font("Cairo", 10F, FontStyle.Regular);
-        var fontHeader = new Font("Cairo", 9.5F, FontStyle.Bold);
+        var fontHeader = new Font("Cairo", 10F, FontStyle.Bold);
         var fontCell = new Font("Cairo", 9F, FontStyle.Regular);
 
         float y = 50;

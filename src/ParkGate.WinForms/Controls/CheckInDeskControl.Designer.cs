@@ -145,7 +145,7 @@ partial class CheckInDeskControl
         // 
         this._lblOrganization.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblOrganization.AutoSize = true;
-        this._lblOrganization.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblOrganization.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblOrganization.Location = new System.Drawing.Point(412, 11);
         this._lblOrganization.Name = "_lblOrganization";
         this._lblOrganization.Size = new System.Drawing.Size(52, 24);
@@ -155,7 +155,7 @@ partial class CheckInDeskControl
         // _txtCardNumber
         // 
         this._txtCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._txtCardNumber.Location = new System.Drawing.Point(475, 6);
         this._txtCardNumber.MaxLength = 50;
         this._txtCardNumber.Name = "_txtCardNumber";
@@ -166,7 +166,7 @@ partial class CheckInDeskControl
         // 
         this._lblCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblCardNumber.AutoSize = true;
-        this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblCardNumber.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         this._lblCardNumber.Location = new System.Drawing.Point(866, 11);
         this._lblCardNumber.Name = "_lblCardNumber";
@@ -243,7 +243,7 @@ partial class CheckInDeskControl
         this._tblHolder.Controls.Add(this._lblHolderStatusTitle, 0, 6);
         this._tblHolder.Controls.Add(this._lblHolderStatus, 1, 6);
         this._tblHolder.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._tblHolder.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._tblHolder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblHolder.Location = new System.Drawing.Point(8, 26);
         this._tblHolder.Name = "_tblHolder";
         this._tblHolder.RowCount = 7;
@@ -261,7 +261,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderNameTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderNameTitle.AutoSize = true;
-        this._lblHolderNameTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderNameTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderNameTitle.Location = new System.Drawing.Point(404, 7);
         this._lblHolderNameTitle.Name = "_lblHolderNameTitle";
         this._lblHolderNameTitle.Size = new System.Drawing.Size(77, 17);
@@ -272,7 +272,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderName.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderName.AutoSize = true;
-        this._lblHolderName.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderName.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblHolderName.Location = new System.Drawing.Point(336, 5);
         this._lblHolderName.Name = "_lblHolderName";
@@ -284,7 +284,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderPhoneTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderPhoneTitle.AutoSize = true;
-        this._lblHolderPhoneTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderPhoneTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderPhoneTitle.Location = new System.Drawing.Point(407, 38);
         this._lblHolderPhoneTitle.Name = "_lblHolderPhoneTitle";
         this._lblHolderPhoneTitle.Size = new System.Drawing.Size(74, 17);
@@ -305,7 +305,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderOrgTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderOrgTitle.AutoSize = true;
-        this._lblHolderOrgTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderOrgTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderOrgTitle.Location = new System.Drawing.Point(435, 69);
         this._lblHolderOrgTitle.Name = "_lblHolderOrgTitle";
         this._lblHolderOrgTitle.Size = new System.Drawing.Size(46, 17);
@@ -326,7 +326,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderNatIdTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderNatIdTitle.AutoSize = true;
-        this._lblHolderNatIdTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderNatIdTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderNatIdTitle.Location = new System.Drawing.Point(398, 100);
         this._lblHolderNatIdTitle.Name = "_lblHolderNatIdTitle";
         this._lblHolderNatIdTitle.Size = new System.Drawing.Size(83, 17);
@@ -347,7 +347,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderExpiryTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderExpiryTitle.AutoSize = true;
-        this._lblHolderExpiryTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderExpiryTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderExpiryTitle.Location = new System.Drawing.Point(404, 131);
         this._lblHolderExpiryTitle.Name = "_lblHolderExpiryTitle";
         this._lblHolderExpiryTitle.Size = new System.Drawing.Size(77, 17);
@@ -368,7 +368,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderLastEntryTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderLastEntryTitle.AutoSize = true;
-        this._lblHolderLastEntryTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderLastEntryTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderLastEntryTitle.Location = new System.Drawing.Point(397, 162);
         this._lblHolderLastEntryTitle.Name = "_lblHolderLastEntryTitle";
         this._lblHolderLastEntryTitle.Size = new System.Drawing.Size(84, 17);
@@ -389,7 +389,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderStatusTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderStatusTitle.AutoSize = true;
-        this._lblHolderStatusTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderStatusTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderStatusTitle.Location = new System.Drawing.Point(403, 198);
         this._lblHolderStatusTitle.Name = "_lblHolderStatusTitle";
         this._lblHolderStatusTitle.Size = new System.Drawing.Size(78, 17);
@@ -400,7 +400,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderStatus.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderStatus.AutoSize = true;
-        this._lblHolderStatus.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderStatus.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderStatus.Location = new System.Drawing.Point(338, 198);
         this._lblHolderStatus.Name = "_lblHolderStatus";
         this._lblHolderStatus.Size = new System.Drawing.Size(13, 17);
@@ -474,7 +474,7 @@ partial class CheckInDeskControl
         this._btnRecordEntry.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnRecordEntry.FlatAppearance.BorderSize = 0;
         this._btnRecordEntry.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnRecordEntry.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnRecordEntry.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnRecordEntry.ForeColor = System.Drawing.Color.White;
         this._btnRecordEntry.Location = new System.Drawing.Point(448, 2);
         this._btnRecordEntry.Margin = new System.Windows.Forms.Padding(3, 2, 0, 2);
@@ -523,7 +523,7 @@ partial class CheckInDeskControl
         this._btnClear.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
         this._btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClear.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClear.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
         this._btnClear.Location = new System.Drawing.Point(13, 2);
         this._btnClear.Margin = new System.Windows.Forms.Padding(0, 2, 5, 2);
@@ -553,7 +553,7 @@ partial class CheckInDeskControl
         // 
         this._lblTotalPersons.AutoSize = true;
         this._lblTotalPersons.Dock = System.Windows.Forms.DockStyle.Right;
-        this._lblTotalPersons.Font = new System.Drawing.Font("Cairo", 11.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTotalPersons.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblTotalPersons.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblTotalPersons.Location = new System.Drawing.Point(140, 2);
         this._lblTotalPersons.Name = "_lblTotalPersons";
@@ -566,7 +566,7 @@ partial class CheckInDeskControl
         // 
         this._lblFreeCompanions.AutoSize = true;
         this._lblFreeCompanions.Dock = System.Windows.Forms.DockStyle.Right;
-        this._lblFreeCompanions.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblFreeCompanions.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblFreeCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this._lblFreeCompanions.Location = new System.Drawing.Point(80, 2);
         this._lblFreeCompanions.Name = "_lblFreeCompanions";
