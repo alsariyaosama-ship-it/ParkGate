@@ -182,7 +182,47 @@ Index: `IX_SyncOutboxes_Pending (IsProcessed, RetryCount, Sequence)`.
 - **F1 `AccessCredentials`**: Id, BeneficiaryId, Type (QR), TokenHash (binary(32), unique), IssuedAtUtc, IssuedByUserId, RevokedAtUtc, RevokedByUserId, RevokeReason. One active QR per holder (filtered unique on `RevokedAtUtc IS NULL`).
 - **F2** `Dependents` (if Option B) and gate event log.
 
-> F1 shipped as raw-SQL tables (`docs/ENTRY_CARDS.md`): `EntryCards`, `QrSigningKeys`. They are **not** EF-managed and are created by `EntryCardSchemaInitializer`, not by migrations.
+> F1 (entry cards) is EF-managed since R6.1 (migration `AdoptEntryCards`, ADR-025): §3.15–§3.17. The earlier raw-SQL tables, view and procedures were removed.
+
+### 3.15 `QrSigningKeys` — مفاتيح التوقيع العامة (F1)
+| Column | Type | Notes |
+|---|---|---|
+| KeyId | tinyint PK | Assigned by the app (next free id, 1..255); not IDENTITY |
+| PublicKeySpki | varbinary(200) NOT NULL | Unique `UX_QrSigningKeys_PublicKeySpki`. The private key stays in the desk's CNG store |
+| StationName | nvarchar(100) NOT NULL | Desk that registered the key |
+| CreatedAtUtc | datetime2(3) NOT NULL | Default `SYSUTCDATETIME()` |
+| RevokedAtUtc | datetime2(3) NULL | A revoked key no longer verifies cards; its desk must create a new key |
+| RowVersion | rowversion | |
+
+### 3.16 `EntryCards` — بطاقات الدخول QR (F1)
+| Column | Type | Notes |
+|---|---|---|
+| Id | int IDENTITY PK | |
+| CardId | uniqueidentifier NOT NULL | The value inside the signed QR. Unique `UX_EntryCards_CardId` |
+| BeneficiaryId | uniqueidentifier FK → Beneficiaries | |
+| KeyId | tinyint FK → QrSigningKeys | |
+| IssuedAtUtc | datetime2(3) NOT NULL | Default `SYSUTCDATETIME()` |
+| ExpiresOn | date NOT NULL | Park-local date (R3.10) |
+| RevokedAtUtc | datetime2(3) NULL | DB time |
+| RevokeReason | nvarchar(200) NULL | `استُبدلت ببطاقة جديدة` when a reissue replaced it |
+| RowVersion | rowversion | |
+
+Filtered unique `UX_EntryCards_OneActivePerBeneficiary` on `BeneficiaryId` where `RevokedAtUtc IS NULL`. A reissue revokes the active card and adds the new one in one transaction; a parallel reissue that hits the index retries, so exactly one card stays active.
+
+### 3.17 `CardScanLog` — سجل مسح البطاقات (F1)
+| Column | Type | Notes |
+|---|---|---|
+| Id | bigint IDENTITY PK | Append-only |
+| ScannedAtUtc | datetime2(3) NOT NULL | Default `SYSUTCDATETIME()` |
+| StationName | nvarchar(100) NOT NULL | Kept for gate stations that are not registered workstations |
+| WorkstationId | int NULL FK → Workstations | The scanning desk when registered (R6.2) |
+| Status | tinyint NOT NULL | `CardScanStatus` (0 Accepted … 7 PermitSuspended) |
+| CardId | uniqueidentifier NULL | NULL when the QR could not be read |
+| RawPrefix | nvarchar(32) NULL | First 32 characters of a rejected scan |
+
+Indexes: `IX_CardScanLog_ScannedAtUtc` (INCLUDE `Status`, `StationName`), `IX_CardScanLog_CardId`, `IX_CardScanLog_WorkstationId`.
+
+No audit columns on these tables: keys and cards record their own issue and revoke times, and the scan log is append-only.
 
 ### 3.12 `GiftVouchers` — قسائم الهدايا (F5)
 
@@ -192,7 +232,7 @@ EF-managed table created by migration `AddGiftVouchersAndCompanionLimit`. `Id` i
 |---|---|---|
 | Id | int IDENTITY PK | Receipt number |
 | Token | uniqueidentifier NOT NULL | Random 128-bit; the value inside the signed QR. Unique `UX_GiftVouchers_Token` |
-| KeyId | tinyint NOT NULL | Signing key id used (no FK — `QrSigningKeys` is raw SQL) |
+| KeyId | tinyint NOT NULL | Signing key id used. No FK yet; one is possible now that `QrSigningKeys` is EF-managed (§3.15) |
 | BeneficiaryId | uniqueidentifier FK → Beneficiaries | Restrict |
 | OrganizationId | int FK → Organizations | Restrict. Snapshot at issue |
 | Value | decimal(10,3) NOT NULL | Snapshot at issue. CHECK `Value > 0` |

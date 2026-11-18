@@ -319,6 +319,53 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ParkGate.Domain.Entities.CardScan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid?>("CardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RawPrefix")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<DateTime>("ScannedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("StationName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int?>("WorkstationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardId")
+                        .HasDatabaseName("IX_CardScanLog_CardId");
+
+                    b.HasIndex("ScannedAtUtc")
+                        .HasDatabaseName("IX_CardScanLog_ScannedAtUtc");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ScannedAtUtc"), new[] { "Status", "StationName" });
+
+                    b.HasIndex("WorkstationId");
+
+                    b.ToTable("CardScanLog", (string)null);
+                });
+
             modelBuilder.Entity("ParkGate.Domain.Entities.EntryAttempt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -447,6 +494,62 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         {
                             t.HasCheckConstraint("CK_EntryAttemptCompanions_Count", "[Count] >= 0");
                         });
+                });
+
+            modelBuilder.Entity("ParkGate.Domain.Entities.EntryCard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("BeneficiaryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("ExpiresOn")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("IssuedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<byte>("KeyId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("RevokeReason")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("RevokedAtUtc")
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BeneficiaryId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_EntryCards_OneActivePerBeneficiary")
+                        .HasFilter("[RevokedAtUtc] IS NULL");
+
+                    b.HasIndex("CardId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_EntryCards_CardId");
+
+                    b.HasIndex("KeyId");
+
+                    b.ToTable("EntryCards", (string)null);
                 });
 
             modelBuilder.Entity("ParkGate.Domain.Entities.GiftVoucher", b =>
@@ -684,6 +787,46 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ParkGate.Domain.Entities.QrSigningKey", b =>
+                {
+                    b.Property<byte>("KeyId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<byte[]>("PublicKeySpki")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varbinary(200)");
+
+                    b.Property<DateTime?>("RevokedAtUtc")
+                        .HasPrecision(3)
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("StationName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("KeyId");
+
+                    b.HasIndex("PublicKeySpki")
+                        .IsUnique()
+                        .HasDatabaseName("UX_QrSigningKeys_PublicKeySpki");
+
+                    b.ToTable("QrSigningKeys", (string)null);
+                });
+
             modelBuilder.Entity("ParkGate.Domain.Entities.SyncOutbox", b =>
                 {
                     b.Property<Guid>("Id")
@@ -868,6 +1011,14 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ParkGate.Domain.Entities.CardScan", b =>
+                {
+                    b.HasOne("ParkGate.Domain.Entities.Workstation", null)
+                        .WithMany()
+                        .HasForeignKey("WorkstationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("ParkGate.Domain.Entities.EntryAttempt", b =>
                 {
                     b.HasOne("ParkGate.Domain.Entities.Beneficiary", null)
@@ -917,6 +1068,21 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .WithMany("Companions")
                         .HasForeignKey("EntryAttemptId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ParkGate.Domain.Entities.EntryCard", b =>
+                {
+                    b.HasOne("ParkGate.Domain.Entities.Beneficiary", null)
+                        .WithMany()
+                        .HasForeignKey("BeneficiaryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ParkGate.Domain.Entities.QrSigningKey", null)
+                        .WithMany()
+                        .HasForeignKey("KeyId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

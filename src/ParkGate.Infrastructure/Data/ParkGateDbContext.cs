@@ -21,6 +21,9 @@ public class ParkGateDbContext : DbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<SyncOutbox> SyncOutboxes => Set<SyncOutbox>();
     public DbSet<GiftVoucher> GiftVouchers => Set<GiftVoucher>();
+    public DbSet<QrSigningKey> QrSigningKeys => Set<QrSigningKey>();
+    public DbSet<EntryCard> EntryCards => Set<EntryCard>();
+    public DbSet<CardScan> CardScanLog => Set<CardScan>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

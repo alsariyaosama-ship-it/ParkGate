@@ -30,10 +30,7 @@ public sealed class AuditWriter : IAuditWriter
         DateTime nowUtc;
         try
         {
-            var dbTime = await context.Database
-                .SqlQueryRaw<DateTime>("SELECT SYSUTCDATETIME() AS [Value]")
-                .SingleAsync(cancellationToken);
-            nowUtc = DateTime.SpecifyKind(dbTime, DateTimeKind.Utc);
+            nowUtc = await DatabaseClock.GetUtcNowAsync(context, cancellationToken);
         }
         catch
         {
