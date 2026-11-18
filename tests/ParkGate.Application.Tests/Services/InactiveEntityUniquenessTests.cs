@@ -7,7 +7,6 @@ using ParkGate.Application.Common;
 using ParkGate.Application.Organizations.DTOs;
 using ParkGate.Application.Organizations.Services;
 using ParkGate.Application.Organizations.Validators;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Application.Security;

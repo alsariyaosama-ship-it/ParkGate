@@ -3,7 +3,6 @@ using ParkGate.Application.Security;
 using ParkGate.Application.Settings.Models;
 using ParkGate.Application.Settings.Services;
 using ParkGate.Application.Settings.Validators;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Application.Ports.Settings;

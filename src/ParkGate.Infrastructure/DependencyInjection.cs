@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Application.Ports.Settings;
@@ -37,7 +36,6 @@ public static class DependencyInjection
         // 3. Infrastructure singletons & services
         services.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>();
         services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
-        services.AddSingleton<IAuditWriter, AuditWriter>();
         services.AddSingleton<IAppSettingsStore, AppSettingsStore>();
         services.AddTransient<IDatabaseStartupService, DatabaseStartupService>();
         services.AddTransient<ParkGate.Application.Ports.Persistence.IDatabaseBackupService, ParkGate.Infrastructure.Data.DatabaseBackupService>();

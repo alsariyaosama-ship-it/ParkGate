@@ -95,7 +95,7 @@ Maximum 4 production projects. Do not add a project without an ADR (the future F
 
 ### 4.2 Application
 - One class per use case or a small cohesive service per module (`CheckInService`, `BeneficiaryService`, `AuthService`, `SettingsService`, `ReportService`). Each public method = one use case.
-- Ports defined here, implemented in Infrastructure: `IUnitOfWorkFactory`, `IUnitOfWork`, repositories, `IPasswordHasher`, `IAppSettingsStore`, `IAuditWriter`, `IReportQueries`.
+- Ports defined here, implemented in Infrastructure: `IUnitOfWorkFactory`, `IUnitOfWork`, repositories, `IPasswordHasher`, `IAppSettingsStore`, `IReportQueries`.
 - **Unit of work per use case** (WinForms has no request scope):
   ```csharp
   await using var uow = _uowFactory.Create();      // fresh DbContext from IDbContextFactory
@@ -116,7 +116,7 @@ Maximum 4 production projects. Do not add a project without an ADR (the future F
 ### 4.3 Infrastructure
 - `ParkGateDbContext` registered with `AddDbContextFactory` (ADR-003). **Never** inject a long-lived `DbContext` into forms or singletons.
 - One `IEntityTypeConfiguration<T>` per entity, matching `docs/DATABASE.md` exactly (names, lengths, indexes, check constraints).
-- Audit columns via a `SaveChangesInterceptor`; audit log rows via `IAuditWriter`.
+- Audit columns via a `SaveChangesInterceptor` (database clock, BR-05). Audit log rows are added to the use case's unit of work with `uow.AddAuditAsync(...)` / `uow.AuditLogs` before the save, so the row and the change commit together (R6.11). There is no separate audit writer.
 - Read-heavy screens/reports use `AsNoTracking()` and projections to DTOs.
 - Never edit a migration that has been pushed; add a new one. Migration names: `YYYYMMDD_Description` style via `dotnet ef migrations add <Description>`.
 - Password hashing: `Rfc2898DeriveBytes.Pbkdf2`, SHA-256, 16-byte salt, 32-byte hash, 600 000 iterations, constant-time comparison, format in DATABASE.md §3.6. Re-hash on login if the iteration count is older.
