@@ -10,11 +10,11 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-18 |
-| Last session | S37 — R7.6 and R7.11 done on `phase/r7-consistency` (PR #17 merged into `main`) |
+| Last session | S37 — R7.6, R7.11, R7.7, R7.8 done on `phase/r7-consistency` (PR #17 merged into `main`) |
 | Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 merged (PR #17). R7 in progress on `phase/r7-consistency` |
 | Working branch | `phase/r7-consistency` (from `main` `88c9867`) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 725 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 187 architecture |
+| .NET Unit tests | 727 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 189 architecture |
 | .NET Integration tests | 56 passed on LocalDB |
 | Web tests | `php artisan test` (PHP 8.4): 98 passed on SQLite (MySQL job runs in CI) |
 | Total tests | 877 (779 .NET + 98 web), all green |
@@ -121,8 +121,9 @@
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
 **S37 (2026-11-18, `phase/r7-consistency`): R7.6 done.** `IssueQrDialog` renders the QR through `IQrImageRenderer` (Application port) instead of Infrastructure's `QrImageRenderer`. New `WinFormsSource_OnlyCompositionRootMentionsInfrastructure` scans the source, because the reflection test misses static calls.
-Then R7.11 (found by Osama): `Main` was `async`, so `[STAThread]` was ignored and the UI ran on an MTA thread; saving or printing the QR threw `ThreadStateException`. `Main` is synchronous now and startup runs inside the message loop. **Osama to re-test QR save and print (OneNote printer).**
-**Next:** R7.7 (all message boxes through `Notify`), then R7.8, R7.9.
+Then R7.11 (found by Osama): `Main` was `async`, so `[STAThread]` was ignored and the UI ran on an MTA thread; saving or printing the QR threw `ThreadStateException`. `Main` is synchronous now and startup runs inside the message loop. Osama re-tested: QR save and print work (print layout needs work later: R7.12).
+R7.7: 39 `MessageBox.Show` calls now go through `Notify` (same buttons/icons). R7.8: 16 designers moved from `AutoScaleMode.Font` to `Dpi` 96x96; at 125 % those windows were not scaled while text grew. Verified with an off-screen render probe at 120 DPI (46 clipped controls before, 25 after, none new); remaining older clipping is R7.13.
+**Next:** R7.9 (28 files with `: this(null, ...)` constructors, 95 nullable service fields, 119 `?.` calls). Decide first how designer-hosted user controls (`CounterInput`, `StatusBanner`, `GiftOfferPanel`) keep a parameterless constructor; WinForms tests build controls without DI and will need fakes.
 
 **S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
 Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
@@ -174,6 +175,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ### S37 — 2026-11-18 — R7.6
 - PR #17 was merged; created `phase/r7-consistency` from `main`. Baseline green (723 unit).
 - R7.6 test-first: the new source-scan test failed on `IssueQrDialog.cs` only, then passed. Tests 723 → 724.
+- R7.7, R7.8 done. Visual Studio had the app open and locked `bin\`; built with `--artifacts-path artifacts/verify`.
+- Layout probe (scratchpad only, not committed): renders every designer-backed form/control off-screen, saves PNGs and lists clipped text and overflowing children. Worth turning into a tool for R7.13 / R5.
 - R7.11: Osama hit `ThreadStateException` saving the QR. Test-first (reflection on `Program.Main`); smoke run reached the login window.
 - No test resolves forms from DI; the new constructor follows `GiftQrDialog`'s pattern. R7.9 makes the services required.
 
