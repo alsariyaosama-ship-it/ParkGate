@@ -257,8 +257,8 @@ partial class GiftReceiptsForm
         // 
         // GiftReceiptsForm
         // 
-        AutoScaleDimensions = new System.Drawing.SizeF(7F, 19F);
-        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         ClientSize = new System.Drawing.Size(1100, 680);
         Controls.Add(_mainLayout);
         Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);

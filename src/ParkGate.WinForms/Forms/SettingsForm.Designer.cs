@@ -445,8 +445,8 @@ partial class SettingsForm
         // SettingsForm
         // 
         AcceptButton = _btnSave;
-        AutoScaleDimensions = new SizeF(9F, 32F);
-        AutoScaleMode = AutoScaleMode.Font;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = _btnClose;
         ClientSize = new Size(650, 416);
         Controls.Add(_tabSettings);

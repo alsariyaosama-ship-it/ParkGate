@@ -306,8 +306,8 @@ partial class EditBeneficiaryDialog
         // EditBeneficiaryDialog
         // 
         this.AcceptButton = this._btnSave;
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
         this.ClientSize = new System.Drawing.Size(520, 446);
         this.Controls.Add(this._tblLayout);

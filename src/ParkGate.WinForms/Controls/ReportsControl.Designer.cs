@@ -426,8 +426,8 @@ partial class ReportsControl
         this._lblStatus.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
 
         // Control
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.Controls.Add(this._tabControl);
         this.Controls.Add(this._pnlTop);
         this.Controls.Add(this._lblStatus);
