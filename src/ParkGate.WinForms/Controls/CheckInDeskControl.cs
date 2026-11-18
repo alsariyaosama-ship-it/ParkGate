@@ -238,6 +238,15 @@ public partial class CheckInDeskControl : UserControl
                 }
                 break;
 
+            case Keys.F8:
+                // R5.6: void the entry selected in today's grid (same as its button and context menu).
+                if (_todayPanel.SelectedVoidableAttempt != null)
+                {
+                    _ = VoidSelectedTodayEntryAsync();
+                    return true;
+                }
+                break;
+
             case Keys.Escape:
                 if (_cmbOrganization.DroppedDown || _registrationPanel.IsOrganizationListOpen)
                 {

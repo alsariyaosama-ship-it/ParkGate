@@ -52,6 +52,18 @@ public partial class TodayEntriesPanel : UserControl
         };
 
         _todayContextMenu.Opening += (_, e) => e.Cancel = SelectedVoidableAttempt == null;
+
+        // R5.6: the same action as a visible button (F8 on the desk); the context menu stays.
+        Theme.ApplySecondaryButtonStyle(_btnVoid);
+        _btnVoid.Text = Strings.Btn_VoidTodayEntry;
+        _btnVoid.Click += (_, _) =>
+        {
+            if (SelectedVoidableAttempt != null)
+            {
+                VoidRequested?.Invoke(this, EventArgs.Empty);
+            }
+        };
+        _gridToday.SelectionChanged += (_, _) => UpdateVoidButton();
     }
 
     public event EventHandler? VoidRequested;
@@ -95,7 +107,10 @@ public partial class TodayEntriesPanel : UserControl
         }
 
         _gridToday.ResumeLayout(true);
+        UpdateVoidButton();
     }
+
+    private void UpdateVoidButton() => _btnVoid.Enabled = SelectedVoidableAttempt != null;
 
     private void AddRow(TodayDeskAttemptDto item, string? timeZoneId)
     {

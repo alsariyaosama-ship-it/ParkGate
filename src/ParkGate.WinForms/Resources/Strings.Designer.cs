@@ -378,6 +378,7 @@ internal class Strings
     internal static string Btn_ConfirmVoid => GetString(nameof(Btn_ConfirmVoid));
     internal static string Msg_ConfirmVoid => GetString(nameof(Msg_ConfirmVoid));
     internal static string Msg_VoidSuccess => GetString(nameof(Msg_VoidSuccess));
+    internal static string Btn_VoidTodayEntry => GetString(nameof(Btn_VoidTodayEntry));
     internal static string Menu_VoidTodayEntry => GetString(nameof(Menu_VoidTodayEntry));
 
     internal static string Label_CreatedAt => GetString(nameof(Label_CreatedAt));

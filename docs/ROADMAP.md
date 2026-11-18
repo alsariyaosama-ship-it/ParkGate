@@ -220,7 +220,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
 - [ ] R5.4 Keyboard access to the companion counters
 - [ ] R5.5 Mark companion counts prefilled from the last visit
-- [ ] R5.6 Visible «إلغاء العملية…» button above the today grid
+- [x] R5.6 Visible «إلغاء العملية…» button above the today grid
 - [ ] R5.7 Distinct success and denial sounds, with separate settings
 - [ ] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
 - [ ] R5.9 Fix amber banner contrast (below 4.5:1)

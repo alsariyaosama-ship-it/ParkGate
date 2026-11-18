@@ -826,6 +826,9 @@
   <data name="Msg_VoidSuccess" xml:space="preserve">
     <value>تم إلغاء عملية الدخول بنجاح.</value>
   </data>
+  <data name="Btn_VoidTodayEntry" xml:space="preserve">
+    <value>إلغاء العملية… (F8)</value>
+  </data>
   <data name="Menu_VoidTodayEntry" xml:space="preserve">
     <value>إلغاء هذه العملية (Void)...</value>
   </data>
