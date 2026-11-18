@@ -62,13 +62,28 @@ function Get-SqlServiceAccount {
     return "NT Service\MSSQLSERVER"
 }
 
+function Invoke-Icacls {
+    param ([string[]]$Arguments, [string]$Step)
+    & icacls.exe @Arguments | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not $Step (icacls exit code $LASTEXITCODE). Run as Administrator."
+    }
+}
+
 function Set-BackupFolderAcl {
     param ([string]$Path, [string]$ServiceAccount)
-    # Remove inherited access (Users, Authenticated Users) and grant only what the backup needs.
     # *S-1-5-32-544 = Administrators, *S-1-5-18 = SYSTEM; SIDs work on any Windows display language.
-    & icacls.exe $Path /inheritance:r /grant:r "*S-1-5-32-544:(OI)(CI)F" "*S-1-5-18:(OI)(CI)F" "${ServiceAccount}:(OI)(CI)M" /T /Q | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        throw "Could not restrict access to $Path (icacls exit code $LASTEXITCODE). Run as Administrator."
+    # 1. Files left by earlier runs can carry their own ACL that even administrators cannot write through.
+    #    The Administrators group takes ownership (icacls uses the restore privilege of an elevated run),
+    #    and an owner can always rewrite the ACL.
+    Invoke-Icacls -Arguments @($Path, "/setowner", "*S-1-5-32-544", "/T", "/C", "/Q") -Step "take ownership of $Path"
+
+    # 2. The folder itself: no inherited access (Users, Authenticated Users), only what the backup needs.
+    Invoke-Icacls -Arguments @($Path, "/inheritance:r", "/grant:r", "*S-1-5-32-544:(OI)(CI)F", "*S-1-5-18:(OI)(CI)F", "${ServiceAccount}:(OI)(CI)M", "/Q") -Step "restrict access to $Path"
+
+    # 3. Everything inside inherits from the folder, so old files lose any wider or narrower ACL.
+    if (Get-ChildItem -LiteralPath $Path -Force | Select-Object -First 1) {
+        Invoke-Icacls -Arguments @((Join-Path $Path "*"), "/reset", "/T", "/C", "/Q") -Step "reset the access of the files in $Path"
     }
 }
 
