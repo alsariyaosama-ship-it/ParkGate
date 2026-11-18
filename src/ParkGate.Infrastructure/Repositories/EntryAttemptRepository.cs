@@ -60,6 +60,12 @@ public sealed class EntryAttemptRepository : IEntryAttemptRepository
             .ToListAsync(cancellationToken);
     }
 
+    public Task<bool> HasGrantedEntryOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken cancellationToken = default) =>
+        _context.EntryAttempts.AsNoTracking().AnyAsync(
+            a => a.BeneficiaryId == beneficiaryId && a.BusinessDate == businessDate && !a.IsVoided &&
+                 (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden),
+            cancellationToken);
+
     public async Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default)
     {
         var day = _context.EntryAttempts

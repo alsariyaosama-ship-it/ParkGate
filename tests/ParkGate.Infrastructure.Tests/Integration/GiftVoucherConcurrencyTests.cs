@@ -116,6 +116,47 @@ public sealed class GiftVoucherConcurrencyTests : IClassFixture<LocalDbTestFixtu
             PhoneNumber.Create($"092{Random.Shared.Next(1_000_000):D7}"));
         context.Beneficiaries.Add(holder);
         await context.SaveChangesAsync();
+
+        // A gift needs a granted entry on today's park business date (owner, 2026-11-18).
+        var userId = await context.Users.Select(u => u.Id).FirstAsync();
+        var deskId = await context.Workstations.Select(w => w.Id).FirstAsync();
+        context.EntryAttempts.Add(Attempt(holder, org, ParkToday(), userId, deskId));
+        await context.SaveChangesAsync();
         return holder;
+    }
+
+    private static DateOnly ParkToday() => TimeZoneHelper.GetLocalBusinessDate(DateTime.UtcNow, "Libya Standard Time");
+
+    private static EntryAttempt Attempt(Beneficiary holder, Organization org, DateOnly day, int userId, int deskId, bool denied = false)
+    {
+        var at = DateTime.UtcNow;
+        return denied
+            ? EntryAttempt.CreateDenied(Guid.NewGuid(), holder.Id, org.Id, at, day, DenialReason.CooldownActive, 1440, at.AddDays(1), deskId, userId, EntryChannel.Desk)
+            : EntryAttempt.CreateAllowed(Guid.NewGuid(), holder.Id, org.Id, at, day, 1440, at.AddDays(1), deskId, userId, EntryChannel.Desk);
+    }
+
+    [Fact]
+    public async Task HasGrantedEntryOn_CountsOnlyAGrantedNonVoidedEntryThatDay()
+    {
+        var (org, user, desk) = await SeedAsync("HGE", 5m);
+        await using (var seed = _fixture.CreateDbContext())
+        {
+            var none = new Beneficiary(Guid.NewGuid(), org.Id, CardNumber.Create($"N-{Guid.NewGuid():N}"[..12]), "بدون دخول", PhoneNumber.Create("0921111111"));
+            seed.Beneficiaries.Add(none);
+            await seed.SaveChangesAsync();
+            var today = ParkToday();
+            var voided = Attempt(none, org, today, user.Id, desk.Id);
+            voided.Void(user.Id, "دخول بالخطأ", DateTime.UtcNow);
+            seed.EntryAttempts.AddRange(
+                voided,
+                Attempt(none, org, today, user.Id, desk.Id, denied: true),
+                Attempt(none, org, today.AddDays(-1), user.Id, desk.Id));
+            await seed.SaveChangesAsync();
+
+            await using var context = _fixture.CreateDbContext();
+            var repository = new ParkGate.Infrastructure.Repositories.EntryAttemptRepository(context);
+            (await repository.HasGrantedEntryOnAsync(none.Id, today)).ShouldBeFalse();
+            (await repository.HasGrantedEntryOnAsync(none.Id, today.AddDays(-1))).ShouldBeTrue();
+        }
     }
 }

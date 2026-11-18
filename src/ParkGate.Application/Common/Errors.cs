@@ -64,6 +64,7 @@ public static class Errors
         public static readonly Error HolderBlocked = new("Gift.HolderBlocked", "Holder is blocked from receiving gifts.");
         public static readonly Error HolderSuspended = new("Gift.HolderSuspended", "Holder is suspended from receiving gifts.");
         public static readonly Error IntervalNotElapsed = new("Gift.IntervalNotElapsed", "Gift interval period has not yet elapsed.");
+        public static readonly Error NoEntryToday = new("Gift.NoEntryToday", "The holder has no granted entry today.");
         public static readonly Error OverrideReasonRequired = new("Gift.OverrideReasonRequired", "A reason of at least 5 characters is required for gift interval override.");
         public static readonly Error OverrideNotAllowed = new("Gift.OverrideNotAllowed", "Override is not permitted for this denial reason.");
         public static readonly Error NotFound = new("Gift.NotFound", "Gift voucher not found.");

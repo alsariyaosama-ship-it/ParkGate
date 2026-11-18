@@ -308,6 +308,10 @@ public sealed class FakeEntryAttemptRepository : IEntryAttemptRepository
         return Task.FromResult(list);
     }
 
+    public Task<bool> HasGrantedEntryOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_attempts.Any(a => a.BeneficiaryId == beneficiaryId && a.BusinessDate == businessDate && !a.IsVoided &&
+                                           (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)));
+
     public Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default)
     {
         var day = _attempts.Where(a => a.WorkstationId == workstationId && a.BusinessDate == businessDate).ToList();
