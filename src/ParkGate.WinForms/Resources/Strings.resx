@@ -1307,6 +1307,14 @@
     <value>تم إنشاء النسخة الاحتياطية لقاعدة البيانات بنجاح في المسار:
 {0}</value>
   </data>
+  <data name="Msg_DatabaseSize" xml:space="preserve">
+    <value>حجم بيانات القاعدة: {0:N0} MB من {1:N0} MB ({2}%).</value>
+  </data>
+  <data name="Msg_DatabaseSizeNearLimit" xml:space="preserve">
+    <value>تنبيه: حجم بيانات القاعدة {0:N0} MB، أي {1}% من حد SQL Server Express ({2:N0} MB).
+عند الوصول إلى الحد تتوقف القاعدة عن قبول أي تسجيل جديد.
+راجع مع مسؤول النظام سياسة الاحتفاظ بالسجلات القديمة.</value>
+  </data>
   <data name="Msg_BackupFailed" xml:space="preserve">
     <value>فشل إنشاء النسخة الاحتياطية لقاعدة البيانات: {0}</value>
   </data>

@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>();
         services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddSingleton<IAppSettingsStore, AppSettingsStore>();
+        services.AddTransient<IDatabaseSizeQueries, DatabaseSizeQueries>();
         services.AddTransient<IDatabaseStartupService, DatabaseStartupService>();
         services.AddTransient<ParkGate.Application.Ports.Persistence.IDatabaseBackupService, ParkGate.Infrastructure.Data.DatabaseBackupService>();
         services.AddTransient<ParkGate.Application.Ports.Reports.IReportQueries, ParkGate.Infrastructure.Reports.ReportQueries>();

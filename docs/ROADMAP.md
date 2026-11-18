@@ -234,7 +234,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R6.5 Least-privilege `parkgate_app` login; restrict the firewall rules — blocked on Q-R6
 - [x] R6.6 Re-measure the `LIKE '%term%'` name search at 100 000 holders
 - [ ] R6.7 ~~Business-day cutoff~~ — cancelled (Q-R5): the park closes at midnight
-- [ ] R6.8 Database size warning on the Admin backup screen; propose a retention policy
+- [x] R6.8 Database size warning on the Admin backup screen; propose a retention policy (proposal in DEPLOYMENT.md §9.3, awaiting approval; no deletes)
 - [x] R6.9 ACL-restricted backup folder; document an encrypted off-site copy
 - [x] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
 - [x] R6.11 Write management audit rows in the same unit of work; record old and new card number

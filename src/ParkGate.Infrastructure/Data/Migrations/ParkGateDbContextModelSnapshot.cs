@@ -1000,6 +1000,21 @@ namespace ParkGate.Infrastructure.Data.Migrations
                     b.ToTable("Workstations", (string)null);
                 });
 
+            modelBuilder.Entity("ParkGate.Infrastructure.Data.DatabaseFileRow", b =>
+                {
+                    b.Property<int>("SizePages")
+                        .HasColumnType("int")
+                        .HasColumnName("size");
+
+                    b.Property<byte>("Type")
+                        .HasColumnType("tinyint")
+                        .HasColumnName("type");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("database_files", "sys");
+                });
+
             modelBuilder.Entity("ParkGate.Domain.Entities.Beneficiary", b =>
                 {
                     b.HasOne("ParkGate.Domain.Entities.Organization", null)

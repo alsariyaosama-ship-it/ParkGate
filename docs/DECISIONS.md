@@ -173,6 +173,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Context:** The entry-card feature added raw-SQL tables, a view and stored procedures created at runtime, and a few repositories use SQL text. Two ways of defining the schema drift apart and need DDL rights on the app login.
 - **Decision:** All data access goes through EF Core LINQ and EF migrations. Forbidden in `src/`: `FromSql*`, `SqlQuery*`, `ExecuteSql*`, ADO `DbCommand`, stored procedures, views, and `migrationBuilder.Sql` in new migrations. Allowed: SQL fragments that are part of the EF model configuration (`HasDefaultValueSql`, `HasCheckConstraint`, `HasFilter`) and built-in functions mapped with `HasDbFunction`. The only runtime exception is the `BACKUP DATABASE` command in `DatabaseBackupService`, which EF cannot express. Migrations pushed before this decision stay unchanged. An architecture test enforces it (R6.14).
 - **Consequences:** R6.1 (entry cards), R6.12 (database clock) and R6.13 (row lock) remove the existing SQL. Existing entry-card data is test data and is not preserved.
+- **Amendment (Osama, 2026-11-18, R6.8):** a read-only keyless entity may map a SQL Server *system* catalog view with `ToView` (EF model configuration, no SQL text, never created by migrations). First use: `DatabaseFileRow` → `sys.database_files` for the database size check. Creating our own views stays forbidden.
 
 ---
 

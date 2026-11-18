@@ -547,6 +547,8 @@ internal class Strings
     internal static string Msg_ConfirmBackupNow => GetString(nameof(Msg_ConfirmBackupNow));
     internal static string Msg_BackupSuccess => GetString(nameof(Msg_BackupSuccess));
     internal static string Msg_BackupFailed => GetString(nameof(Msg_BackupFailed));
+    internal static string Msg_DatabaseSize => GetString(nameof(Msg_DatabaseSize));
+    internal static string Msg_DatabaseSizeNearLimit => GetString(nameof(Msg_DatabaseSizeNearLimit));
 
     internal static string Grp_Org_Policy => GetString(nameof(Grp_Org_Policy));
     internal static string Label_Org_MaxFreeCompanions => GetString(nameof(Label_Org_MaxFreeCompanions));
