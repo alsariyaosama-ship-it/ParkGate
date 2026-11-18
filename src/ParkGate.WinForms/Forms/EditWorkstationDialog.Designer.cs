@@ -54,7 +54,7 @@ partial class EditWorkstationDialog
         this._lblHeader.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
         this._lblHeader.Size = new System.Drawing.Size(460, 50);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "تعديل محطة العمل";
+        this._lblHeader.Text = "تعديل الشباك";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _tblLayout
@@ -93,7 +93,7 @@ partial class EditWorkstationDialog
         // 
         this._lblMachineNameValue.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblMachineNameValue.AutoSize = true;
-        this._lblMachineNameValue.Font = new System.Drawing.Font("Cairo", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblMachineNameValue.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblMachineNameValue.Location = new System.Drawing.Point(230, 25);
         this._lblMachineNameValue.Name = "_lblMachineNameValue";
         this._lblMachineNameValue.Size = new System.Drawing.Size(51, 17);
@@ -108,7 +108,7 @@ partial class EditWorkstationDialog
         this._lblDisplayName.Name = "_lblDisplayName";
         this._lblDisplayName.Size = new System.Drawing.Size(126, 19);
         this._lblDisplayName.TabIndex = 2;
-        this._lblDisplayName.Text = "الاسم التعريفي للمحطة:";
+        this._lblDisplayName.Text = "الاسم التعريفي للشباك:";
         // 
         // _txtDisplayName
         // 
@@ -127,7 +127,7 @@ partial class EditWorkstationDialog
         this._lblType.Name = "_lblType";
         this._lblType.Size = new System.Drawing.Size(73, 19);
         this._lblType.TabIndex = 4;
-        this._lblType.Text = "نوع المحطة:";
+        this._lblType.Text = "نوع الشباك:";
         // 
         // _cmbType
         // 
@@ -173,7 +173,7 @@ partial class EditWorkstationDialog
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnCancel.Location = new System.Drawing.Point(208, 9);
         this._btnCancel.Name = "_btnCancel";
@@ -185,8 +185,8 @@ partial class EditWorkstationDialog
         // EditWorkstationDialog
         // 
         this.AcceptButton = this._btnSave;
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
         this.ClientSize = new System.Drawing.Size(460, 256);
         this.Controls.Add(this._tblLayout);
@@ -198,7 +198,7 @@ partial class EditWorkstationDialog
         this.Name = "EditWorkstationDialog";
         this.ShowInTaskbar = false;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        this.Text = "تعديل محطة العمل";
+        this.Text = "تعديل الشباك";
         this._pnlHeader.ResumeLayout(false);
         this._tblLayout.ResumeLayout(false);
         this._tblLayout.PerformLayout();

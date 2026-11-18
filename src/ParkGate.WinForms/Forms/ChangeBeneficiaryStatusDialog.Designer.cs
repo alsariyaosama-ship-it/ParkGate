@@ -58,7 +58,7 @@ partial class ChangeBeneficiaryStatusDialog
         this._lblHeader.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
         this._lblHeader.Size = new System.Drawing.Size(500, 50);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "تغيير حالة المستفيد";
+        this._lblHeader.Text = "تغيير حالة الزائر";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _tblLayout
@@ -93,7 +93,7 @@ partial class ChangeBeneficiaryStatusDialog
         this._lblBeneficiaryInfo.Name = "_lblBeneficiaryInfo";
         this._lblBeneficiaryInfo.Size = new System.Drawing.Size(116, 19);
         this._lblBeneficiaryInfo.TabIndex = 0;
-        this._lblBeneficiaryInfo.Text = "المستفيد: - (بطاقة: -)";
+        this._lblBeneficiaryInfo.Text = "الزائر: - (بطاقة: -)";
         // 
         // _lblCurrentStatus
         // 
@@ -218,7 +218,7 @@ partial class ChangeBeneficiaryStatusDialog
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnCancel.Location = new System.Drawing.Point(238, 9);
         this._btnCancel.Name = "_btnCancel";
@@ -230,8 +230,8 @@ partial class ChangeBeneficiaryStatusDialog
         // ChangeBeneficiaryStatusDialog
         // 
         this.AcceptButton = this._btnConfirm;
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
         this.ClientSize = new System.Drawing.Size(500, 396);
         this.Controls.Add(this._tblLayout);
@@ -243,7 +243,7 @@ partial class ChangeBeneficiaryStatusDialog
         this.Name = "ChangeBeneficiaryStatusDialog";
         this.ShowInTaskbar = false;
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        this.Text = "تغيير حالة المستفيد";
+        this.Text = "تغيير حالة الزائر";
         this._pnlHeader.ResumeLayout(false);
         this._tblLayout.ResumeLayout(false);
         this._tblLayout.PerformLayout();

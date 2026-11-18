@@ -60,7 +60,7 @@ partial class GiftQrDialog
         this._lblHeader.Padding = new System.Windows.Forms.Padding(16, 0, 16, 0);
         this._lblHeader.Size = new System.Drawing.Size(540, 50);
         this._lblHeader.TabIndex = 0;
-        this._lblHeader.Text = "وصل قسيمة ألعاب الأطفال";
+        this._lblHeader.Text = "قسيمة ألعاب الأطفال";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _tblMain
@@ -120,13 +120,13 @@ partial class GiftQrDialog
         // 
         this._lblReceiptNo.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblReceiptNo.AutoSize = true;
-        this._lblReceiptNo.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblReceiptNo.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblReceiptNo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblReceiptNo.Location = new System.Drawing.Point(180, 2);
         this._lblReceiptNo.Name = "_lblReceiptNo";
         this._lblReceiptNo.Size = new System.Drawing.Size(109, 26);
         this._lblReceiptNo.TabIndex = 0;
-        this._lblReceiptNo.Text = "رقم الوصل: -";
+        this._lblReceiptNo.Text = "رقم القسيمة: -";
         // 
         // _lblCustomerName
         // 
@@ -137,13 +137,13 @@ partial class GiftQrDialog
         this._lblCustomerName.Name = "_lblCustomerName";
         this._lblCustomerName.Size = new System.Drawing.Size(69, 24);
         this._lblCustomerName.TabIndex = 1;
-        this._lblCustomerName.Text = "الزبون: -";
+        this._lblCustomerName.Text = "الزائر: -";
         // 
         // _lblCardNumber
         // 
         this._lblCardNumber.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblCardNumber.AutoSize = true;
-        this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblCardNumber.Location = new System.Drawing.Point(198, 60);
         this._lblCardNumber.Name = "_lblCardNumber";
         this._lblCardNumber.Size = new System.Drawing.Size(91, 23);
@@ -154,7 +154,7 @@ partial class GiftQrDialog
         // 
         this._lblOrganization.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblOrganization.AutoSize = true;
-        this._lblOrganization.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblOrganization.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblOrganization.Location = new System.Drawing.Point(234, 88);
         this._lblOrganization.Name = "_lblOrganization";
         this._lblOrganization.Size = new System.Drawing.Size(55, 23);
@@ -165,7 +165,7 @@ partial class GiftQrDialog
         // 
         this._lblValue.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblValue.AutoSize = true;
-        this._lblValue.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblValue.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
         this._lblValue.Location = new System.Drawing.Point(190, 116);
         this._lblValue.Name = "_lblValue";
@@ -189,7 +189,7 @@ partial class GiftQrDialog
         // 
         this._lblOverrideNotice.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblOverrideNotice.AutoSize = true;
-        this._lblOverrideNotice.Font = new System.Drawing.Font("Cairo", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblOverrideNotice.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblOverrideNotice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
         this._lblOverrideNotice.Location = new System.Drawing.Point(75, 175);
         this._lblOverrideNotice.Name = "_lblOverrideNotice";
@@ -233,7 +233,7 @@ partial class GiftQrDialog
         this._btnSave.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnSave.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnSave.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnSave.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnSave.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnSave.Location = new System.Drawing.Point(272, 9);
         this._btnSave.Name = "_btnSave";
@@ -249,7 +249,7 @@ partial class GiftQrDialog
         this._btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this._btnClose.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClose.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClose.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnClose.Location = new System.Drawing.Point(166, 9);
         this._btnClose.Name = "_btnClose";
@@ -261,8 +261,8 @@ partial class GiftQrDialog
         // GiftQrDialog
         // 
         this.AcceptButton = this._btnPrint;
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnClose;
         this.ClientSize = new System.Drawing.Size(540, 346);
         this.Controls.Add(this._tblMain);

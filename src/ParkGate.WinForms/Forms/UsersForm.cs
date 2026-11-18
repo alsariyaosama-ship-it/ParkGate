@@ -19,37 +19,33 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class UsersForm : RtlFormBase
 {
-    private readonly IUserService? _userService;
-    private readonly ICurrentUser? _currentUser;
-    private readonly ISettingsService? _settingsService;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<UsersForm>? _logger;
+    private readonly IUserService _userService;
+    private readonly ICurrentUser _currentUser;
+    private readonly ISettingsService _settingsService;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<UsersForm> _logger;
 
     private readonly List<UserDto> _users = [];
     private UserDto? _selectedUser;
     private string _timeZoneId = "Libya Standard Time";
 
-    public UsersForm() : this(null, null, null, null, null, null)
-    {
-    }
-
     public UsersForm(
-        IUserService? userService,
-        ICurrentUser? currentUser,
-        ISettingsService? settingsService,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<UsersForm>? logger)
+        IUserService userService,
+        ICurrentUser currentUser,
+        ISettingsService settingsService,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<UsersForm> logger)
     {
         InitializeComponent();
 
-        _userService = userService;
-        _currentUser = currentUser;
-        _settingsService = settingsService;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         Theme.ApplyGridStyle(_gridUsers);
@@ -79,17 +75,14 @@ public partial class UsersForm : RtlFormBase
     {
         Load += async (_, _) =>
         {
-            if (_settingsService != null)
+            try
             {
-                try
-                {
-                    var settings = await _settingsService.GetSettingsAsync();
-                    _timeZoneId = settings.TimeZoneId;
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogWarning(ex, "Failed to load time zone settings.");
-                }
+                var settings = await _settingsService.GetSettingsAsync();
+                _timeZoneId = settings.TimeZoneId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to load time zone settings.");
             }
             await LoadUsersAsync();
         };
@@ -113,11 +106,6 @@ public partial class UsersForm : RtlFormBase
 
     public async Task LoadUsersAsync()
     {
-        if (_userService == null)
-        {
-            return;
-        }
-
         try
         {
             var list = await _userService.GetAllAsync();
@@ -129,8 +117,8 @@ public partial class UsersForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error loading users.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error loading users.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 
@@ -221,8 +209,7 @@ public partial class UsersForm : RtlFormBase
 
     public async Task AddUserAsync()
     {
-        var dialog = _formFactory?.Create<CreateUserDialog>() ??
-                     new CreateUserDialog(_userService, _notifyService, null);
+        var dialog = _formFactory.Create<CreateUserDialog>();
 
         using (dialog)
         {
@@ -240,14 +227,13 @@ public partial class UsersForm : RtlFormBase
             return;
         }
 
-        if (_currentUser?.UserId.HasValue == true && _currentUser.UserId.Value == _selectedUser.Id)
+        if (_currentUser.UserId.HasValue == true && _currentUser.UserId.Value == _selectedUser.Id)
         {
-            _notifyService?.Warning(Strings.Msg_CannotChangeSelfRole);
+            _notifyService.Warning(Strings.Msg_CannotChangeSelfRole);
             return;
         }
 
-        var dialog = _formFactory?.Create<ChangeUserRoleDialog>() ??
-                     new ChangeUserRoleDialog(_userService, _notifyService, null);
+        var dialog = _formFactory.Create<ChangeUserRoleDialog>();
 
         using (dialog)
         {
@@ -266,8 +252,7 @@ public partial class UsersForm : RtlFormBase
             return;
         }
 
-        var dialog = _formFactory?.Create<ResetUserPasswordDialog>() ??
-                     new ResetUserPasswordDialog(_userService, _notifyService, null);
+        var dialog = _formFactory.Create<ResetUserPasswordDialog>();
 
         using (dialog)
         {
@@ -281,14 +266,14 @@ public partial class UsersForm : RtlFormBase
 
     public async Task ToggleActiveAsync()
     {
-        if (_selectedUser == null || _userService == null)
+        if (_selectedUser == null)
         {
             return;
         }
 
-        if (_currentUser?.UserId.HasValue == true && _currentUser.UserId.Value == _selectedUser.Id)
+        if (_currentUser.UserId.HasValue == true && _currentUser.UserId.Value == _selectedUser.Id)
         {
-            _notifyService?.Warning(Strings.Msg_CannotDeactivateSelf);
+            _notifyService.Warning(Strings.Msg_CannotDeactivateSelf);
             return;
         }
 
@@ -297,14 +282,7 @@ public partial class UsersForm : RtlFormBase
             ? Strings.Msg_ConfirmDeactivateUser
             : Strings.Msg_ConfirmReactivateUser;
 
-        var confirmed = _notifyService?.Confirm(confirmMsg, Strings.Title_Confirm) ??
-                        (MessageBox.Show(
-                            confirmMsg,
-                            Strings.Title_Confirm,
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Question,
-                            MessageBoxDefaultButton.Button2,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign) == DialogResult.Yes);
+        var confirmed = _notifyService.Confirm(confirmMsg, Strings.Title_Confirm);
 
         if (!confirmed)
         {
@@ -323,13 +301,13 @@ public partial class UsersForm : RtlFormBase
             }
             else
             {
-                _notifyService?.Warning(ErrorMessages.GetMessage(result.Error));
+                _notifyService.Warning(ErrorMessages.GetMessage(result.Error));
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error toggling user active state.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error toggling user active state.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 }

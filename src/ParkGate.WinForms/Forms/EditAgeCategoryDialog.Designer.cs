@@ -61,7 +61,7 @@ partial class EditAgeCategoryDialog
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);
         this._pnlHeader.Margin = new System.Windows.Forms.Padding(0);
         this._pnlHeader.Name = "_pnlHeader";
-        this._pnlHeader.Size = new System.Drawing.Size(500, 64);
+        this._pnlHeader.Size = new System.Drawing.Size(500, 76);
         this._pnlHeader.TabIndex = 0;
         // 
         // _lblHeader
@@ -72,7 +72,7 @@ partial class EditAgeCategoryDialog
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(16, 8);
         this._lblHeader.Name = "_lblHeader";
-        this._lblHeader.Size = new System.Drawing.Size(468, 26);
+        this._lblHeader.Size = new System.Drawing.Size(468, 32);
         this._lblHeader.TabIndex = 0;
         this._lblHeader.Text = "بيانات الفئة العمرية";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -81,11 +81,11 @@ partial class EditAgeCategoryDialog
         // 
         this._lblHeaderSubtitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-        this._lblHeaderSubtitle.Font = new System.Drawing.Font("Cairo", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblHeaderSubtitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblHeaderSubtitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(252)))), ((int)(((byte)(231)))));
-        this._lblHeaderSubtitle.Location = new System.Drawing.Point(16, 34);
+        this._lblHeaderSubtitle.Location = new System.Drawing.Point(16, 42);
         this._lblHeaderSubtitle.Name = "_lblHeaderSubtitle";
-        this._lblHeaderSubtitle.Size = new System.Drawing.Size(468, 20);
+        this._lblHeaderSubtitle.Size = new System.Drawing.Size(468, 26);
         this._lblHeaderSubtitle.TabIndex = 1;
         this._lblHeaderSubtitle.Text = "تحديد اسم الفئة العمرية ووصفها وترتيب ظهورها في النظام";
         this._lblHeaderSubtitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -93,7 +93,7 @@ partial class EditAgeCategoryDialog
         // _tblLayout
         // 
         this._tblLayout.ColumnCount = 2;
-        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
+        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 210F));
         this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblLayout.Controls.Add(this._lblNameAr, 0, 0);
         this._tblLayout.Controls.Add(this._txtNameAr, 1, 0);
@@ -119,7 +119,7 @@ partial class EditAgeCategoryDialog
         this._lblNameAr.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblNameAr.AutoSize = true;
         this._lblNameAr.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblNameAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._lblNameAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._lblNameAr.Location = new System.Drawing.Point(370, 26);
         this._lblNameAr.Name = "_lblNameAr";
         this._lblNameAr.Size = new System.Drawing.Size(73, 20);
@@ -129,7 +129,7 @@ partial class EditAgeCategoryDialog
         // _txtNameAr
         // 
         this._txtNameAr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtNameAr.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtNameAr.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._txtNameAr.Location = new System.Drawing.Point(23, 21);
         this._txtNameAr.MaxLength = 100;
         this._txtNameAr.Name = "_txtNameAr";
@@ -141,7 +141,7 @@ partial class EditAgeCategoryDialog
         this._lblDescriptionAr.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblDescriptionAr.AutoSize = true;
         this._lblDescriptionAr.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblDescriptionAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._lblDescriptionAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._lblDescriptionAr.Location = new System.Drawing.Point(370, 72);
         this._lblDescriptionAr.Name = "_lblDescriptionAr";
         this._lblDescriptionAr.Size = new System.Drawing.Size(56, 20);
@@ -151,7 +151,7 @@ partial class EditAgeCategoryDialog
         // _txtDescriptionAr
         // 
         this._txtDescriptionAr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtDescriptionAr.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtDescriptionAr.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._txtDescriptionAr.Location = new System.Drawing.Point(23, 67);
         this._txtDescriptionAr.MaxLength = 250;
         this._txtDescriptionAr.Name = "_txtDescriptionAr";
@@ -163,7 +163,7 @@ partial class EditAgeCategoryDialog
         this._lblSortOrder.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblSortOrder.AutoSize = true;
         this._lblSortOrder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblSortOrder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._lblSortOrder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._lblSortOrder.Location = new System.Drawing.Point(370, 118);
         this._lblSortOrder.Name = "_lblSortOrder";
         this._lblSortOrder.Size = new System.Drawing.Size(54, 20);
@@ -173,7 +173,7 @@ partial class EditAgeCategoryDialog
         // _numSortOrder
         // 
         this._numSortOrder.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._numSortOrder.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._numSortOrder.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._numSortOrder.Location = new System.Drawing.Point(227, 113);
         this._numSortOrder.Maximum = new decimal(new int[] { 100, 0, 0, 0 });
         this._numSortOrder.Name = "_numSortOrder";
@@ -185,8 +185,8 @@ partial class EditAgeCategoryDialog
         // 
         this._chkIsCompanionLimitExempt.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._chkIsCompanionLimitExempt.AutoSize = true;
-        this._chkIsCompanionLimitExempt.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._chkIsCompanionLimitExempt.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._chkIsCompanionLimitExempt.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._chkIsCompanionLimitExempt.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._chkIsCompanionLimitExempt.Location = new System.Drawing.Point(23, 162);
         this._chkIsCompanionLimitExempt.Name = "_chkIsCompanionLimitExempt";
         this._chkIsCompanionLimitExempt.Size = new System.Drawing.Size(324, 28);
@@ -247,7 +247,7 @@ partial class EditAgeCategoryDialog
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(500, 348);
+        this.ClientSize = new System.Drawing.Size(540, 348);
         this.Controls.Add(this._tblLayout);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);

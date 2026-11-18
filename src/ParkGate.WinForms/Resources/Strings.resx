@@ -179,7 +179,7 @@
     <value>كلمة المرور:</value>
   </data>
   <data name="Label_Workstation" xml:space="preserve">
-    <value>محطة العمل:</value>
+    <value>الشباك:</value>
   </data>
   <data name="Btn_Login" xml:space="preserve">
     <value>تسجيل الدخول</value>
@@ -221,13 +221,13 @@
     <value>العمليات</value>
   </data>
   <data name="Menu_CheckIn" xml:space="preserve">
-    <value>بوابة الدخول</value>
+    <value>شباك الدخول</value>
   </data>
   <data name="Menu_Management" xml:space="preserve">
     <value>الإدارة</value>
   </data>
   <data name="Menu_Beneficiaries" xml:space="preserve">
-    <value>الزبائن</value>
+    <value>الزوار</value>
   </data>
   <data name="Menu_Organizations" xml:space="preserve">
     <value>الجهات والمنظمات</value>
@@ -239,7 +239,7 @@
     <value>المستخدمون</value>
   </data>
   <data name="Menu_Workstations" xml:space="preserve">
-    <value>محطات العمل</value>
+    <value>الشبابيك</value>
   </data>
   <data name="Menu_Settings" xml:space="preserve">
     <value>إعدادات النظام</value>
@@ -263,7 +263,7 @@
     <value>المستخدم: {0} ({1})</value>
   </data>
   <data name="Status_Workstation" xml:space="preserve">
-    <value>المحطة: {0}</value>
+    <value>الشباك: {0}</value>
   </data>
   <data name="Status_ServerTime" xml:space="preserve">
     <value>وقت الخادم: {0}</value>
@@ -314,19 +314,19 @@
     <value>تم إعداد الحساب الرئيسي للمنظومة مسبقاً.</value>
   </data>
   <data name="Error_Auth_WorkstationNotFound" xml:space="preserve">
-    <value>محطة العمل غير مسجلة.</value>
+    <value>هذا الشباك غير مسجل.</value>
   </data>
   <data name="Error_Auth_WorkstationInactive" xml:space="preserve">
-    <value>محطة العمل هذه معطّلة. يرجى مراجعة المشرف.</value>
+    <value>هذا الشباك معطّل. يرجى مراجعة المشرف.</value>
   </data>
   <data name="Error_Auth_SupervisorRequired" xml:space="preserve">
     <value>هذا الإجراء يتطلب صلاحية مشرف أو مدير.</value>
   </data>
   <data name="Error_CheckIn_CooldownActive" xml:space="preserve">
-    <value>فترة التهدئة نشطة — سبق الدخول ضمن الفترة المحددة ولا يسمح بالدخول حالياً.</value>
+    <value>فترة الانتظار سارية — سبق الدخول ضمن الفترة المحددة ولا يُسمح بالدخول حالياً.</value>
   </data>
   <data name="Error_CheckIn_OrganizationInactive" xml:space="preserve">
-    <value>الجهة التابع لها الزبون معطّلة أو غير نشطة حالياً.</value>
+    <value>الجهة التابع لها الزائر معطّلة أو غير نشطة حالياً.</value>
   </data>
   <data name="Error_CheckIn_ExceedsMaxGroupSize" xml:space="preserve">
     <value>إجمالي عدد الأفراد يتجاوز الحد الأقصى المسموح به للمجموعة في المرة الواحدة.</value>
@@ -338,7 +338,7 @@
     <value>يرجى كتابة سبب التجاوز (5 أحرف على الأقل).</value>
   </data>
   <data name="Error_CheckIn_OverrideNotAllowed" xml:space="preserve">
-    <value>لا يُسمح بالتجاوز للزبائن المحظورين أو الجهات غير النشطة.</value>
+    <value>لا يُسمح بالتجاوز للزوار المحظورين أو الجهات غير النشطة.</value>
   </data>
   <data name="Error_CheckIn_AttemptNotFound" xml:space="preserve">
     <value>لم يتم العثور على محاولة الدخول المطلوبة.</value>
@@ -353,7 +353,7 @@
     <value>يرجى كتابة سبب الإلغاء (5 أحرف على الأقل).</value>
   </data>
   <data name="Error_Beneficiary_NotFound" xml:space="preserve">
-    <value>لم يتم العثور على بيانات الزبون المطلوبة.</value>
+    <value>لم يتم العثور على بيانات الزائر المطلوبة.</value>
   </data>
   <data name="Error_Beneficiary_CardNotFound" xml:space="preserve">
     <value>رقم البطاقة غير مسجل بالمنظومة.</value>
@@ -362,22 +362,22 @@
     <value>رقم البطاقة مسجل مسبقاً لنفس الجهة الراعية.</value>
   </data>
   <data name="Error_Beneficiary_NationalIdAlreadyExists" xml:space="preserve">
-    <value>الرقم الوطني مسجل مسبقاً لزبون آخر.</value>
+    <value>الرقم الوطني مسجل مسبقاً لزائر آخر.</value>
   </data>
   <data name="Error_Beneficiary_MultipleHoldersFound" xml:space="preserve">
     <value>تم العثور على رقم البطاقة في أكثر من جهة راعية.</value>
   </data>
   <data name="Error_Beneficiary_Blocked" xml:space="preserve">
-    <value>حساب الزبون محظور تماماً من الدخول.</value>
+    <value>حساب الزائر محظور تماماً من الدخول.</value>
   </data>
   <data name="Error_Beneficiary_Suspended" xml:space="preserve">
-    <value>حساب الزبون موقوف مؤقتاً.</value>
+    <value>حساب الزائر موقوف مؤقتاً.</value>
   </data>
   <data name="Error_Beneficiary_CardExpired" xml:space="preserve">
     <value>صلاحية البطاقة منتهية.</value>
   </data>
   <data name="Error_Beneficiary_InvalidStatusTransition" xml:space="preserve">
-    <value>تغيير حالة الزبون المطلوب غير صالح.</value>
+    <value>تغيير حالة الزائر المطلوب غير صالح.</value>
   </data>
   <data name="Error_Organization_NotFound" xml:space="preserve">
     <value>لم يتم العثور على الجهة المطلوبة.</value>
@@ -410,10 +410,10 @@
     <value>لا يمكنك تغيير صلاحيات حسابك الخاص.</value>
   </data>
   <data name="Error_Workstation_NotFound" xml:space="preserve">
-    <value>لم يتم العثور على محطة العمل المطلوبة.</value>
+    <value>لم يتم العثور على الشباك المطلوب.</value>
   </data>
   <data name="Error_Workstation_MachineNameAlreadyExists" xml:space="preserve">
-    <value>اسم الجهاز مسجل مسبقاً لمحطة عمل أخرى.</value>
+    <value>اسم الجهاز مسجل مسبقاً لشباك آخر.</value>
   </data>
   <data name="Error_Settings_KeyNotFound" xml:space="preserve">
     <value>مفتاح الإعداد المطلوب غير موجود.</value>
@@ -425,16 +425,16 @@
     <value>يجب أن يكون تاريخ البداية يسبق أو يساوي تاريخ النهاية.</value>
   </data>
   <data name="Denial_CooldownActive" xml:space="preserve">
-    <value>فترة التهدئة نشطة (سبق الدخول)</value>
+    <value>فترة الانتظار سارية (سبق الدخول)</value>
   </data>
   <data name="Denial_CardExpired" xml:space="preserve">
     <value>صلاحية البطاقة منتهية</value>
   </data>
   <data name="Denial_HolderSuspended" xml:space="preserve">
-    <value>حساب الزبون موقوف مؤقتاً</value>
+    <value>حساب الزائر موقوف مؤقتاً</value>
   </data>
   <data name="Denial_HolderBlocked" xml:space="preserve">
-    <value>حساب الزبون محظور</value>
+    <value>حساب الزائر محظور</value>
   </data>
   <data name="Denial_OrganizationInactive" xml:space="preserve">
     <value>الجهة الراعية غير نشطة</value>
@@ -503,7 +503,7 @@
     <value>منتزه المرح العائلي</value>
   </data>
   <data name="About_Description" xml:space="preserve">
-    <value>نظام إدارة والتحكم في الدخول المجاني لزبائن صندوق التضامن الاجتماعي والجهات الراعية.</value>
+    <value>نظام إدارة والتحكم في الدخول المجاني لزوار صندوق التضامن الاجتماعي والجهات الراعية.</value>
   </data>
   <data name="About_Vendor" xml:space="preserve">
     <value>شركة الركاز المتين لتقنية المعلومات</value>
@@ -560,7 +560,7 @@
     <value>بحث (Enter)</value>
   </data>
   <data name="Title_HolderInfo" xml:space="preserve">
-    <value>بيانات الزبون</value>
+    <value>بيانات الزائر</value>
   </data>
   <data name="Label_HolderName" xml:space="preserve">
     <value>الاسم الكامل:</value>
@@ -596,7 +596,7 @@
     <value>لا يوجد</value>
   </data>
   <data name="Title_InlineRegistration" xml:space="preserve">
-    <value>تسجيل زبون جديد (فوري)</value>
+    <value>تسجيل زائر جديد (فوري)</value>
   </data>
   <data name="Label_RegFullName" xml:space="preserve">
     <value>الاسم الرباعي:</value>
@@ -623,13 +623,13 @@
     <value>إلغاء</value>
   </data>
   <data name="Title_Companions" xml:space="preserve">
-    <value>المرافقون مع الزبون</value>
+    <value>المرافقون مع الزائر</value>
   </data>
   <data name="Label_TotalPersons" xml:space="preserve">
-    <value>الإجمالي مع الزبون: {0} فرد</value>
+    <value>الإجمالي مع الزائر: {0} فرد</value>
   </data>
   <data name="Notice_HolderCounted" xml:space="preserve">
-    <value>(الزبون محتسب تلقائياً +1)</value>
+    <value>(الزائر محتسب تلقائياً +1)</value>
   </data>
   <data name="Btn_RecordEntry" xml:space="preserve">
     <value>تسجيل الدخول (F5)</value>
@@ -638,13 +638,13 @@
     <value>تجاوز المشرف (F9)</value>
   </data>
   <data name="Btn_NewHolder" xml:space="preserve">
-    <value>زبون جديد (F2)</value>
+    <value>زائر جديد (F2)</value>
   </data>
   <data name="Btn_Clear" xml:space="preserve">
     <value>مسح الشاشة (Esc)</value>
   </data>
   <data name="Title_TodayDesk" xml:space="preserve">
-    <value>سجل الدخول لهذا اليوم بالمحطة (آخر 20 محاولة)</value>
+    <value>سجل الدخول لهذا اليوم بهذا الشباك (آخر 20 محاولة)</value>
   </data>
   <data name="Col_Time" xml:space="preserve">
     <value>الوقت</value>
@@ -653,7 +653,7 @@
     <value>رقم البطاقة</value>
   </data>
   <data name="Col_HolderName" xml:space="preserve">
-    <value>اسم الزبون</value>
+    <value>اسم الزائر</value>
   </data>
   <data name="Col_Org" xml:space="preserve">
     <value>الجهة</value>
@@ -683,16 +683,16 @@
     <value>تحديد الجهة للبطاقة</value>
   </data>
   <data name="Header_SelectOrganization" xml:space="preserve">
-    <value>رقم البطاقة مسجل لدى أكثر من جهة، يرجى اختيار الجهة المطلوبة للمتابعة:</value>
+    <value>البطاقة مسجلة لدى أكثر من جهة. اختر الجهة للمتابعة:</value>
   </data>
   <data name="Btn_SelectOrg" xml:space="preserve">
     <value>اختيار ومتابعة</value>
   </data>
   <data name="Title_Beneficiaries" xml:space="preserve">
-    <value>إدارة الزبائن والمستفيدين</value>
+    <value>إدارة الزوار</value>
   </data>
   <data name="Header_BeneficiariesSearch" xml:space="preserve">
-    <value>البحث في الزبائن</value>
+    <value>البحث في الزوار</value>
   </data>
   <data name="Label_SearchTerm" xml:space="preserve">
     <value>البحث (رقم البطاقة / الاسم / الهاتف / الرقم الوطني):</value>
@@ -731,7 +731,7 @@
     <value>آخر دخول</value>
   </data>
   <data name="Group_Ben_Details" xml:space="preserve">
-    <value>تفاصيل الزبون</value>
+    <value>تفاصيل الزائر</value>
   </data>
   <data name="Group_Ben_History" xml:space="preserve">
     <value>سجل محاولات وحركات الدخول</value>
@@ -746,16 +746,16 @@
     <value>فتح بشباك الدخول</value>
   </data>
   <data name="Title_EditBeneficiary" xml:space="preserve">
-    <value>تعديل بيانات الزبون</value>
+    <value>تعديل بيانات الزائر</value>
   </data>
   <data name="Header_EditBeneficiary" xml:space="preserve">
-    <value>تعديل بيانات المستفيد المسجل</value>
+    <value>تعديل بيانات الزائر المسجل</value>
   </data>
   <data name="Title_ChangeStatus" xml:space="preserve">
-    <value>تغيير حالة المستفيد</value>
+    <value>تغيير حالة الزائر</value>
   </data>
   <data name="Header_ChangeStatus" xml:space="preserve">
-    <value>تحديث حالة المستفيد في النظام</value>
+    <value>تحديث حالة الزائر في النظام</value>
   </data>
   <data name="Label_CurrentStatus" xml:space="preserve">
     <value>الحالة الحالية: {0}</value>
@@ -767,16 +767,16 @@
     <value>سبب تغيير الحالة (مطلوب عند الإيقاف أو الحظر - 5 أحرف على الأقل):</value>
   </data>
   <data name="Msg_StatusChangeSuccess" xml:space="preserve">
-    <value>تم تحديث حالة المستفيد بنجاح.</value>
+    <value>تم تحديث حالة الزائر بنجاح.</value>
   </data>
   <data name="Msg_EditBeneficiarySuccess" xml:space="preserve">
-    <value>تم حفظ تعديلات بيانات المستفيد بنجاح.</value>
+    <value>تم حفظ تعديلات بيانات الزائر بنجاح.</value>
   </data>
   <data name="Msg_SelectBeneficiaryFirst" xml:space="preserve">
-    <value>يرجى تحديد مستفيد من القائمة أولاً.</value>
+    <value>يرجى تحديد زائر من القائمة أولاً.</value>
   </data>
   <data name="Msg_NoHistoryFound" xml:space="preserve">
-    <value>لا توجد حركات دخول سابقة لهذا المستفيد.</value>
+    <value>لا توجد حركات دخول سابقة لهذا الزائر.</value>
   </data>
   <data name="Col_Hist_Time" xml:space="preserve">
     <value>الوقت والتاريخ</value>
@@ -812,7 +812,7 @@
     <value>إلغاء عملية دخول</value>
   </data>
   <data name="Header_VoidEntry" xml:space="preserve">
-    <value>إلغاء حركة دخول مسجلة (إعادة احتساب فترة السماح)</value>
+    <value>إلغاء حركة دخول مسجلة (إعادة احتساب فترة الانتظار)</value>
   </data>
   <data name="Label_VoidReasonPrompt" xml:space="preserve">
     <value>سبب الإلغاء (إلزامي - 5 أحرف على الأقل):</value>
@@ -821,7 +821,7 @@
     <value>تأكيد الإلغاء</value>
   </data>
   <data name="Msg_ConfirmVoid" xml:space="preserve">
-    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيؤدي ذلك لإعادة احتساب موعد آخر دخول للمستفيد تلقائياً.</value>
+    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيؤدي ذلك لإعادة احتساب موعد آخر دخول للزائر تلقائياً.</value>
   </data>
   <data name="Msg_VoidSuccess" xml:space="preserve">
     <value>تم إلغاء عملية الدخول بنجاح.</value>
@@ -875,7 +875,7 @@
     <value>اسم الجهة</value>
   </data>
   <data name="Col_Org_Cooldown" xml:space="preserve">
-    <value>فترة السماح</value>
+    <value>فترة الانتظار</value>
   </data>
   <data name="Col_Org_Default" xml:space="preserve">
     <value>افتراضية</value>
@@ -890,16 +890,16 @@
     <value>اسم الجهة بالعربية:</value>
   </data>
   <data name="Label_Org_CustomCooldown" xml:space="preserve">
-    <value>تحديد فترة سماح خاصة بهذه الجهة</value>
+    <value>تحديد فترة انتظار خاصة بهذه الجهة</value>
   </data>
   <data name="Label_Org_CooldownHours" xml:space="preserve">
-    <value>فترة السماح (بالساعات):</value>
+    <value>فترة الانتظار (بالساعات):</value>
   </data>
   <data name="Label_Org_IsDefault" xml:space="preserve">
     <value>الجهة الافتراضية للنظام</value>
   </data>
   <data name="Msg_ConfirmDeactivateOrg" xml:space="preserve">
-    <value>هل أنت متأكد من تعطيل هذه الجهة؟ لن يتمكن زبائن بطاقاتها من الدخول حتى إعادة تفعيلها.</value>
+    <value>هل أنت متأكد من تعطيل هذه الجهة؟ لن يتمكن زوار هذه الجهة من الدخول حتى إعادة تفعيلها.</value>
   </data>
   <data name="Msg_ConfirmReactivateOrg" xml:space="preserve">
     <value>هل أنت متأكد من إعادة تفعيل هذه الجهة؟</value>
@@ -947,16 +947,16 @@
     <value>تم حفظ الفئة العمرية بنجاح.</value>
   </data>
   <data name="Title_Workstations" xml:space="preserve">
-    <value>إدارة محطات العمل ونقاط الدخول</value>
+    <value>إدارة الشبابيك ونقاط الدخول</value>
   </data>
   <data name="Title_EditWorkstation" xml:space="preserve">
-    <value>تعديل محطة العمل</value>
+    <value>تعديل الشباك</value>
   </data>
   <data name="Col_Ws_MachineName" xml:space="preserve">
     <value>اسم الجهاز</value>
   </data>
   <data name="Col_Ws_DisplayName" xml:space="preserve">
-    <value>اسم المحطة</value>
+    <value>اسم الشباك</value>
   </data>
   <data name="Col_Ws_Type" xml:space="preserve">
     <value>النوع</value>
@@ -971,10 +971,10 @@
     <value>اسم الجهاز في الشبكة:</value>
   </data>
   <data name="Label_Ws_DisplayName" xml:space="preserve">
-    <value>الاسم التعريفي للمحطة:</value>
+    <value>الاسم التعريفي للشباك:</value>
   </data>
   <data name="Label_Ws_Type" xml:space="preserve">
-    <value>نوع المحطة:</value>
+    <value>نوع الشباك:</value>
   </data>
   <data name="Ws_Type_Desk" xml:space="preserve">
     <value>شباك موظف (Desk)</value>
@@ -983,13 +983,13 @@
     <value>بوابة إلكترونية (Gate)</value>
   </data>
   <data name="Msg_ConfirmDeactivateWs" xml:space="preserve">
-    <value>هل أنت متأكد من تعطيل محطة العمل هذه؟</value>
+    <value>هل أنت متأكد من تعطيل هذا الشباك؟</value>
   </data>
   <data name="Msg_ConfirmReactivateWs" xml:space="preserve">
-    <value>هل أنت متأكد من إعادة تفعيل محطة العمل هذه؟</value>
+    <value>هل أنت متأكد من إعادة تفعيل هذا الشباك؟</value>
   </data>
   <data name="Msg_SaveWsSuccess" xml:space="preserve">
-    <value>تم حفظ بيانات محطة العمل بنجاح.</value>
+    <value>تم حفظ بيانات الشباك بنجاح.</value>
   </data>
   <data name="Title_Users" xml:space="preserve">
     <value>إدارة المستخدمين</value>
@@ -1073,7 +1073,7 @@
     <value>إعدادات عامة</value>
   </data>
   <data name="Tab_EntrySettings" xml:space="preserve">
-    <value>إعدادات الدخول وفترة السماح</value>
+    <value>إعدادات الدخول وفترة الانتظار</value>
   </data>
   <data name="Tab_SecuritySettings" xml:space="preserve">
     <value>إعدادات الأمان والقفل</value>
@@ -1085,16 +1085,16 @@
     <value>المنطقة الزمنية (TimeZone):</value>
   </data>
   <data name="Label_DefaultCooldownHours" xml:space="preserve">
-    <value>فترة السماح الافتراضية بين الزيارات (بالساعات):</value>
+    <value>فترة الانتظار الافتراضية بين الزيارات (بالساعات):</value>
   </data>
   <data name="Label_MaxGroupSize" xml:space="preserve">
-    <value>الحد الأقصى لعدد الأفراد في المجموعة (شامل الزبون):</value>
+    <value>الحد الأقصى لعدد الأفراد في المجموعة (شامل الزائر):</value>
   </data>
   <data name="Label_DenialDedupMinutes" xml:space="preserve">
     <value>مدة عدم تكرار تسجيل المحاولات المرفوضة المتتالية (بالدقائق):</value>
   </data>
   <data name="Label_PrefillCompanions" xml:space="preserve">
-    <value>تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للمستفيد</value>
+    <value>تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للزائر</value>
   </data>
   <data name="Label_DenialSound" xml:space="preserve">
     <value>تشغيل تنبيه صوتي عند رفض الدخول</value>
@@ -1202,7 +1202,7 @@
     <value>إجمالي الأفراد</value>
   </data>
   <data name="Kpi_Holders" xml:space="preserve">
-    <value>الزبائن</value>
+    <value>الزوار</value>
   </data>
   <data name="Kpi_Companions" xml:space="preserve">
     <value>المرافقون</value>
@@ -1232,7 +1232,7 @@
     <value>ملغى</value>
   </data>
   <data name="Col_Holders" xml:space="preserve">
-    <value>الزبائن</value>
+    <value>الزوار</value>
   </data>
   <data name="Col_Companions" xml:space="preserve">
     <value>المرافقون</value>
@@ -1250,7 +1250,7 @@
     <value>الكود</value>
   </data>
   <data name="Col_UniqueHolders" xml:space="preserve">
-    <value>المستفيدون الفريدون</value>
+    <value>الزوار الفريدون</value>
   </data>
   <data name="Col_Operator" xml:space="preserve">
     <value>المشغل</value>
@@ -1268,7 +1268,7 @@
     <value>وقت المحاولة</value>
   </data>
   <data name="Col_BeneficiaryName" xml:space="preserve">
-    <value>اسم المستفيد</value>
+    <value>اسم الزائر</value>
   </data>
   <data name="Col_DenialReason" xml:space="preserve">
     <value>سبب الرفض</value>
@@ -1385,19 +1385,19 @@
     <value>يتجاوز عدد المرافقين الحد الأقصى المسموح به للدخول المجاني لهذه الجهة.</value>
   </data>
   <data name="Error_Gift_OrganizationInactive" xml:space="preserve">
-    <value>الجهة التابع لها الزبون معطلة، لا يمكن إصدار هدية.</value>
+    <value>الجهة التابع لها الزائر معطلة، لا يمكن إصدار هدية.</value>
   </data>
   <data name="Error_Gift_NotEnabled" xml:space="preserve">
-    <value>هدايا الألعاب غير مفعلة للجهة التابع لها هذا الزبون.</value>
+    <value>هدايا الألعاب غير مفعلة للجهة التابع لها هذا الزائر.</value>
   </data>
   <data name="Error_Gift_HolderBlocked" xml:space="preserve">
-    <value>حساب الزبون محظور، لا يمكن إصدار هدية.</value>
+    <value>حساب الزائر محظور، لا يمكن إصدار هدية.</value>
   </data>
   <data name="Error_Gift_HolderSuspended" xml:space="preserve">
-    <value>حساب الزبون موقوف مؤقتاً، لا يمكن إصدار هدية.</value>
+    <value>حساب الزائر موقوف مؤقتاً، لا يمكن إصدار هدية.</value>
   </data>
   <data name="Error_Gift_IntervalNotElapsed" xml:space="preserve">
-    <value>لم تنتهِ فترة الانتظار المقررة منذ آخر هدية مستلمة لهذا الزبون.</value>
+    <value>لم تنتهِ فترة الانتظار المقررة منذ آخر هدية مستلمة لهذا الزائر.</value>
   </data>
   <data name="Error_Gift_OverrideReasonRequired" xml:space="preserve">
     <value>سبب تجاوز مدة الانتظار مطلوب (5 أحرف على الأقل).</value>
@@ -1409,7 +1409,7 @@
     <value>لم يتم العثور على قسيمة الهدية المطلوبة.</value>
   </data>
   <data name="Error_Gift_AlreadyRedeemed" xml:space="preserve">
-    <value>تم صرف قسيمة الهدية هذه واستبدالها بوصل مسبقاً.</value>
+    <value>تم صرف قسيمة الهدية هذه مسبقاً.</value>
   </data>
   <data name="Error_Gift_Voided" xml:space="preserve">
     <value>تم إلغاء قسيمة الهدية هذه.</value>
@@ -1436,10 +1436,10 @@
     <value>قسيمة هدية الألعاب</value>
   </data>
   <data name="Label_GiftEligible" xml:space="preserve">
-    <value>الزبون مؤهل لاستلام قسيمة هدية ألعاب بقيمة {0} {1}</value>
+    <value>الزائر مؤهل لاستلام قسيمة هدية ألعاب بقيمة {0} {1}</value>
   </data>
   <data name="Label_GiftNotEligible" xml:space="preserve">
-    <value>الزبون غير مؤهل لاستلام قسيمة هدية: {0}</value>
+    <value>الزائر غير مؤهل لاستلام قسيمة هدية: {0}</value>
   </data>
   <data name="Label_GiftNextEligible" xml:space="preserve">
     <value>(موعد الاستحقاق القادم: {0})</value>
@@ -1457,10 +1457,10 @@
     <value>قسيمة هدية الألعاب</value>
   </data>
   <data name="Header_GiftVoucher" xml:space="preserve">
-    <value>وصل قسيمة ألعاب الأطفال</value>
+    <value>قسيمة ألعاب الأطفال</value>
   </data>
   <data name="Label_ReceiptNo" xml:space="preserve">
-    <value>رقم الوصل: {0}</value>
+    <value>رقم القسيمة: {0}</value>
   </data>
   <data name="Label_GiftValueDisplay" xml:space="preserve">
     <value>قيمة القسيمة: {0:0.###} {1}</value>
@@ -1508,22 +1508,22 @@
     <value>شباك الألعاب – صرف قسائم الهدايا</value>
   </data>
   <data name="Label_ScanGiftQr" xml:space="preserve">
-    <value>امسح رمز QR الخاص بالهدية أو أدخل رقم الوصل:</value>
+    <value>امسح رمز QR الخاص بالهدية أو أدخل رقم القسيمة:</value>
   </data>
   <data name="Watermark_ScanGiftQr" xml:space="preserve">
-    <value>امسح الكيوركود هنا أو أدخل رقم الوصل ثم اضغط Enter...</value>
+    <value>امسح الكيوركود هنا أو أدخل رقم القسيمة ثم اضغط Enter...</value>
   </data>
   <data name="Btn_RedeemGift" xml:space="preserve">
     <value>صرف الهدية (Enter)</value>
   </data>
   <data name="Banner_GiftRedeemedSuccess" xml:space="preserve">
-    <value>هدية صالحة — قيمتها {0:0.###} {1} — سلّم الكوبون للزبون</value>
+    <value>هدية صالحة — قيمتها {0:0.###} {1} — سلّم الهدية للزائر</value>
   </data>
   <data name="Banner_ScanReady" xml:space="preserve">
     <value>جاهز لمسح قسيمة الهدية</value>
   </data>
   <data name="Banner_ScanReadyDetails" xml:space="preserve">
-    <value>قم بمسح رمز الاستجابة السريعة (QR) أو إدخال رقم الوصل</value>
+    <value>قم بمسح رمز الاستجابة السريعة (QR) أو إدخال رقم القسيمة</value>
   </data>
   <data name="Group_RedeemedVoucherDetails" xml:space="preserve">
     <value>تفاصيل القسيمة المصروفة</value>
@@ -1538,16 +1538,16 @@
     <value>وقت الصرف</value>
   </data>
   <data name="Msg_GiftInputEmpty" xml:space="preserve">
-    <value>يرجى مسح رمز الهدية أو إدخال رقم الوصل أولاً.</value>
+    <value>يرجى مسح رمز الهدية أو إدخال رقم القسيمة أولاً.</value>
   </data>
   <data name="Label_ReceiptNoTitle" xml:space="preserve">
-    <value>رقم الوصل:</value>
+    <value>رقم القسيمة:</value>
   </data>
   <data name="Label_ValueTitle" xml:space="preserve">
     <value>قيمة القسيمة:</value>
   </data>
   <data name="Col_ReceiptNo" xml:space="preserve">
-    <value>رقم الوصل</value>
+    <value>رقم القسيمة</value>
   </data>
   <data name="Col_Value" xml:space="preserve">
     <value>القيمة (د.ل)</value>
@@ -1559,13 +1559,13 @@
     <value>الجهة:</value>
   </data>
   <data name="Label_HolderNameTitle" xml:space="preserve">
-    <value>اسم المستفيد:</value>
+    <value>اسم الزائر:</value>
   </data>
   <data name="Menu_GiftReceiptsReport" xml:space="preserve">
     <value>تقرير قسائم الهدايا</value>
   </data>
   <data name="Title_GiftReceipts" xml:space="preserve">
-    <value>تقرير قسائم ووصولات الهدايا</value>
+    <value>تقرير قسائم الهدايا</value>
   </data>
   <data name="Label_DateFrom" xml:space="preserve">
     <value>من تاريخ:</value>
@@ -1592,10 +1592,10 @@
     <value>إجمالي القسائم: {0} | القيمة الإجمالية: {1:N3} د.ل (مصروفة: {2} بقيمة {3:N3} د.ل | نشطة: {4} بقيمة {5:N3} د.ل | ملغاة: {6} بقيمة {7:N3} د.ل)</value>
   </data>
   <data name="Col_Gift_ReceiptNo" xml:space="preserve">
-    <value>رقم الإيصال</value>
+    <value>رقم القسيمة</value>
   </data>
   <data name="Col_Gift_HolderName" xml:space="preserve">
-    <value>اسم المستفيد</value>
+    <value>اسم الزائر</value>
   </data>
   <data name="Col_Gift_CardNumber" xml:space="preserve">
     <value>رقم البطاقة</value>
@@ -1640,13 +1640,13 @@
     <value>الجهة:</value>
   </data>
   <data name="Val_RegOrganizationRequired" xml:space="preserve">
-    <value>يرجى اختيار الجهة التي يتبع لها الزبون.</value>
+    <value>يرجى اختيار الجهة التي يتبع لها الزائر.</value>
   </data>
   <data name="Banner_CardRegisteredElsewhere" xml:space="preserve">
     <value>البطاقة مسجلة لدى جهة: {0}</value>
   </data>
   <data name="Banner_CardRegisteredElsewhereHint" xml:space="preserve">
-    <value>اضغط Enter لعرض الزبون تحت جهته، أو F2 لتسجيله تحت الجهة المختارة.</value>
+    <value>اضغط Enter لعرض الزائر تحت جهته، أو F2 لتسجيله تحت الجهة المختارة.</value>
   </data>
   <data name="Text_ListSeparator" xml:space="preserve">
     <value>، </value>
@@ -1688,13 +1688,13 @@
     <value>م</value>
   </data>
   <data name="Ui_Beneficiaries_01" xml:space="preserve">
-    <value>قائمة المستفيدين</value>
+    <value>قائمة الزوار</value>
   </data>
   <data name="Ui_Beneficiaries_02" xml:space="preserve">
     <value>سبب الحالة:</value>
   </data>
   <data name="Ui_Beneficiaries_03" xml:space="preserve">
-    <value>إجمالي المستفيدين: {0}</value>
+    <value>إجمالي الزوار: {0}</value>
   </data>
   <data name="Ui_Beneficiaries_04" xml:space="preserve">
     <value>غير محدد</value>
@@ -1721,13 +1721,13 @@
     <value>يسمح بالدخول بعد: {0} (فترة الانتظار: {1} ساعة)</value>
   </data>
   <data name="Ui_CheckInDesk_03" xml:space="preserve">
-    <value>البطاقة غير مسجلة — يرجى تسجيل بيانات المستفيد</value>
+    <value>البطاقة غير مسجلة — يرجى تسجيل بيانات الزائر</value>
   </data>
   <data name="Ui_CheckInDesk_04" xml:space="preserve">
     <value>أدخل الاسم الرباعي ورقم الهاتف للمتابعة</value>
   </data>
   <data name="Ui_CheckInDesk_05" xml:space="preserve">
-    <value>يرجى إدخال رقم البطاقة أولاً لتسجيل زبون جديد.</value>
+    <value>يرجى إدخال رقم البطاقة أولاً لتسجيل زائر جديد.</value>
   </data>
   <data name="Ui_CheckInDesk_06" xml:space="preserve">
     <value>يرجى إدخال أو مسح رقم البطاقة</value>
@@ -1742,7 +1742,7 @@
     <value>رقم الهاتف مطلوب.</value>
   </data>
   <data name="Ui_CheckInDesk_10" xml:space="preserve">
-    <value>تم تسجيل الزبون بنجاح.</value>
+    <value>تم تسجيل الزائر بنجاح.</value>
   </data>
   <data name="Ui_CheckInDesk_11" xml:space="preserve">
     <value>تم التسجيل</value>
@@ -1793,10 +1793,10 @@
     <value>عدد المرافقين</value>
   </data>
   <data name="Ui_Reports_04" xml:space="preserve">
-    <value>الإجمالي العام: {0:N0} زيارة مقبولة | {1:N0} زبون | {2:N0} مرافق | {3:N0} إجمالي الأفراد | {4:N0} محاولة مرفوضة | {5:N0} ملغاة</value>
+    <value>الإجمالي العام: {0:N0} زيارة مقبولة | {1:N0} زائر | {2:N0} مرافق | {3:N0} إجمالي الأفراد | {4:N0} محاولة مرفوضة | {5:N0} ملغاة</value>
   </data>
   <data name="Ui_Reports_05" xml:space="preserve">
-    <value>الإجمالي: {0:N0} زيارة مقبولة | {1:N0} مستفيد فريد | {2:N0} مرافق | {3:N0} إجمالي الأفراد المستفيدين (تمثل {4} من زوار الحديقة)</value>
+    <value>الإجمالي: {0:N0} زيارة مقبولة | {1:N0} زائر فريد | {2:N0} مرافق | {3:N0} إجمالي الأفراد (تمثل {4} من كل من دخل الحديقة)</value>
   </data>
   <data name="Ui_Reports_06" xml:space="preserve">
     <value>إجمالي السجلات المعروضة: {0:N0}</value>
@@ -1826,10 +1826,10 @@
     <value>طُبع من منظومة ParkGate بتاريخ {0:dd/MM/yyyy hh:mm tt}</value>
   </data>
   <data name="Ui_Reports_15" xml:space="preserve">
-    <value>المستفيد محظور</value>
+    <value>الزائر محظور</value>
   </data>
   <data name="Ui_Reports_16" xml:space="preserve">
-    <value>المستفيد موقوف</value>
+    <value>الزائر موقوف</value>
   </data>
   <data name="Ui_Reports_17" xml:space="preserve">
     <value>البطاقة منتهية الصلاحية</value>
@@ -1886,7 +1886,7 @@
     <value>اسم الجهة بالعربية مطلوب.</value>
   </data>
   <data name="Ui_EditWorkstation_01" xml:space="preserve">
-    <value>الاسم التعريفي للمحطة مطلوب.</value>
+    <value>الاسم التعريفي للشباك مطلوب.</value>
   </data>
   <data name="Ui_IssueQr_01" xml:space="preserve">
     <value>خدمة إصدار البطاقات غير متوفرة.</value>
@@ -1961,7 +1961,7 @@
     <value>سبب الإلغاء مطلوب ويجب ألا يقل عن 5 أحرف.</value>
   </data>
   <data name="Ui_Workstations_01" xml:space="preserve">
-    <value>إجمالي المحطات: {0} (نشطة: {1} | معطلة: {2})</value>
+    <value>إجمالي الشبابيك: {0} (نشطة: {1} | معطلة: {2})</value>
   </data>
   <data name="Ui_Program_01" xml:space="preserve">
     <value>خطأ في النظام</value>

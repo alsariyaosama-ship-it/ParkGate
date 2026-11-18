@@ -72,7 +72,7 @@ partial class LoginForm
         // _lblAppName
         // 
         _lblAppName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        _lblAppName.Font = new Font("Cairo", 18F, FontStyle.Bold);
+        _lblAppName.Font = new Font("Cairo", 14F, FontStyle.Bold);
         _lblAppName.ForeColor = Color.White;
         _lblAppName.Location = new Point(20, 15);
         _lblAppName.Margin = new Padding(4, 0, 4, 0);
@@ -98,7 +98,7 @@ partial class LoginForm
         // _pnlWorkstationChip
         // 
         _pnlWorkstationChip.Anchor = AnchorStyles.Bottom;
-        _pnlWorkstationChip.BackColor = Color.FromArgb(20, 105, 48);
+        _pnlWorkstationChip.BackColor = Color.FromArgb(21, 109, 51);
         _pnlWorkstationChip.Controls.Add(lblWorkstation);
         _pnlWorkstationChip.Location = new Point(100, 110);
         _pnlWorkstationChip.Margin = new Padding(4);
@@ -117,7 +117,7 @@ partial class LoginForm
         lblWorkstation.Name = "lblWorkstation";
         lblWorkstation.Size = new Size(355, 31);
         lblWorkstation.TabIndex = 0;
-        lblWorkstation.Text = "محطة العمل";
+        lblWorkstation.Text = "الشباك";
         lblWorkstation.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _pnlCard
@@ -150,7 +150,7 @@ partial class LoginForm
         _tblCard.Margin = new Padding(4);
         _tblCard.Name = "_tblCard";
         _tblCard.RowCount = 12;
-        _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+        _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 48F));
         _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
         _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 12F));
         _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 32F));
@@ -195,7 +195,7 @@ partial class LoginForm
         // 
         lblUsername.Dock = DockStyle.Fill;
         lblUsername.Font = new Font("Cairo", 10F, FontStyle.Bold);
-        lblUsername.ForeColor = Color.FromArgb(51, 65, 85);
+        lblUsername.ForeColor = Color.FromArgb(71, 85, 105);
         lblUsername.Location = new Point(0, 82);
         lblUsername.Margin = new Padding(0);
         lblUsername.Name = "lblUsername";
@@ -220,7 +220,7 @@ partial class LoginForm
         // 
         lblPassword.Dock = DockStyle.Fill;
         lblPassword.Font = new Font("Cairo", 10F, FontStyle.Bold);
-        lblPassword.ForeColor = Color.FromArgb(51, 65, 85);
+        lblPassword.ForeColor = Color.FromArgb(71, 85, 105);
         lblPassword.Location = new Point(0, 174);
         lblPassword.Margin = new Padding(0);
         lblPassword.Name = "lblPassword";
@@ -245,7 +245,7 @@ partial class LoginForm
         // lblError
         // 
         lblError.Dock = DockStyle.Fill;
-        lblError.Font = new Font("Cairo", 9.5F, FontStyle.Bold);
+        lblError.Font = new Font("Cairo", 10F, FontStyle.Bold);
         lblError.ForeColor = Color.FromArgb(198, 40, 40);
         lblError.Location = new Point(0, 256);
         lblError.Margin = new Padding(0);

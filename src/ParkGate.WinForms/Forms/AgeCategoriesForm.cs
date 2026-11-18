@@ -16,30 +16,26 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class AgeCategoriesForm : RtlFormBase
 {
-    private readonly IAgeCategoryService? _ageCategoryService;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<AgeCategoriesForm>? _logger;
+    private readonly IAgeCategoryService _ageCategoryService;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<AgeCategoriesForm> _logger;
 
     private readonly List<AgeCategoryDto> _categories = [];
     private AgeCategoryDto? _selectedCategory;
 
-    public AgeCategoriesForm() : this(null, null, null, null)
-    {
-    }
-
     public AgeCategoriesForm(
-        IAgeCategoryService? ageCategoryService,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<AgeCategoriesForm>? logger)
+        IAgeCategoryService ageCategoryService,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<AgeCategoriesForm> logger)
     {
         InitializeComponent();
 
-        _ageCategoryService = ageCategoryService;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
+        _ageCategoryService = ageCategoryService ?? throw new ArgumentNullException(nameof(ageCategoryService));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         ApplyGridOptimizations();
@@ -63,6 +59,7 @@ public partial class AgeCategoriesForm : RtlFormBase
         _btnToggleActive.Text = Strings.Btn_Deactivate;
         _btnRefresh.Text = Strings.Btn_Refresh;
         _btnClose.Text = Strings.Btn_Close;
+        Theme.ApplySecondaryButtonStyle(_btnClose);
 
         _colName.HeaderText = Strings.Col_Age_Name;
         _colDescription.HeaderText = Strings.Col_Age_Description;
@@ -106,11 +103,6 @@ public partial class AgeCategoriesForm : RtlFormBase
 
     public async Task LoadAgeCategoriesAsync()
     {
-        if (_ageCategoryService == null)
-        {
-            return;
-        }
-
         try
         {
             var list = await _ageCategoryService.GetAllAsync();
@@ -122,8 +114,8 @@ public partial class AgeCategoriesForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error loading age categories.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error loading age categories.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 
@@ -201,8 +193,7 @@ public partial class AgeCategoriesForm : RtlFormBase
 
     public async Task AddAgeCategoryAsync()
     {
-        var dialog = _formFactory?.Create<EditAgeCategoryDialog>() ??
-                     new EditAgeCategoryDialog(_ageCategoryService, _notifyService, null);
+        var dialog = _formFactory.Create<EditAgeCategoryDialog>();
 
         using (dialog)
         {
@@ -220,8 +211,7 @@ public partial class AgeCategoriesForm : RtlFormBase
             return;
         }
 
-        var dialog = _formFactory?.Create<EditAgeCategoryDialog>() ??
-                     new EditAgeCategoryDialog(_ageCategoryService, _notifyService, null);
+        var dialog = _formFactory.Create<EditAgeCategoryDialog>();
 
         using (dialog)
         {
@@ -235,7 +225,7 @@ public partial class AgeCategoriesForm : RtlFormBase
 
     public async Task ToggleActiveAsync()
     {
-        if (_selectedCategory == null || _ageCategoryService == null)
+        if (_selectedCategory == null)
         {
             return;
         }
@@ -245,14 +235,7 @@ public partial class AgeCategoriesForm : RtlFormBase
             ? Strings.Msg_ConfirmDeactivateAge
             : Strings.Msg_ConfirmReactivateAge;
 
-        var confirmed = _notifyService?.Confirm(confirmMsg, Strings.Title_Confirm) ??
-                        (MessageBox.Show(
-                            confirmMsg,
-                            Strings.Title_Confirm,
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Question,
-                            MessageBoxDefaultButton.Button2,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign) == DialogResult.Yes);
+        var confirmed = _notifyService.Confirm(confirmMsg, Strings.Title_Confirm);
 
         if (!confirmed)
         {
@@ -271,13 +254,13 @@ public partial class AgeCategoriesForm : RtlFormBase
             }
             else
             {
-                _notifyService?.Warning(ErrorMessages.GetMessage(result.Error));
+                _notifyService.Warning(ErrorMessages.GetMessage(result.Error));
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error toggling age category active state.");
-            _notifyService?.Error(Strings.Msg_UnexpectedError);
+            _logger.LogError(ex, "Error toggling age category active state.");
+            _notifyService.Error(Strings.Msg_UnexpectedError);
         }
     }
 }

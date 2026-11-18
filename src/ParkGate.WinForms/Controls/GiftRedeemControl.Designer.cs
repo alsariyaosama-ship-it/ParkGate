@@ -119,12 +119,12 @@ partial class GiftRedeemControl
         this._lblScan.Anchor = System.Windows.Forms.AnchorStyles.None;
         this._lblScan.AutoSize = true;
         this._lblScan.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
-        this._lblScan.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblScan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._lblScan.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblScan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._lblScan.Name = "_lblScan";
         this._lblScan.Size = new System.Drawing.Size(275, 26);
         this._lblScan.TabIndex = 0;
-        this._lblScan.Text = "امسح رمز QR الخاص بالهدية أو أدخل رقم الوصل:";
+        this._lblScan.Text = "امسح رمز QR الخاص بالهدية أو أدخل رقم القسيمة:";
         // 
         // _txtScan
         // 
@@ -147,7 +147,7 @@ partial class GiftRedeemControl
         this._btnRedeem.ForeColor = System.Drawing.Color.White;
         this._btnRedeem.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
         this._btnRedeem.Name = "_btnRedeem";
-        this._btnRedeem.Size = new System.Drawing.Size(130, 38);
+        this._btnRedeem.Size = new System.Drawing.Size(150, 38);
         this._btnRedeem.TabIndex = 2;
         this._btnRedeem.Text = "صرف الهدية (Enter)";
         this._btnRedeem.UseVisualStyleBackColor = false;
@@ -155,15 +155,15 @@ partial class GiftRedeemControl
         // _btnClear
         // 
         this._btnClear.Anchor = System.Windows.Forms.AnchorStyles.None;
-        this._btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnClear.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClear.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._btnClear.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnClear.Margin = new System.Windows.Forms.Padding(0);
         this._btnClear.Name = "_btnClear";
-        this._btnClear.Size = new System.Drawing.Size(105, 38);
+        this._btnClear.Size = new System.Drawing.Size(130, 38);
         this._btnClear.TabIndex = 3;
         this._btnClear.Text = "مسح (Esc)";
         this._btnClear.UseVisualStyleBackColor = false;
@@ -183,7 +183,7 @@ partial class GiftRedeemControl
         this._grpDetails.Controls.Add(this._tblDetails);
         this._grpDetails.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpDetails.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._grpDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpDetails.Location = new System.Drawing.Point(0, 136);
         this._grpDetails.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
         this._grpDetails.Name = "_grpDetails";
@@ -196,11 +196,11 @@ partial class GiftRedeemControl
         // _tblDetails
         // 
         this._tblDetails.ColumnCount = 6;
-        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
         this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33F));
-        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
         this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33F));
-        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+        this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
         this._tblDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.34F));
         this._tblDetails.Controls.Add(this._lblReceiptNoTitle, 0, 0);
         this._tblDetails.Controls.Add(this._lblReceiptNo, 1, 0);
@@ -227,19 +227,19 @@ partial class GiftRedeemControl
         // 
         this._lblReceiptNoTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblReceiptNoTitle.AutoSize = true;
-        this._lblReceiptNoTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblReceiptNoTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblReceiptNoTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblReceiptNoTitle.Location = new System.Drawing.Point(900, 8);
         this._lblReceiptNoTitle.Name = "_lblReceiptNoTitle";
         this._lblReceiptNoTitle.Size = new System.Drawing.Size(69, 24);
         this._lblReceiptNoTitle.TabIndex = 0;
-        this._lblReceiptNoTitle.Text = "رقم الوصل:";
+        this._lblReceiptNoTitle.Text = "رقم القسيمة:";
         // 
         // _lblReceiptNo
         // 
         this._lblReceiptNo.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblReceiptNo.AutoSize = true;
-        this._lblReceiptNo.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblReceiptNo.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblReceiptNo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblReceiptNo.Location = new System.Drawing.Point(750, 7);
         this._lblReceiptNo.Name = "_lblReceiptNo";
@@ -251,13 +251,13 @@ partial class GiftRedeemControl
         // 
         this._lblHolderNameTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderNameTitle.AutoSize = true;
-        this._lblHolderNameTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderNameTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblHolderNameTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblHolderNameTitle.Location = new System.Drawing.Point(570, 8);
         this._lblHolderNameTitle.Name = "_lblHolderNameTitle";
         this._lblHolderNameTitle.Size = new System.Drawing.Size(76, 24);
         this._lblHolderNameTitle.TabIndex = 2;
-        this._lblHolderNameTitle.Text = "اسم المستفيد:";
+        this._lblHolderNameTitle.Text = "اسم الزائر:";
         // 
         // _lblHolderName
         // 
@@ -275,7 +275,7 @@ partial class GiftRedeemControl
         // 
         this._lblValueTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblValueTitle.AutoSize = true;
-        this._lblValueTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblValueTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblValueTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblValueTitle.Location = new System.Drawing.Point(240, 8);
         this._lblValueTitle.Name = "_lblValueTitle";
@@ -287,7 +287,7 @@ partial class GiftRedeemControl
         // 
         this._lblValue.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblValue.AutoSize = true;
-        this._lblValue.Font = new System.Drawing.Font("Cairo", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblValue.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblValue.Location = new System.Drawing.Point(100, 4);
         this._lblValue.Name = "_lblValue";
@@ -299,7 +299,7 @@ partial class GiftRedeemControl
         // 
         this._lblCardNumberTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblCardNumberTitle.AutoSize = true;
-        this._lblCardNumberTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblCardNumberTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblCardNumberTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblCardNumberTitle.Location = new System.Drawing.Point(900, 49);
         this._lblCardNumberTitle.Name = "_lblCardNumberTitle";
@@ -323,7 +323,7 @@ partial class GiftRedeemControl
         // 
         this._lblOrganizationTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblOrganizationTitle.AutoSize = true;
-        this._lblOrganizationTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblOrganizationTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblOrganizationTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblOrganizationTitle.Location = new System.Drawing.Point(570, 49);
         this._lblOrganizationTitle.Name = "_lblOrganizationTitle";
@@ -347,7 +347,7 @@ partial class GiftRedeemControl
         // 
         this._lblRedeemedAtTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblRedeemedAtTitle.AutoSize = true;
-        this._lblRedeemedAtTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblRedeemedAtTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblRedeemedAtTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblRedeemedAtTitle.Location = new System.Drawing.Point(240, 49);
         this._lblRedeemedAtTitle.Name = "_lblRedeemedAtTitle";
@@ -373,8 +373,8 @@ partial class GiftRedeemControl
         this._grpToday.Controls.Add(this._gridToday);
         this._grpToday.Controls.Add(this._lblTodaySummary);
         this._grpToday.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpToday.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpToday.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._grpToday.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpToday.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpToday.Location = new System.Drawing.Point(0, 266);
         this._grpToday.Margin = new System.Windows.Forms.Padding(0);
         this._grpToday.Name = "_grpToday";
@@ -394,11 +394,11 @@ partial class GiftRedeemControl
         this._gridToday.BorderStyle = System.Windows.Forms.BorderStyle.None;
         this._gridToday.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
         dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-        dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(244)))), ((int)(((byte)(248)))));
-        dataGridViewCellStyle1.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(244)))), ((int)(((byte)(248)))));
-        dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        dataGridViewCellStyle1.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
         this._gridToday.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
         this._gridToday.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -412,9 +412,9 @@ partial class GiftRedeemControl
         dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
         dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
         dataGridViewCellStyle2.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
-        dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+        dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
         this._gridToday.DefaultCellStyle = dataGridViewCellStyle2;
         this._gridToday.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -439,14 +439,14 @@ partial class GiftRedeemControl
         // _colReceiptNo
         // 
         this._colReceiptNo.FillWeight = 80F;
-        this._colReceiptNo.HeaderText = "رقم الوصل";
+        this._colReceiptNo.HeaderText = "رقم القسيمة";
         this._colReceiptNo.Name = "_colReceiptNo";
         this._colReceiptNo.ReadOnly = true;
         // 
         // _colHolderName
         // 
         this._colHolderName.FillWeight = 140F;
-        this._colHolderName.HeaderText = "اسم الزبون";
+        this._colHolderName.HeaderText = "اسم الزائر";
         this._colHolderName.Name = "_colHolderName";
         this._colHolderName.ReadOnly = true;
         // 
@@ -488,7 +488,7 @@ partial class GiftRedeemControl
         // 
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-        this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
+        this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
         this.Controls.Add(this._mainLayout);
         this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.Name = "GiftRedeemControl";

@@ -8,6 +8,7 @@ use App\Models\Organization;
 use App\Models\ParkHeartbeat;
 use App\Models\SyncBatch;
 use App\Services\GiftSummaryService;
+use App\Support\ParkTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -101,7 +102,7 @@ class DashboardController extends Controller
                     'organization_name' => $item->organization?->name_ar ?? '—',
                     'total_persons' => $item->total_persons,
                     'result' => $item->result,
-                    'time_formatted' => $item->attempted_at_utc ? $item->attempted_at_utc->format('H:i') : '—',
+                    'time_formatted' => ParkTime::time($item->attempted_at_utc),
                     'channel' => $item->channel,
                 ];
             });

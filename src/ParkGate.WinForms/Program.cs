@@ -13,8 +13,10 @@ internal static class Program
 {
     private static IHost? _host;
 
+    // Main must stay synchronous: [STAThread] is ignored on an async Main, and the UI would then run on an
+    // MTA thread-pool thread where SaveFileDialog and PrintDialog throw ThreadStateException.
     [STAThread]
-    private static async Task Main()
+    private static void Main()
     {
         // 1. High DPI initialization
         ApplicationConfiguration.Initialize();
@@ -51,6 +53,26 @@ internal static class Program
             e.SetObserved();
         };
 
+        // The startup sequence is async and shows dialogs, so it runs inside the UI message loop on this STA thread.
+        using var appContext = new ApplicationContext();
+        SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+        _ = StartAsync(appContext);
+        WinFormsApp.Run(appContext);
+
+        // Leave the UI context before blocking, so host shutdown continuations cannot wait for a stopped loop.
+        SynchronizationContext.SetSynchronizationContext(null);
+        if (_host != null)
+        {
+            _host.StopAsync().GetAwaiter().GetResult();
+            _host.Dispose();
+        }
+
+        Log.Information("ParkGate shutdown complete.");
+        Log.CloseAndFlush();
+    }
+
+    private static async Task StartAsync(ApplicationContext appContext)
+    {
         try
         {
             Log.Information("ParkGate starting up...");
@@ -80,52 +102,32 @@ internal static class Program
                 var formFactory = _host.Services.GetRequiredService<IFormFactory>();
                 var mainForm = formFactory.Create<Forms.MainForm>();
 
-                WinFormsApp.Run(mainForm);
+                // Closing the main form ends the message loop (ApplicationContext.MainForm).
+                appContext.MainForm = mainForm;
+                mainForm.Show();
+                return;
             }
-            else
-            {
-                Log.Information("ParkGate startup finished with status {Status}. Exiting application.", status);
-            }
+
+            Log.Information("ParkGate startup finished with status {Status}. Exiting application.", status);
         }
         catch (Exception ex)
         {
             Log.Fatal(ex, "ParkGate terminated unexpectedly during startup.");
             ShowFatalErrorMessage(ex);
         }
-        finally
-        {
-            if (_host != null)
-            {
-                await _host.StopAsync();
-                _host.Dispose();
-            }
 
-            Log.Information("ParkGate shutdown complete.");
-            Log.CloseAndFlush();
-        }
+        appContext.ExitThread();
     }
 
     private static void HandleException(string source, Exception? exception)
     {
         Log.Error(exception, "Unhandled exception captured in {Source}", source);
 
-        MessageBox.Show(
-            Strings.Msg_UnexpectedError,
-            Strings.Ui_Program_01,
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Error,
-            MessageBoxDefaultButton.Button1,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        Notify.Error(Strings.Msg_UnexpectedError, Strings.Ui_Program_01);
     }
 
     private static void ShowFatalErrorMessage(Exception exception)
     {
-        MessageBox.Show(
-            $"{Strings.Msg_StartupFailed}{Environment.NewLine}{UserMessages.Describe(exception)}",
-            Strings.Ui_Program_02,
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Stop,
-            MessageBoxDefaultButton.Button1,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        Notify.Error($"{Strings.Msg_StartupFailed}{Environment.NewLine}{UserMessages.Describe(exception)}", Strings.Ui_Program_02);
     }
 }

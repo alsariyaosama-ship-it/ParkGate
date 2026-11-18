@@ -89,7 +89,7 @@ partial class UsersForm
         this._btnAddUser.ForeColor = System.Drawing.Color.White;
         this._btnAddUser.Location = new System.Drawing.Point(704, 8);
         this._btnAddUser.Name = "_btnAddUser";
-        this._btnAddUser.Size = new System.Drawing.Size(130, 36);
+        this._btnAddUser.Size = new System.Drawing.Size(150, 36);
         this._btnAddUser.TabIndex = 0;
         this._btnAddUser.Text = "+ إضافة مستخدم";
         this._btnAddUser.UseVisualStyleBackColor = false;
@@ -101,7 +101,7 @@ partial class UsersForm
         this._btnChangeRole.Enabled = false;
         this._btnChangeRole.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnChangeRole.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnChangeRole.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnChangeRole.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnChangeRole.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnChangeRole.Location = new System.Drawing.Point(568, 8);
         this._btnChangeRole.Name = "_btnChangeRole";
@@ -117,7 +117,7 @@ partial class UsersForm
         this._btnResetPassword.Enabled = false;
         this._btnResetPassword.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnResetPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnResetPassword.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnResetPassword.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnResetPassword.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnResetPassword.Location = new System.Drawing.Point(398, 8);
         this._btnResetPassword.Name = "_btnResetPassword";
@@ -133,7 +133,7 @@ partial class UsersForm
         this._btnToggleActive.Enabled = false;
         this._btnToggleActive.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnToggleActive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnToggleActive.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnToggleActive.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnToggleActive.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnToggleActive.Location = new System.Drawing.Point(272, 8);
         this._btnToggleActive.Name = "_btnToggleActive";
@@ -148,7 +148,7 @@ partial class UsersForm
         this._btnRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnRefresh.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnRefresh.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnRefresh.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnRefresh.Location = new System.Drawing.Point(176, 8);
         this._btnRefresh.Name = "_btnRefresh";
@@ -253,7 +253,7 @@ partial class UsersForm
         this._btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnClose.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClose.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClose.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnClose.Location = new System.Drawing.Point(16, 6);
         this._btnClose.Name = "_btnClose";
@@ -264,8 +264,9 @@ partial class UsersForm
         // 
         // UsersForm
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+        this.CancelButton = this._btnClose;
         this.ClientSize = new System.Drawing.Size(850, 532);
         this.Controls.Add(this._gridUsers);
         this.Controls.Add(this._pnlFooter);

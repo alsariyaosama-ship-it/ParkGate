@@ -17,53 +17,38 @@ namespace ParkGate.WinForms.Controls;
 /// </summary>
 public partial class GiftOfferPanel : UserControl
 {
-    private IGiftVoucherService? _giftVoucherService;
-    private ICurrentUser? _currentUser;
-    private IFormFactory? _formFactory;
-    private INotifyService? _notifyService;
-    private ILogger<GiftOfferPanel>? _logger;
+    // Hosted in the CheckInDeskControl designer, so the services arrive through InitializeServices (R7.9).
+    private PanelServices? _services;
 
     private Guid? _currentBeneficiaryId;
     private GiftEligibilityDto? _eligibility;
-    private string? _timeZoneId = "Libya Standard Time";
+    private string? _timeZoneId; // set by the desk from Park.TimeZoneId (R7.10)
 
-    public GiftOfferPanel() : this(null, null, null, null, null)
-    {
-    }
-
-    public GiftOfferPanel(
-        IGiftVoucherService? giftVoucherService,
-        ICurrentUser? currentUser,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<GiftOfferPanel>? logger)
+    public GiftOfferPanel()
     {
         InitializeComponent();
-
-        _giftVoucherService = giftVoucherService;
-        _currentUser = currentUser;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
-
         InitializeControlText();
         WireEvents();
         Visible = false;
     }
 
+    private PanelServices Services =>
+        _services ?? throw new InvalidOperationException("GiftOfferPanel.InitializeServices was not called.");
+
     public void InitializeServices(
-        IGiftVoucherService? giftVoucherService,
-        ICurrentUser? currentUser,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<GiftOfferPanel>? logger,
+        IGiftVoucherService giftVoucherService,
+        ICurrentUser currentUser,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<GiftOfferPanel> logger,
         string? timeZoneId = null)
     {
-        _giftVoucherService = giftVoucherService;
-        _currentUser = currentUser;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
+        _services = new PanelServices(
+            giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService)),
+            currentUser ?? throw new ArgumentNullException(nameof(currentUser)),
+            formFactory ?? throw new ArgumentNullException(nameof(formFactory)),
+            notifyService ?? throw new ArgumentNullException(nameof(notifyService)),
+            logger ?? throw new ArgumentNullException(nameof(logger)));
         if (!string.IsNullOrWhiteSpace(timeZoneId))
         {
             _timeZoneId = timeZoneId;
@@ -104,19 +89,14 @@ public partial class GiftOfferPanel : UserControl
 
     public async Task LoadAsync(Guid beneficiaryId)
     {
-        if (_giftVoucherService == null)
-        {
-            Visible = false;
-            return;
-        }
-
+        var services = Services;
         try
         {
-            var result = await _giftVoucherService.GetEligibilityAsync(beneficiaryId);
+            var result = await services.GiftVouchers.GetEligibilityAsync(beneficiaryId);
             if (!result.IsSuccess)
             {
                 // Any error or failure (e.g. Forbidden) hides the panel and never blocks entry
-                _logger?.LogDebug("Gift eligibility returned failure: {ErrorCode}", result.Error.Code);
+                services.Logger.LogDebug("Gift eligibility returned failure: {ErrorCode}", result.Error.Code);
                 Visible = false;
                 return;
             }
@@ -135,9 +115,9 @@ public partial class GiftOfferPanel : UserControl
 
             if (eligibility.IsEligible)
             {
-                _grpMain.BackColor = Color.FromArgb(240, 253, 244);
+                _grpMain.BackColor = Theme.SuccessTint;
                 _lblStatus.Text = string.Format(Strings.Label_GiftEligible, eligibility.GiftValue.ToString("0.###"), Strings.Unit_Currency);
-                _lblStatus.ForeColor = Color.FromArgb(27, 135, 63);
+                _lblStatus.ForeColor = Theme.Success;
                 _lblDetails.Text = string.Empty;
 
                 _btnIssue.Enabled = true;
@@ -146,10 +126,10 @@ public partial class GiftOfferPanel : UserControl
             }
             else
             {
-                _grpMain.BackColor = Color.FromArgb(254, 252, 232);
+                _grpMain.BackColor = Theme.WarningTint;
                 var reasonError = new Error(eligibility.ReasonCode ?? "Gift.NotEligible");
                 _lblStatus.Text = string.Format(Strings.Label_GiftNotEligible, ErrorMessages.GetMessage(reasonError));
-                _lblStatus.ForeColor = Color.FromArgb(178, 106, 0);
+                _lblStatus.ForeColor = Theme.Warning;
 
                 if (eligibility.NextEligibleAtUtc.HasValue)
                 {
@@ -168,14 +148,14 @@ public partial class GiftOfferPanel : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to load gift eligibility for beneficiary {BeneficiaryId}", beneficiaryId);
+            services.Logger.LogError(ex, "Failed to load gift eligibility for beneficiary {BeneficiaryId}", beneficiaryId);
             Visible = false;
         }
     }
 
     public async Task IssueAsync()
     {
-        if (_currentBeneficiaryId == null || _giftVoucherService == null || !_btnIssue.Enabled)
+        if (_currentBeneficiaryId == null || !_btnIssue.Enabled)
         {
             return;
         }
@@ -185,7 +165,7 @@ public partial class GiftOfferPanel : UserControl
             try
             {
                 var request = new IssueGiftVoucherRequest(_currentBeneficiaryId.Value);
-                var result = await _giftVoucherService.IssueAsync(request);
+                var result = await Services.GiftVouchers.IssueAsync(request);
                 if (result.IsSuccess)
                 {
                     ShowGiftDialog(result.Value);
@@ -198,7 +178,7 @@ public partial class GiftOfferPanel : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error issuing gift voucher.");
+                Services.Logger.LogError(ex, "Error issuing gift voucher.");
                 ShowError(Strings.Msg_UnexpectedError);
             }
         }
@@ -206,13 +186,12 @@ public partial class GiftOfferPanel : UserControl
 
     public async Task IssueOverrideAsync()
     {
-        if (_currentBeneficiaryId == null || _giftVoucherService == null || !_btnIssueOverride.Enabled)
+        if (_currentBeneficiaryId == null || !_btnIssueOverride.Enabled)
         {
             return;
         }
 
-        var supervisorDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
-                               new SupervisorAuthDialog(null, _currentUser);
+        using var supervisorDialog = Services.FormFactory.Create<SupervisorAuthDialog>();
 
         supervisorDialog.SetContext(defaultReason: Strings.Ui_GiftOffer_01);
 
@@ -230,7 +209,7 @@ public partial class GiftOfferPanel : UserControl
                     supervisorDialog.Reason,
                     supervisorDialog.ApprovalToken);
 
-                var result = await _giftVoucherService.IssueOverrideAsync(request);
+                var result = await Services.GiftVouchers.IssueOverrideAsync(request);
                 if (result.IsSuccess)
                 {
                     ShowGiftDialog(result.Value);
@@ -243,7 +222,7 @@ public partial class GiftOfferPanel : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error issuing override gift voucher.");
+                Services.Logger.LogError(ex, "Error issuing override gift voucher.");
                 ShowError(Strings.Msg_UnexpectedError);
             }
         }
@@ -251,44 +230,25 @@ public partial class GiftOfferPanel : UserControl
 
     private void ShowGiftDialog(IssuedGiftVoucherDto voucher)
     {
-        var dialog = _formFactory?.Create<GiftQrDialog>() ?? new GiftQrDialog(null, _notifyService, null);
+        using var dialog = Services.FormFactory.Create<GiftQrDialog>();
         dialog.SetVoucher(voucher);
         dialog.ShowDialog(this.FindForm());
     }
 
     private void ShowWarning(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Warning(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Warning,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        Services.Notify.Warning(message);
     }
 
     private void ShowError(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Error(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Error,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        Services.Notify.Error(message);
     }
+
+    private sealed record PanelServices(
+        IGiftVoucherService GiftVouchers,
+        ICurrentUser CurrentUser,
+        IFormFactory FormFactory,
+        INotifyService Notify,
+        ILogger<GiftOfferPanel> Logger);
 }

@@ -21,6 +21,7 @@ partial class GiftReceiptsForm
     private System.Windows.Forms.Button _btnPrintPreview;
     private System.Windows.Forms.DataGridView _gridReceipts;
     private System.Windows.Forms.Panel _summaryPanel;
+    private System.Windows.Forms.Button _btnClose;
     private System.Windows.Forms.Label _lblSummary;
 
     protected override void Dispose(bool disposing)
@@ -49,6 +50,7 @@ partial class GiftReceiptsForm
         _btnPrintPreview = new System.Windows.Forms.Button();
         _gridReceipts = new System.Windows.Forms.DataGridView();
         _summaryPanel = new System.Windows.Forms.Panel();
+        _btnClose = new System.Windows.Forms.Button();
         _lblSummary = new System.Windows.Forms.Label();
 
         _mainLayout.SuspendLayout();
@@ -70,7 +72,7 @@ partial class GiftReceiptsForm
         _mainLayout.Name = "_mainLayout";
         _mainLayout.Padding = new System.Windows.Forms.Padding(12);
         _mainLayout.RowCount = 3;
-        _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 55F));
+        _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 96F));
         _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
         _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
         _mainLayout.Size = new System.Drawing.Size(1100, 680);
@@ -197,7 +199,7 @@ partial class GiftReceiptsForm
         _btnExportExcel.Location = new System.Drawing.Point(89, 4);
         _btnExportExcel.Margin = new System.Windows.Forms.Padding(3, 4, 6, 3);
         _btnExportExcel.Name = "_btnExportExcel";
-        _btnExportExcel.Size = new System.Drawing.Size(100, 30);
+        _btnExportExcel.Size = new System.Drawing.Size(112, 30);
         _btnExportExcel.TabIndex = 9;
         _btnExportExcel.Text = "تصدير Excel";
         _btnExportExcel.UseVisualStyleBackColor = true;
@@ -235,6 +237,7 @@ partial class GiftReceiptsForm
         // _summaryPanel
         // 
         _summaryPanel.Controls.Add(_lblSummary);
+        _summaryPanel.Controls.Add(_btnClose);
         _summaryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
         _summaryPanel.Location = new System.Drawing.Point(15, 621);
         _summaryPanel.Name = "_summaryPanel";
@@ -255,10 +258,22 @@ partial class GiftReceiptsForm
         _lblSummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 
         // 
+        // _btnClose
+        // 
+        _btnClose.Dock = System.Windows.Forms.DockStyle.Left;
+        _btnClose.Location = new System.Drawing.Point(0, 0);
+        _btnClose.Name = "_btnClose";
+        _btnClose.Size = new System.Drawing.Size(100, 44);
+        _btnClose.TabIndex = 1;
+        _btnClose.Text = "إغلاق";
+
+        // 
         // GiftReceiptsForm
         // 
-        AutoScaleDimensions = new System.Drawing.SizeF(7F, 19F);
-        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        AcceptButton = _btnRefresh;
+        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+        CancelButton = _btnClose;
         ClientSize = new System.Drawing.Size(1100, 680);
         Controls.Add(_mainLayout);
         Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -268,7 +283,7 @@ partial class GiftReceiptsForm
         RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         RightToLeftLayout = true;
         StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        Text = "تقرير قسائم ووصولات الهدايا";
+        Text = "تقرير قسائم الهدايا";
         _mainLayout.ResumeLayout(false);
         _filtersPanel.ResumeLayout(false);
         _filtersPanel.PerformLayout();

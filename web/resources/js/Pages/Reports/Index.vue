@@ -144,7 +144,7 @@ const printReport = () => {
                     <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800">
                         <tr>
                             <th class="p-3.5">التاريخ والوقت</th>
-                            <th class="p-3.5">المستفيد</th>
+                            <th class="p-3.5">الزائر</th>
                             <th class="p-3.5">رقم البطاقة</th>
                             <th class="p-3.5">الجهة الراعية</th>
                             <th class="p-3.5 text-center">الأشخاص</th>
@@ -154,7 +154,7 @@ const printReport = () => {
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         <tr v-for="a in attempts.data" :key="a.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-                            <td class="p-3.5 font-mono text-slate-600 dark:text-slate-400">{{ a.business_date }} {{ a.time_formatted }}</td>
+                            <td class="p-3.5 font-mono text-slate-600 dark:text-slate-400">{{ a.date_formatted }} {{ a.time_formatted }}</td>
                             <td class="p-3.5 font-bold text-slate-900 dark:text-white">{{ a.beneficiary_name }}</td>
                             <td class="p-3.5 font-mono text-slate-600 dark:text-slate-400">{{ a.card_number }}</td>
                             <td class="p-3.5 text-slate-600 dark:text-slate-300">{{ a.organization_name }}</td>

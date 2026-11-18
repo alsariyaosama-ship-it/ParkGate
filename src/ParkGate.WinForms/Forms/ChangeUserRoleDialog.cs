@@ -15,28 +15,24 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class ChangeUserRoleDialog : RtlFormBase
 {
-    private readonly IUserService? _userService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<ChangeUserRoleDialog>? _logger;
+    private readonly IUserService _userService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<ChangeUserRoleDialog> _logger;
 
     private UserDto? _targetUser;
 
     public UserDto? UpdatedUser { get; private set; }
 
-    public ChangeUserRoleDialog() : this(null, null, null)
-    {
-    }
-
     public ChangeUserRoleDialog(
-        IUserService? userService,
-        INotifyService? notifyService,
-        ILogger<ChangeUserRoleDialog>? logger)
+        IUserService userService,
+        INotifyService notifyService,
+        ILogger<ChangeUserRoleDialog> logger)
     {
         InitializeComponent();
 
-        _userService = userService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         PopulateRolesCombo();
@@ -83,7 +79,7 @@ public partial class ChangeUserRoleDialog : RtlFormBase
 
     public async Task SaveAsync()
     {
-        if (_userService == null || _targetUser == null)
+        if (_targetUser == null)
         {
             return;
         }
@@ -98,7 +94,7 @@ public partial class ChangeUserRoleDialog : RtlFormBase
                 if (result.IsSuccess)
                 {
                     UpdatedUser = result.Value;
-                    _notifyService?.Info(Strings.Msg_RoleChangeSuccess);
+                    _notifyService.Info(Strings.Msg_RoleChangeSuccess);
                     DialogResult = DialogResult.OK;
                     Close();
                 }
@@ -109,7 +105,7 @@ public partial class ChangeUserRoleDialog : RtlFormBase
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error updating user role.");
+                _logger.LogError(ex, "Error updating user role.");
                 ShowError(UserMessages.Describe(ex));
             }
         }
@@ -117,38 +113,12 @@ public partial class ChangeUserRoleDialog : RtlFormBase
 
     private void ShowWarning(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Warning(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Warning,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        _notifyService.Warning(message);
     }
 
     private void ShowError(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Error(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Error,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        _notifyService.Error(message);
     }
 
     private sealed class ComboBoxItem<T>

@@ -15,28 +15,24 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
 {
-    private readonly IBeneficiaryService? _beneficiaryService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<ChangeBeneficiaryStatusDialog>? _logger;
+    private readonly IBeneficiaryService _beneficiaryService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<ChangeBeneficiaryStatusDialog> _logger;
 
     private BeneficiaryDto? _beneficiary;
 
     public BeneficiaryDto? UpdatedBeneficiary { get; private set; }
 
-    public ChangeBeneficiaryStatusDialog() : this(null, null, null)
-    {
-    }
-
     public ChangeBeneficiaryStatusDialog(
-        IBeneficiaryService? beneficiaryService,
-        INotifyService? notifyService,
-        ILogger<ChangeBeneficiaryStatusDialog>? logger)
+        IBeneficiaryService beneficiaryService,
+        INotifyService notifyService,
+        ILogger<ChangeBeneficiaryStatusDialog> logger)
     {
         InitializeComponent();
 
-        _beneficiaryService = beneficiaryService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         WireEvents();
@@ -105,7 +101,7 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
 
     public async Task ConfirmChangeAsync()
     {
-        if (_beneficiary == null || _beneficiaryService == null)
+        if (_beneficiary == null)
         {
             return;
         }
@@ -121,20 +117,7 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
         if (targetStatus != BeneficiaryStatus.Active && reason.Length < 5)
         {
             var msg = Strings.Ui_ChangeBeneficiaryStatus_05;
-            if (_notifyService != null)
-            {
-                _notifyService.Warning(msg);
-            }
-            else
-            {
-                MessageBox.Show(
-                    msg,
-                    Strings.Title_Warning,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning,
-                    MessageBoxDefaultButton.Button1,
-                    MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-            }
+            _notifyService.Warning(msg);
             _txtReason.Focus();
             return;
         }
@@ -152,20 +135,7 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
                 if (result.IsSuccess)
                 {
                     UpdatedBeneficiary = result.Value;
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Info(Strings.Msg_StatusChangeSuccess);
-                    }
-                    else
-                    {
-                        MessageBox.Show(
-                            Strings.Msg_StatusChangeSuccess,
-                            Strings.Title_Info,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-                    }
+                    _notifyService.Info(Strings.Msg_StatusChangeSuccess);
 
                     DialogResult = DialogResult.OK;
                     Close();
@@ -173,40 +143,14 @@ public partial class ChangeBeneficiaryStatusDialog : RtlFormBase
                 else
                 {
                     var msg = ErrorMessages.GetMessage(result.Error);
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Warning(msg);
-                    }
-                    else
-                    {
-                        MessageBox.Show(
-                            msg,
-                            Strings.Title_Warning,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-                    }
+                    _notifyService.Warning(msg);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Unexpected error changing beneficiary status.");
+                _logger.LogError(ex, "Unexpected error changing beneficiary status.");
                 var msg = UserMessages.Describe(ex);
-                if (_notifyService != null)
-                {
-                    _notifyService.Error(msg);
-                }
-                else
-                {
-                    MessageBox.Show(
-                        msg,
-                        Strings.Title_Error,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error,
-                        MessageBoxDefaultButton.Button1,
-                        MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-                }
+                _notifyService.Error(msg);
             }
         }
     }

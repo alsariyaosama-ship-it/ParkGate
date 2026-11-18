@@ -51,8 +51,8 @@ partial class CounterInput
         // 
         this._lblTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
         this._lblTitle.AutoEllipsis = true;
-        this._lblTitle.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._lblTitle.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._lblTitle.Location = new System.Drawing.Point(194, 12);
         this._lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
         this._lblTitle.Name = "_lblTitle";
@@ -66,9 +66,9 @@ partial class CounterInput
         this._btnDecrement.Anchor = System.Windows.Forms.AnchorStyles.None;
         this._btnDecrement.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnDecrement.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnDecrement.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnDecrement.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnDecrement.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnDecrement.Font = new System.Drawing.Font("Cairo", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnDecrement.Font = new System.Drawing.Font("Cairo", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnDecrement.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnDecrement.Location = new System.Drawing.Point(135, 3);
         this._btnDecrement.Margin = new System.Windows.Forms.Padding(0);
@@ -81,7 +81,7 @@ partial class CounterInput
         // _txtValue
         // 
         this._txtValue.Anchor = System.Windows.Forms.AnchorStyles.None;
-        this._txtValue.Font = new System.Drawing.Font("Cairo", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._txtValue.Font = new System.Drawing.Font("Cairo", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._txtValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
         this._txtValue.Location = new System.Drawing.Point(59, 5);
         this._txtValue.Margin = new System.Windows.Forms.Padding(0);
@@ -95,11 +95,11 @@ partial class CounterInput
         // _btnIncrement
         // 
         this._btnIncrement.Anchor = System.Windows.Forms.AnchorStyles.None;
-        this._btnIncrement.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(247)))), ((int)(((byte)(242)))));
+        this._btnIncrement.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(253)))), ((int)(((byte)(244)))));
         this._btnIncrement.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnIncrement.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(167)))), ((int)(((byte)(219)))), ((int)(((byte)(185)))));
         this._btnIncrement.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnIncrement.Font = new System.Drawing.Font("Cairo", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnIncrement.Font = new System.Drawing.Font("Cairo", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnIncrement.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._btnIncrement.Location = new System.Drawing.Point(3, 3);
         this._btnIncrement.Margin = new System.Windows.Forms.Padding(0);

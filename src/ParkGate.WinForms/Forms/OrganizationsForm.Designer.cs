@@ -67,7 +67,7 @@ partial class OrganizationsForm
         // 
         this._lblHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-        this._lblHeader.Font = new System.Drawing.Font("Cairo", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHeader.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(16, 10);
         this._lblHeader.Name = "_lblHeader";
@@ -129,7 +129,7 @@ partial class OrganizationsForm
         this._btnEdit.Enabled = false;
         this._btnEdit.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnEdit.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnEdit.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnEdit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnEdit.Location = new System.Drawing.Point(502, 10);
         this._btnEdit.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
@@ -146,7 +146,7 @@ partial class OrganizationsForm
         this._btnToggleActive.Enabled = false;
         this._btnToggleActive.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnToggleActive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnToggleActive.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnToggleActive.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnToggleActive.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnToggleActive.Location = new System.Drawing.Point(382, 10);
         this._btnToggleActive.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
@@ -162,7 +162,7 @@ partial class OrganizationsForm
         this._btnRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnRefresh.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnRefresh.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnRefresh.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._btnRefresh.Location = new System.Drawing.Point(282, 10);
         this._btnRefresh.Margin = new System.Windows.Forms.Padding(0, 0, 16, 0);
@@ -176,7 +176,7 @@ partial class OrganizationsForm
         // 
         this._chkActiveOnly.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._chkActiveOnly.AutoSize = true;
-        this._chkActiveOnly.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._chkActiveOnly.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._chkActiveOnly.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._chkActiveOnly.Location = new System.Drawing.Point(145, 16);
         this._chkActiveOnly.Margin = new System.Windows.Forms.Padding(0);
@@ -221,7 +221,7 @@ partial class OrganizationsForm
             this._colStatus});
         dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
         dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
-        dataGridViewCellStyle3.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        dataGridViewCellStyle3.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
         dataGridViewCellStyle3.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
         dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(252)))), ((int)(((byte)(231)))));
@@ -260,7 +260,7 @@ partial class OrganizationsForm
         // _colCooldown
         // 
         this._colCooldown.FillWeight = 20F;
-        this._colCooldown.HeaderText = "فترة السماح";
+        this._colCooldown.HeaderText = "فترة الانتظار";
         this._colCooldown.MinimumWidth = 100;
         this._colCooldown.Name = "_colCooldown";
         this._colCooldown.ReadOnly = true;
@@ -339,7 +339,7 @@ partial class OrganizationsForm
         // 
         this._lblCount.Anchor = System.Windows.Forms.AnchorStyles.Right;
         this._lblCount.AutoSize = true;
-        this._lblCount.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblCount.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblCount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._lblCount.Location = new System.Drawing.Point(624, 14);
         this._lblCount.Name = "_lblCount";
@@ -355,8 +355,8 @@ partial class OrganizationsForm
         this._btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this._btnClose.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClose.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._btnClose.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._btnClose.Location = new System.Drawing.Point(16, 8);
         this._btnClose.Name = "_btnClose";
         this._btnClose.Size = new System.Drawing.Size(96, 32);

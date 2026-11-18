@@ -15,28 +15,24 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class EditWorkstationDialog : RtlFormBase
 {
-    private readonly IWorkstationService? _workstationService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<EditWorkstationDialog>? _logger;
+    private readonly IWorkstationService _workstationService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<EditWorkstationDialog> _logger;
 
     private WorkstationDto? _existingWorkstation;
 
     public WorkstationDto? SavedWorkstation { get; private set; }
 
-    public EditWorkstationDialog() : this(null, null, null)
-    {
-    }
-
     public EditWorkstationDialog(
-        IWorkstationService? workstationService,
-        INotifyService? notifyService,
-        ILogger<EditWorkstationDialog>? logger)
+        IWorkstationService workstationService,
+        INotifyService notifyService,
+        ILogger<EditWorkstationDialog> logger)
     {
         InitializeComponent();
 
-        _workstationService = workstationService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _workstationService = workstationService ?? throw new ArgumentNullException(nameof(workstationService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         PopulateTypeCombo();
@@ -86,7 +82,7 @@ public partial class EditWorkstationDialog : RtlFormBase
 
     public async Task SaveAsync()
     {
-        if (_workstationService == null || _existingWorkstation == null)
+        if (_existingWorkstation == null)
         {
             return;
         }
@@ -110,7 +106,7 @@ public partial class EditWorkstationDialog : RtlFormBase
                 if (result.IsSuccess)
                 {
                     SavedWorkstation = result.Value;
-                    _notifyService?.Info(Strings.Msg_SaveWsSuccess);
+                    _notifyService.Info(Strings.Msg_SaveWsSuccess);
                     DialogResult = DialogResult.OK;
                     Close();
                 }
@@ -121,7 +117,7 @@ public partial class EditWorkstationDialog : RtlFormBase
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error updating workstation.");
+                _logger.LogError(ex, "Error updating workstation.");
                 ShowError(UserMessages.Describe(ex));
             }
         }
@@ -129,38 +125,12 @@ public partial class EditWorkstationDialog : RtlFormBase
 
     private void ShowWarning(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Warning(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Warning,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        _notifyService.Warning(message);
     }
 
     private void ShowError(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Error(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Error,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        _notifyService.Error(message);
     }
 
     private sealed class ComboBoxItem<T>

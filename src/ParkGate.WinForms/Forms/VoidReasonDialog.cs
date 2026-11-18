@@ -10,19 +10,15 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class VoidReasonDialog : RtlFormBase
 {
-    private readonly INotifyService? _notifyService;
+    private readonly INotifyService _notifyService;
 
     public string Reason { get; private set; } = string.Empty;
 
-    public VoidReasonDialog() : this(null)
-    {
-    }
-
-    public VoidReasonDialog(INotifyService? notifyService)
+    public VoidReasonDialog(INotifyService notifyService)
     {
         InitializeComponent();
 
-        _notifyService = notifyService;
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
 
         InitializeFormText();
         WireEvents();
@@ -54,20 +50,7 @@ public partial class VoidReasonDialog : RtlFormBase
         if (reason.Length < 5)
         {
             var msg = Strings.Ui_VoidReason_02;
-            if (_notifyService != null)
-            {
-                _notifyService.Warning(msg);
-            }
-            else
-            {
-                MessageBox.Show(
-                    msg,
-                    Strings.Title_Warning,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning,
-                    MessageBoxDefaultButton.Button1,
-                    MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-            }
+            _notifyService.Warning(msg);
             _txtReason.Focus();
             return;
         }

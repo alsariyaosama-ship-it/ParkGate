@@ -175,7 +175,7 @@ partial class SettingsForm
         _tabEntry.Padding = new Padding(12);
         _tabEntry.Size = new Size(642, 265);
         _tabEntry.TabIndex = 1;
-        _tabEntry.Text = "إعدادات الدخول وفترة السماح";
+        _tabEntry.Text = "إعدادات الدخول وفترة الانتظار";
         _tabEntry.UseVisualStyleBackColor = true;
         // 
         // _tblEntry
@@ -211,7 +211,7 @@ partial class SettingsForm
         _lblCooldownHours.Name = "_lblCooldownHours";
         _lblCooldownHours.Size = new Size(349, 38);
         _lblCooldownHours.TabIndex = 0;
-        _lblCooldownHours.Text = "فترة السماح الافتراضية بين الزيارات للزبون (بالساعات):";
+        _lblCooldownHours.Text = "فترة الانتظار الافتراضية بين الزيارات (بالساعات):";
         // 
         // _numCooldownHours
         // 
@@ -232,7 +232,7 @@ partial class SettingsForm
         _lblMaxGroupSize.Name = "_lblMaxGroupSize";
         _lblMaxGroupSize.Size = new Size(348, 38);
         _lblMaxGroupSize.TabIndex = 2;
-        _lblMaxGroupSize.Text = "الحد الأقصى لعدد الأفراد في المجموعة (شامل الزبون):";
+        _lblMaxGroupSize.Text = "الحد الأقصى لعدد الأفراد في المجموعة (شامل الزائر):";
         // 
         // _numMaxGroupSize
         // 
@@ -275,7 +275,7 @@ partial class SettingsForm
         _chkPrefillCompanions.Name = "_chkPrefillCompanions";
         _chkPrefillCompanions.Size = new Size(432, 32);
         _chkPrefillCompanions.TabIndex = 6;
-        _chkPrefillCompanions.Text = "تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للمستفيد";
+        _chkPrefillCompanions.Text = "تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للزائر";
         _chkPrefillCompanions.UseVisualStyleBackColor = true;
         // 
         // _chkDenialSound
@@ -417,7 +417,7 @@ partial class SettingsForm
         _btnReload.Cursor = Cursors.Hand;
         _btnReload.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
         _btnReload.FlatStyle = FlatStyle.Flat;
-        _btnReload.Font = new Font("Cairo", 9.5F);
+        _btnReload.Font = new Font("Cairo", 10F);
         _btnReload.ForeColor = Color.FromArgb(30, 41, 59);
         _btnReload.Location = new Point(389, 11);
         _btnReload.Name = "_btnReload";
@@ -433,7 +433,7 @@ partial class SettingsForm
         _btnClose.DialogResult = DialogResult.Cancel;
         _btnClose.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
         _btnClose.FlatStyle = FlatStyle.Flat;
-        _btnClose.Font = new Font("Cairo", 9.5F);
+        _btnClose.Font = new Font("Cairo", 10F);
         _btnClose.ForeColor = Color.FromArgb(30, 41, 59);
         _btnClose.Location = new Point(293, 11);
         _btnClose.Name = "_btnClose";
@@ -445,8 +445,8 @@ partial class SettingsForm
         // SettingsForm
         // 
         AcceptButton = _btnSave;
-        AutoScaleDimensions = new SizeF(9F, 32F);
-        AutoScaleMode = AutoScaleMode.Font;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = _btnClose;
         ClientSize = new Size(650, 416);
         Controls.Add(_tabSettings);

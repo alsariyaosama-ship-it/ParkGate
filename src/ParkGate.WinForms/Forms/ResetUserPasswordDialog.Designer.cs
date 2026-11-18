@@ -60,7 +60,7 @@ partial class ResetUserPasswordDialog
         // _tblLayout
         // 
         this._tblLayout.ColumnCount = 2;
-        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
+        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
         this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblLayout.Controls.Add(this._lblUserInfoPrompt, 0, 0);
         this._tblLayout.Controls.Add(this._lblUserInfo, 1, 0);
@@ -160,9 +160,9 @@ partial class ResetUserPasswordDialog
         this._btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnSave.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSave.ForeColor = System.Drawing.Color.White;
-        this._btnSave.Location = new System.Drawing.Point(268, 9);
+        this._btnSave.Location = new System.Drawing.Point(228, 9);
         this._btnSave.Name = "_btnSave";
-        this._btnSave.Size = new System.Drawing.Size(140, 38);
+        this._btnSave.Size = new System.Drawing.Size(180, 38);
         this._btnSave.TabIndex = 0;
         this._btnSave.Text = "تعيين كلمة المرور";
         this._btnSave.UseVisualStyleBackColor = false;
@@ -174,7 +174,7 @@ partial class ResetUserPasswordDialog
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnCancel.Location = new System.Drawing.Point(158, 9);
         this._btnCancel.Name = "_btnCancel";
@@ -186,8 +186,8 @@ partial class ResetUserPasswordDialog
         // ResetUserPasswordDialog
         // 
         this.AcceptButton = this._btnSave;
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
         this.ClientSize = new System.Drawing.Size(440, 246);
         this.Controls.Add(this._tblLayout);

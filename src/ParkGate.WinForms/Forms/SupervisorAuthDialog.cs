@@ -12,24 +12,22 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class SupervisorAuthDialog : RtlFormBase
 {
-    private readonly IAuthService? _authService;
-    private readonly ICurrentUser? _currentUser;
+    private readonly IAuthService _authService;
+    private readonly ICurrentUser _currentUser;
 
     /// <summary>Single-use approval for the use case (R3.2). The approver is resolved from it, never from an id.</summary>
     public string ApprovalToken { get; private set; } = string.Empty;
     public string SupervisorFullName { get; private set; } = string.Empty;
     public string Reason { get; private set; } = string.Empty;
 
-    public SupervisorAuthDialog() : this(null, null)
-    {
-    }
-
-    public SupervisorAuthDialog(IAuthService? authService, ICurrentUser? currentUser)
+    public SupervisorAuthDialog(
+        IAuthService authService,
+        ICurrentUser currentUser)
     {
         InitializeComponent();
 
-        _authService = authService;
-        _currentUser = currentUser;
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
 
         InitializeFormText();
         WireEvents();
@@ -37,8 +35,7 @@ public partial class SupervisorAuthDialog : RtlFormBase
 
     public void SetContext(string? defaultReason = null, bool prefillCurrentUserIfSupervisor = true)
     {
-        if (prefillCurrentUserIfSupervisor && _currentUser != null &&
-            (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin)))
+        if (prefillCurrentUserIfSupervisor && (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin)))
         {
             _txtUsername.Text = _currentUser.UserName ?? string.Empty;
             _txtPassword.Focus();
@@ -113,13 +110,6 @@ public partial class SupervisorAuthDialog : RtlFormBase
         {
             _lblError.Text = Strings.Val_SupervisorReasonTooShort;
             _txtReason.Focus();
-            return;
-        }
-
-        if (_authService == null)
-        {
-            // No service, no approval: never invent one (R3.2).
-            _lblError.Text = Strings.Error_Auth_SupervisorRequired;
             return;
         }
 

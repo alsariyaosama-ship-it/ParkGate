@@ -105,7 +105,7 @@ defineProps({
                     <span class="text-xs text-slate-500 dark:text-slate-400">محاولة</span>
                 </div>
                 <div class="mt-2 text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
-                    <span>بسبب فترة السماح أو الإيقاف</span>
+                    <span>بسبب فترة الانتظار أو الإيقاف</span>
                 </div>
             </div>
 
@@ -121,7 +121,7 @@ defineProps({
                 </div>
                 <div class="mt-3 flex items-baseline gap-2">
                     <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ kpis.total_beneficiaries.toLocaleString() }}</span>
-                    <span class="text-xs text-slate-500 dark:text-slate-400">مستفيد</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">زائر</span>
                 </div>
                 <div class="mt-2 text-xs text-purple-600 dark:text-purple-400 flex items-center gap-1 font-medium">
                     <span>النشطون حالياً: {{ kpis.active_beneficiaries.toLocaleString() }}</span>
@@ -139,7 +139,10 @@ defineProps({
                     </div>
                 </div>
 
-                <div class="h-44 flex items-end gap-2 pt-6 pb-2 px-2 overflow-x-auto">
+                <div v-if="!Object.values(hourly_stats).some(count => count > 0)" class="h-44 flex items-center justify-center text-xs text-slate-400">
+                    لا توجد حركات دخول اليوم بعد.
+                </div>
+                <div v-else class="h-44 flex items-end gap-2 pt-6 pb-2 px-2 overflow-x-auto">
                     <div v-for="(count, hour) in hourly_stats" :key="hour" class="flex-1 flex flex-col items-center gap-2 group min-w-[28px]">
                         <span class="text-[10px] text-slate-400 group-hover:text-emerald-500 font-bold transition">{{ count > 0 ? count : '' }}</span>
                         <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-md group-hover:bg-emerald-500 transition-all duration-300 relative flex items-end justify-center"
@@ -197,7 +200,7 @@ defineProps({
                     <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800">
                         <tr>
                             <th class="p-3.5">الوقت</th>
-                            <th class="p-3.5">المستفيد</th>
+                            <th class="p-3.5">الزائر</th>
                             <th class="p-3.5">رقم البطاقة</th>
                             <th class="p-3.5">الجهة الراعية</th>
                             <th class="p-3.5 text-center">العدد</th>

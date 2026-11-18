@@ -76,7 +76,7 @@ partial class EditOrganizationDialog
         // _tblLayout
         // 
         this._tblLayout.ColumnCount = 2;
-        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
+        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 220F));
         this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblLayout.Controls.Add(this._lblCode, 0, 0);
         this._tblLayout.Controls.Add(this._txtCode, 1, 0);
@@ -147,7 +147,7 @@ partial class EditOrganizationDialog
         this._chkCustomCooldown.Name = "_chkCustomCooldown";
         this._chkCustomCooldown.Size = new System.Drawing.Size(138, 23);
         this._chkCustomCooldown.TabIndex = 4;
-        this._chkCustomCooldown.Text = "فترة سماح خاصة:";
+        this._chkCustomCooldown.Text = "فترة انتظار خاصة:";
         this._chkCustomCooldown.UseVisualStyleBackColor = true;
         // 
         // _numCooldownHours
@@ -177,8 +177,8 @@ partial class EditOrganizationDialog
         // 
         this._grpPolicy.Controls.Add(this._tblPolicyLayout);
         this._grpPolicy.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpPolicy.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpPolicy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._grpPolicy.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpPolicy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._grpPolicy.Location = new System.Drawing.Point(19, 159);
         this._grpPolicy.Name = "_grpPolicy";
         this._grpPolicy.Padding = new System.Windows.Forms.Padding(8);
@@ -322,7 +322,7 @@ partial class EditOrganizationDialog
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnCancel.Location = new System.Drawing.Point(268, 9);
         this._btnCancel.Name = "_btnCancel";
@@ -334,8 +334,8 @@ partial class EditOrganizationDialog
         // EditOrganizationDialog
         // 
         this.AcceptButton = this._btnSave;
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
         this.ClientSize = new System.Drawing.Size(520, 470);
         this.Controls.Add(this._tblLayout);

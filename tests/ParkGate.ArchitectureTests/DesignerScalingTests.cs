@@ -15,6 +15,48 @@ public sealed class DesignerScalingTests
 
     private static readonly Regex DpiMode = new(@"AutoScaleMode\s*=\s*(?:System\.Windows\.Forms\.)?AutoScaleMode\.Dpi\b", RegexOptions.Compiled);
 
+    private static readonly Regex AnyMode = new(@"AutoScaleMode\s*=\s*(?:System\.Windows\.Forms\.)?AutoScaleMode\.(?<mode>\w+)", RegexOptions.Compiled);
+
+    private static readonly Regex FontSize = new(
+        @"new\s+(?:System\.Drawing\.)?Font\(""[^""]+"",\s*(?<size>[\d.]+)F|CreateFont\((?<size>[\d.]+)F",
+        RegexOptions.Compiled);
+
+    [Fact]
+    public void FormsAndControls_UseTheTypeScale()
+    {
+        // R7.2: Caption 9, Body 10, Section 12, Title 14, Banner 20 (Theme). Seven sizes between 9 and 12.5 were mixed.
+        double[] scale = [9, 10, 12, 14, 20];
+        var root = FindRepoRoot();
+        var offenders = Directory.EnumerateFiles(Path.Combine(root, "src", "ParkGate.WinForms"), "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") &&
+                        !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            .SelectMany(f => FontSize.Matches(File.ReadAllText(f))
+                .Select(m => double.Parse(m.Groups["size"].Value, CultureInfo.InvariantCulture))
+                .Where(size => !scale.Contains(size))
+                .Select(size => $"{Path.GetRelativePath(root, f)}: {size}"))
+            .ToList();
+
+        offenders.ShouldBeEmpty("Use a Theme size: 9, 10, 12, 14 or 20 pt.");
+    }
+
+    [Fact]
+    public void Designers_AllUseDpiScaling()
+    {
+        // R7.8 / AGENTS.md §5.1: Font scaling with Cairo stretched heights (R4.11, R4.13) and left
+        // Font-mode dialogs unscaled at 125 % while their text grew, which clipped labels and buttons.
+        var root = FindRepoRoot();
+        var offenders = Directory.EnumerateFiles(
+                Path.Combine(root, "src", "ParkGate.WinForms"), "*.Designer.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") &&
+                        !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            .SelectMany(f => AnyMode.Matches(File.ReadAllText(f))
+                .Where(m => m.Groups["mode"].Value != "Dpi")
+                .Select(m => $"{Path.GetRelativePath(root, f)}: {m.Groups["mode"].Value}"))
+            .ToList();
+
+        offenders.ShouldBeEmpty("Set AutoScaleMode.Dpi with AutoScaleDimensions = new SizeF(96F, 96F).");
+    }
+
     [Fact]
     public void Designers_UsingDpiScaling_StoreEqualDpiDimensions()
     {

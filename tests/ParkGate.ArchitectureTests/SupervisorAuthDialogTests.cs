@@ -26,7 +26,7 @@ public sealed class SupervisorAuthDialogTests
     [Fact]
     public void SupervisorAuthDialog_InitialState_ShouldHaveArabicLabelsAndEmptyError()
     {
-        using var form = new SupervisorAuthDialog();
+        using var form = TestUi.Create<SupervisorAuthDialog>();
 
         form.Text.ShouldBe(Strings.Title_SupervisorAuth);
 
@@ -51,7 +51,7 @@ public sealed class SupervisorAuthDialogTests
     public async Task SupervisorAuthDialog_Validation_RequiresUsername()
     {
         var authService = new TestAuthService();
-        using var form = new SupervisorAuthDialog(authService, null);
+        using var form = TestUi.Create<SupervisorAuthDialog>(authService);
 
         var lblError = GetField<Label>(form, "_lblError");
 
@@ -65,7 +65,7 @@ public sealed class SupervisorAuthDialogTests
     public async Task SupervisorAuthDialog_Validation_RequiresPassword()
     {
         var authService = new TestAuthService();
-        using var form = new SupervisorAuthDialog(authService, null);
+        using var form = TestUi.Create<SupervisorAuthDialog>(authService);
 
         var txtUsername = GetField<TextBox>(form, "_txtUsername");
         var lblError = GetField<Label>(form, "_lblError");
@@ -81,7 +81,7 @@ public sealed class SupervisorAuthDialogTests
     public async Task SupervisorAuthDialog_Validation_RequiresReasonAtLeast5Chars()
     {
         var authService = new TestAuthService();
-        using var form = new SupervisorAuthDialog(authService, null);
+        using var form = TestUi.Create<SupervisorAuthDialog>(authService);
 
         var txtUsername = GetField<TextBox>(form, "_txtUsername");
         var txtPassword = GetField<TextBox>(form, "_txtPassword");
@@ -112,7 +112,7 @@ public sealed class SupervisorAuthDialogTests
             ApproveResult = Result<SupervisorApprovalDto>.Success(new SupervisorApprovalDto("token-5", 5, "المشرف كمال"))
         };
 
-        using var form = new SupervisorAuthDialog(authService, null);
+        using var form = TestUi.Create<SupervisorAuthDialog>(authService);
 
         var txtUsername = GetField<TextBox>(form, "_txtUsername");
         var txtPassword = GetField<TextBox>(form, "_txtPassword");
@@ -139,7 +139,7 @@ public sealed class SupervisorAuthDialogTests
             ApproveResult = Result<SupervisorApprovalDto>.Failure(Errors.Auth.InvalidCredentials)
         };
 
-        using var form = new SupervisorAuthDialog(authService, null);
+        using var form = TestUi.Create<SupervisorAuthDialog>(authService);
 
         var txtUsername = GetField<TextBox>(form, "_txtUsername");
         var txtPassword = GetField<TextBox>(form, "_txtPassword");
@@ -158,20 +158,10 @@ public sealed class SupervisorAuthDialogTests
     }
 
     [Fact]
-    public async Task SupervisorAuthDialog_WithoutAuthService_NeverApproves()
+    public void SupervisorAuthDialog_WithoutAuthService_CannotBeCreated()
     {
-        // R3.2: the old fallback approved as user 1 when no service was injected.
-        using var form = new SupervisorAuthDialog();
-
-        GetField<TextBox>(form, "_txtUsername").Text = "super";
-        GetField<TextBox>(form, "_txtPassword").Text = "superpass";
-        GetField<TextBox>(form, "_txtReason").Text = "تجاوز استثنائي بموافقة الإدارة";
-
-        await form.SubmitAsync();
-
-        form.DialogResult.ShouldNotBe(DialogResult.OK);
-        form.ApprovalToken.ShouldBeEmpty();
-        GetField<Label>(form, "_lblError").Text.ShouldBe(Strings.Error_Auth_SupervisorRequired);
+        // R3.2: the old fallback approved as user 1 when no service was injected; R7.9 makes the service required.
+        Should.Throw<ArgumentNullException>(() => new SupervisorAuthDialog(null!, NSubstitute.Substitute.For<ParkGate.Application.Security.ICurrentUser>()));
     }
 
     private sealed class TestAuthService : IAuthService

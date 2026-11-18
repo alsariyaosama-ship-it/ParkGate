@@ -93,7 +93,7 @@ partial class BeneficiariesControl
         // 
         // _pnlSearch
         // 
-        this._pnlSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(247)))));
+        this._pnlSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
         this._pnlSearch.Controls.Add(this._lblSearch);
         this._pnlSearch.Controls.Add(this._txtSearch);
         this._pnlSearch.Controls.Add(this._btnSearch);
@@ -111,21 +111,21 @@ partial class BeneficiariesControl
         this._lblSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblSearch.AutoSize = true;
         this._lblSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblSearch.Location = new System.Drawing.Point(895, 13);
+        this._lblSearch.Location = new System.Drawing.Point(850, 13);
         this._lblSearch.Name = "_lblSearch";
-        this._lblSearch.Size = new System.Drawing.Size(95, 26);
+        this._lblSearch.Size = new System.Drawing.Size(140, 26);
         this._lblSearch.TabIndex = 0;
         this._lblSearch.Text = "بحث سريع:";
         // 
         // _txtSearch
         // 
         this._txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtSearch.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._txtSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._txtSearch.Location = new System.Drawing.Point(525, 9);
         this._txtSearch.MaxLength = 100;
         this._txtSearch.Name = "_txtSearch";
         this._txtSearch.PlaceholderText = "رقم البطاقة / الاسم / الهاتف / الرقم الوطني...";
-        this._txtSearch.Size = new System.Drawing.Size(360, 34);
+        this._txtSearch.Size = new System.Drawing.Size(320, 34);
         this._txtSearch.TabIndex = 1;
         // 
         // _btnSearch
@@ -135,11 +135,11 @@ partial class BeneficiariesControl
         this._btnSearch.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnSearch.FlatAppearance.BorderSize = 0;
         this._btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnSearch.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSearch.ForeColor = System.Drawing.Color.White;
-        this._btnSearch.Location = new System.Drawing.Point(435, 9);
+        this._btnSearch.Location = new System.Drawing.Point(399, 9);
         this._btnSearch.Name = "_btnSearch";
-        this._btnSearch.Size = new System.Drawing.Size(84, 34);
+        this._btnSearch.Size = new System.Drawing.Size(120, 34);
         this._btnSearch.TabIndex = 2;
         this._btnSearch.Text = "بحث";
         this._btnSearch.UseVisualStyleBackColor = false;
@@ -147,13 +147,13 @@ partial class BeneficiariesControl
         // _btnClearSearch
         // 
         this._btnClearSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._btnClearSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnClearSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnClearSearch.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnClearSearch.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnClearSearch.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClearSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClearSearch.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnClearSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._btnClearSearch.Location = new System.Drawing.Point(345, 9);
+        this._btnClearSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClearSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._btnClearSearch.Location = new System.Drawing.Point(309, 9);
         this._btnClearSearch.Name = "_btnClearSearch";
         this._btnClearSearch.Size = new System.Drawing.Size(84, 34);
         this._btnClearSearch.TabIndex = 3;
@@ -164,7 +164,7 @@ partial class BeneficiariesControl
         // 
         this._lblSearchResultCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
         this._lblSearchResultCount.AutoSize = true;
-        this._lblSearchResultCount.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblSearchResultCount.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblSearchResultCount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this._lblSearchResultCount.Location = new System.Drawing.Point(20, 14);
         this._lblSearchResultCount.Name = "_lblSearchResultCount";
@@ -196,14 +196,14 @@ partial class BeneficiariesControl
         // 
         this._grpResults.Controls.Add(this._gridBeneficiaries);
         this._grpResults.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpResults.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpResults.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpResults.Location = new System.Drawing.Point(8, 4);
         this._grpResults.Name = "_grpResults";
         this._grpResults.Padding = new System.Windows.Forms.Padding(6);
         this._grpResults.Size = new System.Drawing.Size(984, 232);
         this._grpResults.TabIndex = 0;
         this._grpResults.TabStop = false;
-        this._grpResults.Text = "قائمة المستفيدين المطابقين";
+        this._grpResults.Text = "قائمة الزوار المطابقين";
         // 
         // _gridBeneficiaries
         // 
@@ -224,7 +224,7 @@ partial class BeneficiariesControl
             this._colLastEntry,
             this._colExpiryDate});
         this._gridBeneficiaries.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._gridBeneficiaries.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._gridBeneficiaries.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._gridBeneficiaries.Location = new System.Drawing.Point(6, 23);
         this._gridBeneficiaries.MultiSelect = false;
         this._gridBeneficiaries.Name = "_gridBeneficiaries";
@@ -314,14 +314,14 @@ partial class BeneficiariesControl
         this._grpHolderDetails.Controls.Add(this._tblDetails);
         this._grpHolderDetails.Controls.Add(this._pnlDetailsActions);
         this._grpHolderDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpHolderDetails.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpHolderDetails.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpHolderDetails.Location = new System.Drawing.Point(0, 0);
         this._grpHolderDetails.Name = "_grpHolderDetails";
         this._grpHolderDetails.Padding = new System.Windows.Forms.Padding(6);
         this._grpHolderDetails.Size = new System.Drawing.Size(376, 332);
         this._grpHolderDetails.TabIndex = 0;
         this._grpHolderDetails.TabStop = false;
-        this._grpHolderDetails.Text = "تفاصيل الزبون";
+        this._grpHolderDetails.Text = "تفاصيل الزائر";
         // 
         // _tblDetails
         // 
@@ -346,6 +346,7 @@ partial class BeneficiariesControl
         this._tblDetails.Controls.Add(this._lblDetailReason, 1, 7);
         this._tblDetails.Controls.Add(this._lblDetailNotesTitle, 0, 8);
         this._tblDetails.Controls.Add(this._lblDetailNotes, 1, 8);
+        this._tblDetails.AutoScroll = true;
         this._tblDetails.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblDetails.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblDetails.Location = new System.Drawing.Point(6, 23);
@@ -359,7 +360,7 @@ partial class BeneficiariesControl
         this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
         this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
         this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
         this._tblDetails.Size = new System.Drawing.Size(364, 258);
         this._tblDetails.TabIndex = 0;
         // 
@@ -609,7 +610,7 @@ partial class BeneficiariesControl
         this._grpHistory.Controls.Add(this._gridHistory);
         this._grpHistory.Controls.Add(this._pnlHistoryActions);
         this._grpHistory.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpHistory.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpHistory.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpHistory.Location = new System.Drawing.Point(4, 0);
         this._grpHistory.Name = "_grpHistory";
         this._grpHistory.Padding = new System.Windows.Forms.Padding(6);
@@ -718,17 +719,17 @@ partial class BeneficiariesControl
         this._btnVoidHistoryEntry.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnVoidHistoryEntry.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnVoidHistoryEntry.ForeColor = System.Drawing.Color.White;
-        this._btnVoidHistoryEntry.Location = new System.Drawing.Point(444, 5);
+        this._btnVoidHistoryEntry.Location = new System.Drawing.Point(384, 5);
         this._btnVoidHistoryEntry.Name = "_btnVoidHistoryEntry";
-        this._btnVoidHistoryEntry.Size = new System.Drawing.Size(130, 30);
+        this._btnVoidHistoryEntry.Size = new System.Drawing.Size(170, 30);
         this._btnVoidHistoryEntry.TabIndex = 0;
         this._btnVoidHistoryEntry.Text = "إلغاء العملية (Void)...";
         this._btnVoidHistoryEntry.UseVisualStyleBackColor = false;
         // 
         // BeneficiariesControl
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.Controls.Add(this._splitMain);
         this.Controls.Add(this._pnlSearch);
         this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);

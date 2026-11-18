@@ -20,7 +20,7 @@ public sealed class ReportsControlTests
     [Fact]
     public void ReportsControl_ShouldHaveRtlAndSixLocalizedTabs()
     {
-        using var control = new ReportsControl();
+        using var control = TestUi.Create<ReportsControl>();
 
         control.RightToLeft.ShouldBe(RightToLeft.Yes);
 
@@ -38,7 +38,7 @@ public sealed class ReportsControlTests
     [Fact]
     public void ReportsControl_ActionButtons_ShouldHaveArabicLabels()
     {
-        using var control = new ReportsControl();
+        using var control = TestUi.Create<ReportsControl>();
 
         var btnRun = GetField<Button>(control, "_btnRunReport");
         var btnExport = GetField<Button>(control, "_btnExportExcel");
@@ -52,7 +52,7 @@ public sealed class ReportsControlTests
     [Fact]
     public void ReportsControl_QuickDateButtons_ShouldSetExpectedDates()
     {
-        using var control = new ReportsControl();
+        using var control = TestUi.Create<ReportsControl>();
 
         var btnToday = GetField<Button>(control, "_btnToday");
         var btnYesterday = GetField<Button>(control, "_btnYesterday");
@@ -71,7 +71,7 @@ public sealed class ReportsControlTests
     [Fact]
     public void ReportsControl_SelectReportTab_ShouldSwitchActiveTab()
     {
-        using var control = new ReportsControl();
+        using var control = TestUi.Create<ReportsControl>();
 
         var tabControl = GetField<TabControl>(control, "_tabControl");
         control.SelectReportTab(2);
@@ -83,7 +83,7 @@ public sealed class ReportsControlTests
     [Fact]
     public void ReportsControl_FilterVisibility_ShouldAdaptToTab()
     {
-        using var control = new ReportsControl();
+        using var control = TestUi.Create<ReportsControl>();
 
         var lblFilterType = GetField<Label>(control, "_lblFilterType");
         var cboFilterType = GetField<ComboBox>(control, "_cboFilterType");

@@ -7,7 +7,7 @@ namespace ParkGate.Application.EntryCards;
 /// إصدار (أو إعادة إصدار) بطاقة لمستفيد. الإصدار الجديد يلغي القديمة تلقائياً،
 /// فأي نسخة مصورة من البطاقة السابقة تتوقف عن العمل.
 /// </summary>
-public sealed class EntryCardIssuer
+public sealed class EntryCardIssuer : IEntryCardIssuer
 {
     private readonly QrTokenSigner _signer;
     private readonly IEntryCardRepository _cards;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EntryAttempt;
 use App\Models\Organization;
 use App\Services\GiftSummaryService;
+use App\Support\ParkTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -48,7 +49,8 @@ class ReportController extends Controller
                     'card_number' => $a->beneficiary?->card_number ?? '—',
                     'organization_name' => $a->organization?->name_ar ?? '—',
                     'business_date' => $a->business_date,
-                    'time_formatted' => $a->attempted_at_utc ? $a->attempted_at_utc->format('H:i') : '—',
+                    'date_formatted' => ParkTime::date($a->business_date),
+                    'time_formatted' => ParkTime::time($a->attempted_at_utc),
                     'result' => $a->result,
                     'denial_reason' => $a->denial_reason,
                     'total_persons' => $a->total_persons,

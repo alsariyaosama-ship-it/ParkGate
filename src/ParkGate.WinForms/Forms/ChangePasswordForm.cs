@@ -8,20 +8,18 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class ChangePasswordForm : RtlFormBase
 {
-    private readonly IAuthService? _authService;
-    private readonly ICurrentUser? _currentUser;
+    private readonly IAuthService _authService;
+    private readonly ICurrentUser _currentUser;
     private int? _targetUserId;
 
-    public ChangePasswordForm() : this(null, null)
-    {
-    }
-
-    public ChangePasswordForm(IAuthService? authService, ICurrentUser? currentUser)
+    public ChangePasswordForm(
+        IAuthService authService,
+        ICurrentUser currentUser)
     {
         InitializeComponent();
 
-        _authService = authService;
-        _currentUser = currentUser;
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
 
         InitializeFormText();
         btnChange.Click += async (_, _) => await OnChangePasswordAsync();
@@ -47,6 +45,7 @@ public partial class ChangePasswordForm : RtlFormBase
         lblConfirmNewPassword.Text = Strings.Label_ConfirmNewPassword;
         btnChange.Text = Strings.Btn_ChangePassword;
         btnCancel.Text = Strings.Btn_Cancel;
+        Theme.ApplySecondaryButtonStyle(btnCancel);
     }
 
     private async Task OnChangePasswordAsync()
@@ -55,8 +54,8 @@ public partial class ChangePasswordForm : RtlFormBase
         var newPassword = txtNewPassword.Text;
         var confirmNewPassword = txtConfirmNewPassword.Text;
 
-        var userId = _targetUserId ?? _currentUser?.UserId;
-        if (!userId.HasValue || _authService == null)
+        var userId = _targetUserId ?? _currentUser.UserId;
+        if (!userId.HasValue)
         {
             DialogResult = DialogResult.OK;
             Close();

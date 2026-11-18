@@ -32,7 +32,7 @@ public sealed class BeneficiariesManagementTests
     [Fact]
     public void BeneficiariesControl_ParameterlessCtor_ShouldInitializeProperlyAndRtl()
     {
-        using var control = new BeneficiariesControl();
+        using var control = TestUi.Create<BeneficiariesControl>();
 
         control.RightToLeft.ShouldBe(RightToLeft.Yes);
 
@@ -105,15 +105,7 @@ public sealed class BeneficiariesManagementTests
         var fakeBenService = new FakeBeneficiaryService([fakeHolder], fakeHistory);
         var currentUser = new FakeCurrentUser(1, "supervisor1", "Park Supervisor", UserRole.Supervisor);
 
-        using var control = new BeneficiariesControl(
-            fakeBenService,
-            null,
-            null,
-            currentUser,
-            null,
-            null,
-            null,
-            null);
+        using var control = TestUi.Create<BeneficiariesControl>(fakeBenService, currentUser);
 
         var txtSearch = GetField<TextBox>(control, "_txtSearch");
         var gridBen = GetField<DataGridView>(control, "_gridBeneficiaries");
@@ -172,15 +164,7 @@ public sealed class BeneficiariesManagementTests
         var fakeBenService = new FakeBeneficiaryService([fakeHolder], []);
         var currentUser = new FakeCurrentUser(1, "admin", "Admin User", UserRole.Admin);
 
-        using var control = new BeneficiariesControl(
-            fakeBenService,
-            null,
-            null,
-            currentUser,
-            null,
-            null,
-            null,
-            null);
+        using var control = TestUi.Create<BeneficiariesControl>(fakeBenService, currentUser);
 
         await control.EnsureLoadedAsync();
 
@@ -224,15 +208,7 @@ public sealed class BeneficiariesManagementTests
         var fakeBenService = new FakeBeneficiaryService([fakeHolder], []);
         var currentUser = new FakeCurrentUser(1, "operator1", "Park Operator", UserRole.Operator);
 
-        using var control = new BeneficiariesControl(
-            fakeBenService,
-            null,
-            null,
-            currentUser,
-            null,
-            null,
-            null,
-            null);
+        using var control = TestUi.Create<BeneficiariesControl>(fakeBenService, currentUser);
 
         var txtSearch = GetField<TextBox>(control, "_txtSearch");
         var gridBen = GetField<DataGridView>(control, "_gridBeneficiaries");
@@ -274,15 +250,7 @@ public sealed class BeneficiariesManagementTests
         var fakeBenService = new FakeBeneficiaryService([fakeHolder], []);
         var currentUser = new FakeCurrentUser(1, "supervisor1", "Park Supervisor", UserRole.Supervisor);
 
-        using var control = new BeneficiariesControl(
-            fakeBenService,
-            null,
-            null,
-            currentUser,
-            null,
-            null,
-            null,
-            null);
+        using var control = TestUi.Create<BeneficiariesControl>(fakeBenService, currentUser);
 
         string? requestedCard = null;
         control.RequestCheckIn += (_, card) => requestedCard = card;
@@ -299,7 +267,7 @@ public sealed class BeneficiariesManagementTests
     [Fact]
     public void EditBeneficiaryDialog_ParameterlessCtor_ShouldInitializeProperly()
     {
-        using var dialog = new EditBeneficiaryDialog();
+        using var dialog = TestUi.Create<EditBeneficiaryDialog>();
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
         dialog.Text.ShouldBe(Strings.Title_EditBeneficiary);
     }
@@ -326,7 +294,7 @@ public sealed class BeneficiariesManagementTests
         var fakeOrgService = new FakeOrganizationService([new OrganizationDto(1, "TADAMUN", "صندوق التضامن", 720, true, true)]);
 
         var fakeNotifyService = new FakeNotifyService();
-        using var dialog = new EditBeneficiaryDialog(fakeBenService, fakeOrgService, fakeNotifyService, null);
+        using var dialog = TestUi.Create<EditBeneficiaryDialog>(fakeBenService, fakeOrgService, fakeNotifyService);
         await dialog.SetBeneficiaryAsync(holder);
 
         var txtFullName = GetField<TextBox>(dialog, "_txtFullName");
@@ -350,7 +318,7 @@ public sealed class BeneficiariesManagementTests
     [Fact]
     public void ChangeBeneficiaryStatusDialog_ParameterlessCtor_ShouldInitializeProperly()
     {
-        using var dialog = new ChangeBeneficiaryStatusDialog();
+        using var dialog = TestUi.Create<ChangeBeneficiaryStatusDialog>();
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
         dialog.Text.ShouldBe(Strings.Title_ChangeStatus);
     }
@@ -375,7 +343,7 @@ public sealed class BeneficiariesManagementTests
 
         var fakeBenService = new FakeBeneficiaryService([holder], []);
         var fakeNotifyService = new FakeNotifyService();
-        using var dialog = new ChangeBeneficiaryStatusDialog(fakeBenService, fakeNotifyService, null);
+        using var dialog = TestUi.Create<ChangeBeneficiaryStatusDialog>(fakeBenService, fakeNotifyService);
         dialog.SetBeneficiary(holder);
 
         var radSuspended = GetField<RadioButton>(dialog, "_radSuspended");
@@ -411,7 +379,7 @@ public sealed class BeneficiariesManagementTests
 
         var fakeBenService = new FakeBeneficiaryService([holder], []);
         var fakeNotifyService = new FakeNotifyService();
-        using var dialog = new ChangeBeneficiaryStatusDialog(fakeBenService, fakeNotifyService, null);
+        using var dialog = TestUi.Create<ChangeBeneficiaryStatusDialog>(fakeBenService, fakeNotifyService);
         dialog.SetBeneficiary(holder);
 
         var radSuspended = GetField<RadioButton>(dialog, "_radSuspended");
@@ -432,7 +400,7 @@ public sealed class BeneficiariesManagementTests
     public void VoidReasonDialog_Validation_RequiresMin5Chars()
     {
         var fakeNotifyService = new FakeNotifyService();
-        using var dialog = new VoidReasonDialog(fakeNotifyService);
+        using var dialog = TestUi.Create<VoidReasonDialog>(fakeNotifyService);
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
 
         dialog.SetContext("CARD-1", "علي", "10:30 ص", 2);

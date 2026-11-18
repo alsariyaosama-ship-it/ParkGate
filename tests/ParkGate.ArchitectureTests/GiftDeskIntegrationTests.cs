@@ -44,7 +44,7 @@ public sealed class GiftDeskIntegrationTests
     [Fact]
     public void GiftQrDialog_ParameterlessConstructor_ShouldBeRtlFormBase()
     {
-        using var dialog = new GiftQrDialog();
+        using var dialog = TestUi.Create<GiftQrDialog>();
         dialog.ShouldNotBeNull();
         dialog.RightToLeft.ShouldBe(RightToLeft.Yes);
         dialog.RightToLeftLayout.ShouldBeTrue();
@@ -54,7 +54,7 @@ public sealed class GiftDeskIntegrationTests
     [Fact]
     public void GiftQrDialog_SetVoucher_ShouldPopulateLabelsCorrectly()
     {
-        using var dialog = new GiftQrDialog();
+        using var dialog = TestUi.Create<GiftQrDialog>();
         var voucher = new IssuedGiftVoucherDto(
             ReceiptNo: 1001,
             BeneficiaryId: Guid.NewGuid(),
@@ -101,7 +101,7 @@ public sealed class GiftDeskIntegrationTests
                 LastGiftIssuedUtc: null))
         };
 
-        using var panel = new GiftOfferPanel(fakeService, null, null, null, null);
+        using var panel = TestUi.CreateGiftPanel(fakeService);
 
         await panel.LoadAsync(beneficiaryId);
 
@@ -129,7 +129,7 @@ public sealed class GiftDeskIntegrationTests
                 LastGiftIssuedUtc: DateTime.UtcNow.AddDays(-10)))
         };
 
-        using var panel = new GiftOfferPanel(fakeService, null, null, null, null);
+        using var panel = TestUi.CreateGiftPanel(fakeService);
 
         await panel.LoadAsync(beneficiaryId);
 
@@ -154,7 +154,7 @@ public sealed class GiftDeskIntegrationTests
                 LastGiftIssuedUtc: null))
         };
 
-        using var panel = new GiftOfferPanel(fakeService, null, null, null, null);
+        using var panel = TestUi.CreateGiftPanel(fakeService);
 
         await panel.LoadAsync(beneficiaryId);
 
@@ -166,8 +166,6 @@ public sealed class GiftDeskIntegrationTests
     [Fact]
     public void CheckInDeskControl_FreeCompanionLimit_ShouldBlockWhenLimitExceeded()
     {
-        using var desk = new CheckInDeskControl();
-
         var orgList = new List<OrganizationDto>
         {
             new(Id: 10, Code: "TADAMON", NameAr: "التضامن", CooldownMinutes: 1440, IsDefault: true, IsActive: true, MaxFreeCompanions: 2)
@@ -175,6 +173,16 @@ public sealed class GiftDeskIntegrationTests
 
         var catAdult = new AgeCategoryDto(Id: 1, NameAr: "بالغ", DescriptionAr: null, SortOrder: 1, IsActive: true, IsCompanionLimitExempt: false);
         var catInfant = new AgeCategoryDto(Id: 3, NameAr: "رضيع", DescriptionAr: null, SortOrder: 2, IsActive: true, IsCompanionLimitExempt: true);
+
+        // The desk reloads categories when it loads, so the service returns the same two.
+        var ageCategories = NSubstitute.Substitute.For<ParkGate.Application.AgeCategories.Services.IAgeCategoryService>();
+        NSubstitute.SubstituteExtensions.Returns(ageCategories.GetActiveAsync(NSubstitute.Arg.Any<CancellationToken>()),
+            Task.FromResult<IReadOnlyList<AgeCategoryDto>>([catAdult, catInfant]));
+        var organizations = NSubstitute.Substitute.For<ParkGate.Application.Organizations.Services.IOrganizationService>();
+        NSubstitute.SubstituteExtensions.Returns(
+            organizations.GetAllAsync(NSubstitute.Arg.Any<bool>(), NSubstitute.Arg.Any<CancellationToken>()),
+            Task.FromResult<IReadOnlyList<OrganizationDto>>(orgList));
+        using var desk = TestUi.Create<CheckInDeskControl>(ageCategories, organizations);
 
         // Populate org and categories into desk
         var orgField = desk.GetType().GetField("_organizations", BindingFlags.NonPublic | BindingFlags.Instance)!;

@@ -19,8 +19,8 @@ partial class CheckInDeskControl
 
     private void InitializeComponent()
     {
-        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+        this._registrationPanel = new ParkGate.WinForms.Controls.InlineRegistrationPanel();
+        this._todayPanel = new ParkGate.WinForms.Controls.TodayEntriesPanel();
         this._mainLayout = new System.Windows.Forms.TableLayoutPanel();
         this._pnlSearch = new System.Windows.Forms.Panel();
         this._btnSearch = new System.Windows.Forms.Button();
@@ -30,23 +30,6 @@ partial class CheckInDeskControl
         this._lblCardNumber = new System.Windows.Forms.Label();
         this._statusBanner = new ParkGate.WinForms.Controls.StatusBanner();
         this._splitMiddle = new System.Windows.Forms.SplitContainer();
-        this._grpRegistration = new System.Windows.Forms.GroupBox();
-        this._tblRegistration = new System.Windows.Forms.TableLayoutPanel();
-        this._lblRegOrganization = new System.Windows.Forms.Label();
-        this._cmbRegOrganization = new System.Windows.Forms.ComboBox();
-        this._lblRegFullName = new System.Windows.Forms.Label();
-        this._txtRegFullName = new System.Windows.Forms.TextBox();
-        this._lblRegPhone = new System.Windows.Forms.Label();
-        this._txtRegPhone = new System.Windows.Forms.TextBox();
-        this._lblRegNationalId = new System.Windows.Forms.Label();
-        this._txtRegNationalId = new System.Windows.Forms.TextBox();
-        this._lblRegExpiry = new System.Windows.Forms.Label();
-        this._dtpRegExpiry = new System.Windows.Forms.DateTimePicker();
-        this._lblRegNotes = new System.Windows.Forms.Label();
-        this._txtRegNotes = new System.Windows.Forms.TextBox();
-        this._pnlRegActions = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSaveReg = new System.Windows.Forms.Button();
-        this._btnCancelReg = new System.Windows.Forms.Button();
         this._grpHolder = new System.Windows.Forms.GroupBox();
         this._tblHolder = new System.Windows.Forms.TableLayoutPanel();
         this._lblHolderNameTitle = new System.Windows.Forms.Label();
@@ -76,32 +59,18 @@ partial class CheckInDeskControl
         this._btnNewHolder = new System.Windows.Forms.Button();
         this._btnClear = new System.Windows.Forms.Button();
         this._giftPanel = new ParkGate.WinForms.Controls.GiftOfferPanel();
-        this._grpToday = new System.Windows.Forms.GroupBox();
-        this._gridToday = new System.Windows.Forms.DataGridView();
-        this._colTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        this._colCard = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        this._colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        this._colOrg = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        this._colPersons = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        this._colResult = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        this._lblTodaySummary = new System.Windows.Forms.Label();
         this._mainLayout.SuspendLayout();
         this._pnlSearch.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._splitMiddle)).BeginInit();
         this._splitMiddle.Panel1.SuspendLayout();
         this._splitMiddle.Panel2.SuspendLayout();
         this._splitMiddle.SuspendLayout();
-        this._grpRegistration.SuspendLayout();
-        this._tblRegistration.SuspendLayout();
-        this._pnlRegActions.SuspendLayout();
         this._grpHolder.SuspendLayout();
         this._tblHolder.SuspendLayout();
         this._grpCompanions.SuspendLayout();
         this._pnlCompanionsTotal.SuspendLayout();
         this._pnlActions.SuspendLayout();
         this._flowActions.SuspendLayout();
-        this._grpToday.SuspendLayout();
-        ((System.ComponentModel.ISupportInitialize)(this._gridToday)).BeginInit();
         this.SuspendLayout();
         // 
         // _mainLayout
@@ -113,7 +82,7 @@ partial class CheckInDeskControl
         this._mainLayout.Controls.Add(this._splitMiddle, 0, 2);
         this._mainLayout.Controls.Add(this._pnlActions, 0, 3);
         this._mainLayout.Controls.Add(this._giftPanel, 0, 4);
-        this._mainLayout.Controls.Add(this._grpToday, 0, 5);
+        this._mainLayout.Controls.Add(this._todayPanel, 0, 5);
         this._mainLayout.Dock = System.Windows.Forms.DockStyle.Fill;
         this._mainLayout.Location = new System.Drawing.Point(10, 10);
         this._mainLayout.Margin = new System.Windows.Forms.Padding(0);
@@ -176,7 +145,7 @@ partial class CheckInDeskControl
         // 
         this._lblOrganization.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblOrganization.AutoSize = true;
-        this._lblOrganization.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblOrganization.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblOrganization.Location = new System.Drawing.Point(412, 11);
         this._lblOrganization.Name = "_lblOrganization";
         this._lblOrganization.Size = new System.Drawing.Size(52, 24);
@@ -186,7 +155,7 @@ partial class CheckInDeskControl
         // _txtCardNumber
         // 
         this._txtCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._txtCardNumber.Location = new System.Drawing.Point(475, 6);
         this._txtCardNumber.MaxLength = 50;
         this._txtCardNumber.Name = "_txtCardNumber";
@@ -197,8 +166,8 @@ partial class CheckInDeskControl
         // 
         this._lblCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblCardNumber.AutoSize = true;
-        this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblCardNumber.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblCardNumber.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._lblCardNumber.Location = new System.Drawing.Point(866, 11);
         this._lblCardNumber.Name = "_lblCardNumber";
         this._lblCardNumber.Size = new System.Drawing.Size(95, 26);
@@ -227,7 +196,7 @@ partial class CheckInDeskControl
         // 
         // _splitMiddle.Panel1
         // 
-        this._splitMiddle.Panel1.Controls.Add(this._grpRegistration);
+        this._splitMiddle.Panel1.Controls.Add(this._registrationPanel);
         this._splitMiddle.Panel1.Controls.Add(this._grpHolder);
         this._splitMiddle.Panel1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         // 
@@ -239,235 +208,20 @@ partial class CheckInDeskControl
         this._splitMiddle.SplitterDistance = 500;
         this._splitMiddle.TabIndex = 2;
         // 
-        // _grpRegistration
-        // 
-        this._grpRegistration.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(252)))), ((int)(((byte)(232)))));
-        this._grpRegistration.Controls.Add(this._tblRegistration);
-        this._grpRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpRegistration.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(77)))), ((int)(((byte)(14)))));
-        this._grpRegistration.Location = new System.Drawing.Point(0, 0);
-        this._grpRegistration.Name = "_grpRegistration";
-        this._grpRegistration.Padding = new System.Windows.Forms.Padding(8);
-        this._grpRegistration.Size = new System.Drawing.Size(500, 289);
-        this._grpRegistration.TabIndex = 1;
-        this._grpRegistration.TabStop = false;
-        this._grpRegistration.Text = "تسجيل زبون جديد (فوري)";
-        this._grpRegistration.Visible = false;
-        // 
-        // _tblRegistration
-        // 
-        this._tblRegistration.ColumnCount = 2;
-        this._tblRegistration.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 165F));
-        this._tblRegistration.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-        this._tblRegistration.Controls.Add(this._lblRegOrganization, 0, 0);
-        this._tblRegistration.Controls.Add(this._cmbRegOrganization, 1, 0);
-        this._tblRegistration.Controls.Add(this._lblRegFullName, 0, 1);
-        this._tblRegistration.Controls.Add(this._txtRegFullName, 1, 1);
-        this._tblRegistration.Controls.Add(this._lblRegPhone, 0, 2);
-        this._tblRegistration.Controls.Add(this._txtRegPhone, 1, 2);
-        this._tblRegistration.Controls.Add(this._lblRegNationalId, 0, 3);
-        this._tblRegistration.Controls.Add(this._txtRegNationalId, 1, 3);
-        this._tblRegistration.Controls.Add(this._lblRegExpiry, 0, 4);
-        this._tblRegistration.Controls.Add(this._dtpRegExpiry, 1, 4);
-        this._tblRegistration.Controls.Add(this._lblRegNotes, 0, 5);
-        this._tblRegistration.Controls.Add(this._txtRegNotes, 1, 5);
-        this._tblRegistration.Controls.Add(this._pnlRegActions, 1, 6);
-        this._tblRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._tblRegistration.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._tblRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._tblRegistration.Location = new System.Drawing.Point(8, 26);
-        this._tblRegistration.Name = "_tblRegistration";
-        this._tblRegistration.RowCount = 7;
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
-        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
-        this._tblRegistration.Size = new System.Drawing.Size(484, 255);
-        this._tblRegistration.TabIndex = 0;
-        // 
-        // _lblRegOrganization
-        // 
-        this._lblRegOrganization.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._lblRegOrganization.AutoSize = true;
-        this._lblRegOrganization.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblRegOrganization.Location = new System.Drawing.Point(437, 7);
-        this._lblRegOrganization.Name = "_lblRegOrganization";
-        this._lblRegOrganization.Size = new System.Drawing.Size(44, 17);
-        this._lblRegOrganization.TabIndex = 0;
-        this._lblRegOrganization.Text = "الجهة:";
-        // 
-        // _cmbRegOrganization
-        // 
-        this._cmbRegOrganization.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._cmbRegOrganization.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-        this._cmbRegOrganization.FormattingEnabled = true;
-        this._cmbRegOrganization.Location = new System.Drawing.Point(3, 4);
-        this._cmbRegOrganization.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-        this._cmbRegOrganization.Name = "_cmbRegOrganization";
-        this._cmbRegOrganization.Size = new System.Drawing.Size(348, 24);
-        this._cmbRegOrganization.TabIndex = 1;
-        // 
-        // _lblRegFullName
-        // 
-        this._lblRegFullName.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._lblRegFullName.AutoSize = true;
-        this._lblRegFullName.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblRegFullName.Location = new System.Drawing.Point(395, 7);
-        this._lblRegFullName.Name = "_lblRegFullName";
-        this._lblRegFullName.Size = new System.Drawing.Size(86, 17);
-        this._lblRegFullName.TabIndex = 2;
-        this._lblRegFullName.Text = "الاسم الرباعي:";
-        // 
-        // _txtRegFullName
-        // 
-        this._txtRegFullName.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtRegFullName.Location = new System.Drawing.Point(3, 4);
-        this._txtRegFullName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-        this._txtRegFullName.MaxLength = 100;
-        this._txtRegFullName.Name = "_txtRegFullName";
-        this._txtRegFullName.Size = new System.Drawing.Size(348, 24);
-        this._txtRegFullName.TabIndex = 3;
-        // 
-        // _lblRegPhone
-        // 
-        this._lblRegPhone.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._lblRegPhone.AutoSize = true;
-        this._lblRegPhone.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblRegPhone.Location = new System.Drawing.Point(407, 39);
-        this._lblRegPhone.Name = "_lblRegPhone";
-        this._lblRegPhone.Size = new System.Drawing.Size(74, 17);
-        this._lblRegPhone.TabIndex = 4;
-        this._lblRegPhone.Text = "رقم الهاتف:";
-        // 
-        // _txtRegPhone
-        // 
-        this._txtRegPhone.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtRegPhone.Location = new System.Drawing.Point(3, 36);
-        this._txtRegPhone.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-        this._txtRegPhone.MaxLength = 20;
-        this._txtRegPhone.Name = "_txtRegPhone";
-        this._txtRegPhone.Size = new System.Drawing.Size(348, 24);
-        this._txtRegPhone.TabIndex = 5;
-        // 
-        // _lblRegNationalId
-        // 
-        this._lblRegNationalId.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._lblRegNationalId.AutoSize = true;
-        this._lblRegNationalId.Location = new System.Drawing.Point(365, 71);
-        this._lblRegNationalId.Name = "_lblRegNationalId";
-        this._lblRegNationalId.Size = new System.Drawing.Size(116, 17);
-        this._lblRegNationalId.TabIndex = 6;
-        this._lblRegNationalId.Text = "الرقم الوطني (اختياري):";
-        // 
-        // _txtRegNationalId
-        // 
-        this._txtRegNationalId.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtRegNationalId.Location = new System.Drawing.Point(3, 68);
-        this._txtRegNationalId.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-        this._txtRegNationalId.MaxLength = 12;
-        this._txtRegNationalId.Name = "_txtRegNationalId";
-        this._txtRegNationalId.Size = new System.Drawing.Size(348, 24);
-        this._txtRegNationalId.TabIndex = 7;
-        // 
-        // _lblRegExpiry
-        // 
-        this._lblRegExpiry.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._lblRegExpiry.AutoSize = true;
-        this._lblRegExpiry.Location = new System.Drawing.Point(367, 103);
-        this._lblRegExpiry.Name = "_lblRegExpiry";
-        this._lblRegExpiry.Size = new System.Drawing.Size(114, 17);
-        this._lblRegExpiry.TabIndex = 8;
-        this._lblRegExpiry.Text = "صلاحية البطاقة (اختياري):";
-        // 
-        // _dtpRegExpiry
-        // 
-        this._dtpRegExpiry.Checked = false;
-        this._dtpRegExpiry.CustomFormat = "dd/MM/yyyy";
-        this._dtpRegExpiry.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._dtpRegExpiry.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-        this._dtpRegExpiry.Location = new System.Drawing.Point(3, 100);
-        this._dtpRegExpiry.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-        this._dtpRegExpiry.Name = "_dtpRegExpiry";
-        this._dtpRegExpiry.ShowCheckBox = true;
-        this._dtpRegExpiry.Size = new System.Drawing.Size(348, 24);
-        this._dtpRegExpiry.TabIndex = 9;
-        // 
-        // _lblRegNotes
-        // 
-        this._lblRegNotes.Anchor = System.Windows.Forms.AnchorStyles.Left;
-        this._lblRegNotes.AutoSize = true;
-        this._lblRegNotes.Location = new System.Drawing.Point(427, 137);
-        this._lblRegNotes.Name = "_lblRegNotes";
-        this._lblRegNotes.Size = new System.Drawing.Size(54, 17);
-        this._lblRegNotes.TabIndex = 10;
-        this._lblRegNotes.Text = "ملاحظات:";
-        // 
-        // _txtRegNotes
-        // 
-        this._txtRegNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtRegNotes.Location = new System.Drawing.Point(3, 132);
-        this._txtRegNotes.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-        this._txtRegNotes.MaxLength = 500;
-        this._txtRegNotes.Name = "_txtRegNotes";
-        this._txtRegNotes.Size = new System.Drawing.Size(348, 24);
-        this._txtRegNotes.TabIndex = 11;
-        // 
-        // _pnlRegActions
-        // 
-        this._pnlRegActions.Controls.Add(this._btnSaveReg);
-        this._pnlRegActions.Controls.Add(this._btnCancelReg);
-        this._pnlRegActions.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._pnlRegActions.Location = new System.Drawing.Point(3, 163);
-        this._pnlRegActions.Name = "_pnlRegActions";
-        this._pnlRegActions.Size = new System.Drawing.Size(348, 54);
-        this._pnlRegActions.TabIndex = 12;
-        // 
-        // _btnSaveReg
-        // 
-        this._btnSaveReg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
-        this._btnSaveReg.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnSaveReg.FlatAppearance.BorderSize = 0;
-        this._btnSaveReg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnSaveReg.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._btnSaveReg.ForeColor = System.Drawing.Color.White;
-        this._btnSaveReg.Location = new System.Drawing.Point(195, 3);
-        this._btnSaveReg.Name = "_btnSaveReg";
-        this._btnSaveReg.Size = new System.Drawing.Size(150, 32);
-        this._btnSaveReg.TabIndex = 0;
-        this._btnSaveReg.Text = "حفظ ومتابعة الدخول";
-        this._btnSaveReg.UseVisualStyleBackColor = false;
-        // 
-        // _btnCancelReg
-        // 
-        this._btnCancelReg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
-        this._btnCancelReg.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnCancelReg.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
-        this._btnCancelReg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancelReg.Location = new System.Drawing.Point(109, 3);
-        this._btnCancelReg.Name = "_btnCancelReg";
-        this._btnCancelReg.Size = new System.Drawing.Size(80, 32);
-        this._btnCancelReg.TabIndex = 1;
-        this._btnCancelReg.Text = "إلغاء";
-        this._btnCancelReg.UseVisualStyleBackColor = false;
-        // 
         // _grpHolder
         // 
         this._grpHolder.BackColor = System.Drawing.Color.White;
         this._grpHolder.Controls.Add(this._tblHolder);
         this._grpHolder.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpHolder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpHolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._grpHolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpHolder.Location = new System.Drawing.Point(0, 0);
         this._grpHolder.Name = "_grpHolder";
         this._grpHolder.Padding = new System.Windows.Forms.Padding(8);
         this._grpHolder.Size = new System.Drawing.Size(500, 254);
         this._grpHolder.TabIndex = 0;
         this._grpHolder.TabStop = false;
-        this._grpHolder.Text = "بيانات الزبون";
+        this._grpHolder.Text = "بيانات الزائر";
         // 
         // _tblHolder
         // 
@@ -489,7 +243,7 @@ partial class CheckInDeskControl
         this._tblHolder.Controls.Add(this._lblHolderStatusTitle, 0, 6);
         this._tblHolder.Controls.Add(this._lblHolderStatus, 1, 6);
         this._tblHolder.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._tblHolder.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._tblHolder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblHolder.Location = new System.Drawing.Point(8, 26);
         this._tblHolder.Name = "_tblHolder";
         this._tblHolder.RowCount = 7;
@@ -507,18 +261,18 @@ partial class CheckInDeskControl
         // 
         this._lblHolderNameTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderNameTitle.AutoSize = true;
-        this._lblHolderNameTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderNameTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderNameTitle.Location = new System.Drawing.Point(404, 7);
         this._lblHolderNameTitle.Name = "_lblHolderNameTitle";
         this._lblHolderNameTitle.Size = new System.Drawing.Size(77, 17);
         this._lblHolderNameTitle.TabIndex = 0;
-        this._lblHolderNameTitle.Text = "اسم الزبون:";
+        this._lblHolderNameTitle.Text = "اسم الزائر:";
         // 
         // _lblHolderName
         // 
         this._lblHolderName.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderName.AutoSize = true;
-        this._lblHolderName.Font = new System.Drawing.Font("Cairo", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderName.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblHolderName.Location = new System.Drawing.Point(336, 5);
         this._lblHolderName.Name = "_lblHolderName";
@@ -530,7 +284,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderPhoneTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderPhoneTitle.AutoSize = true;
-        this._lblHolderPhoneTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderPhoneTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderPhoneTitle.Location = new System.Drawing.Point(407, 38);
         this._lblHolderPhoneTitle.Name = "_lblHolderPhoneTitle";
         this._lblHolderPhoneTitle.Size = new System.Drawing.Size(74, 17);
@@ -551,7 +305,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderOrgTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderOrgTitle.AutoSize = true;
-        this._lblHolderOrgTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderOrgTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderOrgTitle.Location = new System.Drawing.Point(435, 69);
         this._lblHolderOrgTitle.Name = "_lblHolderOrgTitle";
         this._lblHolderOrgTitle.Size = new System.Drawing.Size(46, 17);
@@ -572,7 +326,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderNatIdTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderNatIdTitle.AutoSize = true;
-        this._lblHolderNatIdTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderNatIdTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderNatIdTitle.Location = new System.Drawing.Point(398, 100);
         this._lblHolderNatIdTitle.Name = "_lblHolderNatIdTitle";
         this._lblHolderNatIdTitle.Size = new System.Drawing.Size(83, 17);
@@ -593,7 +347,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderExpiryTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderExpiryTitle.AutoSize = true;
-        this._lblHolderExpiryTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderExpiryTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderExpiryTitle.Location = new System.Drawing.Point(404, 131);
         this._lblHolderExpiryTitle.Name = "_lblHolderExpiryTitle";
         this._lblHolderExpiryTitle.Size = new System.Drawing.Size(77, 17);
@@ -614,7 +368,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderLastEntryTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderLastEntryTitle.AutoSize = true;
-        this._lblHolderLastEntryTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderLastEntryTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderLastEntryTitle.Location = new System.Drawing.Point(397, 162);
         this._lblHolderLastEntryTitle.Name = "_lblHolderLastEntryTitle";
         this._lblHolderLastEntryTitle.Size = new System.Drawing.Size(84, 17);
@@ -635,7 +389,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderStatusTitle.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderStatusTitle.AutoSize = true;
-        this._lblHolderStatusTitle.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderStatusTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderStatusTitle.Location = new System.Drawing.Point(403, 198);
         this._lblHolderStatusTitle.Name = "_lblHolderStatusTitle";
         this._lblHolderStatusTitle.Size = new System.Drawing.Size(78, 17);
@@ -646,7 +400,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderStatus.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderStatus.AutoSize = true;
-        this._lblHolderStatus.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderStatus.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderStatus.Location = new System.Drawing.Point(338, 198);
         this._lblHolderStatus.Name = "_lblHolderStatus";
         this._lblHolderStatus.Size = new System.Drawing.Size(13, 17);
@@ -659,14 +413,14 @@ partial class CheckInDeskControl
         this._grpCompanions.Controls.Add(this._flowCounters);
         this._grpCompanions.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpCompanions.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._grpCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpCompanions.Location = new System.Drawing.Point(0, 0);
         this._grpCompanions.Name = "_grpCompanions";
         this._grpCompanions.Padding = new System.Windows.Forms.Padding(8);
         this._grpCompanions.Size = new System.Drawing.Size(484, 254);
         this._grpCompanions.TabIndex = 0;
         this._grpCompanions.TabStop = false;
-        this._grpCompanions.Text = "المرافقون مع الزبون";
+        this._grpCompanions.Text = "المرافقون مع الزائر";
         // 
         // _flowCounters
         // 
@@ -720,7 +474,7 @@ partial class CheckInDeskControl
         this._btnRecordEntry.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnRecordEntry.FlatAppearance.BorderSize = 0;
         this._btnRecordEntry.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnRecordEntry.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnRecordEntry.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnRecordEntry.ForeColor = System.Drawing.Color.White;
         this._btnRecordEntry.Location = new System.Drawing.Point(448, 2);
         this._btnRecordEntry.Margin = new System.Windows.Forms.Padding(3, 2, 0, 2);
@@ -760,17 +514,17 @@ partial class CheckInDeskControl
         this._btnNewHolder.Name = "_btnNewHolder";
         this._btnNewHolder.Size = new System.Drawing.Size(140, 42);
         this._btnNewHolder.TabIndex = 2;
-        this._btnNewHolder.Text = "زبون جديد (F2)";
+        this._btnNewHolder.Text = "زائر جديد (F2)";
         this._btnNewHolder.UseVisualStyleBackColor = false;
         // 
         // _btnClear
         // 
-        this._btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnClear.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnClear.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._btnClear.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnClear.Location = new System.Drawing.Point(13, 2);
         this._btnClear.Margin = new System.Windows.Forms.Padding(0, 2, 5, 2);
         this._btnClear.Name = "_btnClear";
@@ -799,20 +553,20 @@ partial class CheckInDeskControl
         // 
         this._lblTotalPersons.AutoSize = true;
         this._lblTotalPersons.Dock = System.Windows.Forms.DockStyle.Right;
-        this._lblTotalPersons.Font = new System.Drawing.Font("Cairo", 11.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTotalPersons.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblTotalPersons.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblTotalPersons.Location = new System.Drawing.Point(140, 2);
         this._lblTotalPersons.Name = "_lblTotalPersons";
         this._lblTotalPersons.Size = new System.Drawing.Size(190, 38);
         this._lblTotalPersons.TabIndex = 0;
-        this._lblTotalPersons.Text = "الإجمالي مع الزبون: 1 فرد";
+        this._lblTotalPersons.Text = "الإجمالي مع الزائر: 1 فرد";
         this._lblTotalPersons.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
         // 
         // _lblFreeCompanions
         // 
         this._lblFreeCompanions.AutoSize = true;
         this._lblFreeCompanions.Dock = System.Windows.Forms.DockStyle.Right;
-        this._lblFreeCompanions.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblFreeCompanions.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblFreeCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(90)))), ((int)(((byte)(100)))));
         this._lblFreeCompanions.Location = new System.Drawing.Point(80, 2);
         this._lblFreeCompanions.Name = "_lblFreeCompanions";
@@ -831,7 +585,7 @@ partial class CheckInDeskControl
         this._lblCompanionsNotice.Name = "_lblCompanionsNotice";
         this._lblCompanionsNotice.Size = new System.Drawing.Size(155, 38);
         this._lblCompanionsNotice.TabIndex = 1;
-        this._lblCompanionsNotice.Text = "(الزبون محتسب تلقائياً +1 فرد)";
+        this._lblCompanionsNotice.Text = "(الزائر محتسب تلقائياً +1 فرد)";
         this._lblCompanionsNotice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         // 
         // _giftPanel
@@ -843,135 +597,31 @@ partial class CheckInDeskControl
         this._giftPanel.Size = new System.Drawing.Size(988, 70);
         this._giftPanel.TabIndex = 4;
         this._giftPanel.Visible = false;
-        // 
-        // _grpToday
-        // 
-        this._grpToday.BackColor = System.Drawing.Color.White;
-        this._grpToday.Controls.Add(this._gridToday);
-        this._grpToday.Controls.Add(this._lblTodaySummary);
-        this._grpToday.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpToday.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpToday.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._grpToday.Location = new System.Drawing.Point(0, 428);
-        this._grpToday.Margin = new System.Windows.Forms.Padding(0);
-        this._grpToday.Name = "_grpToday";
-        this._grpToday.Padding = new System.Windows.Forms.Padding(6);
-        this._grpToday.Size = new System.Drawing.Size(988, 213);
-        this._grpToday.TabIndex = 4;
-        this._grpToday.TabStop = false;
-        this._grpToday.Text = "سجل الدخول لهذا اليوم بالمحطة (آخر 20 محاولة)";
-        // 
-        // _gridToday
-        // 
-        this._gridToday.AllowUserToAddRows = false;
-        this._gridToday.AllowUserToDeleteRows = false;
-        this._gridToday.AllowUserToResizeRows = false;
-        this._gridToday.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-        this._gridToday.BackgroundColor = System.Drawing.Color.White;
-        this._gridToday.BorderStyle = System.Windows.Forms.BorderStyle.None;
-        this._gridToday.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
-        this._gridToday.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-        dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-        dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
-        dataGridViewCellStyle1.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(4);
-        dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
-        dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-        this._gridToday.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-        this._gridToday.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-        this._gridToday.ColumnHeadersHeight = 36;
-        this._gridToday.RowTemplate.Height = 32;
-        this._gridToday.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._colTime,
-            this._colCard,
-            this._colName,
-            this._colOrg,
-            this._colPersons,
-            this._colResult});
-        dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-        dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
-        dataGridViewCellStyle2.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(3);
-        dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
-        dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
-        dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-        this._gridToday.DefaultCellStyle = dataGridViewCellStyle2;
-        this._gridToday.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._gridToday.EnableHeadersVisualStyles = false;
-        this._gridToday.Location = new System.Drawing.Point(6, 23);
-        this._gridToday.MultiSelect = false;
-        this._gridToday.Name = "_gridToday";
-        this._gridToday.ReadOnly = true;
-        this._gridToday.RowHeadersVisible = false;
-        this._gridToday.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-        this._gridToday.Size = new System.Drawing.Size(976, 152);
-        this._gridToday.TabIndex = 0;
-        // 
-        // _colTime
-        // 
-        this._colTime.FillWeight = 60F;
-        this._colTime.HeaderText = "الوقت";
-        this._colTime.Name = "_colTime";
-        this._colTime.ReadOnly = true;
-        // 
-        // _colCard
-        // 
-        this._colCard.FillWeight = 80F;
-        this._colCard.HeaderText = "رقم البطاقة";
-        this._colCard.Name = "_colCard";
-        this._colCard.ReadOnly = true;
-        // 
-        // _colName
-        // 
-        this._colName.FillWeight = 120F;
-        this._colName.HeaderText = "اسم الزبون";
-        this._colName.Name = "_colName";
-        this._colName.ReadOnly = true;
-        // 
-        // _colOrg
-        // 
-        this._colOrg.FillWeight = 100F;
-        this._colOrg.HeaderText = "الجهة";
-        this._colOrg.Name = "_colOrg";
-        this._colOrg.ReadOnly = true;
-        // 
-        // _colPersons
-        // 
-        this._colPersons.FillWeight = 50F;
-        this._colPersons.HeaderText = "الأفراد";
-        this._colPersons.Name = "_colPersons";
-        this._colPersons.ReadOnly = true;
-        // 
-        // _colResult
-        // 
-        this._colResult.FillWeight = 70F;
-        this._colResult.HeaderText = "النتيجة";
-        this._colResult.Name = "_colResult";
-        this._colResult.ReadOnly = true;
-        // 
-        // _lblTodaySummary
-        // 
-        this._lblTodaySummary.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
-        this._lblTodaySummary.Dock = System.Windows.Forms.DockStyle.Bottom;
-        this._lblTodaySummary.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblTodaySummary.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._lblTodaySummary.Location = new System.Drawing.Point(6, 175);
-        this._lblTodaySummary.Name = "_lblTodaySummary";
-        this._lblTodaySummary.Padding = new System.Windows.Forms.Padding(8, 2, 8, 2);
-        this._lblTodaySummary.Size = new System.Drawing.Size(976, 32);
-        this._lblTodaySummary.TabIndex = 1;
-        this._lblTodaySummary.Text = "المقبول: 0 | التجاوز: 0 | المرفوض: 0 | إجمالي الأفراد: 0";
-        this._lblTodaySummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+        //
+        // _registrationPanel
+        //
+        this._registrationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._registrationPanel.Location = new System.Drawing.Point(0, 0);
+        this._registrationPanel.Name = "_registrationPanel";
+        this._registrationPanel.Size = new System.Drawing.Size(500, 289);
+        this._registrationPanel.TabIndex = 1;
+        this._registrationPanel.Visible = false;
+        //
+        // _todayPanel
+        //
+        this._todayPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._todayPanel.Location = new System.Drawing.Point(0, 428);
+        this._todayPanel.Margin = new System.Windows.Forms.Padding(0);
+        this._todayPanel.Name = "_todayPanel";
+        this._todayPanel.Size = new System.Drawing.Size(988, 213);
+        this._todayPanel.TabIndex = 4;
         // 
         // CheckInDeskControl
         // 
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.AutoScroll = true;
-        this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
+        this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
         this.Controls.Add(this._mainLayout);
         this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.Name = "CheckInDeskControl";
@@ -985,10 +635,6 @@ partial class CheckInDeskControl
         this._splitMiddle.Panel2.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)(this._splitMiddle)).EndInit();
         this._splitMiddle.ResumeLayout(false);
-        this._grpRegistration.ResumeLayout(false);
-        this._tblRegistration.ResumeLayout(false);
-        this._tblRegistration.PerformLayout();
-        this._pnlRegActions.ResumeLayout(false);
         this._grpHolder.ResumeLayout(false);
         this._tblHolder.ResumeLayout(false);
         this._tblHolder.PerformLayout();
@@ -997,14 +643,14 @@ partial class CheckInDeskControl
         this._pnlCompanionsTotal.PerformLayout();
         this._pnlActions.ResumeLayout(false);
         this._flowActions.ResumeLayout(false);
-        this._grpToday.ResumeLayout(false);
-        ((System.ComponentModel.ISupportInitialize)(this._gridToday)).EndInit();
         this.ResumeLayout(false);
 
     }
 
     #endregion
 
+    private ParkGate.WinForms.Controls.InlineRegistrationPanel _registrationPanel;
+    private ParkGate.WinForms.Controls.TodayEntriesPanel _todayPanel;
     private System.Windows.Forms.TableLayoutPanel _mainLayout;
     private System.Windows.Forms.Panel _pnlSearch;
     private System.Windows.Forms.Label _lblCardNumber;
@@ -1030,23 +676,6 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Label _lblHolderLastEntry;
     private System.Windows.Forms.Label _lblHolderStatusTitle;
     private System.Windows.Forms.Label _lblHolderStatus;
-    private System.Windows.Forms.GroupBox _grpRegistration;
-    private System.Windows.Forms.TableLayoutPanel _tblRegistration;
-    private System.Windows.Forms.Label _lblRegOrganization;
-    private System.Windows.Forms.ComboBox _cmbRegOrganization;
-    private System.Windows.Forms.Label _lblRegFullName;
-    private System.Windows.Forms.TextBox _txtRegFullName;
-    private System.Windows.Forms.Label _lblRegPhone;
-    private System.Windows.Forms.TextBox _txtRegPhone;
-    private System.Windows.Forms.Label _lblRegNationalId;
-    private System.Windows.Forms.TextBox _txtRegNationalId;
-    private System.Windows.Forms.Label _lblRegExpiry;
-    private System.Windows.Forms.DateTimePicker _dtpRegExpiry;
-    private System.Windows.Forms.Label _lblRegNotes;
-    private System.Windows.Forms.TextBox _txtRegNotes;
-    private System.Windows.Forms.FlowLayoutPanel _pnlRegActions;
-    private System.Windows.Forms.Button _btnSaveReg;
-    private System.Windows.Forms.Button _btnCancelReg;
     private System.Windows.Forms.GroupBox _grpCompanions;
     private System.Windows.Forms.FlowLayoutPanel _flowCounters;
     private System.Windows.Forms.Panel _pnlCompanionsTotal;
@@ -1060,13 +689,4 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Button _btnOverride;
     private System.Windows.Forms.Button _btnNewHolder;
     private System.Windows.Forms.Button _btnClear;
-    private System.Windows.Forms.GroupBox _grpToday;
-    private System.Windows.Forms.DataGridView _gridToday;
-    private System.Windows.Forms.DataGridViewTextBoxColumn _colTime;
-    private System.Windows.Forms.DataGridViewTextBoxColumn _colCard;
-    private System.Windows.Forms.DataGridViewTextBoxColumn _colName;
-    private System.Windows.Forms.DataGridViewTextBoxColumn _colOrg;
-    private System.Windows.Forms.DataGridViewTextBoxColumn _colPersons;
-    private System.Windows.Forms.DataGridViewTextBoxColumn _colResult;
-    private System.Windows.Forms.Label _lblTodaySummary;
 }

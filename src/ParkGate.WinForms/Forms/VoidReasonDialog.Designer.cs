@@ -87,13 +87,14 @@ partial class VoidReasonDialog
         // 
         // _lblWarning
         // 
-        this._lblWarning.AutoSize = true;
+        this._lblWarning.AutoSize = false;
+        this._lblWarning.Dock = System.Windows.Forms.DockStyle.Fill;
         this._lblWarning.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(198)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
         this._lblWarning.Location = new System.Drawing.Point(23, 48);
         this._lblWarning.Name = "_lblWarning";
         this._lblWarning.Size = new System.Drawing.Size(438, 38);
         this._lblWarning.TabIndex = 1;
-        this._lblWarning.Text = "تنبيه: سيؤدي إلغاء الحركة إلى إعادة احتساب آخر دخول مسموح للمستفيد تلقائياً والسماح بالدخول إذا استوفى الشروط.";
+        this._lblWarning.Text = "تنبيه: الإلغاء يعيد احتساب آخر دخول للزائر تلقائياً.";
         // 
         // _lblReasonPrompt
         // 
@@ -149,7 +150,7 @@ partial class VoidReasonDialog
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnCancel.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnCancel.Location = new System.Drawing.Point(218, 9);
         this._btnCancel.Name = "_btnCancel";
@@ -161,8 +162,8 @@ partial class VoidReasonDialog
         // VoidReasonDialog
         // 
         this.AcceptButton = this._btnConfirm;
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
         this.ClientSize = new System.Drawing.Size(480, 336);
         this.Controls.Add(this._tblLayout);

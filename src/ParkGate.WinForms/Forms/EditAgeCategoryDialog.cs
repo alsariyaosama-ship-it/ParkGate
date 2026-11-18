@@ -14,28 +14,24 @@ namespace ParkGate.WinForms.Forms;
 /// </summary>
 public partial class EditAgeCategoryDialog : RtlFormBase
 {
-    private readonly IAgeCategoryService? _ageCategoryService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<EditAgeCategoryDialog>? _logger;
+    private readonly IAgeCategoryService _ageCategoryService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<EditAgeCategoryDialog> _logger;
 
     private AgeCategoryDto? _existingCategory;
 
     public AgeCategoryDto? SavedCategory { get; private set; }
 
-    public EditAgeCategoryDialog() : this(null, null, null)
-    {
-    }
-
     public EditAgeCategoryDialog(
-        IAgeCategoryService? ageCategoryService,
-        INotifyService? notifyService,
-        ILogger<EditAgeCategoryDialog>? logger)
+        IAgeCategoryService ageCategoryService,
+        INotifyService notifyService,
+        ILogger<EditAgeCategoryDialog> logger)
     {
         InitializeComponent();
 
-        _ageCategoryService = ageCategoryService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _ageCategoryService = ageCategoryService ?? throw new ArgumentNullException(nameof(ageCategoryService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         WireEvents();
@@ -74,11 +70,6 @@ public partial class EditAgeCategoryDialog : RtlFormBase
 
     public async Task SaveAsync()
     {
-        if (_ageCategoryService == null)
-        {
-            return;
-        }
-
         var nameAr = _txtNameAr.Text.Trim();
         var descriptionAr = string.IsNullOrWhiteSpace(_txtDescriptionAr.Text)
             ? null
@@ -104,7 +95,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
                     if (result.IsSuccess)
                     {
                         SavedCategory = result.Value;
-                        _notifyService?.Info(Strings.Msg_SaveAgeSuccess);
+                        _notifyService.Info(Strings.Msg_SaveAgeSuccess);
                         DialogResult = DialogResult.OK;
                         Close();
                     }
@@ -120,7 +111,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
                     if (result.IsSuccess)
                     {
                         SavedCategory = result.Value;
-                        _notifyService?.Info(Strings.Msg_SaveAgeSuccess);
+                        _notifyService.Info(Strings.Msg_SaveAgeSuccess);
                         DialogResult = DialogResult.OK;
                         Close();
                     }
@@ -132,7 +123,7 @@ public partial class EditAgeCategoryDialog : RtlFormBase
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error saving age category.");
+                _logger.LogError(ex, "Error saving age category.");
                 ShowError(UserMessages.Describe(ex));
             }
         }
@@ -140,37 +131,11 @@ public partial class EditAgeCategoryDialog : RtlFormBase
 
     private void ShowWarning(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Warning(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Warning,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        _notifyService.Warning(message);
     }
 
     private void ShowError(string message)
     {
-        if (_notifyService != null)
-        {
-            _notifyService.Error(message);
-        }
-        else
-        {
-            MessageBox.Show(
-                message,
-                Strings.Title_Error,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-        }
+        _notifyService.Error(message);
     }
 }

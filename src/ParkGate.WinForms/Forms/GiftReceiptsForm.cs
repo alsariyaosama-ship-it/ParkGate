@@ -17,38 +17,34 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class GiftReceiptsForm : RtlFormBase
 {
-    private readonly IGiftReportService? _giftReportService;
-    private readonly IGiftExcelExportService? _giftExcelExportService;
-    private readonly IOrganizationService? _organizationService;
-    private readonly ISettingsService? _settingsService;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<GiftReceiptsForm>? _logger;
+    private readonly IGiftReportService _giftReportService;
+    private readonly IGiftExcelExportService _giftExcelExportService;
+    private readonly IOrganizationService _organizationService;
+    private readonly ISettingsService _settingsService;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<GiftReceiptsForm> _logger;
 
     private List<OrganizationDto> _organizations = [];
     private GiftReceiptReportDto? _currentReport;
     private string _timeZoneId = "Libya Standard Time";
     private bool _isBusy;
 
-    public GiftReceiptsForm() : this(null, null, null, null, null, null)
-    {
-    }
-
     public GiftReceiptsForm(
-        IGiftReportService? giftReportService,
-        IGiftExcelExportService? giftExcelExportService,
-        IOrganizationService? organizationService,
-        ISettingsService? settingsService,
-        INotifyService? notifyService,
-        ILogger<GiftReceiptsForm>? logger)
+        IGiftReportService giftReportService,
+        IGiftExcelExportService giftExcelExportService,
+        IOrganizationService organizationService,
+        ISettingsService settingsService,
+        INotifyService notifyService,
+        ILogger<GiftReceiptsForm> logger)
     {
         InitializeComponent();
 
-        _giftReportService = giftReportService;
-        _giftExcelExportService = giftExcelExportService;
-        _organizationService = organizationService;
-        _settingsService = settingsService;
-        _notifyService = notifyService;
-        _logger = logger;
+        _giftReportService = giftReportService ?? throw new ArgumentNullException(nameof(giftReportService));
+        _giftExcelExportService = giftExcelExportService ?? throw new ArgumentNullException(nameof(giftExcelExportService));
+        _organizationService = organizationService ?? throw new ArgumentNullException(nameof(organizationService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         Theme.ApplyGridStyle(_gridReceipts);
@@ -67,10 +63,12 @@ public partial class GiftReceiptsForm : RtlFormBase
         _btnRefresh.Text = Strings.Btn_Refresh;
         _btnExportExcel.Text = Strings.Btn_ExportExcel;
         _btnPrintPreview.Text = Strings.Btn_Print;
+        _btnClose.Text = Strings.Btn_Close;
 
         Theme.ApplyPrimaryButtonStyle(_btnRefresh);
         Theme.ApplyPrimaryButtonStyle(_btnExportExcel);
         Theme.ApplySecondaryButtonStyle(_btnPrintPreview);
+        Theme.ApplySecondaryButtonStyle(_btnClose);
     }
 
     private void SetupColumns()
@@ -178,17 +176,15 @@ public partial class GiftReceiptsForm : RtlFormBase
         _btnRefresh.Click += async (_, _) => await LoadReportAsync();
         _btnExportExcel.Click += async (_, _) => await ExportExcelAsync();
         _btnPrintPreview.Click += (_, _) => ShowPrintPreview();
+        _btnClose.Click += (_, _) => Close();
     }
 
     private async Task OnFormLoadAsync()
     {
         try
         {
-            if (_settingsService != null)
-            {
-                var settings = await _settingsService.GetSettingsAsync();
-                _timeZoneId = settings.TimeZoneId;
-            }
+            var settings = await _settingsService.GetSettingsAsync();
+            _timeZoneId = settings.TimeZoneId;
 
             // Populate status filter combo
             _cmbStatus.Items.Clear();
@@ -203,30 +199,27 @@ public partial class GiftReceiptsForm : RtlFormBase
             _dtpToDate.Value = DateTime.Today;
 
             // Load organizations
-            if (_organizationService != null)
+            _organizations = (await _organizationService.GetAllAsync()).ToList();
+            _cmbOrganization.Items.Clear();
+            _cmbOrganization.Items.Add(new ComboBoxItem<int?>(null, Strings.Filter_AllOrganizations));
+            foreach (var org in _organizations)
             {
-                _organizations = (await _organizationService.GetAllAsync()).ToList();
-                _cmbOrganization.Items.Clear();
-                _cmbOrganization.Items.Add(new ComboBoxItem<int?>(null, Strings.Filter_AllOrganizations));
-                foreach (var org in _organizations)
-                {
-                    _cmbOrganization.Items.Add(new ComboBoxItem<int?>(org.Id, org.NameAr));
-                }
-                _cmbOrganization.SelectedIndex = 0;
+                _cmbOrganization.Items.Add(new ComboBoxItem<int?>(org.Id, org.NameAr));
             }
+            _cmbOrganization.SelectedIndex = 0;
 
             await LoadReportAsync();
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to initialize GiftReceiptsForm");
-            _notifyService?.Error(UserMessages.Describe(ex));
+            _logger.LogError(ex, "Failed to initialize GiftReceiptsForm");
+            _notifyService.Error(UserMessages.Describe(ex));
         }
     }
 
     public async Task LoadReportAsync()
     {
-        if (_isBusy || _giftReportService == null)
+        if (_isBusy)
         {
             return;
         }
@@ -252,7 +245,7 @@ public partial class GiftReceiptsForm : RtlFormBase
             var result = await _giftReportService.GetReceiptsAsync(from, to, orgId, null, filter);
             if (!result.IsSuccess)
             {
-                _notifyService?.Error(ErrorMessages.GetMessage(result.Error.Code));
+                _notifyService.Error(ErrorMessages.GetMessage(result.Error.Code));
                 return;
             }
 
@@ -262,8 +255,8 @@ public partial class GiftReceiptsForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to load gift receipts report");
-            _notifyService?.Error(UserMessages.Describe(ex));
+            _logger.LogError(ex, "Failed to load gift receipts report");
+            _notifyService.Error(UserMessages.Describe(ex));
         }
         finally
         {
@@ -358,11 +351,11 @@ public partial class GiftReceiptsForm : RtlFormBase
 
     public async Task ExportExcelAsync()
     {
-        if (_isBusy || _currentReport == null || _currentReport.Rows.Count == 0 || _giftExcelExportService == null)
+        if (_isBusy || _currentReport == null || _currentReport.Rows.Count == 0)
         {
             if (_currentReport == null || _currentReport.Rows.Count == 0)
             {
-                _notifyService?.Info(Strings.Msg_NoGiftReceiptsFound);
+                _notifyService.Info(Strings.Msg_NoGiftReceiptsFound);
             }
             return;
         }
@@ -384,12 +377,12 @@ public partial class GiftReceiptsForm : RtlFormBase
         {
             var bytes = _giftExcelExportService.ExportGiftReceipts(_currentReport, _timeZoneId);
             await File.WriteAllBytesAsync(sfd.FileName, bytes);
-            _notifyService?.Info(Strings.Msg_ExportExcelSuccess);
+            _notifyService.Info(Strings.Msg_ExportExcelSuccess);
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to export gift receipts to Excel");
-            _notifyService?.Error(UserMessages.Describe(ex));
+            _logger.LogError(ex, "Failed to export gift receipts to Excel");
+            _notifyService.Error(UserMessages.Describe(ex));
         }
         finally
         {
@@ -401,7 +394,7 @@ public partial class GiftReceiptsForm : RtlFormBase
     {
         if (_currentReport == null || _currentReport.Rows.Count == 0)
         {
-            _notifyService?.Info(Strings.Msg_NoGiftReceiptsFound);
+            _notifyService.Info(Strings.Msg_NoGiftReceiptsFound);
             return;
         }
 
@@ -423,8 +416,8 @@ public partial class GiftReceiptsForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to show print preview for gift receipts");
-            _notifyService?.Error(UserMessages.Describe(ex));
+            _logger.LogError(ex, "Failed to show print preview for gift receipts");
+            _notifyService.Error(UserMessages.Describe(ex));
         }
     }
 
@@ -474,7 +467,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         for (int c = 0; c < printHeaders.Length; c++)
         {
             var rect = new RectangleF(x + (printHeaders.Length - 1 - c) * colWidth, y, colWidth, 24);
-            g.FillRectangle(new SolidBrush(Color.FromArgb(27, 135, 63)), rect);
+            g.FillRectangle(new SolidBrush(Theme.Success), rect);
             g.DrawRectangle(Pens.DarkGreen, rect.X, rect.Y, rect.Width, rect.Height);
             g.DrawString(printHeaders[c], fontHeader, Brushes.White, rect, sfCenter);
         }
@@ -503,7 +496,7 @@ public partial class GiftReceiptsForm : RtlFormBase
                     var rect = new RectangleF(x + (vals.Length - 1 - c) * colWidth, y, colWidth, 20);
                     if (r % 2 == 1)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(248, 250, 252)), rect);
+                        g.FillRectangle(new SolidBrush(Theme.Background), rect);
                     }
                     g.DrawRectangle(Pens.LightGray, rect.X, rect.Y, rect.Width, rect.Height);
                     g.DrawString(vals[c], fontData, Brushes.Black, rect, sfCenter);
@@ -513,7 +506,7 @@ public partial class GiftReceiptsForm : RtlFormBase
 
             // Summary line
             y += 10;
-            g.DrawString(_lblSummary.Text, fontSummary, new SolidBrush(Color.FromArgb(27, 135, 63)), new RectangleF(x, y, width, 25), sfRight);
+            g.DrawString(_lblSummary.Text, fontSummary, new SolidBrush(Theme.Success), new RectangleF(x, y, width, 25), sfRight);
         }
 
         e.HasMorePages = false;

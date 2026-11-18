@@ -146,7 +146,7 @@ partial class MainForm
         // 
         _menuBeneficiaries.Name = "_menuBeneficiaries";
         _menuBeneficiaries.Size = new Size(312, 36);
-        _menuBeneficiaries.Text = "الزبائن";
+        _menuBeneficiaries.Text = "الزوار";
         // 
         // _menuManagementSep1
         // 
@@ -175,7 +175,7 @@ partial class MainForm
         // 
         _menuWorkstations.Name = "_menuWorkstations";
         _menuWorkstations.Size = new Size(312, 36);
-        _menuWorkstations.Text = "محطات العمل";
+        _menuWorkstations.Text = "الشبابيك";
         // 
         // _menuManagementSep2
         // 
@@ -234,7 +234,7 @@ partial class MainForm
         // 
         // _statusStrip
         // 
-        _statusStrip.Font = new Font("Cairo", 9.5F);
+        _statusStrip.Font = new Font("Cairo", 10F);
         _statusStrip.ImageScalingSize = new Size(20, 20);
         _statusStrip.Items.AddRange(new ToolStripItem[] { _statusUser, _statusWorkstation, _statusServerTime, _statusConnection, _statusSync });
         _statusStrip.Location = new Point(0, 852);
@@ -261,7 +261,7 @@ partial class MainForm
         _statusWorkstation.Name = "_statusWorkstation";
         _statusWorkstation.Padding = new Padding(10, 2, 10, 2);
         _statusWorkstation.Size = new Size(102, 38);
-        _statusWorkstation.Text = "المحطة: -";
+        _statusWorkstation.Text = "الشباك: -";
         // 
         // _statusServerTime
         // 
@@ -293,7 +293,7 @@ partial class MainForm
         // 
         // _mainContainer
         // 
-        _mainContainer.BackColor = Color.FromArgb(245, 247, 250);
+        _mainContainer.BackColor = Color.FromArgb(248, 250, 252);
         _mainContainer.Controls.Add(_welcomeCard);
         _mainContainer.Dock = DockStyle.Fill;
         _mainContainer.Location = new Point(0, 48);
@@ -322,27 +322,27 @@ partial class MainForm
         // _lblQuickInfo
         // 
         _lblQuickInfo.Dock = DockStyle.Fill;
-        _lblQuickInfo.Font = new Font("Cairo", 10.5F);
+        _lblQuickInfo.Font = new Font("Cairo", 10F);
         _lblQuickInfo.ForeColor = Color.FromArgb(69, 90, 100);
         _lblQuickInfo.Location = new Point(40, 190);
         _lblQuickInfo.Margin = new Padding(4, 0, 4, 0);
         _lblQuickInfo.Name = "_lblQuickInfo";
         _lblQuickInfo.Size = new Size(730, 218);
         _lblQuickInfo.TabIndex = 2;
-        _lblQuickInfo.Text = "اضغط F1 لفتح شباك الدخول وتسجيل المستفيدين.\r\nاستخدم القوائم أعلاه لإدارة النظام أو عرض التقارير حسب الصلاحيات الممنوحة.";
+        _lblQuickInfo.Text = "اضغط F1 لفتح شباك الدخول وتسجيل الزوار.\r\nاستخدم القوائم أعلاه لإدارة النظام أو عرض التقارير حسب الصلاحيات الممنوحة.";
         _lblQuickInfo.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _lblWelcomeSubtitle
         // 
         _lblWelcomeSubtitle.Dock = DockStyle.Top;
         _lblWelcomeSubtitle.Font = new Font("Cairo", 12F);
-        _lblWelcomeSubtitle.ForeColor = Color.FromArgb(45, 55, 72);
+        _lblWelcomeSubtitle.ForeColor = Color.FromArgb(30, 41, 59);
         _lblWelcomeSubtitle.Location = new Point(40, 115);
         _lblWelcomeSubtitle.Margin = new Padding(4, 0, 4, 0);
         _lblWelcomeSubtitle.Name = "_lblWelcomeSubtitle";
         _lblWelcomeSubtitle.Size = new Size(730, 75);
         _lblWelcomeSubtitle.TabIndex = 1;
-        _lblWelcomeSubtitle.Text = "منظومة التحكم في الدخول المجاني لزبائن بطاقات الدعم والرعاية";
+        _lblWelcomeSubtitle.Text = "منظومة التحكم في الدخول المجاني لزوار بطاقات الدعم والرعاية";
         _lblWelcomeSubtitle.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _lblWelcomeParkName

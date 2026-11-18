@@ -22,14 +22,14 @@ namespace ParkGate.WinForms.Controls;
 /// </summary>
 public partial class BeneficiariesControl : UserControl
 {
-    private readonly IBeneficiaryService? _beneficiaryService;
-    private readonly ICheckInService? _checkInService;
-    private readonly ISettingsService? _settingsService;
-    private readonly ICurrentUser? _currentUser;
-    private readonly ICurrentWorkstation? _currentWorkstation;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<BeneficiariesControl>? _logger;
+    private readonly IBeneficiaryService _beneficiaryService;
+    private readonly ICheckInService _checkInService;
+    private readonly ISettingsService _settingsService;
+    private readonly ICurrentUser _currentUser;
+    private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<BeneficiariesControl> _logger;
 
     private readonly List<BeneficiaryDto> _loadedBeneficiaries = [];
     private BeneficiaryDto? _selectedBeneficiary;
@@ -38,30 +38,26 @@ public partial class BeneficiariesControl : UserControl
 
     public event EventHandler<string>? RequestCheckIn;
 
-    public BeneficiariesControl() : this(null, null, null, null, null, null, null, null)
-    {
-    }
-
     public BeneficiariesControl(
-        IBeneficiaryService? beneficiaryService,
-        ICheckInService? checkInService,
-        ISettingsService? settingsService,
-        ICurrentUser? currentUser,
-        ICurrentWorkstation? currentWorkstation,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<BeneficiariesControl>? logger)
+        IBeneficiaryService beneficiaryService,
+        ICheckInService checkInService,
+        ISettingsService settingsService,
+        ICurrentUser currentUser,
+        ICurrentWorkstation currentWorkstation,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<BeneficiariesControl> logger)
     {
         InitializeComponent();
 
-        _beneficiaryService = beneficiaryService;
-        _checkInService = checkInService;
-        _settingsService = settingsService;
-        _currentUser = currentUser;
-        _currentWorkstation = currentWorkstation;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
+        _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
+        _checkInService = checkInService ?? throw new ArgumentNullException(nameof(checkInService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         InitializeFormText();
         ApplyStyles();
@@ -131,9 +127,9 @@ public partial class BeneficiariesControl : UserControl
 
     public void ApplyPermissions()
     {
-        var canEdit = _currentUser?.Has(Permission.EditBeneficiary) ?? false;
-        var canChangeStatus = _currentUser?.Has(Permission.ChangeBeneficiaryStatus) ?? false;
-        var canCheckIn = _currentUser?.Has(Permission.CheckIn) ?? false;
+        var canEdit = _currentUser.Has(Permission.EditBeneficiary);
+        var canChangeStatus = _currentUser.Has(Permission.ChangeBeneficiaryStatus);
+        var canCheckIn = _currentUser.Has(Permission.CheckIn);
 
         _btnEdit.Visible = canEdit;
         _btnChangeStatus.Visible = canChangeStatus;
@@ -188,15 +184,12 @@ public partial class BeneficiariesControl : UserControl
     {
         try
         {
-            if (_settingsService != null)
-            {
-                var settings = await _settingsService.GetSettingsAsync();
-                _timeZoneId = settings.TimeZoneId;
-            }
+            var settings = await _settingsService.GetSettingsAsync();
+            _timeZoneId = settings.TimeZoneId;
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load time zone in BeneficiariesControl.");
+            _logger.LogWarning(ex, "Failed to load time zone in BeneficiariesControl.");
         }
     }
 
@@ -221,12 +214,6 @@ public partial class BeneficiariesControl : UserControl
 
     public async Task PerformSearchAsync()
     {
-        if (_beneficiaryService == null)
-        {
-            _logger?.LogWarning("PerformSearchAsync called but _beneficiaryService is null.");
-            return;
-        }
-
         var rawTerm = _txtSearch.Text.Trim();
         var term = DigitNormalizer.NormalizeDigits(rawTerm);
 
@@ -248,13 +235,13 @@ public partial class BeneficiariesControl : UserControl
                 else
                 {
                     var msg = ErrorMessages.GetMessage(result.Error);
-                    _notifyService?.Warning(msg);
+                    _notifyService.Warning(msg);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error searching beneficiaries.");
-                _notifyService?.Error(Strings.Msg_UnexpectedError);
+                _logger.LogError(ex, "Error searching beneficiaries.");
+                _notifyService.Error(Strings.Msg_UnexpectedError);
             }
         }
     }
@@ -425,11 +412,6 @@ public partial class BeneficiariesControl : UserControl
 
     private async Task LoadBeneficiaryHistoryAsync(Guid beneficiaryId)
     {
-        if (_beneficiaryService == null)
-        {
-            return;
-        }
-
         try
         {
             var historyResult = await _beneficiaryService.GetHistoryAsync(beneficiaryId, maxResults: 100);
@@ -444,7 +426,7 @@ public partial class BeneficiariesControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to load beneficiary history.");
+            _logger.LogError(ex, "Failed to load beneficiary history.");
             ClearHistoryGrid();
         }
     }
@@ -557,8 +539,7 @@ public partial class BeneficiariesControl : UserControl
             return;
         }
 
-        var dialog = _formFactory?.Create<EditBeneficiaryDialog>() ??
-                     new EditBeneficiaryDialog(_beneficiaryService, null, _notifyService, null);
+        var dialog = _formFactory.Create<EditBeneficiaryDialog>();
 
         await dialog.SetBeneficiaryAsync(_selectedBeneficiary);
 
@@ -590,8 +571,7 @@ public partial class BeneficiariesControl : UserControl
             return;
         }
 
-        var dialog = _formFactory?.Create<ChangeBeneficiaryStatusDialog>() ??
-                     new ChangeBeneficiaryStatusDialog(_beneficiaryService, _notifyService, null);
+        var dialog = _formFactory.Create<ChangeBeneficiaryStatusDialog>();
 
         dialog.SetBeneficiary(_selectedBeneficiary);
 
@@ -644,7 +624,7 @@ public partial class BeneficiariesControl : UserControl
             Cursor = Cursors.WaitCursor;
             _btnIssueQr.Enabled = false;
 
-            var dialog = _formFactory?.Create<IssueQrDialog>() ?? new IssueQrDialog();
+            var dialog = _formFactory.Create<IssueQrDialog>();
             using (dialog)
             {
                 await dialog.LoadAndShowAsync(_selectedBeneficiary);
@@ -654,7 +634,7 @@ public partial class BeneficiariesControl : UserControl
         }
         catch (Exception ex)
         {
-            _notifyService?.Error($"{Strings.Msg_QrIssueFailed} {UserMessages.LogAndDescribe(ex, "Issue QR card")}", Strings.Title_Error);
+            _notifyService.Error($"{Strings.Msg_QrIssueFailed} {UserMessages.LogAndDescribe(ex, "Issue QR card")}", Strings.Title_Error);
         }
         finally
         {
@@ -665,7 +645,7 @@ public partial class BeneficiariesControl : UserControl
 
     public async Task VoidSelectedHistoryEntryAsync()
     {
-        if (!CanVoidSelectedHistory() || _checkInService == null)
+        if (!CanVoidSelectedHistory())
         {
             return;
         }
@@ -675,14 +655,12 @@ public partial class BeneficiariesControl : UserControl
         string voidReason;
         string? approvalToken = null;
 
-        var isSupervisorOrAdmin = _currentUser != null &&
-            (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
+        var isSupervisorOrAdmin = (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
 
         if (!isSupervisorOrAdmin)
         {
             // Prompt supervisor re-auth
-            var authDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
-                             new SupervisorAuthDialog(null, _currentUser);
+            var authDialog = _formFactory.Create<SupervisorAuthDialog>();
 
             authDialog.SetContext(defaultReason: Strings.Ui_Beneficiaries_09);
 
@@ -697,8 +675,7 @@ public partial class BeneficiariesControl : UserControl
         else
         {
             // Prompt reason dialog
-            var reasonDialog = _formFactory?.Create<VoidReasonDialog>() ??
-                               new VoidReasonDialog(_notifyService);
+            var reasonDialog = _formFactory.Create<VoidReasonDialog>();
 
             var localTimeStr = DateTimeDisplayHelper.FormatDateTime(
                 DateTimeDisplayHelper.ToParkLocalTime(attempt.AttemptedAtUtc, _timeZoneId));
@@ -719,15 +696,9 @@ public partial class BeneficiariesControl : UserControl
 
         // Confirm prompt
         var confirmMsg = Strings.Msg_ConfirmVoid;
-        var confirmResult = MessageBox.Show(
-            confirmMsg,
-            Strings.Title_Confirm,
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Question,
-            MessageBoxDefaultButton.Button2,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        var confirmed = Notify.Confirm(confirmMsg, Strings.Title_Confirm);
 
-        if (confirmResult != DialogResult.Yes)
+        if (!confirmed)
         {
             return;
         }
@@ -741,7 +712,7 @@ public partial class BeneficiariesControl : UserControl
 
                 if (result.IsSuccess)
                 {
-                    _notifyService?.Info(Strings.Msg_VoidSuccess);
+                    _notifyService.Info(Strings.Msg_VoidSuccess);
 
                     // Refresh history and reload beneficiary to show updated last granted entry
                     if (_selectedBeneficiary != null)
@@ -769,13 +740,13 @@ public partial class BeneficiariesControl : UserControl
                 else
                 {
                     var msg = ErrorMessages.GetMessage(result.Error);
-                    _notifyService?.Warning(msg);
+                    _notifyService.Warning(msg);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error voiding history entry.");
-                _notifyService?.Error(Strings.Msg_UnexpectedError);
+                _logger.LogError(ex, "Error voiding history entry.");
+                _notifyService.Error(Strings.Msg_UnexpectedError);
             }
         }
     }

@@ -44,7 +44,7 @@ partial class IssueQrDialog
         _lblCustomerName.Name = "_lblCustomerName";
         _lblCustomerName.Size = new Size(350, 40);
         _lblCustomerName.TabIndex = 0;
-        _lblCustomerName.Text = "اسم الزبون";
+        _lblCustomerName.Text = "اسم الزائر";
         _lblCustomerName.TextAlign = ContentAlignment.MiddleCenter;
         
         // _picQrCode
@@ -89,7 +89,9 @@ partial class IssueQrDialog
         
         // IssueQrDialog
         AutoScaleDimensions = new SizeF(96F, 96F);
+        AcceptButton = _btnPrint;
         AutoScaleMode = AutoScaleMode.Dpi;
+        CancelButton = _btnClose;
         BackColor = Theme.Surface;
         ClientSize = new Size(390, 435);
         Controls.Add(_btnPrint);

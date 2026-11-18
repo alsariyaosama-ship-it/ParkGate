@@ -36,7 +36,7 @@ partial class GiftOfferPanel
         this._grpMain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(253)))), ((int)(((byte)(244)))));
         this._grpMain.Controls.Add(this._tblContent);
         this._grpMain.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._grpMain.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpMain.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpMain.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpMain.Location = new System.Drawing.Point(0, 0);
         this._grpMain.Name = "_grpMain";
@@ -84,7 +84,7 @@ partial class GiftOfferPanel
         this._btnIssue.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnIssue.FlatAppearance.BorderSize = 0;
         this._btnIssue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnIssue.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnIssue.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnIssue.ForeColor = System.Drawing.Color.White;
         this._btnIssue.Location = new System.Drawing.Point(216, 2);
         this._btnIssue.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
@@ -126,7 +126,7 @@ partial class GiftOfferPanel
         // 
         this._lblDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-        this._lblDetails.Font = new System.Drawing.Font("Cairo", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._lblDetails.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblDetails.Location = new System.Drawing.Point(4, 18);
         this._lblDetails.Name = "_lblDetails";
@@ -137,7 +137,7 @@ partial class GiftOfferPanel
         // 
         this._lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-        this._lblStatus.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblStatus.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblStatus.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblStatus.Location = new System.Drawing.Point(4, 0);
         this._lblStatus.Name = "_lblStatus";

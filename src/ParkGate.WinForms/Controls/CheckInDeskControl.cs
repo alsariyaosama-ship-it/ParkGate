@@ -27,24 +27,22 @@ namespace ParkGate.WinForms.Controls;
 /// </summary>
 public partial class CheckInDeskControl : UserControl
 {
-    private readonly IBeneficiaryService? _beneficiaryService;
-    private readonly ICheckInService? _checkInService;
-    private readonly IOrganizationService? _orgService;
-    private readonly IAgeCategoryService? _ageCategoryService;
-    private readonly ISettingsService? _settingsService;
-    private readonly ICurrentUser? _currentUser;
-    private readonly ICurrentWorkstation? _currentWorkstation;
-    private readonly IFormFactory? _formFactory;
-    private readonly INotifyService? _notifyService;
-    private readonly ILogger<CheckInDeskControl>? _logger;
-    private readonly ParkGate.Application.EntryCards.CardScanService? _cardScanService;
-    private readonly IGiftVoucherService? _giftVoucherService;
+    private readonly IBeneficiaryService _beneficiaryService;
+    private readonly ICheckInService _checkInService;
+    private readonly IOrganizationService _orgService;
+    private readonly IAgeCategoryService _ageCategoryService;
+    private readonly ISettingsService _settingsService;
+    private readonly ICurrentUser _currentUser;
+    private readonly ICurrentWorkstation _currentWorkstation;
+    private readonly IFormFactory _formFactory;
+    private readonly INotifyService _notifyService;
+    private readonly ILogger<CheckInDeskControl> _logger;
+    private readonly ParkGate.Application.EntryCards.ICardScanService _cardScanService;
+    private readonly IGiftVoucherService _giftVoucherService;
 
     private readonly List<CounterInput> _counterInputs = [];
     private readonly List<OrganizationDto> _organizations = [];
     private readonly List<AgeCategoryDto> _ageCategories = [];
-    private readonly ContextMenuStrip _todayContextMenu = new();
-    private readonly ToolStripMenuItem _menuVoidToday = new();
     private BeneficiaryDto? _activeHolder;
     private EligibilityPreviewDto? _activeEligibility;
     private bool _companionsBlockEntry;
@@ -67,49 +65,45 @@ public partial class CheckInDeskControl : UserControl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int AutoResetDelayMs { get; set; } = 1200;
 
-    public CheckInDeskControl() : this(null, null, null, null, null, null, null, null, null, null, null, null)
-    {
-    }
-
     public CheckInDeskControl(
-        IBeneficiaryService? beneficiaryService,
-        ICheckInService? checkInService,
-        IOrganizationService? orgService,
-        IAgeCategoryService? ageCategoryService,
-        ISettingsService? settingsService,
-        ICurrentUser? currentUser,
-        ICurrentWorkstation? currentWorkstation,
-        IFormFactory? formFactory,
-        INotifyService? notifyService,
-        ILogger<CheckInDeskControl>? logger,
-        ParkGate.Application.EntryCards.CardScanService? cardScanService = null,
-        IGiftVoucherService? giftVoucherService = null)
+        IBeneficiaryService beneficiaryService,
+        ICheckInService checkInService,
+        IOrganizationService orgService,
+        IAgeCategoryService ageCategoryService,
+        ISettingsService settingsService,
+        ICurrentUser currentUser,
+        ICurrentWorkstation currentWorkstation,
+        IFormFactory formFactory,
+        INotifyService notifyService,
+        ILogger<CheckInDeskControl> logger,
+        ParkGate.Application.EntryCards.ICardScanService cardScanService,
+        IGiftVoucherService giftVoucherService,
+        ILogger<GiftOfferPanel> giftPanelLogger)
     {
         InitializeComponent();
 
-        _beneficiaryService = beneficiaryService;
-        _checkInService = checkInService;
-        _orgService = orgService;
-        _ageCategoryService = ageCategoryService;
-        _settingsService = settingsService;
-        _currentUser = currentUser;
-        _currentWorkstation = currentWorkstation;
-        _formFactory = formFactory;
-        _notifyService = notifyService;
-        _logger = logger;
-        _cardScanService = cardScanService;
-        _giftVoucherService = giftVoucherService;
+        _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
+        _checkInService = checkInService ?? throw new ArgumentNullException(nameof(checkInService));
+        _orgService = orgService ?? throw new ArgumentNullException(nameof(orgService));
+        _ageCategoryService = ageCategoryService ?? throw new ArgumentNullException(nameof(ageCategoryService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _cardScanService = cardScanService ?? throw new ArgumentNullException(nameof(cardScanService));
+        _giftVoucherService = giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService));
 
         _giftPanel.InitializeServices(
             _giftVoucherService,
             _currentUser,
             _formFactory,
             _notifyService,
-            null,
+            giftPanelLogger,
             _timeZoneId);
 
         InitializeControlText();
-        Theme.ApplyGridStyle(_gridToday);
         WireEvents();
     }
 
@@ -131,15 +125,6 @@ public partial class CheckInDeskControl : UserControl
         _lblHolderStatusTitle.Text = Strings.Label_HolderStatus;
 
         // Inline Registration
-        _grpRegistration.Text = Strings.Title_InlineRegistration;
-        _lblRegOrganization.Text = Strings.Label_RegOrganization;
-        _lblRegFullName.Text = Strings.Label_RegFullName;
-        _lblRegPhone.Text = Strings.Label_RegPhone;
-        _lblRegNationalId.Text = Strings.Label_RegNationalId;
-        _lblRegExpiry.Text = Strings.Label_RegExpiry;
-        _lblRegNotes.Text = Strings.Label_RegNotes;
-        _btnSaveReg.Text = Strings.Btn_SaveAndContinue;
-        _btnCancelReg.Text = Strings.Btn_CancelReg;
 
         // Companions Panel
         _grpCompanions.Text = Strings.Title_Companions;
@@ -153,14 +138,6 @@ public partial class CheckInDeskControl : UserControl
         _btnClear.Text = Strings.Btn_Clear;
 
         // Today Grid
-        _grpToday.Text = Strings.Title_TodayDesk;
-        _colTime.HeaderText = Strings.Col_Time;
-        _colCard.HeaderText = Strings.Col_CardNumber;
-        _colName.HeaderText = Strings.Col_HolderName;
-        _colOrg.HeaderText = Strings.Col_Org;
-        _colPersons.HeaderText = Strings.Col_Persons;
-        _colResult.HeaderText = Strings.Col_Result;
-        _lblTodaySummary.Text = string.Format(Strings.Summary_TodayStats, 0, 0, 0, 0);
 
         _statusBanner.Reset();
         _btnRecordEntry.Enabled = false;
@@ -179,7 +156,7 @@ public partial class CheckInDeskControl : UserControl
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 await LookupCardAsync();
-                if (!_grpRegistration.Visible)
+                if (!_registrationPanel.Visible)
                 {
                     FocusCardNumberBox();
                 }
@@ -206,47 +183,19 @@ public partial class CheckInDeskControl : UserControl
         _btnSearch.Click += async (_, _) =>
         {
             await LookupCardAsync();
-            if (!_grpRegistration.Visible)
+            if (!_registrationPanel.Visible)
             {
                 FocusCardNumberBox();
             }
         };
         _btnClear.Click += (_, _) => ResetDesk();
         _btnNewHolder.Click += (_, _) => StartManualRegistration();
-        _btnCancelReg.Click += (_, _) => HideInlineRegistration();
-        _btnSaveReg.Click += async (_, _) => await SaveInlineRegistrationAsync();
+        _registrationPanel.CancelRequested += (_, _) => HideInlineRegistration();
+        _registrationPanel.SaveRequested += async (_, _) => await SaveInlineRegistrationAsync();
         _btnRecordEntry.Click += async (_, _) => await RecordEntryAsync();
         _btnOverride.Click += async (_, _) => await OverrideEntryAsync();
 
-        // Today grid context menu for voiding (SPEC §7.2 FR-CHK-09)
-        _menuVoidToday.Text = Strings.Menu_VoidTodayEntry;
-        _menuVoidToday.Click += async (_, _) => await VoidSelectedTodayEntryAsync();
-        _todayContextMenu.Items.Add(_menuVoidToday);
-        _gridToday.ContextMenuStrip = _todayContextMenu;
-
-        _gridToday.MouseDown += (s, e) =>
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                var hit = _gridToday.HitTest(e.X, e.Y);
-                if (hit.RowIndex >= 0)
-                {
-                    _gridToday.ClearSelection();
-                    _gridToday.Rows[hit.RowIndex].Selected = true;
-                }
-            }
-        };
-
-        _todayContextMenu.Opening += (_, e) =>
-        {
-            if (_gridToday.SelectedRows.Count == 0 ||
-                _gridToday.SelectedRows[0].Tag is not TodayDeskAttemptDto attempt ||
-                attempt.IsVoided ||
-                attempt.Result == EntryResult.Denied)
-            {
-                e.Cancel = true;
-            }
-        };
+        _todayPanel.VoidRequested += async (_, _) => await VoidSelectedTodayEntryAsync();
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -290,7 +239,7 @@ public partial class CheckInDeskControl : UserControl
                 break;
 
             case Keys.Escape:
-                if (_cmbOrganization.DroppedDown || _cmbRegOrganization.DroppedDown)
+                if (_cmbOrganization.DroppedDown || _registrationPanel.IsOrganizationListOpen)
                 {
                     // Esc closes the open list; it must not also reset the desk (R4.5).
                     break;
@@ -314,14 +263,9 @@ public partial class CheckInDeskControl : UserControl
     /// </summary>
     private bool ConfirmDiscardRegistration()
     {
-        var hasInput = _grpRegistration.Visible &&
-            (!string.IsNullOrWhiteSpace(_txtRegFullName.Text) ||
-             !string.IsNullOrWhiteSpace(_txtRegPhone.Text) ||
-             !string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ||
-             !string.IsNullOrWhiteSpace(_txtRegNotes.Text) ||
-             _dtpRegExpiry.Checked);
+        var hasInput = _registrationPanel.Visible && _registrationPanel.HasInput;
 
-        return !hasInput || (_notifyService?.Confirm(Strings.Confirm_DiscardRegistration, Strings.Title_Warning) ?? false);
+        return !hasInput || (_notifyService.Confirm(Strings.Confirm_DiscardRegistration, Strings.Title_Warning));
     }
 
     public async Task OnDeskLoadedAsync()
@@ -342,11 +286,6 @@ public partial class CheckInDeskControl : UserControl
 
     private async Task LoadSettingsAsync()
     {
-        if (_settingsService == null)
-        {
-            return;
-        }
-
         try
         {
             var settings = await _settingsService.GetSettingsAsync();
@@ -358,17 +297,12 @@ public partial class CheckInDeskControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load check-in settings.");
+            _logger.LogWarning(ex, "Failed to load check-in settings.");
         }
     }
 
     private async Task LoadOrganizationsAsync()
     {
-        if (_orgService == null)
-        {
-            return;
-        }
-
         try
         {
             var orgs = await _orgService.GetAllAsync(activeOnly: true);
@@ -379,28 +313,22 @@ public partial class CheckInDeskControl : UserControl
             _cmbOrganization.Items.Add(new OrgComboItem(null, Strings.Filter_AllOrganizations));
 
             // The registration panel offers real organizations only, never «الكل» (R4.3).
-            _cmbRegOrganization.Items.Clear();
+            _registrationPanel.SetOrganizations(orgs.Select(o => (o.Id, o.NameAr)));
             foreach (var org in orgs)
             {
                 _cmbOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
-                _cmbRegOrganization.Items.Add(new OrgComboItem(org.Id, org.NameAr));
             }
 
             _cmbOrganization.SelectedIndex = 0;
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load organizations for filter.");
+            _logger.LogWarning(ex, "Failed to load organizations for filter.");
         }
     }
 
     public async Task LoadAgeCategoriesAsync()
     {
-        if (_ageCategoryService == null)
-        {
-            return;
-        }
-
         try
         {
             // No categories configured is valid: the holder enters alone. Never invent categories (R4.9).
@@ -409,7 +337,7 @@ public partial class CheckInDeskControl : UserControl
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to load age categories. Recording is disabled until they load.");
+            _logger.LogWarning(ex, "Failed to load age categories. Recording is disabled until they load.");
             PopulateAgeCategories([]);
             _ageCategoriesUnavailable = true;
             _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_AgeCategoriesUnavailable);
@@ -488,25 +416,25 @@ public partial class CheckInDeskControl : UserControl
                     limitExceeded = true;
                     _lblFreeCompanions.Text = string.Format(Strings.Label_FreeCompanionsExceeded, nonExemptCompanions, maxFreeLimit);
                     _lblFreeCompanions.ForeColor = StatusBanner.ColorDenied;
-                    _pnlCompanionsTotal.BackColor = Color.FromArgb(254, 242, 242);
+                    _pnlCompanionsTotal.BackColor = Theme.DangerTint;
                 }
                 else
                 {
                     _lblFreeCompanions.Text = string.Format(Strings.Label_FreeCompanionsCount, nonExemptCompanions, maxFreeLimit);
                     _lblFreeCompanions.ForeColor = StatusBanner.ColorNeutral;
-                    _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+                    _pnlCompanionsTotal.BackColor = Theme.SuccessTint;
                 }
             }
             else
             {
                 _lblFreeCompanions.Visible = false;
-                _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+                _pnlCompanionsTotal.BackColor = Theme.SuccessTint;
             }
         }
         else
         {
             _lblFreeCompanions.Visible = false;
-            _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+            _pnlCompanionsTotal.BackColor = Theme.SuccessTint;
         }
 
         _companionsBlockEntry = totalPersons > _maxGroupSize || limitExceeded;
@@ -556,12 +484,7 @@ public partial class CheckInDeskControl : UserControl
         ClearHolderInfo();
         HideInlineRegistration();
         _giftPanel.Clear();
-
-        _txtRegFullName.Clear();
-        _txtRegPhone.Clear();
-        _txtRegNationalId.Clear();
-        _dtpRegExpiry.Checked = false;
-        _txtRegNotes.Clear();
+        _registrationPanel.ClearFields();
 
         foreach (var counter in _counterInputs)
         {
@@ -583,7 +506,7 @@ public partial class CheckInDeskControl : UserControl
         _lblHolderExpiry.Text = "-";
         _lblHolderLastEntry.Text = "-";
         _lblHolderStatus.Text = "-";
-        _lblHolderStatus.ForeColor = Color.FromArgb(45, 55, 72);
+        _lblHolderStatus.ForeColor = Theme.TextPrimary;
     }
 
     public void ShowHolderInfo(BeneficiaryDto holder, EligibilityPreviewDto? eligibility)
@@ -681,20 +604,15 @@ public partial class CheckInDeskControl : UserControl
     public void ShowInlineRegistration(string cardNumber, int? orgId = null)
     {
         _grpHolder.Visible = false;
-        _grpRegistration.Visible = true;
-
-        _txtRegFullName.Clear();
-        _txtRegPhone.Clear();
-        _txtRegNationalId.Clear();
-        _dtpRegExpiry.Checked = false;
-        _txtRegNotes.Clear();
+        _registrationPanel.Visible = true;
+        _registrationPanel.ClearFields();
         SelectRegistrationOrganization(orgId ?? (_cmbOrganization.SelectedItem as OrgComboItem)?.Id);
 
         _statusBanner.SetWarning(Strings.Ui_CheckInDesk_03, Strings.Ui_CheckInDesk_04);
         _btnRecordEntry.Enabled = false;
         _btnOverride.Enabled = false;
 
-        _txtRegFullName.Focus();
+        _registrationPanel.FocusFullName();
     }
 
     /// <summary>
@@ -704,8 +622,7 @@ public partial class CheckInDeskControl : UserControl
     private void SelectRegistrationOrganization(int? preferredOrgId)
     {
         var targetId = preferredOrgId ?? _organizations.FirstOrDefault(o => o.IsDefault)?.Id;
-        var match = _cmbRegOrganization.Items.OfType<OrgComboItem>().FirstOrDefault(i => i.Id == targetId);
-        _cmbRegOrganization.SelectedItem = match;
+        _registrationPanel.SelectOrganization(targetId);
     }
 
     private void SelectFilterOrganization(int? orgId)
@@ -719,7 +636,7 @@ public partial class CheckInDeskControl : UserControl
 
     public void HideInlineRegistration()
     {
-        _grpRegistration.Visible = false;
+        _registrationPanel.Visible = false;
         _grpHolder.Visible = true;
     }
 
@@ -728,7 +645,7 @@ public partial class CheckInDeskControl : UserControl
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
         if (string.IsNullOrWhiteSpace(card))
         {
-            _notifyService?.Warning(Strings.Ui_CheckInDesk_05, Strings.Title_Warning);
+            _notifyService.Warning(Strings.Ui_CheckInDesk_05, Strings.Title_Warning);
             FocusCardNumberBox();
             return;
         }
@@ -787,7 +704,7 @@ public partial class CheckInDeskControl : UserControl
             }
 
         // 1. Check if scanned input is a signed QR token (203 digits per QrTokenFormat.DigitLength)
-        if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength && _cardScanService != null)
+        if (normalized.Length == ParkGate.Domain.EntryCards.QrTokenFormat.DigitLength)
         {
             using (new BusyScope(this, _btnSearch, _btnNewHolder))
             {
@@ -805,7 +722,7 @@ public partial class CheckInDeskControl : UserControl
                         return;
                     }
 
-                    if (scanResult.BeneficiaryId.HasValue && _beneficiaryService != null)
+                    if (scanResult.BeneficiaryId.HasValue)
                     {
                         var lookupById = await _beneficiaryService.GetByIdAsync(scanResult.BeneficiaryId.Value);
                         if (lookupById.IsSuccess)
@@ -824,17 +741,12 @@ public partial class CheckInDeskControl : UserControl
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogError(ex, "Error scanning QR card token.");
+                    _logger.LogError(ex, "Error scanning QR card token.");
                     _statusBanner.SetDenied(Strings.Banner_QrScanFailed, UserMessages.Describe(ex));
                     FocusCardNumberBox();
                     return;
                 }
             }
-        }
-
-        if (_beneficiaryService == null)
-        {
-            return;
         }
 
         using (new BusyScope(this, _btnSearch, _btnNewHolder))
@@ -911,13 +823,13 @@ public partial class CheckInDeskControl : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error occurred during card lookup.");
+                _logger.LogError(ex, "Error occurred during card lookup.");
                 _statusBanner.SetDenied(Strings.Banner_ConnectionFailed, Strings.Banner_ConnectionRetryHint);
                 FocusCardNumberBox();
             }
         }
 
-        if (!_grpRegistration.Visible)
+        if (!_registrationPanel.Visible)
         {
             FocusCardNumberBox();
         }
@@ -970,7 +882,7 @@ public partial class CheckInDeskControl : UserControl
             return ChooseOrganizationOverride(matches);
         }
 
-        using var dialog = _formFactory?.Create<SelectOrganizationDialog>() ?? new SelectOrganizationDialog();
+        using var dialog = _formFactory.Create<SelectOrganizationDialog>();
         dialog.SetMatches(matches);
         return dialog.ShowDialog(this) == DialogResult.OK ? dialog.SelectedMatch : null;
     }
@@ -989,46 +901,41 @@ public partial class CheckInDeskControl : UserControl
 
     internal async Task SaveInlineRegistrationAsync()
     {
-        var fullName = _txtRegFullName.Text.Trim();
-        var phone = _txtRegPhone.Text.Trim();
+        var fullName = _registrationPanel.FullName;
+        var phone = _registrationPanel.Phone;
         var card = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
-        var registrationOrgId = (_cmbRegOrganization.SelectedItem as OrgComboItem)?.Id;
+        var registrationOrgId = _registrationPanel.SelectedOrganizationId;
 
         if (registrationOrgId is null)
         {
-            _notifyService?.Warning(Strings.Val_RegOrganizationRequired, Strings.Title_Warning);
-            _cmbRegOrganization.Focus();
+            _notifyService.Warning(Strings.Val_RegOrganizationRequired, Strings.Title_Warning);
+            _registrationPanel.FocusOrganization();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(fullName))
         {
-            _notifyService?.Warning(Strings.Ui_CheckInDesk_08, Strings.Title_Warning);
-            _txtRegFullName.Focus();
+            _notifyService.Warning(Strings.Ui_CheckInDesk_08, Strings.Title_Warning);
+            _registrationPanel.FocusFullName();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(phone))
         {
-            _notifyService?.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
-            _txtRegPhone.Focus();
+            _notifyService.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
+            _registrationPanel.FocusPhone();
             return;
         }
 
-        if (_beneficiaryService == null)
-        {
-            return;
-        }
-
-        using (new BusyScope(this, _btnSaveReg, _btnCancelReg))
+        using (new BusyScope(this, _registrationPanel.ActionButtons))
         {
             try
             {
                 var orgId = registrationOrgId.Value;
 
-                DateOnly? expiry = _dtpRegExpiry.Checked ? DateOnly.FromDateTime(_dtpRegExpiry.Value) : null;
-                var natId = string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ? null : _txtRegNationalId.Text.Trim();
-                var notes = string.IsNullOrWhiteSpace(_txtRegNotes.Text) ? null : _txtRegNotes.Text.Trim();
+                var expiry = _registrationPanel.ExpiryDate;
+                var natId = _registrationPanel.NationalId;
+                var notes = _registrationPanel.Notes;
 
                 var regRequest = new RegisterBeneficiaryRequest(
                     OrganizationId: orgId,
@@ -1042,25 +949,25 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
-                    _notifyService?.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
+                    _notifyService.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
                     await LookupCardAsync();
                 }
                 else
                 {
-                    _notifyService?.Error(ErrorMessages.GetMessage(regResult.Error), Strings.Ui_CheckInDesk_12);
+                    _notifyService.Error(ErrorMessages.GetMessage(regResult.Error), Strings.Ui_CheckInDesk_12);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to register beneficiary.");
-                _notifyService?.Error(UserMessages.Describe(ex), Strings.Title_Error);
+                _logger.LogError(ex, "Failed to register beneficiary.");
+                _notifyService.Error(UserMessages.Describe(ex), Strings.Title_Error);
             }
         }
     }
 
     public async Task RecordEntryAsync()
     {
-        if (_activeHolder == null || _checkInService == null)
+        if (_activeHolder == null)
         {
             return;
         }
@@ -1098,7 +1005,7 @@ public partial class CheckInDeskControl : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error recording entry.");
+                _logger.LogError(ex, "Error recording entry.");
                 _statusBanner.SetDenied(Strings.Ui_CheckInDesk_15, Strings.Ui_CheckInDesk_16);
             }
         }
@@ -1108,13 +1015,12 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task OverrideEntryAsync()
     {
-        if (_activeHolder == null || _checkInService == null)
+        if (_activeHolder == null)
         {
             return;
         }
 
-        var supervisorDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
-                               new SupervisorAuthDialog(null, _currentUser);
+        var supervisorDialog = _formFactory.Create<SupervisorAuthDialog>();
 
         supervisorDialog.SetContext(defaultReason: Strings.Ui_CheckInDesk_17);
 
@@ -1154,7 +1060,7 @@ public partial class CheckInDeskControl : UserControl
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error performing override.");
+                _logger.LogError(ex, "Error performing override.");
                 _statusBanner.SetDenied(Strings.Ui_CheckInDesk_20, Strings.Ui_CheckInDesk_21);
             }
         }
@@ -1174,96 +1080,17 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task RefreshTodayDeskSummaryAsync()
     {
-        if (_checkInService == null)
-        {
-            return;
-        }
-
         try
         {
-            var summaryResult = await _checkInService.GetTodayDeskEntriesAsync(_currentWorkstation?.WorkstationId);
+            var summaryResult = await _checkInService.GetTodayDeskEntriesAsync(_currentWorkstation.WorkstationId);
             if (summaryResult.IsSuccess)
             {
-                var summary = summaryResult.Value;
-
-                var baseStats = string.Format(
-                    Strings.Summary_TodayStats,
-                    summary.TotalGranted,
-                    summary.TotalOverridden,
-                    summary.TotalDenied,
-                    summary.TotalPersons);
-
-                if (summary.PersonsPerCategory.Count > 0)
-                {
-                    var categoryBreakdown = string.Join(" · ", summary.PersonsPerCategory.Select(c => $"{c.CategoryName}: {c.Count}"));
-                    _lblTodaySummary.Text = $"{baseStats}   |   {categoryBreakdown}";
-                }
-                else
-                {
-                    _lblTodaySummary.Text = baseStats;
-                }
-
-                if (IsHandleCreated || _gridToday.IsHandleCreated)
-                {
-                    _gridToday.SuspendLayout();
-                    _gridToday.Rows.Clear();
-
-                foreach (var item in summary.RecentAttempts)
-                {
-                    var localTime = DateTimeDisplayHelper.ToParkLocalTime(item.AttemptedAtUtc, _timeZoneId);
-                    var timeStr = DateTimeDisplayHelper.FormatTime(localTime);
-
-                    string resultText;
-                    if (item.IsVoided)
-                    {
-                        resultText = Strings.Result_Voided;
-                    }
-                    else
-                    {
-                        resultText = item.Result switch
-                        {
-                            EntryResult.Allowed => Strings.Result_Allowed,
-                            EntryResult.Denied => Strings.Result_Denied,
-                            EntryResult.Overridden => Strings.Result_Overridden,
-                            _ => item.Result.ToString()
-                        };
-                    }
-
-                    var rowIndex = _gridToday.Rows.Add(
-                        timeStr,
-                        item.CardNumber,
-                        item.BeneficiaryFullName,
-                        item.OrganizationName,
-                        item.TotalPersons,
-                        resultText);
-
-                    var row = _gridToday.Rows[rowIndex];
-                    row.Tag = item;
-                    if (item.IsVoided)
-                    {
-                        row.DefaultCellStyle.ForeColor = Color.Gray;
-                    }
-                    else if (item.Result == EntryResult.Allowed)
-                    {
-                        row.DefaultCellStyle.ForeColor = StatusBanner.ColorGranted;
-                    }
-                    else if (item.Result == EntryResult.Denied)
-                    {
-                        row.DefaultCellStyle.ForeColor = StatusBanner.ColorDenied;
-                    }
-                    else if (item.Result == EntryResult.Overridden)
-                    {
-                        row.DefaultCellStyle.ForeColor = StatusBanner.ColorWarning;
-                    }
-                }
-
-                _gridToday.ResumeLayout(true);
-            }
+                _todayPanel.ShowSummary(summaryResult.Value, _timeZoneId, IsHandleCreated);
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Failed to refresh today's desk summary.");
+            _logger.LogWarning(ex, "Failed to refresh today's desk summary.");
         }
     }
 
@@ -1279,14 +1106,7 @@ public partial class CheckInDeskControl : UserControl
 
     public async Task VoidSelectedTodayEntryAsync()
     {
-        if (_gridToday.SelectedRows.Count == 0 || _checkInService == null)
-        {
-            return;
-        }
-
-        if (_gridToday.SelectedRows[0].Tag is not TodayDeskAttemptDto attempt ||
-            attempt.IsVoided ||
-            attempt.Result == EntryResult.Denied)
+        if (_todayPanel.SelectedVoidableAttempt is not { } attempt)
         {
             return;
         }
@@ -1294,13 +1114,11 @@ public partial class CheckInDeskControl : UserControl
         string voidReason;
         string? approvalToken = null;
 
-        var isSupervisorOrAdmin = _currentUser != null &&
-            (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
+        var isSupervisorOrAdmin = (_currentUser.IsInRole(UserRole.Supervisor) || _currentUser.IsInRole(UserRole.Admin));
 
         if (!isSupervisorOrAdmin)
         {
-            var authDialog = _formFactory?.Create<SupervisorAuthDialog>() ??
-                             new SupervisorAuthDialog(null, _currentUser);
+            var authDialog = _formFactory.Create<SupervisorAuthDialog>();
 
             authDialog.SetContext(defaultReason: Strings.Ui_Beneficiaries_09);
 
@@ -1314,8 +1132,7 @@ public partial class CheckInDeskControl : UserControl
         }
         else
         {
-            var reasonDialog = _formFactory?.Create<VoidReasonDialog>() ??
-                               new VoidReasonDialog(_notifyService);
+            var reasonDialog = _formFactory.Create<VoidReasonDialog>();
 
             var localTimeStr = DateTimeDisplayHelper.FormatDateTime(
                 DateTimeDisplayHelper.ToParkLocalTime(attempt.AttemptedAtUtc, _timeZoneId));
@@ -1334,15 +1151,9 @@ public partial class CheckInDeskControl : UserControl
             voidReason = reasonDialog.Reason;
         }
 
-        var confirmResult = MessageBox.Show(
-            Strings.Msg_ConfirmVoid,
-            Strings.Title_Confirm,
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Question,
-            MessageBoxDefaultButton.Button2,
-            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
+        var confirmed = Notify.Confirm(Strings.Msg_ConfirmVoid, Strings.Title_Confirm);
 
-        if (confirmResult != DialogResult.Yes)
+        if (!confirmed)
         {
             return;
         }
@@ -1356,20 +1167,7 @@ public partial class CheckInDeskControl : UserControl
 
                 if (result.IsSuccess)
                 {
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Info(Strings.Msg_VoidSuccess);
-                    }
-                    else
-                    {
-                        MessageBox.Show(
-                            Strings.Msg_VoidSuccess,
-                            Strings.Title_Info,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-                    }
+                    _notifyService.Info(Strings.Msg_VoidSuccess);
 
                     await RefreshTodayDeskSummaryAsync();
 
@@ -1381,40 +1179,14 @@ public partial class CheckInDeskControl : UserControl
                 else
                 {
                     var msg = ErrorMessages.GetMessage(result.Error);
-                    if (_notifyService != null)
-                    {
-                        _notifyService.Warning(msg);
-                    }
-                    else
-                    {
-                        MessageBox.Show(
-                            msg,
-                            Strings.Title_Warning,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning,
-                            MessageBoxDefaultButton.Button1,
-                            MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-                    }
+                    _notifyService.Warning(msg);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error voiding today entry.");
+                _logger.LogError(ex, "Error voiding today entry.");
                 var msg = UserMessages.Describe(ex);
-                if (_notifyService != null)
-                {
-                    _notifyService.Error(msg);
-                }
-                else
-                {
-                    MessageBox.Show(
-                        msg,
-                        Strings.Title_Error,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error,
-                        MessageBoxDefaultButton.Button1,
-                        MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign);
-                }
+                _notifyService.Error(msg);
             }
         }
     }

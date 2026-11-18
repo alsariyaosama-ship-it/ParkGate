@@ -47,7 +47,7 @@ partial class SupervisorAuthDialog
         // _lblHeader
         // 
         this._lblHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._lblHeader.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHeader.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(16, 12);
         this._lblHeader.Name = "_lblHeader";
@@ -125,7 +125,7 @@ partial class SupervisorAuthDialog
         this._btnApprove.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnApprove.FlatAppearance.BorderSize = 0;
         this._btnApprove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this._btnApprove.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._btnApprove.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnApprove.ForeColor = System.Drawing.Color.White;
         this._btnApprove.Location = new System.Drawing.Point(246, 360);
         this._btnApprove.Name = "_btnApprove";
@@ -136,13 +136,13 @@ partial class SupervisorAuthDialog
         // 
         // _btnCancel
         // 
-        this._btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-        this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnCancel.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnCancel.Location = new System.Drawing.Point(28, 360);
         this._btnCancel.Name = "_btnCancel";
         this._btnCancel.Size = new System.Drawing.Size(120, 40);

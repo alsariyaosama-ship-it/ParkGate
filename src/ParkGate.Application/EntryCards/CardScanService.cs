@@ -12,7 +12,7 @@ namespace ParkGate.Application.EntryCards;
 /// عند القبول يُمرَّر BeneficiaryId لمنطق تسجيل الدخول الحالي (قاعدة منع إعادة الدخول خلال المدة المحددة).
 /// كل محاولة — مقبولة أو مرفوضة — تُسجَّل في CardScanLog.
 /// </summary>
-public sealed class CardScanService
+public sealed class CardScanService : ICardScanService
 {
     private const int RawPrefixLength = 32;
 

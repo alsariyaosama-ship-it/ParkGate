@@ -7,17 +7,13 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class FirstRunAdminForm : RtlFormBase
 {
-    private readonly IAuthService? _authService;
+    private readonly IAuthService _authService;
 
-    public FirstRunAdminForm() : this(null)
-    {
-    }
-
-    public FirstRunAdminForm(IAuthService? authService)
+    public FirstRunAdminForm(IAuthService authService)
     {
         InitializeComponent();
 
-        _authService = authService;
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
 
         InitializeFormText();
         txtUsername.Text = "admin";
@@ -34,6 +30,7 @@ public partial class FirstRunAdminForm : RtlFormBase
         lblConfirmPassword.Text = Strings.Label_AdminConfirmPassword;
         btnCreate.Text = Strings.Btn_CreateAdmin;
         btnCancel.Text = Strings.Btn_Cancel;
+        Theme.ApplySecondaryButtonStyle(btnCancel);
     }
 
     private async Task OnCreateAdminAsync()
@@ -42,13 +39,6 @@ public partial class FirstRunAdminForm : RtlFormBase
         var username = txtUsername.Text.Trim();
         var password = txtPassword.Text;
         var confirmPassword = txtConfirmPassword.Text;
-
-        if (_authService == null)
-        {
-            DialogResult = DialogResult.OK;
-            Close();
-            return;
-        }
 
         SetBusy(true);
         try
