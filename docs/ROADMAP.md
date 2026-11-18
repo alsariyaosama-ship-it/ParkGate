@@ -224,6 +224,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R6.8 Database size warning on the Admin backup screen; propose a retention policy
 - [ ] R6.9 ACL-restricted backup folder; document an encrypted off-site copy
 - [ ] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
+- [ ] R6.11 Write management audit rows in the same unit of work; record old and new card number
 
 ### R7 — Wording and visual consistency · branch `phase/r7-consistency`
 - [ ] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b
@@ -231,6 +232,11 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R7.3 One neutral palette; test against `Color.FromArgb` literals outside `Theme.cs`
 - [ ] R7.4 Dialog conventions: `AcceptButton`, `CancelButton`, tab order, `Theme` button styles
 - [ ] R7.5 Web UI: same glossary, park-local times, empty states, no phone or national ID
+- [ ] R7.6 Remove the Infrastructure reference from `IssueQrDialog`; architecture test
+- [ ] R7.7 All message boxes through `Notify`; architecture test
+- [ ] R7.8 All designers on `AutoScaleMode.Dpi`; extend `DesignerScalingTests`
+- [ ] R7.9 Resolve forms and controls through `IFormFactory`; required services, no null fallbacks
+- [ ] R7.10 Split `CheckInDeskControl` into smaller user controls
 
 ### R8 — Build, packaging and deployment · branch `phase/r8-release`
 - [ ] R8.1 Fix the doubled backslash in the published `appsettings.json` server path

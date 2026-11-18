@@ -121,8 +121,9 @@
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
 1. PR #15 (R4) is open. Osama passed TC-14–TC-19 and TC-21 on the desk; **TC-20 (Cairo missing) is still untried**. TC-21's F7 gift override must be re-run on the fixed gift screen (R4.11/R4.12).
-2. After PR #15 is merged, start R5 from `main`.
-3. Then R5 (desk UX) on `phase/r5-desk-ux`. R5.1 replaces the banner's `/ 60` hours (key `Ui_CheckInDesk_02`).
+2. Branch `docs/entry-identity` (pushed, no PR yet): ADR-024, SPEC F6/F7 recommendations, F8 design (BR-27..BR-29, DATABASE §3.13-3.14, ROADMAP Phase F8). Osama reviews it, then open its PR.
+3. Agreed session order after PR #15 is merged (review 2026-11-18): **R6** (database: entry-card tables into migrations, DB-clock audit columns, R6.11 audit in the unit of work) -> **R7.6-R7.9** (UI-layer conformance: no Infrastructure in WinForms, Notify only, Dpi everywhere, no null-service fallbacks) -> **R5** (desk UX, with R7.10 split of `CheckInDeskControl` first) -> rest of **R7** -> **R8** (release) -> **F8** (only on Osama's go-ahead) -> **R9** (docs last). Reason: F8 adds a migration and organization fields, so the schema conventions (R6) and the UI layer (R7) should be settled first.
+   Gift decisions confirmed 2026-11-18: the interval starts when the voucher is issued, and the gift voucher stays a separate QR slip (current F5 behaviour, no change).
 4. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
    hangs the test host. Use synchronous fakes or a seam (`SuccessDelay`, `ChooseOrganizationOverride`), and run
    `dotnet test` with `timeout`.
