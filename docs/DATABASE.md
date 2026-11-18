@@ -22,14 +22,16 @@ SQL Server Express (2022 or later), database `ParkGate`, schema `dbo`. Managed b
 BeneficiaryStatus : 1 Active, 2 Suspended, 3 Blocked
 EntryResult       : 1 Allowed, 2 Denied, 3 Overridden
 DenialReason      : 1 CooldownActive, 2 HolderSuspended, 3 HolderBlocked,
-                    4 CardExpired, 5 OrganizationInactive
+                    4 CardExpired, 5 OrganizationInactive, 6 DayNotAllowed (F8)
                     (group size over the limit is a validation error, not a denial)
 EntryChannel      : 1 Desk, 2 QrDesk (F1), 3 Gate (F2)
 UserRole          : 1 Operator, 2 Supervisor, 3 Admin
 WorkstationType   : 1 Desk, 2 Gate (F2)
 GiftVoucherStatus : 1 Issued, 2 Redeemed, 3 Voided
 GiftDenialReason  : 1 OrganizationInactive, 2 GiftsNotEnabled, 3 HolderBlocked,
-                    4 HolderSuspended, 5 IntervalNotElapsed
+                    4 HolderSuspended, 5 IntervalNotElapsed, 6 DayNotAllowed (F8)
+CardPatternStatus      : 1 Proposed, 2 Approved, 3 Rejected   (F8)
+CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 ```
 
 ## 3. Tables
@@ -47,6 +49,8 @@ GiftDenialReason  : 1 OrganizationInactive, 2 GiftsNotEnabled, 3 HolderBlocked,
 | GiftEnabled | bit NOT NULL | F5. Default 0 |
 | GiftValue | decimal(10,3) NOT NULL | F5. Default 0. CHECK `GiftEnabled = 0 OR GiftValue > 0` (`CK_Organizations_GiftValue`) |
 | GiftIntervalDays | int NOT NULL | F5. Default 30. CHECK 1..365 (`CK_Organizations_GiftIntervalDays`) |
+| AllowedEntryDays | tinyint NOT NULL | F8, BR-27. Bit mask, bit 0 = Sunday … bit 6 = Saturday (.NET `DayOfWeek`). Default 127 (all days). CHECK 1..127 (`CK_Organizations_AllowedEntryDays`) |
+| GiftAnyDay | bit NOT NULL | F8, BR-28. Default 0 = gifts only on allowed entry days |
 | audit columns, RowVersion | | |
 
 ### 3.2 `Beneficiaries` — حاملو البطاقات
@@ -219,6 +223,40 @@ Indexes: `UX_GiftVouchers_Token (Token)` unique · `IX_GiftVouchers_Beneficiary_
 
 `GiftVoucher` is **not** synced to the cloud (ADR-020 §5): it is not in `OutboxEntityExtractor.SyncableTypes`.
 
+### 3.13 `OrganizationCardPatterns` — أنماط أرقام البطاقات (F8, proposed — create only when F8 starts)
+| Column | Type | Notes |
+|---|---|---|
+| Id | int IDENTITY PK | |
+| OrganizationId | int FK → Organizations | |
+| Shape | nvarchar(50) NOT NULL | Character class per position of the normalized number: `D` digit, `L` letter, `-` dash, `O` other. Example `DDDDD` |
+| Prefix | nvarchar(10) NULL | Leading characters shared by most numbers of this shape (`CardPattern.PrefixLength`); NULL when none dominates |
+| Status | tinyint NOT NULL | `CardPatternStatus` |
+| SampleCount | int NOT NULL | Numbers that matched when it was proposed |
+| ProposedAtUtc | datetime2(3) NOT NULL | DB time |
+| DecidedAtUtc | datetime2(3) NULL | |
+| DecidedByUserId | int NULL FK → Users | Admin only |
+| audit columns, RowVersion | | |
+
+Unique `UX_OrganizationCardPatterns_Org_Shape_Prefix` on (`OrganizationId`, `Shape`, `Prefix`).
+
+### 3.14 `CardPatternAlerts` — تنبيهات أرقام غير معتادة (F8, proposed — create only when F8 starts)
+| Column | Type | Notes |
+|---|---|---|
+| Id | bigint IDENTITY PK | |
+| OrganizationId | int FK → Organizations | |
+| BeneficiaryId | uniqueidentifier FK → Beneficiaries | |
+| CardNumber | nvarchar(50) NOT NULL | Normalized, as registered |
+| Shape | nvarchar(50) NOT NULL | Shape of `CardNumber`, used to count a new series |
+| CreatedAtUtc | datetime2(3) NOT NULL | DB time |
+| CreatedByUserId | int FK → Users | Operator who registered or changed the number |
+| WorkstationId | int FK → Workstations | |
+| Status | tinyint NOT NULL | `CardPatternAlertStatus` |
+| ReviewedAtUtc | datetime2(3) NULL | |
+| ReviewedByUserId | int NULL FK → Users | |
+| ReviewNote | nvarchar(250) NULL | |
+
+Index `IX_CardPatternAlerts_Org_Status_Shape` on (`OrganizationId`, `Status`, `Shape`).
+
 ## 4. Atomic check-in (BR-12, ADR-005)
 
 All steps run in **one transaction** inside a single unit of work:
@@ -268,6 +306,10 @@ EF Core shape (Infrastructure):
 | `Security.MaxFailedLogins` | `5` | BR-18 |
 | `Security.LockoutMinutes` | `15` | BR-18 |
 | `Ui.MaskNationalIdForOperators` | `true` | §8 Security |
+| `CardPattern.MinSample` | `10` | F8, BR-29: cards needed before a pattern is proposed |
+| `CardPattern.NewSeriesThreshold` | `5` | F8, BR-29: alerts with one shape before it is proposed as a new series |
+| `CardPattern.PrefixLength` | `2` | F8, BR-29 |
+| `CardPattern.PrefixSharePercent` | `90` | F8, BR-29: share of numbers that must start with the prefix |
 
 Settings are read through a typed `ISettingsService` in Application (no raw key strings outside one constants class).
 

@@ -141,6 +141,19 @@ Legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked (reason i
 
 ---
 
+## Phase F8 — Entry days and card-number pattern alerts · branch `phase/f8-entry-days` (approved 2026-11-18; start only on Osama's go-ahead)
+Design: SPEC BR-27..BR-29 and §9 F8, DATABASE §3.1, §3.13, §3.14, ADR-024.
+- [ ] T8.1 Domain: allowed weekdays on `Organization`, `DayNotAllowed` in the entry and gift policies, card-number shape and pattern matcher (table-driven tests)
+- [ ] T8.2 Infrastructure: migration (two `Organizations` columns, two tables, settings seed), repositories, integration tests
+- [ ] T8.3 Application: entry and gift use cases apply the days; overrides cover them; pattern check on register and card change writes alerts; Admin use cases to approve or reject patterns and review alerts
+- [ ] T8.4 WinForms: organization dialog (weekdays, gifts on any day); desk banner names the allowed days; amber pattern note; Admin pattern and alert screens
+- [ ] T8.5 Sync: add `AllowedEntryDays` and `GiftAnyDay` to the cloud schema (Q14)
+- [ ] T8.6 Docs and `TEST_SCRIPT.md` steps for BR-27..BR-29
+
+**Done when:** an entry and a gift on a non-allowed day are denied and can be overridden; an unusual number raises an alert without blocking; a new series stops alerting only after an Admin approves it.
+
+---
+
 ## Phase R — Remediation · see `docs/REMEDIATION_PLAN.md`
 
 Source: full code review 2026-11-12. Work R0 → R9 in order, one phase per branch and PR.
