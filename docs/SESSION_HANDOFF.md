@@ -10,14 +10,14 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-18 |
-| Last session | S37 — R7.6, R7.11, R7.7, R7.8 done on `phase/r7-consistency` (PR #17 merged into `main`) |
-| Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 merged (PR #17). R7 in progress on `phase/r7-consistency` |
+| Last session | S37 — Phase R7 complete except R7.12 (print layout, waiting on Osama); R7 PR opened |
+| Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 merged (PR #17). R7 PR open from `phase/r7-consistency` |
 | Working branch | `phase/r7-consistency` (from `main` `88c9867`) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 727 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 189 architecture |
+| .NET Unit tests | 865 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 327 architecture |
 | .NET Integration tests | 56 passed on LocalDB |
-| Web tests | `php artisan test` (PHP 8.4): 98 passed on SQLite (MySQL job runs in CI) |
-| Total tests | 877 (779 .NET + 98 web), all green |
+| Web tests | `php artisan test` (PHP 8.4): 101 passed on SQLite (MySQL job runs in CI) |
+| Total tests | 1022 (921 .NET + 101 web), all green |
 | Latest migration | `RemoveUnusedMaskSetting` (S36), after `RemoveUnreadSoundSetting` and `MapDatabaseFilesView` (snapshot only). Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
 
 ## State of the work
@@ -120,10 +120,9 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-**S37 (2026-11-18, `phase/r7-consistency`): R7.6 done.** `IssueQrDialog` renders the QR through `IQrImageRenderer` (Application port) instead of Infrastructure's `QrImageRenderer`. New `WinFormsSource_OnlyCompositionRootMentionsInfrastructure` scans the source, because the reflection test misses static calls.
-Then R7.11 (found by Osama): `Main` was `async`, so `[STAThread]` was ignored and the UI ran on an MTA thread; saving or printing the QR threw `ThreadStateException`. `Main` is synchronous now and startup runs inside the message loop. Osama re-tested: QR save and print work (print layout needs work later: R7.12).
-R7.7: 39 `MessageBox.Show` calls now go through `Notify` (same buttons/icons). R7.8: 16 designers moved from `AutoScaleMode.Font` to `Dpi` 96x96; at 125 % those windows were not scaled while text grew. Verified with an off-screen render probe at 120 DPI (46 clipped controls before, 25 after, none new); remaining older clipping is R7.13.
-**Next:** R7.9 (28 files with `: this(null, ...)` constructors, 95 nullable service fields, 119 `?.` calls). Decide first how designer-hosted user controls (`CounterInput`, `StatusBanner`, `GiftOfferPanel`) keep a parameterless constructor; WinForms tests build controls without DI and will need fakes.
+**S37 (2026-11-18, `phase/r7-consistency`): R7 done except R7.12; PR opened.** One commit per task, test-first:
+R7.6 QR through `IQrImageRenderer`; R7.11 `Main` synchronous (it was `async`, so the UI ran on an MTA thread and file/print dialogs threw); R7.7 every message box through `Notify`; R7.8 all designers on `Dpi`; R7.9 one constructor with required services per form/control, no `?? new X(null…)` fallbacks, `TestUi.Create` fills fakes (NSubstitute now in the architecture tests), new ports `ICardScanService` / `IEntryCardIssuer`; R7.10 `InlineRegistrationPanel` and `TodayEntriesPanel` split from the desk; R7.1 glossary («الزائر», «فترة الانتظار», «الشباك», «قسيمة»), `GlossaryTests`; R7.2 type scale 9/10/12/14/20; R7.3 palette in `Theme`, `PaletteTests`; R7.4 Accept/Cancel/tab order/Theme buttons in every dialog; R7.5 web: park-local times (the dashboard and reports printed UTC), glossary, empty chart state; R7.13 clipped text at 125 %.
+**Next:** Osama reviews and merges the R7 PR, then **R5** (desk UX). R7.12 (entry-card print layout) waits on Osama saying what to change. R6.5 waits on Q-R6.
 
 **S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
 Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
@@ -144,6 +143,10 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
   with Osama that customer and gift QR printing works without closing the app.
 
 ## Blockers / waiting on the user
+
+- **R7 wording to confirm (Q-R4b defaults applied):** «فترة السماح» and «فترة التهدئة» became «فترة الانتظار»; «المحطة» / «محطة العمل» became «الشباك» (menu «الشبابيك»); «الوصل» / «الكوبون» / «الإيصال» became «القسيمة». Two long sentences were shortened (void warning, select-organization header).
+- **R7.12:** say what the printed entry card should look like (size, fields, logo).
+- **Visible R7 changes to try:** management windows at 125 % (Dpi scaling, no clipping), the gift receipts window has a close button, Esc closes users/workstations lists, web times are park-local.
 
 - **R6.9 re-run:** `scripts\backup.ps1` as Administrator after commit `4a53206` (ownership + child ACL reset).
 - Delete the empty test folder `C:\ParkGate_R69_Test` left by the agent's non-elevated test run (the tool blocks deletes at `C:\`).
@@ -172,13 +175,13 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Session Log (last 10 sessions)
 
-### S37 — 2026-11-18 — R7.6
-- PR #17 was merged; created `phase/r7-consistency` from `main`. Baseline green (723 unit).
-- R7.6 test-first: the new source-scan test failed on `IssueQrDialog.cs` only, then passed. Tests 723 → 724.
-- R7.7, R7.8 done. Visual Studio had the app open and locked `bin\`; built with `--artifacts-path artifacts/verify`.
-- Layout probe (scratchpad only, not committed): renders every designer-backed form/control off-screen, saves PNGs and lists clipped text and overflowing children. Worth turning into a tool for R7.13 / R5.
-- R7.11: Osama hit `ThreadStateException` saving the QR. Test-first (reflection on `Program.Main`); smoke run reached the login window.
-- No test resolves forms from DI; the new constructor follows `GiftQrDialog`'s pattern. R7.9 makes the services required.
+### S37 — 2026-11-18 — Phase R7 (all but R7.12)
+- PR #17 was merged; `phase/r7-consistency` from `main`. Baseline green (723 unit). Tests: .NET unit 723 → 865, web 98 → 101, integration 56.
+- R7.11 found by Osama (QR save threw `ThreadStateException` under the debugger). R7.12 and R7.13 were added during R7.
+- Visual Studio had the app open and locked `bin\`; everything was built with `--artifacts-path artifacts/verify`.
+- Layout probe (scratchpad only): renders every form/control off-screen at the machine DPI (120 here), saves PNGs and lists clipped text and overflow. It drove R7.8, R7.2 and R7.13. Arabic text that wraps can break inside a word in WinForms labels: keep such text on one line.
+- R7.9: removing parameterless constructors exposed that the desk's `Load` reloads organizations and age categories; tests that seed them now pass fakes returning the same data.
+- Bash `sed -i` writes LF; re-checkout such files (`rm f; git checkout -- f`) after committing.
 
 ### S36 — 2026-11-18 — Phase R6 complete (except R6.5, R6.16); R6 PR
 - Baseline green (701 unit). One commit per task, test-first.
