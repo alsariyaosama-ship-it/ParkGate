@@ -122,7 +122,7 @@ Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not fro
 
 **S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
 Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
-**Next:** Osama re-runs `scripts\backup.ps1` as Administrator, then reviews and merges PR #17. Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6. A purge command for the approved retention periods is not built; add it as a task when Osama wants it.
+**Next:** Osama reviews and merges PR #17 (backup script verified). Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6. A purge command for the approved retention periods is not built; add it as a task when Osama wants it.
 
 **S35 (2026-11-18): R6.1, R6.2, R6.12, R6.13, R6.14.** Entry-card tables are EF entities (migration `AdoptEntryCards`); the DB clock is a mapped `SYSUTCDATETIME`; optimistic concurrency with `ConcurrencyRetry` replaced `UPDLOCK` (migration `AddBeneficiaryLastGiftIssuedUtc`); `EfOnlyDataAccessTests` guards ADR-025. Both dev databases were cleaned of the old entry-card objects with Osama's approval (option A) and migrated.
 
@@ -140,7 +140,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **R6.9 re-run:** `scripts\backup.ps1` as Administrator after commit `4a53206` (ownership + child ACL reset).
+- ~~R6.9 re-run~~ **Verified 2026-11-18:** Osama's elevated run wrote `ParkGate_Full_20261118_172041.bak` (7.39 MB, checksum, no compression), and a non-admin can no longer list `C:\ParkGate_Backups`.
 - Delete the empty test folder `C:\ParkGate_R69_Test` left by the agent's non-elevated test run (the tool blocks deletes at `C:\`).
 - **Behaviour change (R6.3):** `CreatedByUserId`, `UpdatedAtUtc` and `UpdatedByUserId` are now filled on holders, organizations and users; they were always NULL before.
 - ~~Apply the three migrations on SQLEXPRESS~~ **Done in S31** (backup first: `C:\ProgramData\ParkGateackups\ParkGate_before_R2.bak`). The 7 pending outbox rows got sequences 1–11 with the re-queued ones and contain no phone, national ID, token or key id. Install the new SyncAgent build before it runs again (still the old one until R8.4).
