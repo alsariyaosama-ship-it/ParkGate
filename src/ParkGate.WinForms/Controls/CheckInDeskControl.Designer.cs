@@ -89,7 +89,7 @@ partial class CheckInDeskControl
         this._mainLayout.MinimumSize = new System.Drawing.Size(0, 690);
         this._mainLayout.Name = "_mainLayout";
         this._mainLayout.RowCount = 6;
-        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
+        this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 76F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 62F));
         this._mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
@@ -155,7 +155,7 @@ partial class CheckInDeskControl
         // _txtCardNumber
         // 
         this._txtCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._txtCardNumber.Font = new System.Drawing.Font("Cairo", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._txtCardNumber.Location = new System.Drawing.Point(475, 6);
         this._txtCardNumber.MaxLength = 50;
         this._txtCardNumber.Name = "_txtCardNumber";
@@ -272,7 +272,7 @@ partial class CheckInDeskControl
         // 
         this._lblHolderName.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblHolderName.AutoSize = true;
-        this._lblHolderName.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblHolderName.Font = new System.Drawing.Font("Cairo", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblHolderName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblHolderName.Location = new System.Drawing.Point(336, 5);
         this._lblHolderName.Name = "_lblHolderName";

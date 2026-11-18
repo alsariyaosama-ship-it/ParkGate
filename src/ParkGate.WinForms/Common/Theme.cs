@@ -48,6 +48,8 @@ public static class Theme
     public static Font BodyBold => AppFont.CreateFont(10F, FontStyle.Bold);
     public static Font Section => AppFont.CreateFont(12F, FontStyle.Bold);
     public static Font Title => AppFont.CreateFont(14F, FontStyle.Bold);
+    /// <summary>Desk card number box (R5.3): the one input read from a distance.</summary>
+    public static Font CardNumber => AppFont.CreateFont(16F, FontStyle.Bold);
     public static Font Caption => AppFont.CreateFont(9F, FontStyle.Regular);
     public static Font Banner => AppFont.CreateFont(20F, FontStyle.Bold);
 

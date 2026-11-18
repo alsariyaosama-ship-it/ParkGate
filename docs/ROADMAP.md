@@ -217,7 +217,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
 - [x] R5.1 Show the remaining time on denial (SPEC A3)
 - [x] R5.2 Banner instead of a message box after registration
-- [ ] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
+- [x] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
 - [ ] R5.4 Keyboard access to the companion counters
 - [ ] R5.5 Mark companion counts prefilled from the last visit
 - [ ] R5.6 Visible «إلغاء العملية…» button above the today grid
@@ -225,6 +225,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
 - [ ] R5.9 Fix amber banner contrast (below 4.5:1)
 - [ ] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
+- [ ] R5.11 Search row in a `TableLayoutPanel` (card box and its label overlap at 125 %)
 
 ### R6 — Database design · branch `phase/r6-database`
 - [x] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script

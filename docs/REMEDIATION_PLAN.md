@@ -167,7 +167,7 @@ All in `src/ParkGate.WinForms/Controls/CheckInDeskControl.cs` unless stated. UI 
 
 - [x] **R5.1 Remaining time on denial.** Banner details: «يُسمح بالدخول الساعة {time} — باقي {h}:{mm}» (SPEC A3 requires the remaining time). Uses R3.9.
 - [x] **R5.2 Replace the "registered successfully" message box** with a banner message; continue straight to the holder panel.
-- [ ] **R5.3 Larger identity text.** Holder name 14 pt bold, card number box 16 pt. Use `Theme` fonts.
+- [x] **R5.3 Larger identity text.** Holder name 14 pt bold, card number box 16 pt. Use `Theme` fonts. Done: `Theme.CardNumber` 16 pt joins the type scale (the one size outside R7.2); the search row grew from 56 to 64 px.
 - [ ] **R5.4 Keyboard access to companion counters.** `Alt+1…9` focuses counter n; `+` / `−` change the focused counter; after a successful lookup of an eligible holder, focus moves to the first counter and Enter records the entry when the card box is not focused. Show the shortcut hints next to the counters.
 - [ ] **R5.5 Mark prefilled companions.** When counts come from the last visit, show «من آخر زيارة» beside the total and tint the counters until the operator changes one or confirms.
 - [ ] **R5.6 Visible void action.** Add a «إلغاء العملية…» button above the today grid (enabled for a selected granted row), with a shortcut. Keep the context menu.
@@ -175,6 +175,7 @@ All in `src/ParkGate.WinForms/Controls/CheckInDeskControl.cs` unless stated. UI 
 - [ ] **R5.8 [Blocked: Q-R7] Layout at the minimum resolution.** Set `MinimumSize` on `MainForm`. At 1366×768 the today grid must show at least 5 rows: make the gift panel collapse to one line when no gift applies, and reduce the fixed rows. Verify at 100 % and 150 % scaling.
 - [ ] **R5.9 Banner contrast.** Detail text on the amber banner (`#F0F0F0` on `#B26A00`) is below 4.5:1. Use white and darken amber to `#9A5B00`. Keep the SPEC colors for green and red.
 - [ ] **R5.10 Idle auto-lock (FR-AUTH-06)** if not implemented: verify, then implement with a setting.
+- [ ] **R5.11 Search row layout** (found in R5.3). `_pnlSearch` places the card box, its label, the organization combo and the search button at absolute positions. At 125 % the card box (710–1190 px) runs under its label (1041–1167 px). Use a `TableLayoutPanel` (AGENTS.md §5.3), as R4.12 did for the gift scan row.
 
 **Done when:** Osama walks through the desk flow keyboard-only on the smallest desk screen.
 

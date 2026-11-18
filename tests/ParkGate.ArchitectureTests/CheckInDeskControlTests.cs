@@ -116,6 +116,21 @@ public sealed class CheckInDeskControlTests
     }
 
     [Fact]
+    public void CheckInDeskControl_IdentityText_IsLargerThanBodyText()
+    {
+        // R5.3: the operator reads the name and the card number at a glance.
+        using var control = TestUi.Create<CheckInDeskControl>();
+
+        var name = GetField<Label>(control, "_lblHolderName").Font;
+        var card = GetField<TextBox>(control, "_txtCardNumber").Font;
+
+        name.SizeInPoints.ShouldBe(14F);
+        name.Bold.ShouldBeTrue();
+        card.SizeInPoints.ShouldBe(16F);
+        card.Bold.ShouldBeTrue();
+    }
+
+    [Fact]
     public void CheckInDeskControl_ShowHolderInfo_WhenCooldownActive_ShouldDisableRecordEntryAndEnableOverride()
     {
         using var control = TestUi.Create<CheckInDeskControl>();
