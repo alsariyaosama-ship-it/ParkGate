@@ -123,6 +123,9 @@ Keyboard-first: the whole flow must be possible without a mouse.
 | BR-16 | **National ID (optional):** digits only after normalization, exactly 12 digits when present. Unique when present (filtered unique index). |
 | BR-17 | **Audit:** create/update of holders, status changes, overrides, voids, settings changes, user management and logins are written to the audit log with user, workstation and DB time. |
 | BR-18 | **Account lockout:** after `Security.MaxFailedLogins` (default 5) failures, the account is locked for `Security.LockoutMinutes` (default 15). |
+| BR-27 | **Entry days (F8, ADR-024):** each organization has allowed weekdays (`AllowedEntryDays`, default all seven). The weekday is that of the park-local business date from the database clock (BR-05). On another day the entry is denied with `DayNotAllowed`, and the banner names the allowed days. Checked right after "organization inactive" in the BR-06 order. A Supervisor can override it (BR-11). |
+| BR-28 | **Gift days (F8):** a gift follows the organization's entry days (BR-27), unless the organization's `GiftAnyDay` option is on. On another day the gift is denied with `DayNotAllowed`; the supervisor gift override can still issue it (Q13). |
+| BR-29 | **Card-number pattern alert (F8):** when a holder is registered or their card number changes, the number's shape (length, character class per position, and a prefix shared by most numbers) is compared with the organization's patterns. A mismatch shows a non-blocking amber note to the operator and writes an alert for the Admin. After `CardPattern.MinSample` (default 10) cards, the dominant shape is proposed and used provisionally until the Admin decides. A shape that reaches `CardPattern.NewSeriesThreshold` (default 5) alerts is proposed as a new series. **Only an Admin approves a pattern**; it is never approved automatically. A rejected pattern keeps alerting, and its holders stay on the review list. |
 
 ## 7. Functional requirements
 
@@ -219,6 +222,11 @@ The MVP data model and abstractions must make these additive, not rewrites.
 - A range is much weaker than a list: any number inside it passes.
 - To decide when approved: what happens for an organization without a list (recommended: supervisor approval), and when a number disappears from a new list (recommended: suspend the holder with the reason shown). Import from Excel with ClosedXML.
 
+### F8 — Entry days and card-number pattern alerts (approved 2026-11-18, not built)
+- Mitigates the forged-card risk accepted in ADR-024. Rules: BR-27, BR-28, BR-29. Data: DATABASE.md §3.1, §3.13, §3.14.
+- Admin screens: allowed weekdays and "gifts on any day" in the organization dialog; a pattern list (approve or reject proposed patterns); an alert list (mark reviewed, or open the holder to suspend or block).
+- The desk shows the amber pattern note under the holder data and never blocks the registration because of it.
+
 ## 10. Data retention and privacy (MVP)
 - Entry history is kept indefinitely until the client defines a policy.
 - Personal data is visible only to authenticated users; exports are limited to Supervisor/Admin.
@@ -241,3 +249,5 @@ Defaults below are applied until the user answers. An agent must not change a de
 | Q10 | Operating hours — any rule tied to closing time? | None | — |
 | Q11 | Gate group handling: Option A, B or C (§9 F2)? | **Deferred by the client** until F2 is scheduled | F2 |
 | Q12 | Which data may go to the cloud? | Answered (Q-R2/Q-R2b): everything except phone and national ID | F3 |
+| Q13 | May the supervisor gift override issue a gift on a day the organization does not allow (BR-28)? | Yes, like the entry override (BR-27) | F8 |
+| Q14 | Do the new F8 fields, patterns and alerts sync to the cloud? | Organization fields yes (part of its payload); patterns and alerts stay local | F8 |

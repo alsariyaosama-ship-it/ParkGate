@@ -156,10 +156,15 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 ---
 
 ### ADR-024 — The organization's card is the source of truth for free entry
-- **Status:** Accepted (Osama, 2026-11-16)
-- **Context:** The desk operator issues free entry and the gate attendant only sees what the desk hands out, so nothing stops an operator from spending the quota of a holder who did not come. The park management accepts that a holder may lend their card to someone else. Stronger checks (phone verification, the organization's employee list) are not available today.
-- **Decision:** A free entry requires the physical card issued by the holder's organization. The card number is the reference; the park's QR is only a faster way to find the holder and never replaces the card. The desk operator checks the card, and the gate attendant checks it again. A forged card is an accepted risk: staff may spot a card that does not look genuine, which raises the effort but does not stop a determined forger. Two stronger measures are recorded as recommendations to the park management (SPEC §9 F6, F7) and are not built.
-- **Consequences:** No schema change now. The highest remaining risks are a forged card and an operator who registers an invented holder at the desk; F7 closes the second when an organization provides its list.
+- **Status:** Accepted (Osama and the park management, 2026-11-16; risk and mitigations updated 2026-11-18)
+- **Context:** The desk operator issues free entry and the gate attendant only sees what the desk hands out. The park management accepts that a holder may lend their card to someone else. Stronger checks (phone verification, the organization's employee list) are not available today.
+- **Decision:**
+  1. A free entry requires the physical card issued by the holder's organization. The card number is the reference; the park's QR is only a faster way to find the holder and never replaces the card. The desk operator checks the card, and the gate attendant checks it again.
+  2. The park management vets the desk operators. Collusion between the desk and the gate is handled by supervision and cameras, as it already is for paid tickets.
+  3. The remaining risk is a **forged card**: once its number is registered it works like a genuine card, and several forged numbers can spread ("snowball"). Copies of one number cannot multiply entries, because the cooldown (BR-03) applies per number.
+  4. Mitigations (SPEC §9 F8): entry only on the organization's allowed weekdays (BR-27, gifts too, BR-28), and a non-blocking alert when a card number does not match the organization's usual numbering pattern (BR-29). A new numbering pattern is accepted only by an Admin, never automatically, so a forger cannot teach the system a forged pattern.
+  5. Two stronger measures are recommendations to the park management and are not built: phone verification (SPEC §9 F6) and the organization's card-number list (SPEC §9 F7).
+- **Consequences:** F8 adds two columns to `Organizations`, two tables and two enum values (DATABASE.md §3.1, §3.13, §3.14). Staff noticing a card that does not look genuine stays the first line of defence.
 
 ---
 
