@@ -14,10 +14,10 @@
 | Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 merged (PR #17). R7 PR #18 open from `phase/r7-consistency` |
 | Working branch | `phase/r7-consistency` (from `main` `88c9867`) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 878 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 340 architecture |
-| .NET Integration tests | 56 passed on LocalDB |
+| .NET Unit tests | 885 passed (non-integration): 210 domain + 240 application + 95 infrastructure + 340 architecture |
+| .NET Integration tests | 57 passed on LocalDB |
 | Web tests | `php artisan test` (PHP 8.4): 101 passed on SQLite (MySQL job runs in CI) |
-| Total tests | 1035 (934 .NET + 101 web), all green |
+| Total tests | 1043 (942 .NET + 101 web), all green |
 | Latest migration | `RemoveUnusedMaskSetting` (S36), after `RemoveUnreadSoundSetting` and `MapDatabaseFilesView` (snapshot only). Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
 
 ## State of the work
@@ -123,7 +123,8 @@ Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not fro
 **S37 (2026-11-18, `phase/r7-consistency`): R7 done; PR #18 opened.** One commit per task, test-first:
 R7.6 QR through `IQrImageRenderer`; R7.11 `Main` synchronous (it was `async`, so the UI ran on an MTA thread and file/print dialogs threw); R7.7 every message box through `Notify`; R7.8 all designers on `Dpi`; R7.9 one constructor with required services per form/control, no `?? new X(null…)` fallbacks, `TestUi.Create` fills fakes (NSubstitute now in the architecture tests), new ports `ICardScanService` / `IEntryCardIssuer`; R7.10 `InlineRegistrationPanel` and `TodayEntriesPanel` split from the desk; R7.1 glossary («الزائر», «فترة الانتظار», «الشباك», «قسيمة»), `GlossaryTests`; R7.2 type scale 9/10/12/14/20; R7.3 palette in `Theme`, `PaletteTests`; R7.4 Accept/Cancel/tab order/Theme buttons in every dialog; R7.5 web: park-local times (the dashboard and reports printed UTC), glossary, empty chart state; R7.13 clipped text at 125 %.
 R7.12 (after Osama's wording, 2026-11-18): entry card and gift voucher print on 80 mm cashier paper through `ReceiptSlips` / `ReceiptPrinter` (company, park, QR, visitor's organization, slip text; no logo, no personal data on the entry card, voucher number but no value on the gift slip, 20 mm cutter feed).
-**Next:** Osama prints both slips on the thermal printer, reviews and merges PR #18, then **R5** (desk UX). R6.5 waits on Q-R6.
+R7.14 (Osama, 2026-11-18): a gift needs gifts enabled for the organization **and** a granted entry today (BR-30, not overridable). PR #19 from `fix/gift-requires-entry`, based on the R7 branch.
+**Next:** Osama prints both slips on the thermal printer, reviews and merges PR #18 and PR #19, then **R5** (desk UX; first item: offer the gift right after a granted entry without a second scan). R6.5 waits on Q-R6.
 
 **S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
 Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
