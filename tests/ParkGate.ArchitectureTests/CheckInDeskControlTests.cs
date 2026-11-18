@@ -556,6 +556,65 @@ public sealed class CheckInDeskControlTests
     }
 
     [Fact]
+    public async Task CheckInDeskControl_CompanionsFromTheLastVisit_AreMarkedUntilTheOperatorChangesOne()
+    {
+        // R5.5: prefilled counts must not pass unnoticed; they are marked until the operator touches a counter.
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 1, OrganizationName: "صندوق التضامن", CardNumber: "100200",
+            FullName: "محمد أحمد علي", Phone: "0912345678", NationalId: null, CardExpiryDate: null,
+            Status: BeneficiaryStatus.Active, StatusReason: null, LastGrantedEntryUtc: DateTime.UtcNow.AddDays(-3),
+            Notes: null, CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: holder.LastGrantedEntryUtc,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var beneficiaries = new FakeBeneficiaryService
+        {
+            LookupReturnResult = [new BeneficiaryLookupResultDto(holder, eligibility, [new CompanionCountDto(1, "طفل", 2)])]
+        };
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries);
+        control.PopulateAgeCategories([new AgeCategoryDto(1, "طفل", "أطفال", 1, true), new AgeCategoryDto(2, "بالغ", "بالغون", 2, true)]);
+        typeof(CheckInDeskControl).GetField("_prefillFromLastVisit", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(control, true);
+        GetField<TextBox>(control, "_txtCardNumber").Text = "100200";
+
+        await control.LookupCardAsync();
+
+        var counters = GetField<List<CounterInput>>(control, "_counterInputs");
+        var total = GetField<Label>(control, "_lblTotalPersons");
+        counters[0].Value.ShouldBe(2);
+        total.Text.ShouldContain(Strings.Label_FromLastVisit);
+        counters.ShouldAllBe(c => c.IsMarkedAsPrefilled);
+
+        counters[1].Increment();
+
+        total.Text.ShouldNotContain(Strings.Label_FromLastVisit);
+        counters.ShouldAllBe(c => !c.IsMarkedAsPrefilled);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_NoCompanionsLastVisit_ShowsNoMark()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 1, OrganizationName: "صندوق التضامن", CardNumber: "100201",
+            FullName: "سالم علي", Phone: "0912345678", NationalId: null, CardExpiryDate: null,
+            Status: BeneficiaryStatus.Active, StatusReason: null, LastGrantedEntryUtc: null,
+            Notes: null, CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var beneficiaries = new FakeBeneficiaryService { LookupReturnResult = [new BeneficiaryLookupResultDto(holder, eligibility, [])] };
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries);
+        control.PopulateAgeCategories([new AgeCategoryDto(1, "طفل", "أطفال", 1, true)]);
+        typeof(CheckInDeskControl).GetField("_prefillFromLastVisit", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(control, true);
+        GetField<TextBox>(control, "_txtCardNumber").Text = "100201";
+
+        await control.LookupCardAsync();
+
+        GetField<Label>(control, "_lblTotalPersons").Text.ShouldNotContain(Strings.Label_FromLastVisit);
+    }
+
+    [Fact]
     public async Task CheckInDeskControl_RecordEntryAsync_SendsRequestAndRefreshesDesk()
     {
         var holder = new BeneficiaryDto(

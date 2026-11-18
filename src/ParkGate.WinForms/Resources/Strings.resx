@@ -625,6 +625,9 @@
   <data name="Title_Companions" xml:space="preserve">
     <value>المرافقون مع الزائر</value>
   </data>
+  <data name="Label_FromLastVisit" xml:space="preserve">
+    <value>(من آخر زيارة)</value>
+  </data>
   <data name="Label_TotalPersons" xml:space="preserve">
     <value>الإجمالي مع الزائر: {0} فرد</value>
   </data>

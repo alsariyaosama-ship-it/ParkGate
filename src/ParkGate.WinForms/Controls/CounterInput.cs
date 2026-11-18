@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 using ParkGate.Domain.Common;
+using ParkGate.WinForms.Common;
 
 namespace ParkGate.WinForms.Controls;
 
@@ -94,6 +95,18 @@ public partial class CounterInput : UserControl
     public void Reset()
     {
         Value = _minValue;
+    }
+
+    /// <summary>True while the value still comes from the visitor's last visit (R5.5).</summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool IsMarkedAsPrefilled { get; private set; }
+
+    /// <summary>Tints the value box while it shows the last visit's count, so it does not pass unnoticed.</summary>
+    public void MarkAsPrefilled(bool marked)
+    {
+        IsMarkedAsPrefilled = marked;
+        _txtValue.BackColor = marked ? Theme.WarningTint : Theme.Surface;
     }
 
     private void WireEvents()

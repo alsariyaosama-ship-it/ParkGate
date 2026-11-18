@@ -53,6 +53,8 @@ public partial class CheckInDeskControl : UserControl
     private IReadOnlyList<int> _registeredElsewhereOrgIds = [];
     private int _maxGroupSize = 10;
     private bool _prefillFromLastVisit;
+    private bool _companionsPrefilled; // R5.5: counts came from the last visit and nobody has touched them yet
+    private bool _isPrefilling;
     private bool _denialSoundEnabled;
     private string? _timeZoneId = "Libya Standard Time";
     private bool _isSearching;
@@ -378,7 +380,7 @@ public partial class CheckInDeskControl : UserControl
                 Value = 0
             };
 
-            counter.ValueChanged += (_, _) => UpdateLiveTotalPersons();
+            counter.ValueChanged += (_, _) => OnCounterChanged();
             _counterInputs.Add(counter);
             _flowCounters.Controls.Add(counter);
         }
@@ -387,12 +389,33 @@ public partial class CheckInDeskControl : UserControl
         UpdateLiveTotalPersons();
     }
 
+    private void OnCounterChanged()
+    {
+        if (!_isPrefilling)
+        {
+            MarkCompanionsPrefilled(false);
+        }
+
+        UpdateLiveTotalPersons();
+    }
+
+    private void MarkCompanionsPrefilled(bool prefilled)
+    {
+        _companionsPrefilled = prefilled;
+        foreach (var counter in _counterInputs)
+        {
+            counter.MarkAsPrefilled(prefilled);
+        }
+    }
+
     private void UpdateLiveTotalPersons()
     {
         var companionsCount = _counterInputs.Sum(c => c.Value);
         var totalPersons = 1 + companionsCount; // BR-08: Holder counts as one person
 
-        _lblTotalPersons.Text = string.Format(Strings.Label_TotalPersons, totalPersons);
+        _lblTotalPersons.Text = _companionsPrefilled
+            ? $"{string.Format(Strings.Label_TotalPersons, totalPersons)} {Strings.Label_FromLastVisit}"
+            : string.Format(Strings.Label_TotalPersons, totalPersons);
 
         var limitExceeded = false;
         var maxFreeLimit = 0;
@@ -903,14 +926,25 @@ public partial class CheckInDeskControl : UserControl
 
     private void PrefillCompanions(IReadOnlyList<CompanionCountDto> companions)
     {
-        foreach (var comp in companions)
+        _isPrefilling = true;
+        try
         {
-            var counter = _counterInputs.FirstOrDefault(c => c.Tag is int id && id == comp.AgeCategoryId);
-            if (counter != null)
+            foreach (var comp in companions)
             {
-                counter.Value = comp.Count;
+                var counter = _counterInputs.FirstOrDefault(c => c.Tag is int id && id == comp.AgeCategoryId);
+                if (counter != null)
+                {
+                    counter.Value = comp.Count;
+                }
             }
         }
+        finally
+        {
+            _isPrefilling = false;
+        }
+
+        MarkCompanionsPrefilled(_counterInputs.Any(c => c.Value > 0));
+        UpdateLiveTotalPersons();
     }
 
     internal async Task SaveInlineRegistrationAsync()
