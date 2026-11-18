@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Beneficiary;
 use App\Models\Organization;
+use App\Support\ParkTime;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,7 +44,7 @@ class BeneficiaryController extends Controller
                     'card_number' => $b->card_number,
                     'organization_name' => $b->organization?->name_ar ?? '—',
                     'status' => $b->status,
-                    'last_entry' => $b->last_granted_entry_utc ? $b->last_granted_entry_utc->format('Y-m-d H:i') : null,
+                    'last_entry' => $b->last_granted_entry_utc ? ParkTime::dateTime($b->last_granted_entry_utc) : null,
                 ];
             });
 

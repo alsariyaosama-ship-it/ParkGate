@@ -39,6 +39,12 @@ public sealed class GlossaryTests
             data.Add(Path.GetRelativePath(root, file));
         }
 
+        // R7.5: the web dashboard uses the same words.
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "web", "resources", "js"), "*.vue", SearchOption.AllDirectories))
+        {
+            data.Add(Path.GetRelativePath(root, file));
+        }
+
         return data;
     }
 

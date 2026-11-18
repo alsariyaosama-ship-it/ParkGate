@@ -41,7 +41,7 @@ const showingNavigationDropdown = ref(false);
                                 <svg class="w-4 h-4 me-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
-                                المستفيدين والبطاقات
+                                الزوار والبطاقات
                             </NavLink>
                             <NavLink :href="route('reports.index')" :active="route().current('reports.*')">
                                 <svg class="w-4 h-4 me-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +92,7 @@ const showingNavigationDropdown = ref(false);
             <div :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="sm:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <div class="space-y-1 pb-3 pt-2">
                     <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">لوحة المتابعة</ResponsiveNavLink>
-                    <ResponsiveNavLink :href="route('beneficiaries.index')" :active="route().current('beneficiaries.*')">المستفيدين والبطاقات</ResponsiveNavLink>
+                    <ResponsiveNavLink :href="route('beneficiaries.index')" :active="route().current('beneficiaries.*')">الزوار والبطاقات</ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('reports.index')" :active="route().current('reports.*')">التقارير والإحصائيات</ResponsiveNavLink>
                 </div>
                 <div class="border-t border-slate-200 dark:border-slate-800 pb-3 pt-4 px-4">

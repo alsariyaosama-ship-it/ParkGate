@@ -33,14 +33,14 @@ const resetFilters = () => {
 </script>
 
 <template>
-    <Head title="سجل حاملي البطاقات والمستفيدين" />
+    <Head title="سجل الزوار" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">سجل المستفيدين وحاملي البطاقات</h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">عرض المستفيدين المزامنين من قاعدة بيانات الحديقة والبحث في بياناتهم</p>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">سجل الزوار وبطاقاتهم</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">عرض الزوار المزامنين من قاعدة بيانات الحديقة والبحث في بياناتهم</p>
                 </div>
             </div>
         </template>
@@ -49,7 +49,7 @@ const resetFilters = () => {
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm mb-6">
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">البحث بالاسم / رقم البطاقة / الهاتف</label>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">البحث بالاسم / رقم البطاقة</label>
                     <input v-model="search" @keyup.enter="applyFilters" type="text" placeholder="اكتب واضغط Enter..."
                         class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
                 </div>
