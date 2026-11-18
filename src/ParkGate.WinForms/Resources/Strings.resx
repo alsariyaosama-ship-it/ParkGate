@@ -1565,7 +1565,7 @@
     <value>تقرير قسائم الهدايا</value>
   </data>
   <data name="Title_GiftReceipts" xml:space="preserve">
-    <value>تقرير قسائم ووصولات الهدايا</value>
+    <value>تقرير قسائم الهدايا</value>
   </data>
   <data name="Label_DateFrom" xml:space="preserve">
     <value>من تاريخ:</value>
@@ -1592,7 +1592,7 @@
     <value>إجمالي القسائم: {0} | القيمة الإجمالية: {1:N3} د.ل (مصروفة: {2} بقيمة {3:N3} د.ل | نشطة: {4} بقيمة {5:N3} د.ل | ملغاة: {6} بقيمة {7:N3} د.ل)</value>
   </data>
   <data name="Col_Gift_ReceiptNo" xml:space="preserve">
-    <value>رقم الإيصال</value>
+    <value>رقم القسيمة</value>
   </data>
   <data name="Col_Gift_HolderName" xml:space="preserve">
     <value>اسم الزائر</value>

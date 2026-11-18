@@ -283,7 +283,7 @@ partial class GiftReceiptsForm
         RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         RightToLeftLayout = true;
         StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-        Text = "تقرير قسائم ووصولات الهدايا";
+        Text = "تقرير قسائم الهدايا";
         _mainLayout.ResumeLayout(false);
         _filtersPanel.ResumeLayout(false);
         _filtersPanel.PerformLayout();
