@@ -110,7 +110,7 @@ public partial class ChangeUserRoleDialog : RtlFormBase
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error updating user role.");
-                ShowError(Strings.Msg_UnexpectedError + Environment.NewLine + ex.Message);
+                ShowError(UserMessages.Describe(ex));
             }
         }
     }

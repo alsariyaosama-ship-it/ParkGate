@@ -23,6 +23,7 @@ partial class GiftRedeemControl
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
         this._mainLayout = new System.Windows.Forms.TableLayoutPanel();
         this._pnlScan = new System.Windows.Forms.Panel();
+        this._tblScan = new System.Windows.Forms.TableLayoutPanel();
         this._lblScan = new System.Windows.Forms.Label();
         this._txtScan = new System.Windows.Forms.TextBox();
         this._btnRedeem = new System.Windows.Forms.Button();
@@ -53,6 +54,7 @@ partial class GiftRedeemControl
         this._lblTodaySummary = new System.Windows.Forms.Label();
         this._mainLayout.SuspendLayout();
         this._pnlScan.SuspendLayout();
+        this._tblScan.SuspendLayout();
         this._grpDetails.SuspendLayout();
         this._tblDetails.SuspendLayout();
         this._grpToday.SuspendLayout();
@@ -83,10 +85,7 @@ partial class GiftRedeemControl
         // 
         this._pnlScan.BackColor = System.Drawing.Color.White;
         this._pnlScan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-        this._pnlScan.Controls.Add(this._btnClear);
-        this._pnlScan.Controls.Add(this._btnRedeem);
-        this._pnlScan.Controls.Add(this._txtScan);
-        this._pnlScan.Controls.Add(this._lblScan);
+        this._pnlScan.Controls.Add(this._tblScan);
         this._pnlScan.Dock = System.Windows.Forms.DockStyle.Fill;
         this._pnlScan.Location = new System.Drawing.Point(0, 0);
         this._pnlScan.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
@@ -94,14 +93,34 @@ partial class GiftRedeemControl
         this._pnlScan.Padding = new System.Windows.Forms.Padding(8, 8, 8, 8);
         this._pnlScan.Size = new System.Drawing.Size(988, 54);
         this._pnlScan.TabIndex = 0;
-        // 
+        //
+        // _tblScan
+        //
+        this._tblScan.ColumnCount = 4;
+        this._tblScan.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblScan.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._tblScan.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblScan.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
+        this._tblScan.Controls.Add(this._lblScan, 0, 0);
+        this._tblScan.Controls.Add(this._txtScan, 1, 0);
+        this._tblScan.Controls.Add(this._btnRedeem, 2, 0);
+        this._tblScan.Controls.Add(this._btnClear, 3, 0);
+        this._tblScan.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._tblScan.Location = new System.Drawing.Point(8, 8);
+        this._tblScan.Margin = new System.Windows.Forms.Padding(0);
+        this._tblScan.Name = "_tblScan";
+        this._tblScan.RowCount = 1;
+        this._tblScan.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._tblScan.Size = new System.Drawing.Size(970, 36);
+        this._tblScan.TabIndex = 0;
+        //
         // _lblScan
-        // 
-        this._lblScan.Anchor = System.Windows.Forms.AnchorStyles.Right;
+        //
+        this._lblScan.Anchor = System.Windows.Forms.AnchorStyles.None;
         this._lblScan.AutoSize = true;
+        this._lblScan.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
         this._lblScan.Font = new System.Drawing.Font("Cairo", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblScan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._lblScan.Location = new System.Drawing.Point(700, 12);
         this._lblScan.Name = "_lblScan";
         this._lblScan.Size = new System.Drawing.Size(275, 26);
         this._lblScan.TabIndex = 0;
@@ -111,7 +130,7 @@ partial class GiftRedeemControl
         // 
         this._txtScan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
         this._txtScan.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._txtScan.Location = new System.Drawing.Point(260, 8);
+        this._txtScan.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
         this._txtScan.MaxLength = 500;
         this._txtScan.Name = "_txtScan";
         this._txtScan.Size = new System.Drawing.Size(430, 37);
@@ -119,14 +138,14 @@ partial class GiftRedeemControl
         // 
         // _btnRedeem
         // 
-        this._btnRedeem.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this._btnRedeem.Anchor = System.Windows.Forms.AnchorStyles.None;
         this._btnRedeem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._btnRedeem.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnRedeem.FlatAppearance.BorderSize = 0;
         this._btnRedeem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnRedeem.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnRedeem.ForeColor = System.Drawing.Color.White;
-        this._btnRedeem.Location = new System.Drawing.Point(120, 7);
+        this._btnRedeem.Margin = new System.Windows.Forms.Padding(0, 0, 8, 0);
         this._btnRedeem.Name = "_btnRedeem";
         this._btnRedeem.Size = new System.Drawing.Size(130, 38);
         this._btnRedeem.TabIndex = 2;
@@ -135,14 +154,14 @@ partial class GiftRedeemControl
         // 
         // _btnClear
         // 
-        this._btnClear.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this._btnClear.Anchor = System.Windows.Forms.AnchorStyles.None;
         this._btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
         this._btnClear.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
         this._btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnClear.Font = new System.Drawing.Font("Cairo", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
-        this._btnClear.Location = new System.Drawing.Point(8, 7);
+        this._btnClear.Margin = new System.Windows.Forms.Padding(0);
         this._btnClear.Name = "_btnClear";
         this._btnClear.Size = new System.Drawing.Size(105, 38);
         this._btnClear.TabIndex = 3;
@@ -467,7 +486,7 @@ partial class GiftRedeemControl
         // 
         // GiftRedeemControl
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+        this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
         this.Controls.Add(this._mainLayout);
@@ -476,8 +495,9 @@ partial class GiftRedeemControl
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         this.Size = new System.Drawing.Size(1008, 661);
         this._mainLayout.ResumeLayout(false);
+        this._tblScan.ResumeLayout(false);
+        this._tblScan.PerformLayout();
         this._pnlScan.ResumeLayout(false);
-        this._pnlScan.PerformLayout();
         this._grpDetails.ResumeLayout(false);
         this._tblDetails.ResumeLayout(false);
         this._tblDetails.PerformLayout();
@@ -491,6 +511,7 @@ partial class GiftRedeemControl
 
     private System.Windows.Forms.TableLayoutPanel _mainLayout;
     private System.Windows.Forms.Panel _pnlScan;
+    private System.Windows.Forms.TableLayoutPanel _tblScan;
     private System.Windows.Forms.Label _lblScan;
     private System.Windows.Forms.TextBox _txtScan;
     private System.Windows.Forms.Button _btnRedeem;

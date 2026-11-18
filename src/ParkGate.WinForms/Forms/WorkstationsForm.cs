@@ -168,7 +168,7 @@ public partial class WorkstationsForm : RtlFormBase
         _gridWorkstations.ResumeLayout(true);
         var activeCount = list.Count(w => w.IsActive);
         var inactiveCount = list.Count - activeCount;
-        _lblCount.Text = $"إجمالي المحطات: {list.Count} (نشطة: {activeCount} | معطلة: {inactiveCount})";
+        _lblCount.Text = string.Format(Strings.Ui_Workstations_01, list.Count, activeCount, inactiveCount);
 
         if (_gridWorkstations.Rows.Count > 0)
         {

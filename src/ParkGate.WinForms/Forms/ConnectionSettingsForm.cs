@@ -159,7 +159,7 @@ public partial class ConnectionSettingsForm : RtlFormBase
 
         SetBusy(true);
         lblStatus.ForeColor = Color.FromArgb(70, 70, 70);
-        lblStatus.Text = "جاري اختبار الاتصال بقاعدة البيانات...";
+        lblStatus.Text = Strings.Ui_ConnectionSettings_01;
 
         try
         {
@@ -183,7 +183,7 @@ public partial class ConnectionSettingsForm : RtlFormBase
         {
             lblStatus.ForeColor = Color.FromArgb(198, 40, 40);
             lblStatus.Text = Strings.Msg_ConnectionFailed;
-            Notify.Error(ex.Message, Strings.Title_Error, this);
+            Notify.Error(UserMessages.LogAndDescribe(ex, "Connection test"), Strings.Title_Error, this);
         }
         finally
         {
@@ -210,7 +210,7 @@ public partial class ConnectionSettingsForm : RtlFormBase
                 if (!canConnect)
                 {
                     var proceedAnyway = Notify.Confirm(
-                        Strings.Msg_ConnectionFailed + Environment.NewLine + "هل ترغب في حفظ هذه الإعدادات على أي حال؟",
+                        Strings.Msg_ConnectionFailed + Environment.NewLine + Strings.Ui_ConnectionSettings_02,
                         Strings.Title_Confirm,
                         this);
 

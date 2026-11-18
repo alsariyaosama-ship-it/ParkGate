@@ -123,7 +123,7 @@ public partial class LoginForm : RtlFormBase
         }
         catch (Exception ex)
         {
-            lblError.Text = ex.Message;
+            lblError.Text = UserMessages.LogAndDescribe(ex, "Login");
         }
         finally
         {

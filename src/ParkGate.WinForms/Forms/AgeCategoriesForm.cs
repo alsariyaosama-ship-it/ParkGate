@@ -135,7 +135,7 @@ public partial class AgeCategoriesForm : RtlFormBase
         foreach (var c in list)
         {
             var statusText = c.IsActive ? Strings.Status_Active : Strings.Status_Inactive;
-            var exemptText = c.IsCompanionLimitExempt ? "نعم" : "لا";
+            var exemptText = c.IsCompanionLimitExempt ? Strings.Ui_AgeCategories_01 : Strings.Ui_AgeCategories_02;
 
             var rowIndex = _gridAgeCategories.Rows.Add(
                 c.NameAr,
@@ -160,7 +160,7 @@ public partial class AgeCategoriesForm : RtlFormBase
         _gridAgeCategories.ResumeLayout(true);
         var activeCount = list.Count(c => c.IsActive);
         var inactiveCount = list.Count - activeCount;
-        _lblCount.Text = $"إجمالي الفئات: {list.Count}  (النشطة: {activeCount} | المعطلة: {inactiveCount})";
+        _lblCount.Text = string.Format(Strings.Ui_AgeCategories_03, list.Count, activeCount, inactiveCount);
 
         if (_gridAgeCategories.Rows.Count > 0)
         {

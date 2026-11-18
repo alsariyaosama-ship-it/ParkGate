@@ -187,16 +187,19 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R3.10 `EntryCardIssuer` computes the card expiry from the client clock (`TimeProvider.GetLocalNow`) — use `ParkClock` (found in R3.7)
 
 ### R4 — Desk UI defects · branch `phase/r4-desk-ui`
-- [ ] R4.1 `BusyScope` must restore each control's previous `Enabled` state
-- [ ] R4.2 Do not lose a scan during the success delay; queue lookups instead of dropping them
-- [ ] R4.3 Organization combo in the inline registration panel (required)
-- [ ] R4.4 Amber banner when the card is registered under another organization
-- [ ] R4.5 Confirm before Esc discards a half-filled registration form
-- [ ] R4.6 Designer-backed `SelectOrganizationDialog` with Accept/Cancel buttons
-- [ ] R4.7 No raw exception text in front of the operator (11 places)
-- [ ] R4.8 Move the 94 hardcoded Arabic literals to `Strings.resx`; add an architecture test
-- [ ] R4.9 Remove the fallback age categories with invented ids
-- [ ] R4.10 Warn once when the Cairo font family is not installed system-wide
+- [x] R4.1 `BusyScope` must restore each control's previous `Enabled` state
+- [x] R4.2 Do not lose a scan during the success delay; queue lookups instead of dropping them
+- [x] R4.3 Organization combo in the inline registration panel (required)
+- [x] R4.4 Amber banner when the card is registered under another organization
+- [x] R4.5 Confirm before Esc discards a half-filled registration form
+- [x] R4.6 Designer-backed `SelectOrganizationDialog` with Accept/Cancel buttons
+- [x] R4.7 No raw exception text in front of the operator (11 places)
+- [x] R4.8 Move the 94 hardcoded Arabic literals to `Strings.resx`; add an architecture test
+- [x] R4.9 Remove the fallback age categories with invented ids
+- [x] R4.10 Warn once when the Cairo font family is not installed system-wide
+- [x] R4.11 Fix gift redemption screen scaling (`AutoScaleDimensions` 96x96) and add a designer scaling guard test
+- [x] R4.12 Lay out the gift redemption scan row with a `TableLayoutPanel`
+- [x] R4.13 Stop clipping on the check-in desk (gift panel, registration buttons) at 120 % DPI
 
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
 - [ ] R5.1 Show the remaining time on denial (SPEC A3)
@@ -211,8 +214,8 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
 
 ### R6 — Database design · branch `phase/r6-database`
-- [ ] R6.1 Bring the entry-card tables under EF migrations; remove the runtime initializer
-- [ ] R6.2 Fix convention drift in those tables (`WorkstationId` FK, `IX_CardScanLog_CardId`)
+- [ ] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script
+- [ ] R6.2 Rename to conventions (`Utc` suffix, `datetime2(3)`), `WorkstationId` FK, `IX_CardScanLog_CardId`, audit columns
 - [ ] R6.3 Audit columns from the database clock, not the client clock (BR-05)
 - [ ] R6.4 Bring `DATABASE.md` up to the model; test the documented table list against it
 - [ ] R6.5 Least-privilege `parkgate_app` login; restrict the firewall rules — blocked on Q-R6
@@ -221,6 +224,10 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R6.8 Database size warning on the Admin backup screen; propose a retention policy
 - [ ] R6.9 ACL-restricted backup folder; document an encrypted off-site copy
 - [ ] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
+- [ ] R6.11 Write management audit rows in the same unit of work; record old and new card number
+- [ ] R6.12 Read the database clock through a mapped `SYSUTCDATETIME` function instead of SQL text
+- [ ] R6.13 Optimistic concurrency on `Beneficiaries.RowVersion` replaces `UPDLOCK` (ADR-026); add `LastGiftIssuedUtc`
+- [ ] R6.14 Architecture test: no raw SQL in `src/` except the backup command
 
 ### R7 — Wording and visual consistency · branch `phase/r7-consistency`
 - [ ] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b
@@ -228,6 +235,11 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R7.3 One neutral palette; test against `Color.FromArgb` literals outside `Theme.cs`
 - [ ] R7.4 Dialog conventions: `AcceptButton`, `CancelButton`, tab order, `Theme` button styles
 - [ ] R7.5 Web UI: same glossary, park-local times, empty states, no phone or national ID
+- [ ] R7.6 Remove the Infrastructure reference from `IssueQrDialog`; architecture test
+- [ ] R7.7 All message boxes through `Notify`; architecture test
+- [ ] R7.8 All designers on `AutoScaleMode.Dpi`; extend `DesignerScalingTests`
+- [ ] R7.9 Resolve forms and controls through `IFormFactory`; required services, no null fallbacks
+- [ ] R7.10 Split `CheckInDeskControl` into smaller user controls
 
 ### R8 — Build, packaging and deployment · branch `phase/r8-release`
 - [ ] R8.1 Fix the doubled backslash in the published `appsettings.json` server path

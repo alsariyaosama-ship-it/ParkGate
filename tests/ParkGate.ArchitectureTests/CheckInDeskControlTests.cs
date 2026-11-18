@@ -487,6 +487,362 @@ public sealed class CheckInDeskControlTests
     }
 
     [Fact]
+    public async Task CheckInDeskControl_RecordEntryAsync_AfterSuccessAndReset_BothActionButtonsStayDisabled()
+    {
+        // R4.1: BusyScope used to re-enable the buttons on the empty desk after ResetDesk disabled them.
+        var holder = new BeneficiaryDto(
+            Guid.NewGuid(), 1, "صندوق التضامن", "100201", "محمد أحمد علي", "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
+
+        using var control = new CheckInDeskControl(null, new FakeCheckInService(), null, null, null, null, null, null, null, null);
+        control.AutoResetDelayMs = 0;
+        control.ShowHolderInfo(holder, eligibility);
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeTrue();
+
+        await control.RecordEntryAsync();
+
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeFalse();
+        GetField<Button>(control, "_btnOverride").Enabled.ShouldBeFalse();
+    }
+
+    // ── R4.3: inline registration carries an explicit organization ──────────
+
+    private static (CheckInDeskControl Control, FakeBeneficiaryService Beneficiaries) DeskWithTwoOrganizations()
+    {
+        var beneficiaries = new FakeBeneficiaryService();
+        var orgs = new FakeOrganizationService(
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(1, "SHA", "هيئة الشهداء", 720, IsDefault: false, IsActive: true),
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
+        var control = new CheckInDeskControl(beneficiaries, null, orgs, null, null, null, null, null, null, null);
+        return (control, beneficiaries);
+    }
+
+    private static async Task FillAndSaveRegistrationAsync(CheckInDeskControl control)
+    {
+        GetField<TextBox>(control, "_txtRegFullName").Text = "سالم محمود علي الورفلي";
+        GetField<TextBox>(control, "_txtRegPhone").Text = "0912345678";
+        await control.SaveInlineRegistrationAsync();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_FilterAll_UsesTheDefaultOrganization()
+    {
+        var (control, beneficiaries) = DeskWithTwoOrganizations();
+        using var _ = control;
+        await control.OnDeskLoadedAsync();
+        GetField<ComboBox>(control, "_cmbOrganization").SelectedIndex = 0; // «الكل»
+        GetField<TextBox>(control, "_txtCardNumber").Text = "555";
+
+        control.ShowInlineRegistration("555");
+        await FillAndSaveRegistrationAsync(control);
+
+        beneficiaries.LastRegisterRequest.ShouldNotBeNull();
+        beneficiaries.LastRegisterRequest.OrganizationId.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_PreselectsTheFilteredOrganization()
+    {
+        var (control, beneficiaries) = DeskWithTwoOrganizations();
+        using var _ = control;
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "556";
+
+        control.ShowInlineRegistration("556", orgId: 1);
+        await FillAndSaveRegistrationAsync(control);
+
+        beneficiaries.LastRegisterRequest!.OrganizationId.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_OperatorCanChooseAnotherOrganization()
+    {
+        var (control, beneficiaries) = DeskWithTwoOrganizations();
+        using var _ = control;
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "557";
+
+        control.ShowInlineRegistration("557");
+        GetField<ComboBox>(control, "_cmbRegOrganization").SelectedIndex = 0; // first item: هيئة الشهداء (id 1)
+        await FillAndSaveRegistrationAsync(control);
+
+        beneficiaries.LastRegisterRequest!.OrganizationId.ShouldBe(1);
+    }
+
+    // ── R4.4: a card registered under another organization ──────────────────
+
+    [Fact]
+    public async Task CheckInDeskControl_CardOnlyInAnotherOrganization_SaysWhereAndSecondEnterLoadsIt()
+    {
+        var holderInOrg2 = new BeneficiaryDto(
+            Guid.NewGuid(), 2, "صندوق التضامن", "777", "خالد عمر", "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
+        var beneficiaries = new FakeBeneficiaryService
+        {
+            LookupReturnResult = [new BeneficiaryLookupResultDto(holderInOrg2, eligibility, [])]
+        };
+        var orgs = new FakeOrganizationService(
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(1, "SHA", "هيئة الشهداء", 720, IsDefault: false, IsActive: true),
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
+        using var control = new CheckInDeskControl(beneficiaries, null, orgs, null, null, null, null, null, null, null);
+        await control.OnDeskLoadedAsync();
+        var filter = GetField<ComboBox>(control, "_cmbOrganization");
+        filter.SelectedIndex = 1; // هيئة الشهداء (id 1)
+        GetField<TextBox>(control, "_txtCardNumber").Text = "777";
+
+        await control.LookupCardAsync();
+
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        banner.State.ShouldBe(BannerState.Warning);
+        banner.Title.ShouldContain("صندوق التضامن");
+        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBeFalse();
+
+        await control.LookupCardAsync();
+
+        beneficiaries.LastOrganizationLookup.ShouldBe(2);
+        GetField<ComboBox>(control, "_cmbOrganization").SelectedIndex.ShouldBe(2);
+        banner.State.ShouldBe(BannerState.Granted);
+    }
+
+    // ── R4.5: Esc does not silently discard a half-filled registration ──────
+
+    private static bool PressEscape(CheckInDeskControl control) =>
+        (bool)typeof(CheckInDeskControl)
+            .GetMethod("ProcessCmdKey", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(control, [new Message(), Keys.Escape])!;
+
+    [Theory]
+    [InlineData(false, true)]  // operator says "keep": the form and the typed name stay
+    [InlineData(true, false)]  // operator confirms: the desk resets
+    public void CheckInDeskControl_Escape_OnHalfFilledRegistration_AsksFirst(bool confirm, bool formStays)
+    {
+        var notify = new FakeNotifyService(confirm);
+        using var control = new CheckInDeskControl(null, null, null, null, null, null, null, null, notify, null);
+        control.ShowInlineRegistration("888");
+        GetField<TextBox>(control, "_txtRegFullName").Text = "سالم محمود";
+
+        PressEscape(control).ShouldBeTrue();
+
+        notify.ConfirmCalls.ShouldBe(1);
+        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBe(formStays);
+        GetField<TextBox>(control, "_txtRegFullName").Text.ShouldBe(formStays ? "سالم محمود" : string.Empty);
+    }
+
+    [Fact]
+    public void CheckInDeskControl_Escape_OnEmptyRegistration_ResetsWithoutAsking()
+    {
+        var notify = new FakeNotifyService(confirmAnswer: false);
+        using var control = new CheckInDeskControl(null, null, null, null, null, null, null, null, notify, null);
+        control.ShowInlineRegistration("889");
+
+        PressEscape(control).ShouldBeTrue();
+
+        notify.ConfirmCalls.ShouldBe(0);
+        GetField<GroupBox>(control, "_grpRegistration").Visible.ShouldBeFalse();
+    }
+
+    // ── R4.6: choosing among several organizations ─────────────────────────
+
+    private static BeneficiaryLookupResultDto MatchIn(int orgId, string orgName, string name) => new(
+        new BeneficiaryDto(Guid.NewGuid(), orgId, orgName, "999", name, "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow),
+        new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null),
+        []);
+
+    [Fact]
+    public void SelectOrganizationDialog_HasEnterAndEscButtons_AndChoosesTheSelectedRow()
+    {
+        using var dialog = new ParkGate.WinForms.Forms.SelectOrganizationDialog();
+        var first = MatchIn(1, "هيئة الشهداء", "أحمد");
+        var second = MatchIn(2, "صندوق التضامن", "سالم");
+        dialog.SetMatches([first, second]);
+
+        dialog.AcceptButton.ShouldBe(GetField<Button>(dialog, "_btnSelect"));
+        dialog.CancelButton.ShouldBe(GetField<Button>(dialog, "_btnCancel"));
+        dialog.SelectedMatch.ShouldBeNull();
+
+        GetField<ListBox>(dialog, "_lstOrganizations").SelectedIndex = 1;
+        dialog.Choose();
+
+        dialog.DialogResult.ShouldBe(DialogResult.OK);
+        dialog.SelectedMatch.ShouldBe(second);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_SeveralOrganizationsAndChooserCancelled_ShowsNobody()
+    {
+        // R4.6: closing the chooser used to load matches[0].
+        var beneficiaries = new FakeBeneficiaryService
+        {
+            LookupReturnResult = [MatchIn(1, "هيئة الشهداء", "أحمد"), MatchIn(2, "صندوق التضامن", "سالم")]
+        };
+        using var control = new CheckInDeskControl(beneficiaries, null, null, null, null, null, null, null, null, null)
+        {
+            ChooseOrganizationOverride = _ => null
+        };
+        GetField<TextBox>(control, "_txtCardNumber").Text = "999";
+
+        await control.LookupCardAsync();
+
+        GetField<StatusBanner>(control, "_statusBanner").State.ShouldBe(BannerState.Neutral);
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeFalse();
+        GetField<Label>(control, "_lblHolderName").Text.ShouldNotContain("أحمد");
+    }
+
+    // ── R4.9: no invented age categories ───────────────────────────────────
+
+    private sealed class FailingAgeCategoryService : ParkGate.Application.AgeCategories.Services.IAgeCategoryService
+    {
+        public int Calls { get; private set; }
+        public bool Fail { get; set; } = true;
+
+        public Task<IReadOnlyList<AgeCategoryDto>> GetActiveAsync(CancellationToken cancellationToken = default)
+        {
+            Calls++;
+            return Fail
+                ? throw new InvalidOperationException("database is down")
+                : Task.FromResult<IReadOnlyList<AgeCategoryDto>>([new AgeCategoryDto(7, "طفل", null, 1, true)]);
+        }
+
+        public Task<IReadOnlyList<AgeCategoryDto>> GetAllAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<AgeCategoryDto>> GetByIdAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<AgeCategoryDto>> CreateAsync(CreateAgeCategoryRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<AgeCategoryDto>> UpdateAsync(UpdateAgeCategoryRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> DeactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> ReactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_AgeCategoriesFailToLoad_NoFakeCountersAndRecordingDisabled()
+    {
+        var categories = new FailingAgeCategoryService();
+        using var control = new CheckInDeskControl(null, null, null, categories, null, null, null, null, null, null);
+
+        await control.LoadAgeCategoriesAsync();
+
+        GetField<List<CounterInput>>(control, "_counterInputs").ShouldBeEmpty();
+        GetField<StatusBanner>(control, "_statusBanner").State.ShouldBe(BannerState.Denied);
+
+        control.ShowHolderInfo(
+            new BeneficiaryDto(Guid.NewGuid(), 1, "صندوق التضامن", "321", "علي", "0912345678", null, null,
+                BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow),
+            new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null));
+
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_AgeCategoriesFailed_NextLookupRetriesLoading()
+    {
+        var categories = new FailingAgeCategoryService();
+        using var control = new CheckInDeskControl(new FakeBeneficiaryService(), null, null, categories, null, null, null, null, null, null);
+        // Creating the handle raises Load, which loads the desk once; measure only what the lookup does.
+        // Fakes complete synchronously, so Load runs to the end here, on the test thread.
+        control.CreateControl();
+        await control.LoadAgeCategoriesAsync();
+        var callsBeforeLookup = categories.Calls;
+        categories.Fail = false;
+        GetField<TextBox>(control, "_txtCardNumber").Text = "322";
+
+        await control.LookupCardAsync();
+
+        categories.Calls.ShouldBe(callsBeforeLookup + 1);
+        GetField<List<CounterInput>>(control, "_counterInputs").Count.ShouldBe(1);
+    }
+
+    // ── R4.2: nothing is lost during the success banner ────────────────────
+
+    private static (CheckInDeskControl Control, FakeBeneficiaryService Beneficiaries, TaskCompletionSource Delay) DeskWithHolderShown(string nextHolderName)
+    {
+        // The success delay is a task the test completes itself, so everything stays on the test thread.
+        var delay = new TaskCompletionSource();
+        var next = new BeneficiaryDto(Guid.NewGuid(), 1, "صندوق التضامن", "777", nextHolderName, "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(true, EntryResult.Allowed, null, string.Empty, false, 720, null, null, null);
+        var beneficiaries = new FakeBeneficiaryService { LookupReturnResult = [new BeneficiaryLookupResultDto(next, eligibility, [])] };
+        var control = new CheckInDeskControl(beneficiaries, new FakeCheckInService(), null, null, null, null, null, null, null, null)
+        {
+            AutoResetDelayMs = 300,
+            SuccessDelay = _ => delay.Task
+        };
+        control.ShowHolderInfo(
+            new BeneficiaryDto(Guid.NewGuid(), 1, "صندوق التضامن", "100", "الحامل الأول", "0912345678", null, null,
+                BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow),
+            eligibility);
+        return (control, beneficiaries, delay);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_ScanDuringSuccessDelay_IsShownAndNotWipedWhenTheDelayEnds()
+    {
+        var (control, _, delay) = DeskWithHolderShown("الحامل الثاني");
+        using var _c = control;
+
+        var recording = control.RecordEntryAsync();          // waits in the success delay
+        GetField<TextBox>(control, "_txtCardNumber").Text = "777";
+        await control.LookupCardAsync();                      // the scanner's Enter
+        delay.SetResult();
+        await recording;
+
+        GetField<TextBox>(control, "_txtCardNumber").Text.ShouldBe("777");
+        GetField<Label>(control, "_lblHolderName").Text.ShouldContain("الحامل الثاني");
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_TypingDuringSuccessDelay_KeepsTheText()
+    {
+        var (control, beneficiaries, delay) = DeskWithHolderShown("الحامل الثاني");
+        using var _c = control;
+
+        var recording = control.RecordEntryAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text.ShouldBeEmpty(); // freed at once for the next card
+        GetField<TextBox>(control, "_txtCardNumber").Text = "12";          // typed, no Enter yet
+        delay.SetResult();
+        await recording;
+
+        GetField<TextBox>(control, "_txtCardNumber").Text.ShouldBe("12");
+        beneficiaries.LookupCalls.ShouldBe(0); // a half-typed number is not looked up
+        GetField<StatusBanner>(control, "_statusBanner").State.ShouldBe(BannerState.Neutral);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_LookupWhileSearching_IsQueuedNotDropped()
+    {
+        var beneficiaries = new FakeBeneficiaryService { LookupGate = new TaskCompletionSource() };
+        using var control = new CheckInDeskControl(beneficiaries, null, null, null, null, null, null, null, null, null);
+        var cardBox = GetField<TextBox>(control, "_txtCardNumber");
+
+        cardBox.Text = "111";
+        var first = control.LookupCardAsync();
+        cardBox.Text = "222";
+        await control.LookupCardAsync();   // arrives while the first is still running
+        beneficiaries.LookupGate.SetResult();
+        await first;
+
+        beneficiaries.LookupCalls.ShouldBe(2);
+        beneficiaries.LastCardNumberLookup.ShouldBe("222");
+    }
+
+    [Fact]
+    public void BusyScope_RestoresEachControlsPreviousEnabledState()
+    {
+        using var enabled = new Button { Enabled = true };
+        using var disabled = new Button { Enabled = false };
+
+        using (new ParkGate.WinForms.Common.BusyScope(null, enabled, disabled))
+        {
+            enabled.Enabled.ShouldBeFalse();
+            disabled.Enabled.ShouldBeFalse();
+        }
+
+        enabled.Enabled.ShouldBeTrue();
+        disabled.Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
     public async Task CheckInDeskControl_RefreshTodayDeskSummaryAsync_UpdatesSummaryStripAndBreakdown()
     {
         var fakeCheckInService = new FakeCheckInService();
@@ -644,10 +1000,20 @@ public sealed class CheckInDeskControlTests
 
         public int? LastOrganizationLookup { get; private set; }
 
-        public Task<ParkGate.Application.Common.Result<CardLookupDto>> LookupByCardNumberAsync(string cardNumber, int? organizationId = null, CancellationToken cancellationToken = default)
+        public int LookupCalls { get; private set; }
+
+        /// <summary>When set, lookups wait for it: lets a test start a second lookup while the first is running.</summary>
+        public TaskCompletionSource? LookupGate { get; set; }
+
+        public async Task<ParkGate.Application.Common.Result<CardLookupDto>> LookupByCardNumberAsync(string cardNumber, int? organizationId = null, CancellationToken cancellationToken = default)
         {
+            LookupCalls++;
             LastCardNumberLookup = cardNumber;
             LastOrganizationLookup = organizationId;
+            if (LookupGate != null)
+            {
+                await LookupGate.Task;
+            }
 
             // Same split as BeneficiaryService (R3.8).
             var inSelected = LookupReturnResult.Where(m => organizationId is null || m.Beneficiary.OrganizationId == organizationId).ToList();
@@ -655,14 +1021,19 @@ public sealed class CheckInDeskControlTests
                 .Where(m => organizationId is not null && m.Beneficiary.OrganizationId != organizationId)
                 .Select(m => new OrganizationRefDto(m.Beneficiary.OrganizationId, m.Beneficiary.OrganizationName))
                 .ToList();
-            return Task.FromResult(ParkGate.Application.Common.Result.Success(new CardLookupDto(inSelected, elsewhere)));
+            return ParkGate.Application.Common.Result.Success(new CardLookupDto(inSelected, elsewhere));
         }
 
         public Task<ParkGate.Application.Common.Result<BeneficiaryLookupResultDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
+        public RegisterBeneficiaryRequest? LastRegisterRequest { get; private set; }
+
         public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> RegisterAsync(RegisterBeneficiaryRequest request, CancellationToken cancellationToken = default)
-            => throw new NotImplementedException();
+        {
+            LastRegisterRequest = request;
+            return Task.FromResult(ParkGate.Application.Common.Result.Failure<BeneficiaryDto>(ParkGate.Application.Common.Errors.General.NotFound));
+        }
 
         public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> UpdateAsync(UpdateBeneficiaryRequest request, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
@@ -675,6 +1046,35 @@ public sealed class CheckInDeskControlTests
 
         public Task<ParkGate.Application.Common.Result<IReadOnlyList<EntryAttemptDto>>> GetHistoryAsync(Guid beneficiaryId, int maxResults = 100, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
+    }
+
+    private sealed class FakeOrganizationService(params ParkGate.Application.Organizations.DTOs.OrganizationDto[] organizations)
+        : ParkGate.Application.Organizations.Services.IOrganizationService
+    {
+        public Task<IReadOnlyList<ParkGate.Application.Organizations.DTOs.OrganizationDto>> GetAllAsync(bool activeOnly = false, CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<ParkGate.Application.Organizations.DTOs.OrganizationDto>>(organizations);
+
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> GetByIdAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> CreateAsync(ParkGate.Application.Organizations.DTOs.CreateOrganizationRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> UpdateAsync(ParkGate.Application.Organizations.DTOs.UpdateOrganizationRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> DeactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> ReactivateAsync(int id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.Organizations.DTOs.OrganizationDto>> SetPolicyAsync(ParkGate.Application.Organizations.DTOs.SetOrganizationPolicyRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    }
+
+    private sealed class FakeNotifyService(bool confirmAnswer) : ParkGate.WinForms.Services.INotifyService
+    {
+        public int ConfirmCalls { get; private set; }
+
+        public void Info(string message, string? title = null) { }
+        public void Warning(string message, string? title = null) { }
+        public void Error(string message, string? title = null) { }
+
+        public bool Confirm(string message, string? title = null)
+        {
+            ConfirmCalls++;
+            return confirmAnswer;
+        }
     }
 
     private sealed class FakeCheckInService : ParkGate.Application.CheckIn.Services.ICheckInService
