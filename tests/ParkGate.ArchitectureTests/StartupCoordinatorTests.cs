@@ -82,10 +82,6 @@ public sealed class StartupCoordinatorTests
             return Task.FromResult(PendingMigrations);
         }
 
-        public Task EnsureEntryCardsSchemaAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
     }
 
     private sealed class FakeAuthService : IAuthService

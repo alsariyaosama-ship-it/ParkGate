@@ -7,6 +7,7 @@ using ParkGate.Application.CheckIn.Services;
 using ParkGate.Application.Common;
 using ParkGate.Application.EntryCards;
 using ParkGate.Application.GiftVouchers.Services;
+using ParkGate.Application.Maintenance.Services;
 using ParkGate.Application.Organizations.Services;
 using ParkGate.Application.Reports.Services;
 using ParkGate.Application.Security;
@@ -48,6 +49,7 @@ public static class DependencyInjection
         services.AddTransient<IGiftVoucherService, GiftVoucherService>();
         services.AddTransient<IGiftReportService, GiftReportService>();
         services.AddTransient<ISyncStatusService, SyncStatusService>();
+        services.AddTransient<IDatabaseSizeService, DatabaseSizeService>();
 
         // 4. EntryCards services
         services.AddSingleton<ParkClock>();

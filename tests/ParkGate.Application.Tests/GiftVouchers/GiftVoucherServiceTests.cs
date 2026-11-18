@@ -284,7 +284,7 @@ public sealed class GiftVoucherServiceTests : IDisposable
     {
         await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
 
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "Gift.Issued");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "Gift.Issued");
         // DetailsJson must not contain the QR text (would be > 200 chars of digits)
         var write = _uowFactory.CurrentUow.AuditLogRows.First(w => w.Action == "Gift.Issued");
         // The detailsJson should be short (just ReceiptNo and Value), not 203-digit QR string

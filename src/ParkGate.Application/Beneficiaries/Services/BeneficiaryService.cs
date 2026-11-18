@@ -1,7 +1,6 @@
 using FluentValidation;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Domain.Entities;
@@ -15,7 +14,6 @@ public sealed class BeneficiaryService : IBeneficiaryService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IEntryEligibilityPolicy _eligibilityPolicy;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<RegisterBeneficiaryRequest> _registerValidator;
@@ -25,7 +23,6 @@ public sealed class BeneficiaryService : IBeneficiaryService
     public BeneficiaryService(
         IUnitOfWorkFactory uowFactory,
         IEntryEligibilityPolicy eligibilityPolicy,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<RegisterBeneficiaryRequest> registerValidator,
@@ -34,7 +31,6 @@ public sealed class BeneficiaryService : IBeneficiaryService
     {
         _uowFactory = uowFactory;
         _eligibilityPolicy = eligibilityPolicy;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _registerValidator = registerValidator;
@@ -84,7 +80,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
             var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
 
-            matches.Add(new BeneficiaryLookupResultDto(beneficiary.ToDto(orgName), preview, lastCompanions));
+            matches.Add(new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName), preview, lastCompanions));
         }
 
         return new CardLookupDto(matches, registeredElsewhere);
@@ -116,7 +112,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
         var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
 
-        return new BeneficiaryLookupResultDto(beneficiary.ToDto(orgName), preview, lastCompanions);
+        return new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName), preview, lastCompanions);
     }
 
     public async Task<Result<BeneficiaryDto>> RegisterAsync(
@@ -176,9 +172,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             request.Notes);
 
         uow.Beneficiaries.Add(beneficiary);
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "BeneficiaryRegistered",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
@@ -186,7 +180,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
             entityId: beneficiary.Id.ToString(),
             cancellationToken: cancellationToken);
 
-        return beneficiary.ToDto(org.NameAr);
+        await uow.SaveChangesAsync(cancellationToken);
+
+        return ToViewerDto(beneficiary, org.NameAr);
     }
 
     public async Task<Result<BeneficiaryDto>> UpdateAsync(
@@ -225,8 +221,10 @@ public sealed class BeneficiaryService : IBeneficiaryService
             return Errors.Organization.NotFound;
         }
 
+        string? cardChange = null;
         if (beneficiary.CardNumber != cardVo)
         {
+            cardChange = AuditDetails.ToJson(new { OldCardNumber = beneficiary.CardNumber.Value, NewCardNumber = cardVo!.Value });
             var existingCard = await uow.Beneficiaries.GetByOrgAndCardAsync(request.OrganizationId, cardVo!, cancellationToken);
             if (existingCard is not null && existingCard.Id != beneficiary.Id)
             {
@@ -248,17 +246,18 @@ public sealed class BeneficiaryService : IBeneficiaryService
             request.CardExpiryDate,
             request.Notes);
 
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "BeneficiaryUpdated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Beneficiary),
             entityId: beneficiary.Id.ToString(),
+            detailsJson: cardChange,
             cancellationToken: cancellationToken);
 
-        return beneficiary.ToDto(org.NameAr);
+        await uow.SaveChangesAsync(cancellationToken);
+
+        return ToViewerDto(beneficiary, org.NameAr);
     }
 
     public async Task<Result<BeneficiaryDto>> ChangeStatusAsync(
@@ -298,11 +297,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
                 return Errors.Beneficiary.InvalidStatusTransition;
         }
 
-        await uow.SaveChangesAsync(cancellationToken);
-
         var org = await uow.Organizations.GetByIdAsync(beneficiary.OrganizationId, cancellationToken);
 
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "BeneficiaryStatusChanged",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
@@ -310,8 +307,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
             entityId: beneficiary.Id.ToString(),
             detailsJson: AuditDetails.ToJson(new { NewStatus = request.TargetStatus.ToString(), request.Reason }),
             cancellationToken: cancellationToken);
+        await uow.SaveChangesAsync(cancellationToken);
 
-        return beneficiary.ToDto(org?.NameAr ?? string.Empty);
+        return ToViewerDto(beneficiary, org?.NameAr ?? string.Empty);
     }
 
     public async Task<Result<IReadOnlyList<BeneficiaryDto>>> SearchAsync(
@@ -332,7 +330,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var dtos = matches.Select(b =>
         {
             var orgName = orgLookup.TryGetValue(b.OrganizationId, out var name) ? name : string.Empty;
-            return b.ToDto(orgName);
+            return ToViewerDto(b, orgName);
         }).ToList();
 
         return dtos;
@@ -371,6 +369,15 @@ public sealed class BeneficiaryService : IBeneficiaryService
         )).ToList();
 
         return dtos;
+    }
+
+    /// <summary>SPEC §8, R6.16: operators get the national ID masked, so the full number never reaches their screen.</summary>
+    private BeneficiaryDto ToViewerDto(Beneficiary beneficiary, string organizationName)
+    {
+        var dto = beneficiary.ToDto(organizationName);
+        return _currentUser.Has(Permission.ViewFullNationalId)
+            ? dto
+            : dto with { NationalId = NationalIdMask.Mask(dto.NationalId) };
     }
 
     private EligibilityPreviewDto BuildEligibilityPreview(

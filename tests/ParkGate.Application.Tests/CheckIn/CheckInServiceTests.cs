@@ -97,7 +97,7 @@ public sealed class CheckInServiceTests
         holder.LastGrantedEntryUtc.ShouldBe(_uowFactory.CurrentUow.CurrentDbTime);
         _attempts.Count.ShouldBe(1);
         _attempts[0].Result.ShouldBe(EntryResult.Allowed);
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryGranted");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "EntryGranted");
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public sealed class CheckInServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.Result.ShouldBe(EntryResult.Overridden);
         holder.LastGrantedEntryUtc.ShouldBe(_uowFactory.CurrentUow.CurrentDbTime);
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryOverridden");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "EntryOverridden");
     }
 
     [Fact]
@@ -209,7 +209,7 @@ public sealed class CheckInServiceTests
 
         // Recalculates to entry1Time (BR-13)
         holder.LastGrantedEntryUtc.ShouldBe(entry1Time);
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "EntryVoided");
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public sealed class CheckInServiceTests
         attempt.IsVoided.ShouldBeTrue();
         attempt.VoidedByUserId.ShouldBe(supervisor.Id);
         holder.LastGrantedEntryUtc.ShouldBeNull();
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided" && w.UserId == supervisor.Id);
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "EntryVoided" && w.UserId == supervisor.Id);
     }
 
     [Fact]

@@ -23,9 +23,8 @@ public sealed class GiftVoucherRepository : IGiftVoucherRepository
 
     public async Task<GiftVoucher?> GetByTokenForUpdateAsync(Guid token, CancellationToken ct = default)
     {
-        return await _context.GiftVouchers
-            .FromSqlInterpolated($"SELECT * FROM dbo.GiftVouchers WITH (UPDLOCK, ROWLOCK) WHERE Token = {token}")
-            .SingleOrDefaultAsync(ct);
+        // Tracked read; RowVersion makes a concurrent redeem or void fail at save (ADR-026).
+        return await _context.GiftVouchers.SingleOrDefaultAsync(v => v.Token == token, ct);
     }
 
     public async Task<DateTime?> GetLatestIssuedUtcAsync(Guid beneficiaryId, CancellationToken ct = default)

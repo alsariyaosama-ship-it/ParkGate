@@ -22,7 +22,7 @@ public sealed class SettingsCacheTests
     {
         _store.Add(new AppSetting("Entry.MaxGroupSize", "10", Start.UtcDateTime, null));
         _sut = new SettingsService(
-            _store, new FakeAuditWriter(), new CurrentUserContext(), new CurrentWorkstationContext("DESK-B"),
+            _store, new FakeUnitOfWorkFactory(appSettings: _store), new CurrentUserContext(), new CurrentWorkstationContext("DESK-B"),
             new UpdateSettingsRequestValidator(), _clock);
     }
 

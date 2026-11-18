@@ -40,13 +40,6 @@ public sealed class DatabaseStartupService : IDatabaseStartupService
         return pending.ToList();
     }
 
-    public async Task EnsureEntryCardsSchemaAsync(CancellationToken cancellationToken = default)
-    {
-        await EntryCards.EntryCardSchemaInitializer.EnsureSchemaAsync(
-            _connectionStringProvider.CurrentConnectionString,
-            cancellationToken).ConfigureAwait(false);
-    }
-
     private static ParkGateDbContext CreateContext(string connectionString)
     {
         var options = new DbContextOptionsBuilder<ParkGateDbContext>()

@@ -25,7 +25,8 @@
 | `src/ParkGate.Application/EntryCards/CardScanService.cs` | Application | خدمة مسح البطاقات والتحقق منها عند البوابة |
 | `src/ParkGate.Infrastructure/EntryCards/CngSigningKeyStore.cs` | Infrastructure | إدارة المفتاح الخاص في مخزن ويندوز CNG وتسجيل المفتاح العام |
 | `src/ParkGate.Infrastructure/EntryCards/QrImageRenderer.cs` | Infrastructure | توليد صورة الباركود PNG باستخدام مكتبة QRCoder |
-| `scripts/001_EntryCards.sql` | Scripts / DB | جداول `QrSigningKeys` و `EntryCards` و `CardScanLog` والعرض والإجراءات المخزنة |
+| `src/ParkGate.Domain/Entities/QrSigningKey.cs`, `EntryCard.cs`, `CardScan.cs` | Domain | كيانات الجداول الثلاثة (EF) |
+| `src/ParkGate.Infrastructure/EntryCards/EntryCardRepositories.cs` | Infrastructure | المستودعات عبر EF فقط؛ الجداول تُنشأ من migration `AdoptEntryCards` (R6.1، ADR-025) |
 | `samples/scanner-test-qr.png` | Samples | صورة QR تجريبية لاختبار أجهزة القراءة |
 
 ---

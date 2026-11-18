@@ -42,7 +42,7 @@ return new class extends Migration
             $table->string('card_number', 50)->index();
             $table->string('full_name', 150)->index();
             $table->date('card_expiry_date')->nullable();
-            $table->unsignedTinyInteger('status')->default(1)->index();
+            $table->unsignedTinyInteger('status')->default(1);
             $table->string('status_reason', 250)->nullable();
             $table->text('notes')->nullable();
             $table->timestamp('last_granted_entry_utc')->nullable();
@@ -57,8 +57,8 @@ return new class extends Migration
             $table->uuid('beneficiary_id')->nullable()->index();
             $table->unsignedInteger('organization_id')->nullable()->index();
             $table->timestamp('attempted_at_utc')->index();
-            $table->date('business_date')->index();
-            $table->unsignedTinyInteger('result')->index();
+            $table->date('business_date');
+            $table->unsignedTinyInteger('result');
             $table->unsignedTinyInteger('denial_reason')->nullable();
             $table->integer('cooldown_minutes_applied')->default(0);
             $table->timestamp('next_eligible_at_utc')->nullable();
@@ -68,12 +68,13 @@ return new class extends Migration
             $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('override_by_user_id')->nullable();
             $table->string('override_reason', 250)->nullable();
-            $table->boolean('is_voided')->default(false)->index();
+            $table->boolean('is_voided')->default(false);
             $table->timestamp('voided_at_utc')->nullable();
             $table->unsignedInteger('voided_by_user_id')->nullable();
             $table->string('void_reason', 250)->nullable();
             $table->timestamp('created_at_utc')->nullable();
 
+            $table->index(['business_date', 'result', 'is_voided']);
             $table->foreign('beneficiary_id')->references('id')->on('beneficiaries')->nullOnDelete();
             $table->foreign('organization_id')->references('id')->on('organizations')->nullOnDelete();
         });

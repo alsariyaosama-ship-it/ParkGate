@@ -7,6 +7,7 @@ public interface IBeneficiaryRepository
 {
     Task<Beneficiary?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Beneficiary>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
+    /// <summary>Tracked read of a holder that the use case will change; a concurrent change fails at save (ADR-026).</summary>
     Task<Beneficiary?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Beneficiary>> GetByCardNumberAsync(CardNumber cardNumber, CancellationToken cancellationToken = default);
     Task<Beneficiary?> GetByOrgAndCardAsync(int organizationId, CardNumber cardNumber, CancellationToken cancellationToken = default);

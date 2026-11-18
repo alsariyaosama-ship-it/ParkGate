@@ -73,8 +73,7 @@ public sealed class StartupCoordinator : IStartupCoordinator
 
         _logger.LogInformation("Database schema verified up-to-date (no pending migrations).");
 
-        // Step 2b: Ensure EntryCards schema exists & initialize QR crypto
-        await _startupService.EnsureEntryCardsSchemaAsync(cancellationToken);
+        // Step 2b: Initialize QR crypto (the entry-card tables come from migrations, R6.1)
         if (_qrCryptoProvider != null)
         {
             await _qrCryptoProvider.InitializeAsync(cancellationToken);

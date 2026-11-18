@@ -42,7 +42,6 @@ public sealed class AuditLoggingTests
     private readonly List<AgeCategory> _categories = [];
     private readonly FakeAppSettingRepository _settings = new();
     private readonly FakePasswordHasher _passwordHasher = new();
-    private readonly FakeAuditWriter _auditWriter = new();
     private readonly CurrentUserContext _currentUser = new();
     private readonly CurrentWorkstationContext _currentWorkstation = new("GATE-01");
     private readonly SupervisorApprovalStore _approvals = new();
@@ -85,7 +84,6 @@ public sealed class AuditLoggingTests
         var authService = new AuthService(
             _uowFactory,
             _passwordHasher,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new FirstRunAdminRequestValidator(),
@@ -95,17 +93,17 @@ public sealed class AuditLoggingTests
         // Login success audit
         var loginResult = await authService.LoginAsync(new LoginRequest("admin", "AdminPass123"));
         loginResult.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserLogin" && w.UserId == 1);
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserLogin" && w.UserId == 1);
 
         // Login failure audit
         var failedResult = await authService.LoginAsync(new LoginRequest("admin", "WrongPass"));
         failedResult.IsFailure.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserLoginFailed" && w.UserId == 1);
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserLoginFailed" && w.UserId == 1);
 
         // Auto-register workstation audit
         var wsResult = await authService.EnsureWorkstationRegisteredAsync("NEW-DESK-09");
         wsResult.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "WorkstationAutoRegistered");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "WorkstationAutoRegistered");
     }
 
     [Fact]
@@ -114,7 +112,6 @@ public sealed class AuditLoggingTests
         var benService = new BeneficiaryService(
             _uowFactory,
             new RollingWindowEligibilityPolicy(),
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new RegisterBeneficiaryRequestValidator(),
@@ -132,7 +129,7 @@ public sealed class AuditLoggingTests
             CardExpiryDate: null));
 
         reg.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "BeneficiaryRegistered" && w.EntityName == nameof(Beneficiary));
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "BeneficiaryRegistered" && w.EntityName == nameof(Beneficiary));
 
         // Update holder
         var update = await benService.UpdateAsync(new UpdateBeneficiaryRequest(
@@ -146,7 +143,7 @@ public sealed class AuditLoggingTests
             CardExpiryDate: null));
 
         update.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "BeneficiaryUpdated" && w.EntityName == nameof(Beneficiary));
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "BeneficiaryUpdated" && w.EntityName == nameof(Beneficiary));
 
         // Change status (Suspend)
         var susp = await benService.ChangeStatusAsync(new ChangeBeneficiaryStatusRequest(
@@ -155,7 +152,7 @@ public sealed class AuditLoggingTests
             Reason: "بطاقة مفقودة"));
 
         susp.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "BeneficiaryStatusChanged");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "BeneficiaryStatusChanged");
 
         // Reactivate
         var react = await benService.ChangeStatusAsync(new ChangeBeneficiaryStatusRequest(
@@ -181,7 +178,7 @@ public sealed class AuditLoggingTests
             Channel: EntryChannel.Desk));
 
         entry.IsSuccess.ShouldBeTrue();
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryGranted" && w.EntityName == nameof(EntryAttempt));
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "EntryGranted" && w.EntityName == nameof(EntryAttempt));
 
         // Override entry (when cooldown active)
         var ovr = await checkInService.OverrideEntryAsync(new OverrideEntryRequest(
@@ -192,7 +189,7 @@ public sealed class AuditLoggingTests
             Channel: EntryChannel.Desk));
 
         ovr.IsSuccess.ShouldBeTrue();
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryOverridden" && w.EntityName == nameof(EntryAttempt));
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "EntryOverridden" && w.EntityName == nameof(EntryAttempt));
 
         // Void entry
         var voidRes = await checkInService.VoidEntryAsync(new VoidEntryRequest(
@@ -200,7 +197,7 @@ public sealed class AuditLoggingTests
             Reason: "خطأ في تسجيل عدد المرافقين"));
 
         voidRes.IsSuccess.ShouldBeTrue();
-        _uowFactory.CurrentUow.AuditLogRows.ShouldContain(w => w.Action == "EntryVoided" && w.EntityName == nameof(EntryAttempt));
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "EntryVoided" && w.EntityName == nameof(EntryAttempt));
     }
 
     [Fact]
@@ -209,7 +206,7 @@ public sealed class AuditLoggingTests
         // Settings updated
         var settingsService = new SettingsService(
             _settings,
-            _auditWriter,
+            _uowFactory,
             _currentUser,
             _currentWorkstation,
             new UpdateSettingsRequestValidator());
@@ -228,12 +225,11 @@ public sealed class AuditLoggingTests
             settings.TimeZoneId));
 
         setRes.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "SettingsUpdated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "SettingsUpdated");
 
         // Organization audit
         var orgService = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new CreateOrganizationRequestValidator(),
@@ -242,24 +238,23 @@ public sealed class AuditLoggingTests
 
         var org = await orgService.CreateAsync(new CreateOrganizationRequest("MOH", "وزارة الصحة", 720));
         org.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "OrganizationCreated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "OrganizationCreated");
 
         var orgUpd = await orgService.UpdateAsync(new UpdateOrganizationRequest(org.Value.Id, "MOH", "وزارة الصحة الليبية", 360, false));
         orgUpd.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "OrganizationUpdated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "OrganizationUpdated");
 
         var orgDeact = await orgService.DeactivateAsync(org.Value.Id);
         orgDeact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "OrganizationDeactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "OrganizationDeactivated");
 
         var orgReact = await orgService.ReactivateAsync(org.Value.Id);
         orgReact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "OrganizationReactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "OrganizationReactivated");
 
         // AgeCategory audit
         var catService = new AgeCategoryService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new CreateAgeCategoryRequestValidator(),
@@ -267,60 +262,58 @@ public sealed class AuditLoggingTests
 
         var cat = await catService.CreateAsync(new CreateAgeCategoryRequest("طفل", "3 إلى 12", 2));
         cat.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "AgeCategoryCreated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "AgeCategoryCreated");
 
         var catUpd = await catService.UpdateAsync(new UpdateAgeCategoryRequest(cat.Value.Id, "طفل", "3 إلى 12 سنة", 2));
         catUpd.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "AgeCategoryUpdated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "AgeCategoryUpdated");
 
         var catDeact = await catService.DeactivateAsync(cat.Value.Id);
         catDeact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "AgeCategoryDeactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "AgeCategoryDeactivated");
 
         var catReact = await catService.ReactivateAsync(cat.Value.Id);
         catReact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "AgeCategoryReactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "AgeCategoryReactivated");
 
         // User audit
         var userService = new UserService(
             _uowFactory,
             _passwordHasher,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new CreateUserRequestValidator());
 
         var u = await userService.CreateAsync(new CreateUserRequest("supervisor1", "Supervisor One", "SuperPass99", UserRole.Supervisor));
         u.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserCreated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserCreated");
 
         var uRole = await userService.UpdateRoleAsync(u.Value.Id, UserRole.Operator);
         uRole.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserRoleChanged");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserRoleChanged");
 
         var uReset = await userService.ResetPasswordAsync(u.Value.Id, "NewTempPass8");
         uReset.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserPasswordReset");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserPasswordReset");
 
         var uDeact = await userService.DeactivateAsync(u.Value.Id);
         uDeact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserDeactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserDeactivated");
 
         var uReact = await userService.ReactivateAsync(u.Value.Id);
         uReact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "UserReactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "UserReactivated");
 
         // Workstation audit
         var wsService = new WorkstationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             new UpdateWorkstationRequestValidator());
 
         var wsUpd = await wsService.UpdateAsync(new UpdateWorkstationRequest(1, "Gate Desk 1 Renovated", WorkstationType.Desk));
         wsUpd.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "WorkstationUpdated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "WorkstationUpdated");
 
         // Deactivate another workstation
         var ws2 = new Workstation("GATE-02", "Gate 2", WorkstationType.Desk, isActive: true);
@@ -329,10 +322,10 @@ public sealed class AuditLoggingTests
 
         var wsDeact = await wsService.DeactivateAsync(2);
         wsDeact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "WorkstationDeactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "WorkstationDeactivated");
 
         var wsReact = await wsService.ReactivateAsync(2);
         wsReact.IsSuccess.ShouldBeTrue();
-        _auditWriter.Writes.ShouldContain(w => w.Action == "WorkstationReactivated");
+        _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "WorkstationReactivated");
     }
 }

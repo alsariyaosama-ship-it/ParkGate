@@ -1,16 +1,18 @@
+using System.Globalization;
 using FluentValidation;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
+using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Settings;
 using ParkGate.Application.Security;
 using ParkGate.Application.Settings.Models;
+using ParkGate.Domain.Entities;
 
 namespace ParkGate.Application.Settings.Services;
 
 public sealed class SettingsService : ISettingsService
 {
     private readonly IAppSettingsStore _settingsStore;
-    private readonly IAuditWriter _auditWriter;
+    private readonly IUnitOfWorkFactory _uowFactory;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<UpdateSettingsRequest> _validator;
@@ -27,7 +29,7 @@ public sealed class SettingsService : ISettingsService
 
     public SettingsService(
         IAppSettingsStore settingsStore,
-        IAuditWriter auditWriter,
+        IUnitOfWorkFactory uowFactory,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<UpdateSettingsRequest> validator,
@@ -35,7 +37,7 @@ public sealed class SettingsService : ISettingsService
     {
         _timeProvider = timeProvider ?? TimeProvider.System;
         _settingsStore = settingsStore;
-        _auditWriter = auditWriter;
+        _uowFactory = uowFactory;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _validator = validator;
@@ -105,24 +107,47 @@ public sealed class SettingsService : ISettingsService
 
         var userId = _currentUser.UserId;
 
-        await _settingsStore.SetValueAsync("Entry.DefaultCooldownMinutes", request.DefaultCooldownMinutes.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Entry.MaxGroupSize", request.MaxGroupSize.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Entry.DenialDedupMinutes", request.DenialDedupMinutes.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Entry.PrefillCompanionsFromLastVisit", request.PrefillCompanionsFromLastVisit.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Entry.DenialSoundEnabled", request.DenialSoundEnabled.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Security.MaxFailedLogins", request.MaxFailedLogins.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Security.LockoutMinutes", request.LockoutMinutes.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Security.AutoLockMinutes", request.AutoLockMinutes.ToString(), userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Park.Name", request.ParkName, userId, cancellationToken);
-        await _settingsStore.SetValueAsync("Park.TimeZoneId", request.TimeZoneId, userId, cancellationToken);
+        var values = new (string Key, string Value)[]
+        {
+            ("Entry.DefaultCooldownMinutes", request.DefaultCooldownMinutes.ToString(CultureInfo.InvariantCulture)),
+            ("Entry.MaxGroupSize", request.MaxGroupSize.ToString(CultureInfo.InvariantCulture)),
+            ("Entry.DenialDedupMinutes", request.DenialDedupMinutes.ToString(CultureInfo.InvariantCulture)),
+            ("Entry.PrefillCompanionsFromLastVisit", request.PrefillCompanionsFromLastVisit.ToString()),
+            ("Entry.DenialSoundEnabled", request.DenialSoundEnabled.ToString()),
+            ("Security.MaxFailedLogins", request.MaxFailedLogins.ToString(CultureInfo.InvariantCulture)),
+            ("Security.LockoutMinutes", request.LockoutMinutes.ToString(CultureInfo.InvariantCulture)),
+            ("Security.AutoLockMinutes", request.AutoLockMinutes.ToString(CultureInfo.InvariantCulture)),
+            ("Park.Name", request.ParkName),
+            ("Park.TimeZoneId", request.TimeZoneId),
+        };
+
+        // All values and the audit row are saved together, stamped with the database clock (R6.11, BR-05).
+        await using (var uow = _uowFactory.Create())
+        {
+            var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
+            foreach (var (key, value) in values)
+            {
+                var setting = await uow.AppSettings.GetByKeyAsync(key, cancellationToken);
+                if (setting is null)
+                {
+                    uow.AppSettings.Add(new AppSetting(key, value, nowUtc, userId));
+                }
+                else
+                {
+                    setting.Update(value, nowUtc, userId);
+                    uow.AppSettings.Update(setting);
+                }
+            }
+
+            await uow.AddAuditAsync(
+                action: "SettingsUpdated",
+                userId: userId,
+                workstationId: _currentWorkstation.WorkstationId,
+                cancellationToken: cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
+        }
 
         InvalidateCache();
-
-        await _auditWriter.WriteAsync(
-            action: "SettingsUpdated",
-            userId: userId,
-            workstationId: _currentWorkstation.WorkstationId,
-            cancellationToken: cancellationToken);
 
         return Result.Success();
     }

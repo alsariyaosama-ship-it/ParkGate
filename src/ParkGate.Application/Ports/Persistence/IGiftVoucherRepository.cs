@@ -6,7 +6,7 @@ public interface IGiftVoucherRepository
 {
     Task<GiftVoucher?> GetByIdAsync(int id, CancellationToken ct = default);
 
-    /// <summary>Lock the row with UPDLOCK, ROWLOCK for atomic redemption.</summary>
+    /// <summary>Tracked read of a voucher that the use case will change; a concurrent change fails at save (ADR-026).</summary>
     Task<GiftVoucher?> GetByTokenForUpdateAsync(Guid token, CancellationToken ct = default);
 
     /// <summary>Latest IssuedAtUtc among non-voided vouchers; null if none.</summary>

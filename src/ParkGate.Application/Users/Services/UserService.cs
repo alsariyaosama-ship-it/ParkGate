@@ -1,6 +1,5 @@
 using FluentValidation;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Application.Security;
@@ -14,7 +13,6 @@ public sealed class UserService : IUserService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<CreateUserRequest> _createValidator;
@@ -22,14 +20,12 @@ public sealed class UserService : IUserService
     public UserService(
         IUnitOfWorkFactory uowFactory,
         IPasswordHasher passwordHasher,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<CreateUserRequest> createValidator)
     {
         _uowFactory = uowFactory;
         _passwordHasher = passwordHasher;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _createValidator = createValidator;
@@ -86,10 +82,11 @@ public sealed class UserService : IUserService
             mustChangePassword: true,
             isActive: true);
 
+        // The audit row names the new identity id, so save twice inside one transaction (R6.11).
+        await uow.BeginTransactionAsync(cancellationToken);
         uow.Users.Add(user);
         await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "UserCreated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
@@ -97,6 +94,9 @@ public sealed class UserService : IUserService
             entityId: user.Id.ToString(),
             detailsJson: AuditDetails.ToJson(new { user.UserName, Role = user.Role.ToString() }),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
+        await uow.CommitAsync(cancellationToken);
 
         return user.ToDto();
     }
@@ -121,9 +121,7 @@ public sealed class UserService : IUserService
         }
 
         user.SetRole(newRole);
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "UserRoleChanged",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
@@ -131,6 +129,8 @@ public sealed class UserService : IUserService
             entityId: user.Id.ToString(),
             detailsJson: AuditDetails.ToJson(new { NewRole = newRole.ToString() }),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return user.ToDto();
     }
@@ -158,15 +158,15 @@ public sealed class UserService : IUserService
         user.ChangePassword(hash, mustChangePassword: true);
         user.ResetLockout();
 
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "UserPasswordReset",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(User),
             entityId: user.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -191,15 +191,15 @@ public sealed class UserService : IUserService
         }
 
         user.Deactivate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "UserDeactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(User),
             entityId: user.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -219,15 +219,15 @@ public sealed class UserService : IUserService
         }
 
         user.Activate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "UserReactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(User),
             entityId: user.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

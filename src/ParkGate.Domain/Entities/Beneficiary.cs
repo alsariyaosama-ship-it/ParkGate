@@ -25,6 +25,12 @@ public sealed class Beneficiary : IAuditableEntity
     public string? Notes { get; private set; }
     public DateTime? LastGrantedEntryUtc { get; private set; }
 
+    /// <summary>
+    /// Latest non-voided gift issue (R6.13). It makes two desks issuing a gift to one holder write the same row, so
+    /// optimistic concurrency stops the second (ADR-026). Eligibility still reads the vouchers themselves.
+    /// </summary>
+    public DateTime? LastGiftIssuedUtc { get; private set; }
+
     public DateTime CreatedAtUtc { get; set; }
     public int? CreatedByUserId { get; set; }
     public DateTime? UpdatedAtUtc { get; set; }
@@ -132,6 +138,26 @@ public sealed class Beneficiary : IAuditableEntity
         }
 
         LastGrantedEntryUtc = latestGrantedUtc;
+    }
+
+    public void RecordGiftIssued(DateTime issuedUtc)
+    {
+        if (issuedUtc.Kind == DateTimeKind.Unspecified)
+        {
+            throw new ArgumentException("Issue timestamp must have UTC kind.", nameof(issuedUtc));
+        }
+
+        LastGiftIssuedUtc = issuedUtc;
+    }
+
+    public void RecalculateLastGiftIssued(DateTime? latestIssuedUtc)
+    {
+        if (latestIssuedUtc.HasValue && latestIssuedUtc.Value.Kind == DateTimeKind.Unspecified)
+        {
+            throw new ArgumentException("Issue timestamp must have UTC kind.", nameof(latestIssuedUtc));
+        }
+
+        LastGiftIssuedUtc = latestIssuedUtc;
     }
 
     private static void ValidateFullName(string fullName)

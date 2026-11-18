@@ -32,5 +32,8 @@ public enum Permission
     IssueGift,
     RedeemGift,
     OverrideGiftInterval,
-    VoidGift
+    VoidGift,
+
+    // Personal data (SPEC §8): without it, national IDs are masked except the last four digits
+    ViewFullNationalId
 }

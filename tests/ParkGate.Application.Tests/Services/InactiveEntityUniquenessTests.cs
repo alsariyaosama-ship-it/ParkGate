@@ -7,7 +7,6 @@ using ParkGate.Application.Common;
 using ParkGate.Application.Organizations.DTOs;
 using ParkGate.Application.Organizations.Services;
 using ParkGate.Application.Organizations.Validators;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Application.Security;
@@ -25,7 +24,6 @@ public sealed class InactiveEntityUniquenessTests
     private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentWorkstation _currentWorkstation = Substitute.For<ICurrentWorkstation>();
-    private readonly IAuditWriter _auditWriter = Substitute.For<IAuditWriter>();
 
     public InactiveEntityUniquenessTests()
     {
@@ -48,7 +46,6 @@ public sealed class InactiveEntityUniquenessTests
 
         var service = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator,
@@ -77,7 +74,6 @@ public sealed class InactiveEntityUniquenessTests
 
         var service = new OrganizationService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator,
@@ -106,7 +102,6 @@ public sealed class InactiveEntityUniquenessTests
         var service = new UserService(
             _uowFactory,
             Substitute.For<IPasswordHasher>(),
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator);
@@ -132,7 +127,6 @@ public sealed class InactiveEntityUniquenessTests
 
         var service = new AgeCategoryService(
             _uowFactory,
-            _auditWriter,
             _currentUser,
             _currentWorkstation,
             validator,

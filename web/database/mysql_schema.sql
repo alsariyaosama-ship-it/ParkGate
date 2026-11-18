@@ -48,16 +48,13 @@ alter table `beneficiaries` add constraint `beneficiaries_organization_id_foreig
 alter table `beneficiaries` add index `beneficiaries_organization_id_index`(`organization_id`);
 alter table `beneficiaries` add index `beneficiaries_card_number_index`(`card_number`);
 alter table `beneficiaries` add index `beneficiaries_full_name_index`(`full_name`);
-alter table `beneficiaries` add index `beneficiaries_status_index`(`status`);
 create table `entry_attempts` (`id` char(36) not null, `beneficiary_id` char(36) null, `organization_id` int unsigned null, `attempted_at_utc` timestamp not null, `business_date` date not null, `result` tinyint unsigned not null, `denial_reason` tinyint unsigned null, `cooldown_minutes_applied` int not null default '0', `next_eligible_at_utc` timestamp null, `total_persons` int not null default '1', `channel` tinyint unsigned not null default '1', `workstation_id` int unsigned null, `user_id` int unsigned null, `override_by_user_id` int unsigned null, `override_reason` varchar(250) null, `is_voided` tinyint(1) not null default '0', `voided_at_utc` timestamp null, `voided_by_user_id` int unsigned null, `void_reason` varchar(250) null, `created_at_utc` timestamp null, primary key (`id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci' engine = InnoDB;
+alter table `entry_attempts` add index `entry_attempts_business_date_result_is_voided_index`(`business_date`, `result`, `is_voided`);
 alter table `entry_attempts` add constraint `entry_attempts_beneficiary_id_foreign` foreign key (`beneficiary_id`) references `beneficiaries` (`id`) on delete set null;
 alter table `entry_attempts` add constraint `entry_attempts_organization_id_foreign` foreign key (`organization_id`) references `organizations` (`id`) on delete set null;
 alter table `entry_attempts` add index `entry_attempts_beneficiary_id_index`(`beneficiary_id`);
 alter table `entry_attempts` add index `entry_attempts_organization_id_index`(`organization_id`);
 alter table `entry_attempts` add index `entry_attempts_attempted_at_utc_index`(`attempted_at_utc`);
-alter table `entry_attempts` add index `entry_attempts_business_date_index`(`business_date`);
-alter table `entry_attempts` add index `entry_attempts_result_index`(`result`);
-alter table `entry_attempts` add index `entry_attempts_is_voided_index`(`is_voided`);
 create table `entry_attempt_companions` (`id` bigint unsigned not null auto_increment primary key, `entry_attempt_id` char(36) not null, `age_category_id` int unsigned not null, `count` int not null default '0') default character set utf8mb4 collate 'utf8mb4_unicode_ci' engine = InnoDB;
 alter table `entry_attempt_companions` add constraint `entry_attempt_companions_entry_attempt_id_foreign` foreign key (`entry_attempt_id`) references `entry_attempts` (`id`) on delete cascade;
 alter table `entry_attempt_companions` add constraint `entry_attempt_companions_age_category_id_foreign` foreign key (`age_category_id`) references `age_categories` (`id`) on delete cascade;

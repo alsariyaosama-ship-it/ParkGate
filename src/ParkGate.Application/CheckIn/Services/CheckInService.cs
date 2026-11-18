@@ -4,6 +4,7 @@ using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Application.Common;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
+using ParkGate.Application.Settings.Models;
 using ParkGate.Application.Settings.Services;
 using ParkGate.Domain.Entities;
 using ParkGate.Domain.Enums;
@@ -69,9 +70,15 @@ public sealed class CheckInService : ICheckInService
             return validation.ToError();
         }
 
-        // Cached settings, read before the row lock is taken (R3.6).
+        // Cached settings, read once before the unit of work (R3.6).
         var settings = await _settings.GetSettingsAsync(cancellationToken);
 
+        return await ConcurrencyRetry.RunAsync(retryCt => RecordEntryOnceAsync(request, settings, actor.Value, retryCt), cancellationToken);
+    }
+
+    /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
+    private async Task<Result<CheckInResultDto>> RecordEntryOnceAsync(RecordEntryRequest request, AppSettingsModel settings, Actor actor, CancellationToken cancellationToken)
+    {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(cancellationToken);
 
@@ -109,7 +116,7 @@ public sealed class CheckInService : ICheckInService
         var context = new EligibilityContext(org, holder, defaultCooldown, nowUtc, businessDate);
         var decision = _eligibilityPolicy.Evaluate(context);
 
-        var (userId, workstationId) = actor.Value;
+        var (userId, workstationId) = actor;
 
         if (!decision.IsEligible)
         {
@@ -218,9 +225,15 @@ public sealed class CheckInService : ICheckInService
             return Errors.Auth.SupervisorRequired;
         }
 
-        // Cached settings, read before the row lock is taken (R3.6).
+        // Cached settings, read once before the unit of work (R3.6).
         var settings = await _settings.GetSettingsAsync(cancellationToken);
 
+        return await ConcurrencyRetry.RunAsync(retryCt => OverrideEntryOnceAsync(request, settings, actor.Value, approverUserId, retryCt), cancellationToken);
+    }
+
+    /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
+    private async Task<Result<CheckInResultDto>> OverrideEntryOnceAsync(OverrideEntryRequest request, AppSettingsModel settings, Actor actor, int approverUserId, CancellationToken cancellationToken)
+    {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(cancellationToken);
 
@@ -275,7 +288,7 @@ public sealed class CheckInService : ICheckInService
             .Select(c => new EntryAttemptCompanion(c.AgeCategoryId, c.Count))
             .ToList();
 
-        var (userId, workstationId) = actor.Value;
+        var (userId, workstationId) = actor;
 
         var attempt = EntryAttempt.CreateOverridden(
             attemptId,
@@ -353,6 +366,12 @@ public sealed class CheckInService : ICheckInService
             }
         }
 
+        return await ConcurrencyRetry.RunAsync(retryCt => VoidEntryOnceAsync(request, actor.Value, voidedByUserId, retryCt), cancellationToken);
+    }
+
+    /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
+    private async Task<Result> VoidEntryOnceAsync(VoidEntryRequest request, Actor actor, int voidedByUserId, CancellationToken cancellationToken)
+    {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(cancellationToken);
 
@@ -387,7 +406,7 @@ public sealed class CheckInService : ICheckInService
         holder.RecalculateLastGrantedEntry(latestRemaining);
 
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryVoided", voidedByUserId, actor.Value.WorkstationId, nameof(EntryAttempt), attempt.Id.ToString(), AuditDetails.ToJson(new { request.Reason })));
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryVoided", voidedByUserId, actor.WorkstationId, nameof(EntryAttempt), attempt.Id.ToString(), AuditDetails.ToJson(new { request.Reason })));
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
 

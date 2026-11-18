@@ -12,7 +12,7 @@ SQL Server Express (2022 or later), database `ParkGate`, schema `dbo`. Managed b
 | Text | `nvarchar` everywhere (Arabic). No `nvarchar(max)` except JSON/details columns |
 | Enums | Stored as `tinyint`; values listed below must never be renumbered |
 | Concurrency | `RowVersion rowversion` on mutable tables (also used for future F3 sync) |
-| Audit columns | `CreatedAtUtc`, `CreatedByUserId`, `UpdatedAtUtc`, `UpdatedByUserId` on mutable business tables, filled by a `SaveChangesInterceptor` |
+| Audit columns | `CreatedAtUtc`, `CreatedByUserId`, `UpdatedAtUtc`, `UpdatedByUserId` on mutable business tables, filled by a `SaveChangesInterceptor` from the database clock: `CreatedAtUtc` keeps its `SYSUTCDATETIME()` default and `UpdatedAtUtc` reads the clock once per save (BR-05, R6.3) |
 | Deletes | No hard deletes on business data (BR-14) |
 | Defaults | DB time defaults use `SYSUTCDATETIME()` |
 
@@ -42,15 +42,15 @@ CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 | Id | int IDENTITY PK | |
 | Code | nvarchar(20) NOT NULL | Unique, e.g. `SSF` |
 | NameAr | nvarchar(150) NOT NULL | |
-| CooldownMinutes | int NULL | NULL = use default setting. CHECK 1..10080 |
+| CooldownMinutes | int NULL | NULL = use default setting. CHECK 1..10080 (`CK_Organizations_CooldownMinutes`) |
 | IsDefault | bit NOT NULL | Exactly one default (filtered unique index on `IsDefault = 1`) |
 | IsActive | bit NOT NULL | |
 | MaxFreeCompanions | int NULL | F5. NULL = no org-specific limit. CHECK 0..50 (`CK_Organizations_MaxFreeCompanions`) |
 | GiftEnabled | bit NOT NULL | F5. Default 0 |
 | GiftValue | decimal(10,3) NOT NULL | F5. Default 0. CHECK `GiftEnabled = 0 OR GiftValue > 0` (`CK_Organizations_GiftValue`) |
 | GiftIntervalDays | int NOT NULL | F5. Default 30. CHECK 1..365 (`CK_Organizations_GiftIntervalDays`) |
-| AllowedEntryDays | tinyint NOT NULL | F8, BR-27. Bit mask, bit 0 = Sunday … bit 6 = Saturday (.NET `DayOfWeek`). Default 127 (all days). CHECK 1..127 (`CK_Organizations_AllowedEntryDays`) |
-| GiftAnyDay | bit NOT NULL | F8, BR-28. Default 0 = gifts only on allowed entry days |
+| AllowedEntryDays | tinyint NOT NULL | F8, proposed (add when F8 starts), BR-27. Bit mask, bit 0 = Sunday … bit 6 = Saturday (.NET `DayOfWeek`). Default 127 (all days). CHECK 1..127 (`CK_Organizations_AllowedEntryDays`) |
+| GiftAnyDay | bit NOT NULL | F8, proposed (add when F8 starts), BR-28. Default 0 = gifts only on allowed entry days |
 | audit columns, RowVersion | | |
 
 ### 3.2 `Beneficiaries` — حاملو البطاقات
@@ -64,12 +64,15 @@ CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 | NationalId | nvarchar(12) NULL | 12 digits (BR-16) |
 | CardExpiryDate | date NULL | |
 | Status | tinyint NOT NULL | `BeneficiaryStatus`, default 1 |
-| StatusReason | nvarchar(250) NULL | Required when status ≠ Active |
+| StatusReason | nvarchar(250) NULL | Required when status ≠ Active (`CK_Beneficiaries_StatusReason`) |
 | Notes | nvarchar(500) NULL | |
-| LastGrantedEntryUtc | datetime2(3) NULL | Denormalized for atomic cooldown check (ADR-005) |
+| LastGrantedEntryUtc | datetime2(3) NULL | Denormalized for atomic cooldown check (ADR-005, ADR-026) |
+| LastGiftIssuedUtc | datetime2(3) NULL | R6.13. Latest non-voided gift issue; written on every issue and recalculated on void so that two gift issues for one holder conflict (ADR-026). Not backfilled (no SQL in migrations, ADR-025): NULL until the holder's next gift. Eligibility still reads `GiftVouchers` |
 | audit columns, RowVersion | | |
 
 Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_Beneficiaries_CardNumber (CardNumber)` (cross-org lookup) · `IX_Beneficiaries_Phone` · `UX_Beneficiaries_NationalId` unique filtered `WHERE NationalId IS NOT NULL` · `IX_Beneficiaries_FullName`.
+
+Name search uses `LIKE '%term%'`, so it scans `IX_Beneficiaries_FullName` instead of seeking it. Measured on LocalDB with 100 000 holders (R6.6, 2026-11-18): about 350 ms for a term matched by one row and for no match, under the 1 s target; `PerformanceBenchmarkTests` keeps the check. Revisit (prefix search on name tokens or full-text) if the holder count grows well past that.
 
 ### 3.3 `AgeCategories` — الفئات العمرية
 | Column | Type | Notes |
@@ -90,7 +93,7 @@ Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_
 | AttemptedAtUtc | datetime2(3) NOT NULL | DB time |
 | BusinessDate | date NOT NULL | Park-local date of `AttemptedAtUtc` (fast daily reports) |
 | Result | tinyint NOT NULL | `EntryResult` |
-| DenialReason | tinyint NULL | Required when Result = Denied, NULL otherwise (CHECK) |
+| DenialReason | tinyint NULL | Required when Result = Denied, NULL otherwise (`CK_EntryAttempts_DenialReason`) |
 | CooldownMinutesApplied | int NOT NULL | Snapshot of the effective cooldown |
 | NextEligibleAtUtc | datetime2(3) NULL | For denied (cooldown) and granted rows |
 | TotalPersons | int NOT NULL | 1 + Σ companions (0 for Denied rows where companions were not entered) |
@@ -98,11 +101,11 @@ Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_
 | WorkstationId | int FK → Workstations | |
 | UserId | int FK → Users | Operator at the desk |
 | OverrideByUserId | int NULL FK → Users | Set when Result = Overridden |
-| OverrideReason | nvarchar(250) NULL | Required when Overridden (CHECK) |
+| OverrideReason | nvarchar(250) NULL | Required when Overridden; with `OverrideByUserId`, set only when Overridden (`CK_EntryAttempts_Override`) |
 | IsVoided | bit NOT NULL default 0 | BR-13 |
 | VoidedAtUtc | datetime2(3) NULL | |
 | VoidedByUserId | int NULL FK → Users | |
-| VoidReason | nvarchar(250) NULL | |
+| VoidReason | nvarchar(250) NULL | `IsVoided = 1` ⇔ `VoidedAtUtc`, `VoidedByUserId` and `VoidReason` all set (`CK_EntryAttempts_Void`) |
 | RowVersion | rowversion | |
 
 Indexes: `IX_EntryAttempts_Beneficiary_Time (BeneficiaryId, AttemptedAtUtc DESC)` · `IX_EntryAttempts_BusinessDate (BusinessDate) INCLUDE (Result, TotalPersons, OrganizationId, IsVoided)` · `IX_EntryAttempts_Workstation_Time (WorkstationId, AttemptedAtUtc DESC)`.
@@ -112,7 +115,7 @@ Indexes: `IX_EntryAttempts_Beneficiary_Time (BeneficiaryId, AttemptedAtUtc DESC)
 |---|---|---|
 | EntryAttemptId | uniqueidentifier FK | PK part 1, cascade delete not needed (no deletes) |
 | AgeCategoryId | int FK | PK part 2 |
-| Count | int NOT NULL | CHECK ≥ 0. Rows with 0 may be omitted |
+| Count | int NOT NULL | CHECK ≥ 0 (`CK_EntryAttemptCompanions_Count`). Rows with 0 may be omitted |
 
 ### 3.6 `Users` — المستخدمون
 | Column | Type | Notes |
@@ -182,7 +185,47 @@ Index: `IX_SyncOutboxes_Pending (IsProcessed, RetryCount, Sequence)`.
 - **F1 `AccessCredentials`**: Id, BeneficiaryId, Type (QR), TokenHash (binary(32), unique), IssuedAtUtc, IssuedByUserId, RevokedAtUtc, RevokedByUserId, RevokeReason. One active QR per holder (filtered unique on `RevokedAtUtc IS NULL`).
 - **F2** `Dependents` (if Option B) and gate event log.
 
-> F1 shipped as raw-SQL tables (`docs/ENTRY_CARDS.md`): `EntryCards`, `QrSigningKeys`. They are **not** EF-managed and are created by `EntryCardSchemaInitializer`, not by migrations.
+> F1 (entry cards) is EF-managed since R6.1 (migration `AdoptEntryCards`, ADR-025): §3.15–§3.17. The earlier raw-SQL tables, view and procedures were removed.
+
+### 3.15 `QrSigningKeys` — مفاتيح التوقيع العامة (F1)
+| Column | Type | Notes |
+|---|---|---|
+| KeyId | tinyint PK | Assigned by the app (next free id, 1..255); not IDENTITY |
+| PublicKeySpki | varbinary(200) NOT NULL | Unique `UX_QrSigningKeys_PublicKeySpki`. The private key stays in the desk's CNG store |
+| StationName | nvarchar(100) NOT NULL | Desk that registered the key |
+| CreatedAtUtc | datetime2(3) NOT NULL | Default `SYSUTCDATETIME()` |
+| RevokedAtUtc | datetime2(3) NULL | A revoked key no longer verifies cards; its desk must create a new key |
+| RowVersion | rowversion | |
+
+### 3.16 `EntryCards` — بطاقات الدخول QR (F1)
+| Column | Type | Notes |
+|---|---|---|
+| Id | int IDENTITY PK | |
+| CardId | uniqueidentifier NOT NULL | The value inside the signed QR. Unique `UX_EntryCards_CardId` |
+| BeneficiaryId | uniqueidentifier FK → Beneficiaries | |
+| KeyId | tinyint FK → QrSigningKeys | |
+| IssuedAtUtc | datetime2(3) NOT NULL | Default `SYSUTCDATETIME()` |
+| ExpiresOn | date NOT NULL | Park-local date (R3.10) |
+| RevokedAtUtc | datetime2(3) NULL | DB time |
+| RevokeReason | nvarchar(200) NULL | `استُبدلت ببطاقة جديدة` when a reissue replaced it |
+| RowVersion | rowversion | |
+
+Filtered unique `UX_EntryCards_OneActivePerBeneficiary` on `BeneficiaryId` where `RevokedAtUtc IS NULL`. A reissue revokes the active card and adds the new one in one transaction; a parallel reissue that hits the index retries, so exactly one card stays active.
+
+### 3.17 `CardScanLog` — سجل مسح البطاقات (F1)
+| Column | Type | Notes |
+|---|---|---|
+| Id | bigint IDENTITY PK | Append-only |
+| ScannedAtUtc | datetime2(3) NOT NULL | Default `SYSUTCDATETIME()` |
+| StationName | nvarchar(100) NOT NULL | Kept for gate stations that are not registered workstations |
+| WorkstationId | int NULL FK → Workstations | The scanning desk when registered (R6.2) |
+| Status | tinyint NOT NULL | `CardScanStatus` (0 Accepted … 7 PermitSuspended) |
+| CardId | uniqueidentifier NULL | NULL when the QR could not be read |
+| RawPrefix | nvarchar(32) NULL | First 32 characters of a rejected scan |
+
+Indexes: `IX_CardScanLog_ScannedAtUtc` (INCLUDE `Status`, `StationName`), `IX_CardScanLog_CardId`, `IX_CardScanLog_WorkstationId`.
+
+No audit columns on these tables: keys and cards record their own issue and revoke times, and the scan log is append-only.
 
 ### 3.12 `GiftVouchers` — قسائم الهدايا (F5)
 
@@ -192,7 +235,7 @@ EF-managed table created by migration `AddGiftVouchersAndCompanionLimit`. `Id` i
 |---|---|---|
 | Id | int IDENTITY PK | Receipt number |
 | Token | uniqueidentifier NOT NULL | Random 128-bit; the value inside the signed QR. Unique `UX_GiftVouchers_Token` |
-| KeyId | tinyint NOT NULL | Signing key id used (no FK — `QrSigningKeys` is raw SQL) |
+| KeyId | tinyint NOT NULL | Signing key id used. No FK yet; one is possible now that `QrSigningKeys` is EF-managed (§3.15) |
 | BeneficiaryId | uniqueidentifier FK → Beneficiaries | Restrict |
 | OrganizationId | int FK → Organizations | Restrict. Snapshot at issue |
 | Value | decimal(10,3) NOT NULL | Snapshot at issue. CHECK `Value > 0` |
@@ -257,40 +300,25 @@ Unique `UX_OrganizationCardPatterns_Org_Shape_Prefix` on (`OrganizationId`, `Sha
 
 Index `IX_CardPatternAlerts_Org_Status_Shape` on (`OrganizationId`, `Status`, `Shape`).
 
-## 4. Atomic check-in (BR-12, ADR-005)
+## 4. Atomic check-in (BR-12, ADR-026)
 
-All steps run in **one transaction** inside a single unit of work:
+Optimistic concurrency on `Beneficiaries.RowVersion` (ADR-026, since R6.13). Each attempt runs in **one transaction** inside a fresh unit of work:
 
-```sql
-BEGIN TRANSACTION;  -- READ COMMITTED
+1. Read the holder (tracked, no lock hint) and its organization; read the database clock (`SYSUTCDATETIME()` mapped in EF, R6.12).
+2. C#: the Domain policy evaluates → `EligibilityDecision` (no SQL here).
+3. Insert the attempt (+ companions). If granted, set `LastGrantedEntryUtc = nowUtc` on the holder.
+4. `SaveChanges` updates the holder `WHERE Id = @Id AND RowVersion = @Original`. If another desk changed the holder first, no row matches, EF throws `DbUpdateConcurrencyException`, the unit of work translates it to `ConcurrencyConflictException`, and the transaction is rolled back.
+5. `ConcurrencyRetry` runs the whole use case again from step 1 (at most 3 attempts). The retry sees the winner's entry and is denied by the normal rules (`CooldownActive`). After the last attempt the use case returns `General.ConcurrencyConflict`.
 
--- 1) lock the holder row; a second desk blocks here until we commit
-SELECT b.Id, b.Status, b.CardExpiryDate, b.LastGrantedEntryUtc, b.OrganizationId,
-       o.IsActive AS OrgActive, o.CooldownMinutes
-FROM dbo.Beneficiaries b WITH (UPDLOCK, ROWLOCK)
-JOIN dbo.Organizations o ON o.Id = b.OrganizationId
-WHERE b.Id = @BeneficiaryId;
-
--- 2) authoritative time
-SELECT SYSUTCDATETIME();
-
--- 3) C#: Domain policy evaluates → EligibilityDecision (no SQL here)
-
--- 4) insert attempt (+ companions); if granted:
-UPDATE dbo.Beneficiaries SET LastGrantedEntryUtc = @NowUtc WHERE Id = @BeneficiaryId;
-
-COMMIT;
-```
+A denied attempt does not change the holder, so it never conflicts. The same pattern covers override, void, gift issue and override (the holder's `LastGiftIssuedUtc` is written on every issue), gift void (recalculates `LastGiftIssuedUtc`) and gift redeem (the voucher's own `RowVersion`).
 
 EF Core shape (Infrastructure):
-- `IBeneficiaryRepository.GetForUpdateAsync(id)` → `FromSqlInterpolated($"SELECT * FROM dbo.Beneficiaries WITH (UPDLOCK, ROWLOCK) WHERE Id = {id}")`.
-- `IUnitOfWork.GetDbUtcNowAsync()` → `SELECT SYSUTCDATETIME()`.
+- `IBeneficiaryRepository.GetForUpdateAsync(id)` → a tracked `SingleOrDefaultAsync`; `IGiftVoucherRepository.GetByTokenForUpdateAsync(token)` likewise.
+- `IUnitOfWork.GetDbUtcNowAsync()` → `SYSUTCDATETIME()` mapped as a built-in EF function (`DatabaseClock`, R6.12), queried over the always-present default organization row.
 - The policy itself lives in Domain and is unit-tested without a database.
-- Integration test (required): two parallel check-ins for the same holder → exactly one `Allowed`, one `Denied/CooldownActive`.
+- Integration tests (required), run against the real services: two parallel check-ins for the same holder → exactly one `Allowed`, one `Denied/CooldownActive` (20 runs); ten parallel gift issues → one voucher; ten parallel redeems → one success; a void racing an override leaves `LastGrantedEntryUtc` equal to the latest remaining granted entry.
 
-**Void recalculation (BR-13):** in one transaction, lock the holder row, mark the attempt voided, then set `LastGrantedEntryUtc = MAX(AttemptedAtUtc)` over that holder's non-voided `Allowed/Overridden` attempts (NULL if none).
-
-**Planned change (R6.13, ADR-026):** the `UPDLOCK` read is replaced by optimistic concurrency on `Beneficiaries.RowVersion` with up to 3 retries, `Beneficiaries.LastGiftIssuedUtc` is added for gifts, and the database clock is read through a mapped `SYSUTCDATETIME` function (R6.12). This section is rewritten when R6.13 ships; until then the steps above describe the code.
+**Void recalculation (BR-13):** in one transaction, mark the attempt voided, then set `LastGrantedEntryUtc = MAX(AttemptedAtUtc)` over that holder's non-voided `Allowed/Overridden` attempts (NULL if none). A concurrent change to the holder makes the void retry.
 
 ## 5. Settings keys and defaults (seeded)
 
@@ -302,14 +330,19 @@ EF Core shape (Infrastructure):
 | `Entry.MaxGroupSize` | `10` | BR-07 (holder included) |
 | `Entry.DenialDedupMinutes` | `5` | BR-10 |
 | `Entry.PrefillCompanionsFromLastVisit` | `true` | §5.1 step 5 |
-| `Entry.PlaySoundOnDenial` | `true` | FR-CHK-08 |
+| `Entry.DenialSoundEnabled` | `true` (not seeded) | FR-CHK-08. Written on the first settings save. The old seed row `Entry.PlaySoundOnDenial` was never read and is deleted by migration `RemoveUnreadSoundSetting` (R6.15) |
 | `Security.MaxFailedLogins` | `5` | BR-18 |
 | `Security.LockoutMinutes` | `15` | BR-18 |
-| `Ui.MaskNationalIdForOperators` | `true` | §8 Security |
-| `CardPattern.MinSample` | `10` | F8, BR-29: cards needed before a pattern is proposed |
-| `CardPattern.NewSeriesThreshold` | `5` | F8, BR-29: alerts with one shape before it is proposed as a new series |
-| `CardPattern.PrefixLength` | `2` | F8, BR-29 |
-| `CardPattern.PrefixSharePercent` | `90` | F8, BR-29: share of numbers that must start with the prefix |
+| `Security.AutoLockMinutes` | `0` (not seeded) | Minutes of inactivity before the desk locks; 0 = never. Written on the first settings save |
+| `SyncAgent.LastHeartbeatUtc`, `SyncAgent.PendingCount`, `SyncAgent.FailedCount` | (not seeded) | Written by the sync agent's heartbeat; read by the admin status bar (R2.5) |
+| `CardPattern.MinSample` | `10` | F8, proposed, BR-29: cards needed before a pattern is proposed |
+| `CardPattern.NewSeriesThreshold` | `5` | F8, proposed, BR-29: alerts with one shape before it is proposed as a new series |
+| `CardPattern.PrefixLength` | `2` | F8, proposed, BR-29 |
+| `CardPattern.PrefixSharePercent` | `90` | F8, proposed, BR-29: share of numbers that must start with the prefix |
+
+`DatabaseDocumentationTests` checks that every table, column, check constraint and seeded key here matches the EF model (R6.4).
+
+National IDs are masked for operators by a fixed rule, not a setting: users without `ViewFullNationalId` get all but the last four digits replaced (SPEC §8, R6.16). The unused seed row `Ui.MaskNationalIdForOperators` is deleted by migration `RemoveUnusedMaskSetting`.
 
 Settings are read through a typed `ISettingsService` in Application (no raw key strings outside one constants class).
 

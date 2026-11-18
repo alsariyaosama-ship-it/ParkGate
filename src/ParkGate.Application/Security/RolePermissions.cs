@@ -29,7 +29,8 @@ public static class RolePermissions
             Permission.IssueGift,
             Permission.RedeemGift,
             Permission.OverrideGiftInterval,
-            Permission.VoidGift
+            Permission.VoidGift,
+            Permission.ViewFullNationalId
         ],
 
         [UserRole.Admin] =
@@ -50,7 +51,8 @@ public static class RolePermissions
             Permission.IssueGift,
             Permission.RedeemGift,
             Permission.OverrideGiftInterval,
-            Permission.VoidGift
+            Permission.VoidGift,
+            Permission.ViewFullNationalId
         ]
     };
 

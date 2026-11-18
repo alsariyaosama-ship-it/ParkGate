@@ -227,20 +227,22 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
 
 ### R6 — Database design · branch `phase/r6-database`
-- [ ] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script
-- [ ] R6.2 Rename to conventions (`Utc` suffix, `datetime2(3)`), `WorkstationId` FK, `IX_CardScanLog_CardId`, audit columns
-- [ ] R6.3 Audit columns from the database clock, not the client clock (BR-05)
-- [ ] R6.4 Bring `DATABASE.md` up to the model; test the documented table list against it
+- [x] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script
+- [x] R6.2 Rename to conventions (`Utc` suffix, `datetime2(3)`), `WorkstationId` FK, `IX_CardScanLog_CardId`, audit columns
+- [x] R6.3 Audit columns from the database clock, not the client clock (BR-05)
+- [x] R6.4 Bring `DATABASE.md` up to the model; test the documented table list against it
 - [ ] R6.5 Least-privilege `parkgate_app` login; restrict the firewall rules — blocked on Q-R6
-- [ ] R6.6 Re-measure the `LIKE '%term%'` name search at 100 000 holders
+- [x] R6.6 Re-measure the `LIKE '%term%'` name search at 100 000 holders
 - [ ] R6.7 ~~Business-day cutoff~~ — cancelled (Q-R5): the park closes at midnight
-- [ ] R6.8 Database size warning on the Admin backup screen; propose a retention policy
-- [ ] R6.9 ACL-restricted backup folder; document an encrypted off-site copy
-- [ ] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
-- [ ] R6.11 Write management audit rows in the same unit of work; record old and new card number
-- [ ] R6.12 Read the database clock through a mapped `SYSUTCDATETIME` function instead of SQL text
-- [ ] R6.13 Optimistic concurrency on `Beneficiaries.RowVersion` replaces `UPDLOCK` (ADR-026); add `LastGiftIssuedUtc`
-- [ ] R6.14 Architecture test: no raw SQL in `src/` except the backup command
+- [x] R6.8 Database size warning on the Admin backup screen; propose a retention policy (proposal in DEPLOYMENT.md §9.3, awaiting approval; no deletes)
+- [x] R6.9 ACL-restricted backup folder; document an encrypted off-site copy
+- [x] R6.10 Cloud schema: `gift_vouchers`, composite index, drop low-cardinality indexes
+- [x] R6.11 Write management audit rows in the same unit of work; record old and new card number
+- [x] R6.12 Read the database clock through a mapped `SYSUTCDATETIME` function instead of SQL text
+- [x] R6.13 Optimistic concurrency on `Beneficiaries.RowVersion` replaces `UPDLOCK` (ADR-026); add `LastGiftIssuedUtc`
+- [x] R6.14 Architecture test: no raw SQL in `src/` except the backup command
+- [x] R6.15 Remove the seeded `Entry.PlaySoundOnDenial` row that nothing reads (migration `RemoveUnreadSoundSetting`); the app uses `Entry.DenialSoundEnabled`
+- [x] R6.16 Mask national IDs for operators in Application (`ViewFullNationalId` for supervisors and admins); remove the UI copies of the rule and the unused `Ui.MaskNationalIdForOperators` seed row (Osama: hide)
 
 ### R7 — Wording and visual consistency · branch `phase/r7-consistency`
 - [ ] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b

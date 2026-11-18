@@ -1,7 +1,6 @@
 using FluentValidation;
 using ParkGate.Application.AgeCategories.DTOs;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Domain.Entities;
@@ -11,7 +10,6 @@ namespace ParkGate.Application.AgeCategories.Services;
 public sealed class AgeCategoryService : IAgeCategoryService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
     private readonly IValidator<CreateAgeCategoryRequest> _createValidator;
@@ -19,14 +17,12 @@ public sealed class AgeCategoryService : IAgeCategoryService
 
     public AgeCategoryService(
         IUnitOfWorkFactory uowFactory,
-        IAuditWriter auditWriter,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
         IValidator<CreateAgeCategoryRequest> createValidator,
         IValidator<UpdateAgeCategoryRequest> updateValidator)
     {
         _uowFactory = uowFactory;
-        _auditWriter = auditWriter;
         _currentUser = currentUser;
         _currentWorkstation = currentWorkstation;
         _createValidator = createValidator;
@@ -89,16 +85,20 @@ public sealed class AgeCategoryService : IAgeCategoryService
 
         category.SetCompanionLimitExempt(request.IsCompanionLimitExempt);
 
+        // The audit row names the new identity id, so save twice inside one transaction (R6.11).
+        await uow.BeginTransactionAsync(cancellationToken);
         uow.AgeCategories.Add(category);
         await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "AgeCategoryCreated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(AgeCategory),
             entityId: category.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
+        await uow.CommitAsync(cancellationToken);
 
         return category.ToDto();
     }
@@ -131,15 +131,15 @@ public sealed class AgeCategoryService : IAgeCategoryService
 
         category.Update(request.NameAr, request.DescriptionAr, request.SortOrder);
         category.SetCompanionLimitExempt(request.IsCompanionLimitExempt);
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "AgeCategoryUpdated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(AgeCategory),
             entityId: category.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return category.ToDto();
     }
@@ -159,15 +159,15 @@ public sealed class AgeCategoryService : IAgeCategoryService
         }
 
         category.Deactivate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "AgeCategoryDeactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(AgeCategory),
             entityId: category.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -187,15 +187,15 @@ public sealed class AgeCategoryService : IAgeCategoryService
         }
 
         category.Activate();
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "AgeCategoryReactivated",
             userId: _currentUser.UserId,
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(AgeCategory),
             entityId: category.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

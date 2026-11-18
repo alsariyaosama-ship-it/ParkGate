@@ -1,7 +1,6 @@
 using FluentValidation;
 using ParkGate.Application.Auth.DTOs;
 using ParkGate.Application.Common;
-using ParkGate.Application.Ports.Audit;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Ports.Security;
 using ParkGate.Application.Security;
@@ -16,7 +15,6 @@ public sealed class AuthService : IAuthService
 {
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IAuditWriter _auditWriter;
     private readonly ICurrentUserSession _currentUserSession;
     private readonly ICurrentWorkstationSession _workstationSession;
     private readonly SupervisorApprovalStore _approvals;
@@ -27,7 +25,6 @@ public sealed class AuthService : IAuthService
     public AuthService(
         IUnitOfWorkFactory uowFactory,
         IPasswordHasher passwordHasher,
-        IAuditWriter auditWriter,
         ICurrentUserSession currentUserSession,
         ICurrentWorkstationSession workstationSession,
         IValidator<FirstRunAdminRequest> firstRunValidator,
@@ -38,7 +35,6 @@ public sealed class AuthService : IAuthService
         _approvals = approvals;
         _uowFactory = uowFactory;
         _passwordHasher = passwordHasher;
-        _auditWriter = auditWriter;
         _currentUserSession = currentUserSession;
         _workstationSession = workstationSession;
         _firstRunValidator = firstRunValidator;
@@ -84,16 +80,20 @@ public sealed class AuthService : IAuthService
             mustChangePassword: false,
             isActive: true);
 
+        // The audit row names the new identity id, so save twice inside one transaction (R6.11).
+        await uow.BeginTransactionAsync(cancellationToken);
         uow.Users.Add(admin);
         await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "FirstRunAdminCreated",
             userId: admin.Id,
             workstationId: _workstationSession.WorkstationId,
             entityName: nameof(User),
             entityId: admin.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
+        await uow.CommitAsync(cancellationToken);
 
         return admin.ToDto();
     }
@@ -127,7 +127,7 @@ public sealed class AuthService : IAuthService
         var user = await uow.Users.GetByUserNameAsync(normalizedUserName, cancellationToken);
         if (user is null)
         {
-            await _auditWriter.WriteAsync(
+            await uow.AddAuditAsync(
                 action: "UserLoginFailed",
                 userId: null,
                 workstationId: _workstationSession.WorkstationId,
@@ -135,13 +135,14 @@ public sealed class AuthService : IAuthService
                 entityId: normalizedUserName,
                 detailsJson: AuditDetails.ToJson(new { Reason = "UserNotFound" }),
                 cancellationToken: cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
 
             return Errors.Auth.InvalidCredentials;
         }
 
         if (!user.IsActive)
         {
-            await _auditWriter.WriteAsync(
+            await uow.AddAuditAsync(
                 action: "UserLoginFailed",
                 userId: user.Id,
                 workstationId: _workstationSession.WorkstationId,
@@ -149,13 +150,14 @@ public sealed class AuthService : IAuthService
                 entityId: user.Id.ToString(),
                 detailsJson: AuditDetails.ToJson(new { Reason = "AccountInactive" }),
                 cancellationToken: cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
 
             return Errors.Auth.AccountInactive;
         }
 
         if (user.IsLockedOut(nowUtc))
         {
-            await _auditWriter.WriteAsync(
+            await uow.AddAuditAsync(
                 action: "UserLoginFailed",
                 userId: user.Id,
                 workstationId: _workstationSession.WorkstationId,
@@ -163,6 +165,7 @@ public sealed class AuthService : IAuthService
                 entityId: user.Id.ToString(),
                 detailsJson: AuditDetails.ToJson(new { Reason = "AccountLocked" }),
                 cancellationToken: cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
 
             return Errors.Auth.AccountLocked;
         }
@@ -171,22 +174,22 @@ public sealed class AuthService : IAuthService
         if (!isPasswordValid)
         {
             user.RecordFailedLogin(nowUtc, maxFailedLogins, lockoutMinutes);
-            await uow.SaveChangesAsync(cancellationToken);
 
             if (user.IsLockedOut(nowUtc))
             {
-                await _auditWriter.WriteAsync(
+                await uow.AddAuditAsync(
                     action: "UserLockedOut",
                     userId: user.Id,
                     workstationId: _workstationSession.WorkstationId,
                     entityName: nameof(User),
                     entityId: user.Id.ToString(),
                     cancellationToken: cancellationToken);
+                await uow.SaveChangesAsync(cancellationToken);
 
                 return Errors.Auth.AccountLocked;
             }
 
-            await _auditWriter.WriteAsync(
+            await uow.AddAuditAsync(
                 action: "UserLoginFailed",
                 userId: user.Id,
                 workstationId: _workstationSession.WorkstationId,
@@ -194,6 +197,7 @@ public sealed class AuthService : IAuthService
                 entityId: user.Id.ToString(),
                 detailsJson: AuditDetails.ToJson(new { Reason = "InvalidPassword" }),
                 cancellationToken: cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
 
             return Errors.Auth.InvalidCredentials;
         }
@@ -205,6 +209,8 @@ public sealed class AuthService : IAuthService
 
         user.RecordSuccessfulLogin(nowUtc);
 
+        // A new workstation gets its identity id on the first save; the audit row names it (R6.11).
+        await uow.BeginTransactionAsync(cancellationToken);
         var machineName = (request.MachineName ?? _workstationSession.MachineName ?? Environment.MachineName).Trim().ToUpperInvariant();
         var workstation = await uow.Workstations.GetByMachineNameAsync(machineName, cancellationToken);
         if (workstation is null)
@@ -225,16 +231,18 @@ public sealed class AuthService : IAuthService
 
         await uow.SaveChangesAsync(cancellationToken);
 
-        _currentUserSession.SetUser(user);
-        _workstationSession.SetWorkstation(workstation);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "UserLogin",
             userId: user.Id,
             workstationId: workstation.Id,
             entityName: nameof(User),
             entityId: user.Id.ToString(),
             cancellationToken: cancellationToken);
+        await uow.SaveChangesAsync(cancellationToken);
+        await uow.CommitAsync(cancellationToken);
+
+        _currentUserSession.SetUser(user);
+        _workstationSession.SetWorkstation(workstation);
 
         return new LoginResponse(user.ToDto(), workstation.ToDto(), user.MustChangePassword);
     }
@@ -283,15 +291,15 @@ public sealed class AuthService : IAuthService
         var newHash = _passwordHasher.HashPassword(request.NewPassword);
         user.ChangePassword(newHash, mustChangePassword: false);
 
-        await uow.SaveChangesAsync(cancellationToken);
-
-        await _auditWriter.WriteAsync(
+        await uow.AddAuditAsync(
             action: "PasswordChanged",
             userId: _currentUserSession.UserId ?? user.Id,
             workstationId: _workstationSession.WorkstationId,
             entityName: nameof(User),
             entityId: user.Id.ToString(),
             cancellationToken: cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -349,16 +357,20 @@ public sealed class AuthService : IAuthService
         {
             workstation = new Workstation(targetMachine, targetMachine, WorkstationType.Desk, isActive: true);
             workstation.RecordHeartbeat(nowUtc);
+            // The audit row names the new identity id, so save twice inside one transaction (R6.11).
+            await uow.BeginTransactionAsync(cancellationToken);
             uow.Workstations.Add(workstation);
             await uow.SaveChangesAsync(cancellationToken);
-
-            await _auditWriter.WriteAsync(
+            await uow.AddAuditAsync(
                 action: "WorkstationAutoRegistered",
                 userId: _currentUserSession.UserId,
                 workstationId: workstation.Id,
                 entityName: nameof(Workstation),
                 entityId: workstation.Id.ToString(),
                 cancellationToken: cancellationToken);
+
+            await uow.SaveChangesAsync(cancellationToken);
+            await uow.CommitAsync(cancellationToken);
         }
         else
         {

@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using ParkGate.Application.Auth.Services;
+using ParkGate.Application.Maintenance.Services;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
 using ParkGate.Application.Settings.Services;
@@ -32,6 +33,7 @@ public partial class MainForm : RtlFormBase
     private readonly ILogger<MainForm>? _logger;
     private readonly IDatabaseBackupService? _databaseBackupService;
     private readonly ISyncStatusService? _syncStatusService;
+    private readonly IDatabaseSizeService? _databaseSizeService;
 
     private TimeSpan _serverUtcOffset = TimeSpan.Zero;
     private string? _parkTimeZoneId = "Libya Standard Time";
@@ -52,7 +54,8 @@ public partial class MainForm : RtlFormBase
         INotifyService? notifyService,
         ILogger<MainForm>? logger,
         IDatabaseBackupService? databaseBackupService = null,
-        ISyncStatusService? syncStatusService = null)
+        ISyncStatusService? syncStatusService = null,
+        IDatabaseSizeService? databaseSizeService = null)
     {
         InitializeComponent();
 
@@ -67,6 +70,7 @@ public partial class MainForm : RtlFormBase
         _logger = logger;
         _databaseBackupService = databaseBackupService;
         _syncStatusService = syncStatusService;
+        _databaseSizeService = databaseSizeService;
 
         InitializeFormText();
         ApplyCurrentUser();
@@ -759,7 +763,16 @@ public partial class MainForm : RtlFormBase
             var result = await _databaseBackupService.BackupDatabaseAsync();
             if (result.IsSuccess)
             {
-                _notifyService?.Info(string.Format(Strings.Msg_BackupSuccess, result.Value), Strings.App_Title);
+                var (sizeNote, nearLimit) = await DescribeDatabaseSizeAsync();
+                var message = string.Format(Strings.Msg_BackupSuccess, result.Value) + sizeNote;
+                if (nearLimit)
+                {
+                    _notifyService?.Warning(message, Strings.App_Title);
+                }
+                else
+                {
+                    _notifyService?.Info(message, Strings.App_Title);
+                }
             }
             else
             {
@@ -775,6 +788,40 @@ public partial class MainForm : RtlFormBase
         {
             Cursor.Current = prevCursor;
             _menuBackupNow.Enabled = true;
+        }
+    }
+
+    /// <summary>
+    /// R6.8: the backup is the admin's routine stop, so its message also reports the size against the Express
+    /// limit. Returns an empty note when the size cannot be read; the backup itself already succeeded.
+    /// </summary>
+    private async Task<(string Note, bool NearLimit)> DescribeDatabaseSizeAsync()
+    {
+        if (_databaseSizeService is null)
+        {
+            return (string.Empty, false);
+        }
+
+        try
+        {
+            var size = await _databaseSizeService.GetAsync();
+            if (size.IsFailure)
+            {
+                return (string.Empty, false);
+            }
+
+            const long bytesPerMb = 1024 * 1024;
+            var usedMb = size.Value.DataBytes / bytesPerMb;
+            var limitMb = size.Value.LimitBytes / bytesPerMb;
+            var text = size.Value.IsNearLimit
+                ? string.Format(Strings.Msg_DatabaseSizeNearLimit, usedMb, size.Value.PercentUsed, limitMb)
+                : string.Format(Strings.Msg_DatabaseSize, usedMb, limitMb, size.Value.PercentUsed);
+            return (Environment.NewLine + Environment.NewLine + text, size.Value.IsNearLimit);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Could not read the database size after a backup.");
+            return (string.Empty, false);
         }
     }
 }

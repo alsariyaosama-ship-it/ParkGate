@@ -283,11 +283,9 @@ public partial class BeneficiariesControl : UserControl
         {
             _gridBeneficiaries.Rows.Clear();
 
-            var isOperator = _currentUser?.IsInRole(UserRole.Operator) ?? false;
-
             foreach (var b in beneficiaries)
             {
-                var displayNid = FormatNationalId(b.NationalId, isOperator);
+                var displayNid = FormatNationalId(b.NationalId);
                 var statusText = GetStatusArabic(b.Status);
                 var expiryText = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? "-";
                 var lastEntryText = b.LastGrantedEntryUtc.HasValue
@@ -341,16 +339,12 @@ public partial class BeneficiariesControl : UserControl
         }
     }
 
-    private static string FormatNationalId(string? nationalId, bool isOperator)
+    /// <summary>The Application layer already masks the ID for operators (R6.16); the form only shows it.</summary>
+    private static string FormatNationalId(string? nationalId)
     {
         if (string.IsNullOrWhiteSpace(nationalId))
         {
             return "-";
-        }
-
-        if (isOperator && nationalId.Length > 4)
-        {
-            return new string('*', nationalId.Length - 4) + nationalId[^4..];
         }
 
         return nationalId;
@@ -384,13 +378,11 @@ public partial class BeneficiariesControl : UserControl
 
     private void DisplayBeneficiaryDetails(BeneficiaryDto b)
     {
-        var isOperator = _currentUser?.IsInRole(UserRole.Operator) ?? false;
-
         _lblDetailName.Text = b.FullName;
         _lblDetailCard.Text = b.CardNumber;
         _lblDetailOrg.Text = b.OrganizationName;
         _lblDetailPhone.Text = b.Phone;
-        _lblDetailNid.Text = FormatNationalId(b.NationalId, isOperator);
+        _lblDetailNid.Text = FormatNationalId(b.NationalId);
         _lblDetailExpiry.Text = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? Strings.Ui_Beneficiaries_04;
 
         _lblDetailStatus.Text = GetStatusArabic(b.Status);
@@ -585,7 +577,7 @@ public partial class BeneficiariesControl : UserControl
                 row.Cells[_colOrganization.Index].Value = updated.OrganizationName;
                 row.Cells[_colFullName.Index].Value = updated.FullName;
                 row.Cells[_colPhone.Index].Value = updated.Phone;
-                row.Cells[_colNationalId.Index].Value = FormatNationalId(updated.NationalId, _currentUser?.IsInRole(UserRole.Operator) ?? false);
+                row.Cells[_colNationalId.Index].Value = FormatNationalId(updated.NationalId);
                 row.Cells[_colExpiryDate.Index].Value = updated.CardExpiryDate?.ToString("dd/MM/yyyy") ?? "-";
             }
         }

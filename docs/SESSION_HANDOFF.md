@@ -9,16 +9,16 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-11-14 |
-| Last session | S34 — PR #15 opened; TC-14–TC-21 run by Osama (all passed except TC-20, Cairo, not yet tried); gift screen fixed (R4.11, R4.12) |
-| Current phase | Phase R — Remediation. R0–R2 merged (PR #11–#13). R3 PR #14 open. R4 code done on `phase/r4-desk-ui`, PR not opened yet |
-| Working branch | `phase/r4-desk-ui` (branched from `phase/r3-application`, because PR #14 was still open) |
-| Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2). No .NET change in R1 |
-| .NET Unit tests | 690 passed: 202 domain + 218 application + 87 infrastructure + 183 architecture |
-| .NET Integration tests | 42 passed on LocalDB (S32; R4 did not touch Infrastructure) |
-| Web tests | `php artisan test` (PHP 8.4): 96 passed on SQLite and on MySQL 8 strict mode (no web change in S32) |
-| Total tests | 828 (732 .NET + 96 web), all green |
-| Latest migration | `20261113205308_RequeueGiftAndPolicyOutbox` (no migration in S32). Applied on LocalDB and on SQLEXPRESS |
+| Last updated | 2026-11-18 |
+| Last session | S36 — R6 complete except R6.5 (blocked Q-R6); R6 PR #17 open |
+| Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 PR open from `phase/r6-database` |
+| Working branch | `phase/r6-database` |
+| Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
+| .NET Unit tests | 723 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 185 architecture |
+| .NET Integration tests | 56 passed on LocalDB |
+| Web tests | `php artisan test` (PHP 8.4): 98 passed on SQLite (MySQL job runs in CI) |
+| Total tests | 877 (779 .NET + 98 web), all green |
+| Latest migration | `RemoveUnusedMaskSetting` (S36), after `RemoveUnreadSoundSetting` and `MapDatabaseFilesView` (snapshot only). Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
 
 ## State of the work
 
@@ -120,14 +120,19 @@
 
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
-1. PR #15 (R4) is open. Osama passed TC-14–TC-19 and TC-21 on the desk; **TC-20 (Cairo missing) is still untried**. TC-21's F7 gift override must be re-run on the fixed gift screen (R4.11/R4.12).
-2. Branch `docs/entry-identity` (pushed, no PR yet): ADR-024, SPEC F6/F7 recommendations, F8 design (BR-27..BR-29, DATABASE §3.13-3.14, ROADMAP Phase F8). Osama reviews it, then open its PR.
-3. Agreed session order after PR #15 is merged (review 2026-11-18): **R6** (database: entry-card tables into migrations, DB-clock audit columns, R6.11 audit in the unit of work) -> **R7.6-R7.9** (UI-layer conformance: no Infrastructure in WinForms, Notify only, Dpi everywhere, no null-service fallbacks) -> **R5** (desk UX, with R7.10 split of `CheckInDeskControl` first) -> rest of **R7** -> **R8** (release) -> **F8** (only on Osama's go-ahead) -> **R9** (docs last). Reason: F8 adds a migration and organization fields, so the schema conventions (R6) and the UI layer (R7) should be settled first.
+**S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
+Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
+**Next:** Osama re-runs `scripts\backup.ps1` as Administrator, then reviews and merges PR #17. Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6. A purge command for the approved retention periods is not built; add it as a task when Osama wants it.
+
+**S35 (2026-11-18): R6.1, R6.2, R6.12, R6.13, R6.14.** Entry-card tables are EF entities (migration `AdoptEntryCards`); the DB clock is a mapped `SYSUTCDATETIME`; optimistic concurrency with `ConcurrencyRetry` replaced `UPDLOCK` (migration `AddBeneficiaryLastGiftIssuedUtc`); `EfOnlyDataAccessTests` guards ADR-025. Both dev databases were cleaned of the old entry-card objects with Osama's approval (option A) and migrated.
+
+1. TC-20 (Cairo missing) is still untried, and TC-21's F7 gift override should be re-run on the fixed gift screen. New TC-22 (database size after backup).
+2. Agreed session order (review 2026-11-18): **R6** (done) (database: entry-card tables into migrations, DB-clock audit columns, R6.11 audit in the unit of work) -> **R7.6-R7.9** (UI-layer conformance: no Infrastructure in WinForms, Notify only, Dpi everywhere, no null-service fallbacks) -> **R5** (desk UX, with R7.10 split of `CheckInDeskControl` first) -> rest of **R7** -> **R8** (release) -> **F8** (only on Osama's go-ahead) -> **R9** (docs last). Reason: F8 adds a migration and organization fields, so the schema conventions (R6) and the UI layer (R7) should be settled first.
    Gift decisions confirmed 2026-11-18: the interval starts when the voucher is issued, and the gift voucher stays a separate QR slip (current F5 behaviour, no change).
-4. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
+3. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
    hangs the test host. Use synchronous fakes or a seam (`SuccessDelay`, `ChooseOrganizationOverride`), and run
    `dotnet test` with `timeout`.
-5. Edit files with byte-level Python (or the Edit tool); text mode turns CRLF into LF.
+4. Edit files with byte-level Python (or the Edit tool); text mode turns CRLF into LF.
 
 Carried over from S25 (do it when a printer is available; it does not block Phase R):
 - Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
@@ -135,6 +140,9 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
+- **R6.9 re-run:** `scripts\backup.ps1` as Administrator after commit `4a53206` (ownership + child ACL reset).
+- Delete the empty test folder `C:\ParkGate_R69_Test` left by the agent's non-elevated test run (the tool blocks deletes at `C:\`).
+- **Behaviour change (R6.3):** `CreatedByUserId`, `UpdatedAtUtc` and `UpdatedByUserId` are now filled on holders, organizations and users; they were always NULL before.
 - ~~Apply the three migrations on SQLEXPRESS~~ **Done in S31** (backup first: `C:\ProgramData\ParkGateackups\ParkGate_before_R2.bak`). The 7 pending outbox rows got sequences 1–11 with the re-queued ones and contain no phone, national ID, token or key id. Install the new SyncAgent build before it runs again (still the old one until R8.4).
 - **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, re-import `web/database/mysql_schema.sql` (it is generated now and drops and recreates every table, so it also wipes `users`: create the user again with `parkgate:create-user`), then let the agent re-queue.
 - Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
@@ -158,6 +166,20 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S36 — 2026-11-18 — Phase R6 complete (except R6.5, R6.16); R6 PR
+- Baseline green (701 unit). One commit per task, test-first.
+- R6.11: 30 audit calls in 7 services moved into the unit of work; creates that audit a new identity id save twice in one transaction; settings saved in one save (the store did ten saves with the client clock). Card number change audits old and new number.
+- R6.3 finding: the audit interceptor was never added to the context options. Registered in `DynamicParkGateDbContextFactory` (one shared instance: EF caches internal services per interceptor instance).
+- R6.4: the new drift test found six unnamed CHECK constraints and two F8 columns documented as built; found R6.15 (dead seeded setting key).
+- R6.6: no query change needed (~350 ms). R6.10: `gift_vouchers` already existed (R2.7); only indexes changed.
+- R6.9 finding: `backup.ps1` used `COMPRESSION`, which Express rejects, so the scheduled backup could never succeed on the target edition.
+- Tip: the Write tool strips trailing spaces in text it writes; byte-exact Python edits need care with blank lines that hold spaces.
+- After Osama agreed: R6.16 (mask in Application, seed row deleted), retention approved, backup ACL fix. R6.15 (migration `RemoveUnreadSoundSetting`; the new key is not seeded because saved desks already have it), `IAuditWriter` removed, R6.8 (option A). Found R6.16 (mask setting never read).
+- Tests: .NET 755 → 773 (integration 54 → 56), web 96 → 98.
+
+### S35 — 2026-11-18 — Phase R6: R6.1, R6.2, R6.12, R6.13, R6.14
+- See "Next session" for the summary. Tests 755 green.
 
 ### S34 — 2026-11-15 — PR #15, manual tests, gift screen fix
 
@@ -236,32 +258,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
   `git add --renormalize .`) in a dedicated commit; added to R9 if not done earlier.
 - Untracked, left out of the commit: `Claude outputs/web.yml` (byte-identical duplicate of the workflow)
   and `scripts/r0-baseline.ps1` (optional helper). Osama to decide: delete or keep.
-
-### S26 — 2026-11-13 — Phase R0 (partial): git baseline, roadmap, web CI
-- No shell available (cloud session). Derived `git status` from `.git/index` + SHA-1 of all 566 tracked
-  files instead of running git.
-- Found: `main` == `origin/main` (`13ec3c6`), nothing unpushed; only `docs/SESSION_HANDOFF.md` modified
-  and only `docs/REMEDIATION_PLAN.md` untracked.
-- Disproved REMEDIATION_PLAN §1's assumption of uncommitted S25 changes in `IssueQrDialog.cs`,
-  `GiftQrDialog.cs`, `Strings.resx`, `Strings.Designer.cs` — touched, identical content.
-- R0.3 done: Phase R (R0–R9) added to `docs/ROADMAP.md`; §2.2 questions asked.
-- R0.4 written but parked at `docs/_R0.4-web-workflow.yml` (`.github/` is protected for remote tools).
-- Added `scripts/r0-baseline.ps1` so one command produces the R0.2 numbers.
-- Confirmed the cloud session cannot reach a shell: no `device_bash`, and the device grants `Terminal`
-  in `click` tier only ("cannot type, press keys, or paste"). Phase R moves to local sessions.
-- Nothing committed. No build or test run.
-
-### Review — 2026-11-12 — Full code review and remediation plan (no code changes)
-- Reviewed web, sync agent, WinForms UI, Application/Infrastructure and database design.
-- Added `docs/REMEDIATION_PLAN.md` (Phase R). Osama answered Q-R1 to Q-R7 (plan §2.1).
-- No source files changed. Nothing committed.
-
-### S25 — 2026-11-05 — Bugfix: PrintDialog COM crash & GDI+ Font rendering on QR card print
-- Fixed `IssueQrDialog` and `GiftQrDialog` print crash (`0xc000041d` in `combase.dll`) by disabling `UseEXDialog`.
-- Replaced private font collection usage in printer graphics with standard font constructor.
-- Added printer count pre-check and invalid printer fallback.
-- Added `Msg_NoPrinterInstalled` to `Strings.resx`.
-- Commits:
-  - `fix(winforms): fix print dialog combase crash and font rendering on qr card print`
-- All 588 unit/arch tests pass (100% green).
-
