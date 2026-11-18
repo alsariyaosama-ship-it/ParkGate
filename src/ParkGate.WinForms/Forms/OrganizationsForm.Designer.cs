@@ -356,7 +356,7 @@ partial class OrganizationsForm
         this._btnClose.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnClose.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._btnClose.Location = new System.Drawing.Point(16, 8);
         this._btnClose.Name = "_btnClose";
         this._btnClose.Size = new System.Drawing.Size(96, 32);

@@ -48,7 +48,7 @@ partial class InlineRegistrationPanel
         this._grpRegistration.Controls.Add(this._tblRegistration);
         this._grpRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpRegistration.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(77)))), ((int)(((byte)(14)))));
+        this._grpRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
         this._grpRegistration.Location = new System.Drawing.Point(0, 0);
         this._grpRegistration.Name = "_grpRegistration";
         this._grpRegistration.Padding = new System.Windows.Forms.Padding(8);
@@ -77,7 +77,7 @@ partial class InlineRegistrationPanel
         this._tblRegistration.Controls.Add(this._pnlRegActions, 1, 6);
         this._tblRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblRegistration.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._tblRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._tblRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._tblRegistration.Location = new System.Drawing.Point(8, 26);
         this._tblRegistration.Name = "_tblRegistration";
         this._tblRegistration.RowCount = 7;
@@ -245,9 +245,9 @@ partial class InlineRegistrationPanel
         // 
         // _btnCancelReg
         // 
-        this._btnCancelReg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnCancelReg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnCancelReg.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnCancelReg.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnCancelReg.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnCancelReg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnCancelReg.Location = new System.Drawing.Point(109, 3);
         this._btnCancelReg.Name = "_btnCancelReg";

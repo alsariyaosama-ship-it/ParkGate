@@ -93,7 +93,7 @@ partial class BeneficiariesControl
         // 
         // _pnlSearch
         // 
-        this._pnlSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(247)))));
+        this._pnlSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
         this._pnlSearch.Controls.Add(this._lblSearch);
         this._pnlSearch.Controls.Add(this._txtSearch);
         this._pnlSearch.Controls.Add(this._btnSearch);
@@ -147,12 +147,12 @@ partial class BeneficiariesControl
         // _btnClearSearch
         // 
         this._btnClearSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-        this._btnClearSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnClearSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnClearSearch.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnClearSearch.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnClearSearch.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClearSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnClearSearch.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnClearSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._btnClearSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnClearSearch.Location = new System.Drawing.Point(309, 9);
         this._btnClearSearch.Name = "_btnClearSearch";
         this._btnClearSearch.Size = new System.Drawing.Size(84, 34);

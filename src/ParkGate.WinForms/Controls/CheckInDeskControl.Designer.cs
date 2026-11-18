@@ -167,7 +167,7 @@ partial class CheckInDeskControl
         this._lblCardNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
         this._lblCardNumber.AutoSize = true;
         this._lblCardNumber.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblCardNumber.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._lblCardNumber.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._lblCardNumber.Location = new System.Drawing.Point(866, 11);
         this._lblCardNumber.Name = "_lblCardNumber";
         this._lblCardNumber.Size = new System.Drawing.Size(95, 26);
@@ -214,7 +214,7 @@ partial class CheckInDeskControl
         this._grpHolder.Controls.Add(this._tblHolder);
         this._grpHolder.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpHolder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpHolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._grpHolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpHolder.Location = new System.Drawing.Point(0, 0);
         this._grpHolder.Name = "_grpHolder";
         this._grpHolder.Padding = new System.Windows.Forms.Padding(8);
@@ -413,7 +413,7 @@ partial class CheckInDeskControl
         this._grpCompanions.Controls.Add(this._flowCounters);
         this._grpCompanions.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpCompanions.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._grpCompanions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpCompanions.Location = new System.Drawing.Point(0, 0);
         this._grpCompanions.Name = "_grpCompanions";
         this._grpCompanions.Padding = new System.Windows.Forms.Padding(8);
@@ -519,12 +519,12 @@ partial class CheckInDeskControl
         // 
         // _btnClear
         // 
-        this._btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(242)))), ((int)(((byte)(247)))));
+        this._btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._btnClear.Cursor = System.Windows.Forms.Cursors.Hand;
-        this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+        this._btnClear.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
         this._btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnClear.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(55)))), ((int)(((byte)(72)))));
+        this._btnClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._btnClear.Location = new System.Drawing.Point(13, 2);
         this._btnClear.Margin = new System.Windows.Forms.Padding(0, 2, 5, 2);
         this._btnClear.Name = "_btnClear";
@@ -621,7 +621,7 @@ partial class CheckInDeskControl
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.AutoScroll = true;
-        this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
+        this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
         this.Controls.Add(this._mainLayout);
         this.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.Name = "CheckInDeskControl";

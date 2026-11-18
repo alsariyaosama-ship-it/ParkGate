@@ -154,7 +154,7 @@ public partial class ConnectionSettingsForm : RtlFormBase
         }
 
         SetBusy(true);
-        lblStatus.ForeColor = Color.FromArgb(70, 70, 70);
+        lblStatus.ForeColor = Theme.TextPrimary;
         lblStatus.Text = Strings.Ui_ConnectionSettings_01;
 
         try
@@ -164,20 +164,20 @@ public partial class ConnectionSettingsForm : RtlFormBase
 
             if (canConnect)
             {
-                lblStatus.ForeColor = Color.FromArgb(27, 135, 63);
+                lblStatus.ForeColor = Theme.Success;
                 lblStatus.Text = Strings.Msg_ConnectionSuccess;
                 Notify.Info(Strings.Msg_ConnectionSuccess, Strings.Title_Info, this);
             }
             else
             {
-                lblStatus.ForeColor = Color.FromArgb(198, 40, 40);
+                lblStatus.ForeColor = Theme.Danger;
                 lblStatus.Text = Strings.Msg_ConnectionFailed;
                 Notify.Error(Strings.Msg_ConnectionFailed, Strings.Title_Error, this);
             }
         }
         catch (Exception ex)
         {
-            lblStatus.ForeColor = Color.FromArgb(198, 40, 40);
+            lblStatus.ForeColor = Theme.Danger;
             lblStatus.Text = Strings.Msg_ConnectionFailed;
             Notify.Error(UserMessages.LogAndDescribe(ex, "Connection test"), Strings.Title_Error, this);
         }

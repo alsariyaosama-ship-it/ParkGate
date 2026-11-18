@@ -16,8 +16,8 @@ namespace ParkGate.WinForms.Forms;
 
 public partial class MainForm : RtlFormBase
 {
-    private static readonly Color ConnectedColor = Color.FromArgb(27, 135, 63);
-    private static readonly Color DisconnectedColor = Color.FromArgb(198, 40, 40);
+    private static readonly Color ConnectedColor = Theme.Success;
+    private static readonly Color DisconnectedColor = Theme.Danger;
 
     /// <summary>The agent beats every minute; three missed beats means it is not running.</summary>
     private static readonly TimeSpan AgentStaleAfter = TimeSpan.FromMinutes(3);

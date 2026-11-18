@@ -293,7 +293,7 @@ partial class MainForm
         // 
         // _mainContainer
         // 
-        _mainContainer.BackColor = Color.FromArgb(245, 247, 250);
+        _mainContainer.BackColor = Color.FromArgb(248, 250, 252);
         _mainContainer.Controls.Add(_welcomeCard);
         _mainContainer.Dock = DockStyle.Fill;
         _mainContainer.Location = new Point(0, 48);
@@ -336,7 +336,7 @@ partial class MainForm
         // 
         _lblWelcomeSubtitle.Dock = DockStyle.Top;
         _lblWelcomeSubtitle.Font = new Font("Cairo", 12F);
-        _lblWelcomeSubtitle.ForeColor = Color.FromArgb(45, 55, 72);
+        _lblWelcomeSubtitle.ForeColor = Color.FromArgb(30, 41, 59);
         _lblWelcomeSubtitle.Location = new Point(40, 115);
         _lblWelcomeSubtitle.Margin = new Padding(4, 0, 4, 0);
         _lblWelcomeSubtitle.Name = "_lblWelcomeSubtitle";

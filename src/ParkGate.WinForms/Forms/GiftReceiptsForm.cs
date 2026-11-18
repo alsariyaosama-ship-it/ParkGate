@@ -464,7 +464,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         for (int c = 0; c < printHeaders.Length; c++)
         {
             var rect = new RectangleF(x + (printHeaders.Length - 1 - c) * colWidth, y, colWidth, 24);
-            g.FillRectangle(new SolidBrush(Color.FromArgb(27, 135, 63)), rect);
+            g.FillRectangle(new SolidBrush(Theme.Success), rect);
             g.DrawRectangle(Pens.DarkGreen, rect.X, rect.Y, rect.Width, rect.Height);
             g.DrawString(printHeaders[c], fontHeader, Brushes.White, rect, sfCenter);
         }
@@ -493,7 +493,7 @@ public partial class GiftReceiptsForm : RtlFormBase
                     var rect = new RectangleF(x + (vals.Length - 1 - c) * colWidth, y, colWidth, 20);
                     if (r % 2 == 1)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(248, 250, 252)), rect);
+                        g.FillRectangle(new SolidBrush(Theme.Background), rect);
                     }
                     g.DrawRectangle(Pens.LightGray, rect.X, rect.Y, rect.Width, rect.Height);
                     g.DrawString(vals[c], fontData, Brushes.Black, rect, sfCenter);
@@ -503,7 +503,7 @@ public partial class GiftReceiptsForm : RtlFormBase
 
             // Summary line
             y += 10;
-            g.DrawString(_lblSummary.Text, fontSummary, new SolidBrush(Color.FromArgb(27, 135, 63)), new RectangleF(x, y, width, 25), sfRight);
+            g.DrawString(_lblSummary.Text, fontSummary, new SolidBrush(Theme.Success), new RectangleF(x, y, width, 25), sfRight);
         }
 
         e.HasMorePages = false;

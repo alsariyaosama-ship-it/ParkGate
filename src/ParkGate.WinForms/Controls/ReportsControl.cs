@@ -330,15 +330,15 @@ public partial class ReportsControl : UserControl
         _pnlDailyKpi.SuspendLayout();
         _pnlDailyKpi.Controls.Clear();
 
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_TotalAttempts, report.TotalAttempts.ToString("N0"), Color.FromArgb(69, 90, 100));
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_AllowedEntries, report.AllowedEntries.ToString("N0"), Color.FromArgb(27, 135, 63));
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_OverriddenEntries, report.OverriddenEntries.ToString("N0"), Color.FromArgb(178, 106, 0));
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_TotalVisits, report.TotalVisits.ToString("N0"), Color.FromArgb(27, 135, 63), true);
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_DeniedEntries, report.DeniedEntries.ToString("N0"), Color.FromArgb(198, 40, 40));
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_VoidedEntries, report.VoidedEntries.ToString("N0"), Color.FromArgb(120, 144, 156));
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_Holders, report.TotalHolders.ToString("N0"), Color.FromArgb(21, 101, 192));
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_Companions, report.TotalCompanions.ToString("N0"), Color.FromArgb(0, 137, 123));
-        AddKpiCard(_pnlDailyKpi, Strings.Kpi_TotalPersons, report.TotalPersons.ToString("N0"), Color.FromArgb(46, 125, 50), true);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_TotalAttempts, report.TotalAttempts.ToString("N0"), Theme.Neutral);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_AllowedEntries, report.AllowedEntries.ToString("N0"), Theme.Success);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_OverriddenEntries, report.OverriddenEntries.ToString("N0"), Theme.Warning);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_TotalVisits, report.TotalVisits.ToString("N0"), Theme.Success, true);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_DeniedEntries, report.DeniedEntries.ToString("N0"), Theme.Danger);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_VoidedEntries, report.VoidedEntries.ToString("N0"), Theme.TextMuted);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_Holders, report.TotalHolders.ToString("N0"), Theme.Info);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_Companions, report.TotalCompanions.ToString("N0"), Theme.Accent);
+        AddKpiCard(_pnlDailyKpi, Strings.Kpi_TotalPersons, report.TotalPersons.ToString("N0"), Theme.Success, true);
 
         _pnlDailyKpi.ResumeLayout();
 
@@ -383,7 +383,7 @@ public partial class ReportsControl : UserControl
         {
             Size = new Size(112, 75),
             Margin = new Padding(3),
-            BackColor = highlight ? Color.FromArgb(232, 245, 233) : Color.FromArgb(248, 249, 250),
+            BackColor = highlight ? Theme.SuccessTint : Theme.SurfaceAlt,
             BorderStyle = BorderStyle.FixedSingle
         };
 
@@ -391,7 +391,7 @@ public partial class ReportsControl : UserControl
         {
             Text = title,
             Font = new Font("Cairo", 9F, FontStyle.Regular),
-            ForeColor = Color.FromArgb(100, 116, 139),
+            ForeColor = Theme.TextMuted,
             Dock = DockStyle.Top,
             Height = 28,
             TextAlign = ContentAlignment.MiddleCenter
@@ -672,11 +672,11 @@ public partial class ReportsControl : UserControl
             // Color status
             if (item.Result == EntryResult.Denied)
             {
-                _gridDenials.Rows[rowIdx].Cells["Result"].Style.ForeColor = Color.FromArgb(198, 40, 40);
+                _gridDenials.Rows[rowIdx].Cells["Result"].Style.ForeColor = Theme.Danger;
             }
             else
             {
-                _gridDenials.Rows[rowIdx].Cells["Result"].Style.ForeColor = Color.FromArgb(178, 106, 0);
+                _gridDenials.Rows[rowIdx].Cells["Result"].Style.ForeColor = Theme.Warning;
             }
         }
 

@@ -178,7 +178,7 @@ partial class EditOrganizationDialog
         this._grpPolicy.Controls.Add(this._tblPolicyLayout);
         this._grpPolicy.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpPolicy.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpPolicy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._grpPolicy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._grpPolicy.Location = new System.Drawing.Point(19, 159);
         this._grpPolicy.Name = "_grpPolicy";
         this._grpPolicy.Padding = new System.Windows.Forms.Padding(8);

@@ -115,9 +115,9 @@ public partial class GiftOfferPanel : UserControl
 
             if (eligibility.IsEligible)
             {
-                _grpMain.BackColor = Color.FromArgb(240, 253, 244);
+                _grpMain.BackColor = Theme.SuccessTint;
                 _lblStatus.Text = string.Format(Strings.Label_GiftEligible, eligibility.GiftValue.ToString("0.###"), Strings.Unit_Currency);
-                _lblStatus.ForeColor = Color.FromArgb(27, 135, 63);
+                _lblStatus.ForeColor = Theme.Success;
                 _lblDetails.Text = string.Empty;
 
                 _btnIssue.Enabled = true;
@@ -126,10 +126,10 @@ public partial class GiftOfferPanel : UserControl
             }
             else
             {
-                _grpMain.BackColor = Color.FromArgb(254, 252, 232);
+                _grpMain.BackColor = Theme.WarningTint;
                 var reasonError = new Error(eligibility.ReasonCode ?? "Gift.NotEligible");
                 _lblStatus.Text = string.Format(Strings.Label_GiftNotEligible, ErrorMessages.GetMessage(reasonError));
-                _lblStatus.ForeColor = Color.FromArgb(178, 106, 0);
+                _lblStatus.ForeColor = Theme.Warning;
 
                 if (eligibility.NextEligibleAtUtc.HasValue)
                 {

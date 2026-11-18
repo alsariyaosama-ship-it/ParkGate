@@ -151,14 +151,14 @@ public partial class GiftQrDialog : RtlFormBase
 
                 // Card rectangle (approx A6 receipt card)
                 var cardRect = new Rectangle(40, 40, 360, 220);
-                using var borderPen = new Pen(Color.FromArgb(27, 135, 63), 2);
+                using var borderPen = new Pen(Theme.Success, 2);
                 using var fillBrush = new SolidBrush(Color.White);
                 g.FillRectangle(fillBrush, cardRect);
                 g.DrawRectangle(borderPen, cardRect);
 
                 // Header banner
                 var headerRect = new Rectangle(cardRect.Left, cardRect.Top, cardRect.Width, 36);
-                using var headerBrush = new SolidBrush(Color.FromArgb(27, 135, 63));
+                using var headerBrush = new SolidBrush(Theme.Success);
                 g.FillRectangle(headerBrush, headerRect);
 
                 using var sfCenter = new StringFormat

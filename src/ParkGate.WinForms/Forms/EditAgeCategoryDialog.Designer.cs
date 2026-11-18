@@ -119,7 +119,7 @@ partial class EditAgeCategoryDialog
         this._lblNameAr.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblNameAr.AutoSize = true;
         this._lblNameAr.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblNameAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._lblNameAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._lblNameAr.Location = new System.Drawing.Point(370, 26);
         this._lblNameAr.Name = "_lblNameAr";
         this._lblNameAr.Size = new System.Drawing.Size(73, 20);
@@ -141,7 +141,7 @@ partial class EditAgeCategoryDialog
         this._lblDescriptionAr.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblDescriptionAr.AutoSize = true;
         this._lblDescriptionAr.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblDescriptionAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._lblDescriptionAr.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._lblDescriptionAr.Location = new System.Drawing.Point(370, 72);
         this._lblDescriptionAr.Name = "_lblDescriptionAr";
         this._lblDescriptionAr.Size = new System.Drawing.Size(56, 20);
@@ -163,7 +163,7 @@ partial class EditAgeCategoryDialog
         this._lblSortOrder.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblSortOrder.AutoSize = true;
         this._lblSortOrder.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblSortOrder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._lblSortOrder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._lblSortOrder.Location = new System.Drawing.Point(370, 118);
         this._lblSortOrder.Name = "_lblSortOrder";
         this._lblSortOrder.Size = new System.Drawing.Size(54, 20);
@@ -186,7 +186,7 @@ partial class EditAgeCategoryDialog
         this._chkIsCompanionLimitExempt.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._chkIsCompanionLimitExempt.AutoSize = true;
         this._chkIsCompanionLimitExempt.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._chkIsCompanionLimitExempt.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+        this._chkIsCompanionLimitExempt.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
         this._chkIsCompanionLimitExempt.Location = new System.Drawing.Point(23, 162);
         this._chkIsCompanionLimitExempt.Name = "_chkIsCompanionLimitExempt";
         this._chkIsCompanionLimitExempt.Size = new System.Drawing.Size(324, 28);

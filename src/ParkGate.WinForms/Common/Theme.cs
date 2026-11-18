@@ -25,12 +25,23 @@ public static class Theme
     public static readonly Color Border = Color.FromArgb(226, 232, 240);
     public static readonly Color TextPrimary = Color.FromArgb(30, 41, 59);
     public static readonly Color TextMuted = Color.FromArgb(100, 116, 139);
+    public static readonly Color TextSecondary = Color.FromArgb(71, 85, 105);
+    public static readonly Color SurfaceMuted = Color.FromArgb(241, 245, 249);
+    public static readonly Color BorderStrong = Color.FromArgb(203, 213, 225);
+
+    // AGENTS.md §5.10 neutral (status banner idle state, neutral KPIs).
+    public static readonly Color Neutral = Color.FromArgb(69, 90, 100);
 
     // Semantic Status Colors
     public static readonly Color Success = Color.FromArgb(27, 135, 63);
     public static readonly Color Warning = Color.FromArgb(178, 106, 0);
     public static readonly Color Danger = Color.FromArgb(198, 40, 40);
     public static readonly Color Info = Color.FromArgb(2, 132, 199);
+    public static readonly Color Accent = Color.FromArgb(0, 137, 123);
+    public static readonly Color SuccessTint = Color.FromArgb(240, 253, 244);
+    public static readonly Color SuccessBorder = Color.FromArgb(167, 219, 185);
+    public static readonly Color WarningTint = Color.FromArgb(254, 252, 232);
+    public static readonly Color DangerTint = Color.FromArgb(254, 242, 242);
 
     // Typography
     public static Font Body => AppFont.CreateFont(10F, FontStyle.Regular);
@@ -74,10 +85,10 @@ public static class Theme
         g.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
         g.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
         g.ColumnHeadersHeight = 44;
-        g.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(241, 245, 249);
-        g.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(71, 85, 105);
-        g.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(241, 245, 249);
-        g.ColumnHeadersDefaultCellStyle.SelectionForeColor = Color.FromArgb(71, 85, 105);
+        g.ColumnHeadersDefaultCellStyle.BackColor = SurfaceMuted;
+        g.ColumnHeadersDefaultCellStyle.ForeColor = TextSecondary;
+        g.ColumnHeadersDefaultCellStyle.SelectionBackColor = SurfaceMuted;
+        g.ColumnHeadersDefaultCellStyle.SelectionForeColor = TextSecondary;
         g.ColumnHeadersDefaultCellStyle.Font = AppFont.CreateFont(10F, FontStyle.Bold);
         g.ColumnHeadersDefaultCellStyle.Padding = new Padding(12, 0, 12, 0);
 
@@ -114,10 +125,10 @@ public static class Theme
     /// </summary>
     public static void ApplySecondaryButtonStyle(Button b)
     {
-        b.BackColor = Color.FromArgb(241, 245, 249);
+        b.BackColor = SurfaceMuted;
         b.ForeColor = TextPrimary;
         b.FlatStyle = FlatStyle.Flat;
-        b.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
+        b.FlatAppearance.BorderColor = BorderStrong;
         b.Cursor = Cursors.Hand;
         b.Font = AppFont.CreateFont(10F, FontStyle.Regular);
     }

@@ -416,25 +416,25 @@ public partial class CheckInDeskControl : UserControl
                     limitExceeded = true;
                     _lblFreeCompanions.Text = string.Format(Strings.Label_FreeCompanionsExceeded, nonExemptCompanions, maxFreeLimit);
                     _lblFreeCompanions.ForeColor = StatusBanner.ColorDenied;
-                    _pnlCompanionsTotal.BackColor = Color.FromArgb(254, 242, 242);
+                    _pnlCompanionsTotal.BackColor = Theme.DangerTint;
                 }
                 else
                 {
                     _lblFreeCompanions.Text = string.Format(Strings.Label_FreeCompanionsCount, nonExemptCompanions, maxFreeLimit);
                     _lblFreeCompanions.ForeColor = StatusBanner.ColorNeutral;
-                    _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+                    _pnlCompanionsTotal.BackColor = Theme.SuccessTint;
                 }
             }
             else
             {
                 _lblFreeCompanions.Visible = false;
-                _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+                _pnlCompanionsTotal.BackColor = Theme.SuccessTint;
             }
         }
         else
         {
             _lblFreeCompanions.Visible = false;
-            _pnlCompanionsTotal.BackColor = Color.FromArgb(240, 253, 244);
+            _pnlCompanionsTotal.BackColor = Theme.SuccessTint;
         }
 
         _companionsBlockEntry = totalPersons > _maxGroupSize || limitExceeded;
@@ -506,7 +506,7 @@ public partial class CheckInDeskControl : UserControl
         _lblHolderExpiry.Text = "-";
         _lblHolderLastEntry.Text = "-";
         _lblHolderStatus.Text = "-";
-        _lblHolderStatus.ForeColor = Color.FromArgb(45, 55, 72);
+        _lblHolderStatus.ForeColor = Theme.TextPrimary;
     }
 
     public void ShowHolderInfo(BeneficiaryDto holder, EligibilityPreviewDto? eligibility)

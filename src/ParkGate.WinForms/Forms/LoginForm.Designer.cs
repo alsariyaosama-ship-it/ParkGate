@@ -98,7 +98,7 @@ partial class LoginForm
         // _pnlWorkstationChip
         // 
         _pnlWorkstationChip.Anchor = AnchorStyles.Bottom;
-        _pnlWorkstationChip.BackColor = Color.FromArgb(20, 105, 48);
+        _pnlWorkstationChip.BackColor = Color.FromArgb(21, 109, 51);
         _pnlWorkstationChip.Controls.Add(lblWorkstation);
         _pnlWorkstationChip.Location = new Point(100, 110);
         _pnlWorkstationChip.Margin = new Padding(4);
@@ -195,7 +195,7 @@ partial class LoginForm
         // 
         lblUsername.Dock = DockStyle.Fill;
         lblUsername.Font = new Font("Cairo", 10F, FontStyle.Bold);
-        lblUsername.ForeColor = Color.FromArgb(51, 65, 85);
+        lblUsername.ForeColor = Color.FromArgb(71, 85, 105);
         lblUsername.Location = new Point(0, 82);
         lblUsername.Margin = new Padding(0);
         lblUsername.Name = "lblUsername";
@@ -220,7 +220,7 @@ partial class LoginForm
         // 
         lblPassword.Dock = DockStyle.Fill;
         lblPassword.Font = new Font("Cairo", 10F, FontStyle.Bold);
-        lblPassword.ForeColor = Color.FromArgb(51, 65, 85);
+        lblPassword.ForeColor = Color.FromArgb(71, 85, 105);
         lblPassword.Location = new Point(0, 174);
         lblPassword.Margin = new Padding(0);
         lblPassword.Name = "lblPassword";

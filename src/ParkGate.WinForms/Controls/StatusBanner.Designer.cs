@@ -60,7 +60,7 @@ partial class StatusBanner
         this._lblDetails.AutoEllipsis = true;
         this._lblDetails.Dock = System.Windows.Forms.DockStyle.Fill;
         this._lblDetails.Font = new System.Drawing.Font("Cairo", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this._lblDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+        this._lblDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
         this._lblDetails.Location = new System.Drawing.Point(0, 48);
         this._lblDetails.Margin = new System.Windows.Forms.Padding(0);
         this._lblDetails.Name = "_lblDetails";
