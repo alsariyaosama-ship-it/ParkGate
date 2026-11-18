@@ -34,6 +34,7 @@ public partial class MainForm : RtlFormBase
     private readonly IDatabaseBackupService _databaseBackupService;
     private readonly ISyncStatusService _syncStatusService;
     private readonly IDatabaseSizeService _databaseSizeService;
+    private readonly IdleMonitor _idleMonitor;
 
     private TimeSpan _serverUtcOffset = TimeSpan.Zero;
     private string? _parkTimeZoneId = "Libya Standard Time";
@@ -51,7 +52,8 @@ public partial class MainForm : RtlFormBase
         ILogger<MainForm> logger,
         IDatabaseBackupService databaseBackupService,
         ISyncStatusService syncStatusService,
-        IDatabaseSizeService databaseSizeService)
+        IDatabaseSizeService databaseSizeService,
+        TimeProvider timeProvider)
     {
         InitializeComponent();
 
@@ -67,6 +69,7 @@ public partial class MainForm : RtlFormBase
         _databaseBackupService = databaseBackupService ?? throw new ArgumentNullException(nameof(databaseBackupService));
         _syncStatusService = syncStatusService ?? throw new ArgumentNullException(nameof(syncStatusService));
         _databaseSizeService = databaseSizeService ?? throw new ArgumentNullException(nameof(databaseSizeService));
+        _idleMonitor = new IdleMonitor(timeProvider ?? throw new ArgumentNullException(nameof(timeProvider)));
 
         InitializeFormText();
         ApplyCurrentUser();
@@ -178,6 +181,8 @@ public partial class MainForm : RtlFormBase
 
         _clockTimer.Tick += (_, _) => UpdateLiveClockDisplay();
         _syncTimer.Tick += async (_, _) => await SyncServerTimeAsync();
+        _idleTimer.Tick += async (_, _) => await LockIfIdleAsync();
+        FormClosed += (_, _) => System.Windows.Forms.Application.RemoveMessageFilter(_idleMonitor);
 
         // Menu click handlers
         _menuChangePassword.Click += OnChangePasswordClicked;
@@ -396,6 +401,9 @@ public partial class MainForm : RtlFormBase
 
         _clockTimer.Start();
         _syncTimer.Start();
+        System.Windows.Forms.Application.AddMessageFilter(_idleMonitor);
+        _idleMonitor.Reset();
+        _idleTimer.Start();
 
         if (_currentUser.Has(Permission.CheckIn))
         {
@@ -519,6 +527,47 @@ public partial class MainForm : RtlFormBase
         }
 
         _logger.LogInformation("User {UserName} initiated logout.", _currentUser.UserName);
+        SignOutAndShowLogin();
+    }
+
+    /// <summary>
+    /// FR-AUTH-06 / R5.10: after <c>Security.AutoLockMinutes</c> without keyboard or mouse input the desk signs out
+    /// and shows the login. It waits while a dialog is open, so a half-finished task (a supervisor approval, a
+    /// registration dialog) is never thrown away under the user.
+    /// </summary>
+    private async Task LockIfIdleAsync()
+    {
+        if (_isLoggingOut || !Visible)
+        {
+            return;
+        }
+
+        int minutes;
+        try
+        {
+            minutes = (await _settingsService.GetSettingsAsync()).AutoLockMinutes;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not read the auto-lock setting.");
+            return;
+        }
+
+        if (!_idleMonitor.IsIdle(minutes) || IsAnotherWindowOpen())
+        {
+            return;
+        }
+
+        _logger.LogInformation("Auto-lock after {Minutes} idle minutes for {UserName}.", minutes, _currentUser.UserName);
+        SignOutAndShowLogin();
+    }
+
+    private bool IsAnotherWindowOpen() =>
+        System.Windows.Forms.Application.OpenForms.Cast<Form>().Any(f => !ReferenceEquals(f, this) && f.Visible);
+
+    private void SignOutAndShowLogin()
+    {
+        _idleTimer.Stop();
         _authService.Logout();
         _currentUserSession.Clear();
 
@@ -534,6 +583,8 @@ public partial class MainForm : RtlFormBase
             ApplyCurrentUser();
             ApplyPermissions();
             Show();
+            _idleMonitor.Reset();
+            _idleTimer.Start();
         }
         else
         {

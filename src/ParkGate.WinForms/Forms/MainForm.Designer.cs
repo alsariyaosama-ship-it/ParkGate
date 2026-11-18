@@ -17,6 +17,7 @@ partial class MainForm
 
             _clockTimer?.Dispose();
             _syncTimer?.Dispose();
+            _idleTimer?.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -64,6 +65,7 @@ partial class MainForm
         _lblWelcomeParkName = new Label();
         _clockTimer = new System.Windows.Forms.Timer(components);
         _syncTimer = new System.Windows.Forms.Timer(components);
+        _idleTimer = new System.Windows.Forms.Timer(components);
         _mainMenuStrip.SuspendLayout();
         _statusStrip.SuspendLayout();
         _mainContainer.SuspendLayout();
@@ -366,6 +368,10 @@ partial class MainForm
         // 
         _syncTimer.Interval = 60000;
         // 
+        // _idleTimer
+        // 
+        _idleTimer.Interval = 30000;
+        // 
         // MainForm
         // 
         AutoScaleDimensions = new SizeF(120F, 120F);
@@ -430,4 +436,5 @@ partial class MainForm
     private System.Windows.Forms.Label _lblQuickInfo;
     private System.Windows.Forms.Timer _clockTimer;
     private System.Windows.Forms.Timer _syncTimer;
+    private System.Windows.Forms.Timer _idleTimer;
 }
