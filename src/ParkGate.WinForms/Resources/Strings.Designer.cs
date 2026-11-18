@@ -708,7 +708,9 @@ internal class Strings
     internal static string Ui_Beneficiaries_08 => GetString(nameof(Ui_Beneficiaries_08));
     internal static string Ui_Beneficiaries_09 => GetString(nameof(Ui_Beneficiaries_09));
     internal static string Ui_CheckInDesk_01 => GetString(nameof(Ui_CheckInDesk_01));
-    internal static string Ui_CheckInDesk_02 => GetString(nameof(Ui_CheckInDesk_02));
+    internal static string Desk_CooldownAllowedAtToday => GetString(nameof(Desk_CooldownAllowedAtToday));
+    internal static string Desk_CooldownAllowedAtOtherDay => GetString(nameof(Desk_CooldownAllowedAtOtherDay));
+    internal static string Desk_CooldownAllowedOn => GetString(nameof(Desk_CooldownAllowedOn));
     internal static string Ui_CheckInDesk_03 => GetString(nameof(Ui_CheckInDesk_03));
     internal static string Ui_CheckInDesk_04 => GetString(nameof(Ui_CheckInDesk_04));
     internal static string Ui_CheckInDesk_05 => GetString(nameof(Ui_CheckInDesk_05));

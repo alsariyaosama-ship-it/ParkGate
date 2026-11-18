@@ -1717,8 +1717,14 @@
   <data name="Ui_CheckInDesk_01" xml:space="preserve">
     <value>آخر دخول: {0}</value>
   </data>
-  <data name="Ui_CheckInDesk_02" xml:space="preserve">
-    <value>يسمح بالدخول بعد: {0} (فترة الانتظار: {1} ساعة)</value>
+  <data name="Desk_CooldownAllowedAtToday" xml:space="preserve">
+    <value>يُسمح بالدخول الساعة {0} — باقي {1}</value>
+  </data>
+  <data name="Desk_CooldownAllowedAtOtherDay" xml:space="preserve">
+    <value>يُسمح بالدخول يوم {0} الساعة {1} — باقي {2}</value>
+  </data>
+  <data name="Desk_CooldownAllowedOn" xml:space="preserve">
+    <value>يُسمح بالدخول يوم {0} الساعة {1}</value>
   </data>
   <data name="Ui_CheckInDesk_03" xml:space="preserve">
     <value>البطاقة غير مسجلة — يرجى تسجيل بيانات الزائر</value>

@@ -165,7 +165,7 @@ All in `src/ParkGate.WinForms/Controls/CheckInDeskControl.cs` unless stated. UI 
 
 ## Phase R5 — Desk UX improvements · branch `phase/r5-desk-ux`
 
-- [ ] **R5.1 Remaining time on denial.** Banner details: «يُسمح بالدخول الساعة {time} — باقي {h}:{mm}» (SPEC A3 requires the remaining time). Uses R3.9.
+- [x] **R5.1 Remaining time on denial.** Banner details: «يُسمح بالدخول الساعة {time} — باقي {h}:{mm}» (SPEC A3 requires the remaining time). Uses R3.9.
 - [ ] **R5.2 Replace the "registered successfully" message box** with a banner message; continue straight to the holder panel.
 - [ ] **R5.3 Larger identity text.** Holder name 14 pt bold, card number box 16 pt. Use `Theme` fonts.
 - [ ] **R5.4 Keyboard access to companion counters.** `Alt+1…9` focuses counter n; `+` / `−` change the focused counter; after a successful lookup of an eligible holder, focus moves to the first counter and Enter records the entry when the card box is not focused. Show the shortcut hints next to the counters.

@@ -155,6 +155,8 @@ public sealed class CheckInDeskControlTests
         btnRecord.Enabled.ShouldBeFalse();
         btnOverride.Enabled.ShouldBeTrue();
         banner.State.ShouldBe(BannerState.Denied);
+        banner.Details.ShouldNotBeNull();
+        banner.Details.ShouldContain("10:00");
     }
 
     [Fact]

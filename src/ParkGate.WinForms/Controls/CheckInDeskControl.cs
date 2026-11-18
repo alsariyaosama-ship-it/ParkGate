@@ -577,7 +577,7 @@ public partial class CheckInDeskControl : UserControl
                 if (eligibility.NextAllowedEntryUtc.HasValue)
                 {
                     var nextLocal = DateTimeDisplayHelper.ToParkLocalTime(eligibility.NextAllowedEntryUtc.Value, _timeZoneId);
-                    details = string.Format(Strings.Ui_CheckInDesk_02, DateTimeDisplayHelper.FormatDateTime(nextLocal), eligibility.EffectiveCooldownMinutes / 60);
+                    details = CooldownText.Format(nextLocal, eligibility.RemainingCooldownMinutes);
                 }
 
                 _statusBanner.SetDenied(reasonText, details);

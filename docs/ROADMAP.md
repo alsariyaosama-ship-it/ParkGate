@@ -215,7 +215,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R4.13 Stop clipping on the check-in desk (gift panel, registration buttons) at 120 % DPI
 
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
-- [ ] R5.1 Show the remaining time on denial (SPEC A3)
+- [x] R5.1 Show the remaining time on denial (SPEC A3)
 - [ ] R5.2 Banner instead of a message box after registration
 - [ ] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
 - [ ] R5.4 Keyboard access to the companion counters
