@@ -10,15 +10,15 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-18 |
-| Last session | S36 — R6 complete except R6.5 (blocked Q-R6) and R6.16 (needs Osama); R6 PR opened |
+| Last session | S36 — R6 complete except R6.5 (blocked Q-R6); R6 PR #17 open |
 | Current phase | Phase R — Remediation. R0–R4 merged (PR #11–#15), `docs/entry-identity` merged (PR #16). R6 PR open from `phase/r6-database` |
 | Working branch | `phase/r6-database` |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 717 passed (non-integration): 207 domain + 230 application + 95 infrastructure + 185 architecture |
+| .NET Unit tests | 723 passed (non-integration): 207 domain + 236 application + 95 infrastructure + 185 architecture |
 | .NET Integration tests | 56 passed on LocalDB |
 | Web tests | `php artisan test` (PHP 8.4): 98 passed on SQLite (MySQL job runs in CI) |
-| Total tests | 871 (773 .NET + 98 web), all green |
-| Latest migration | `MapDatabaseFilesView` (S36; snapshot only), after `RemoveUnreadSoundSetting`. Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
+| Total tests | 877 (779 .NET + 98 web), all green |
+| Latest migration | `RemoveUnusedMaskSetting` (S36), after `RemoveUnreadSoundSetting` and `MapDatabaseFilesView` (snapshot only). Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
 
 ## State of the work
 
@@ -121,7 +121,8 @@
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
 **S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
-**Next:** Osama reviews and merges the R6 PR. Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6; R6.16 waits on Osama.
+Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
+**Next:** Osama re-runs `scripts\backup.ps1` as Administrator, then reviews and merges PR #17. Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6. A purge command for the approved retention periods is not built; add it as a task when Osama wants it.
 
 **S35 (2026-11-18): R6.1, R6.2, R6.12, R6.13, R6.14.** Entry-card tables are EF entities (migration `AdoptEntryCards`); the DB clock is a mapped `SYSUTCDATETIME`; optimistic concurrency with `ConcurrencyRetry` replaced `UPDLOCK` (migration `AddBeneficiaryLastGiftIssuedUtc`); `EfOnlyDataAccessTests` guards ADR-025. Both dev databases were cleaned of the old entry-card objects with Osama's approval (option A) and migrated.
 
@@ -139,9 +140,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **R6.16 (decide):** `Ui.MaskNationalIdForOperators` is seeded but no code reads it. Should operators see full national IDs? Then wire the setting or drop it.
-- **Retention policy (approve or change):** proposal in DEPLOYMENT.md §9.3 — `CardScanLog` 12 months, denied attempts 24 months, `AuditLogs` 36 months, business data never. Nothing is deleted until you approve, and then only by an explicit admin action.
-- **R6.9 manual check:** run `scripts\backup.ps1` once as Administrator on the server (or the dev PC) and confirm the folder ACL and the `.bak` file; the agent could not elevate. Delete the empty test folder `C:\ParkGate_R69_Test` left by the non-elevated test run (the tool blocks deletes at `C:\`).
+- **R6.9 re-run:** `scripts\backup.ps1` as Administrator after commit `4a53206` (ownership + child ACL reset).
+- Delete the empty test folder `C:\ParkGate_R69_Test` left by the agent's non-elevated test run (the tool blocks deletes at `C:\`).
 - **Behaviour change (R6.3):** `CreatedByUserId`, `UpdatedAtUtc` and `UpdatedByUserId` are now filled on holders, organizations and users; they were always NULL before.
 - ~~Apply the three migrations on SQLEXPRESS~~ **Done in S31** (backup first: `C:\ProgramData\ParkGateackups\ParkGate_before_R2.bak`). The 7 pending outbox rows got sequences 1–11 with the re-queued ones and contain no phone, national ID, token or key id. Install the new SyncAgent build before it runs again (still the old one until R8.4).
 - **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, re-import `web/database/mysql_schema.sql` (it is generated now and drops and recreates every table, so it also wipes `users`: create the user again with `parkgate:create-user`), then let the agent re-queue.
@@ -175,7 +175,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - R6.6: no query change needed (~350 ms). R6.10: `gift_vouchers` already existed (R2.7); only indexes changed.
 - R6.9 finding: `backup.ps1` used `COMPRESSION`, which Express rejects, so the scheduled backup could never succeed on the target edition.
 - Tip: the Write tool strips trailing spaces in text it writes; byte-exact Python edits need care with blank lines that hold spaces.
-- After Osama agreed: R6.15 (migration `RemoveUnreadSoundSetting`; the new key is not seeded because saved desks already have it), `IAuditWriter` removed, R6.8 (option A). Found R6.16 (mask setting never read).
+- After Osama agreed: R6.16 (mask in Application, seed row deleted), retention approved, backup ACL fix. R6.15 (migration `RemoveUnreadSoundSetting`; the new key is not seeded because saved desks already have it), `IAuditWriter` removed, R6.8 (option A). Found R6.16 (mask setting never read).
 - Tests: .NET 755 → 773 (integration 54 → 56), web 96 → 98.
 
 ### S35 — 2026-11-18 — Phase R6: R6.1, R6.2, R6.12, R6.13, R6.14
