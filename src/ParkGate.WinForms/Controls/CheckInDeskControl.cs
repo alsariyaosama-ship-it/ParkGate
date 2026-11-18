@@ -597,17 +597,10 @@ public partial class CheckInDeskControl : UserControl
         _lblHolderPhone.Text = holder.Phone;
         _lblHolderOrg.Text = holder.OrganizationName;
 
-        // Mask National ID for Operator role per SPEC §5.3 zone 4 and BR-16
+        // Operators receive the ID already masked from the Application layer (SPEC §8, R6.16).
         if (!string.IsNullOrWhiteSpace(holder.NationalId))
         {
-            if (_currentUser != null && _currentUser.Role == UserRole.Operator && holder.NationalId.Length > 4)
-            {
-                _lblHolderNatId.Text = new string('*', holder.NationalId.Length - 4) + holder.NationalId[^4..];
-            }
-            else
-            {
-                _lblHolderNatId.Text = holder.NationalId;
-            }
+            _lblHolderNatId.Text = holder.NationalId;
         }
         else
         {

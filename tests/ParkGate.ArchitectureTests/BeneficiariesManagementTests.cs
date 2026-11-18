@@ -202,8 +202,9 @@ public sealed class BeneficiariesManagementTests
     }
 
     [Fact]
-    public async Task BeneficiariesControl_WhenOperatorUser_ShouldMaskNationalId()
+    public async Task BeneficiariesControl_WhenOperatorUser_ShowsTheIdMaskedByTheService()
     {
+        // R6.16: Application masks the ID for operators; the control shows exactly what it receives.
         var testHolderId = Guid.NewGuid();
         var fakeHolder = new BeneficiaryDto(
             Id: testHolderId,
@@ -212,7 +213,7 @@ public sealed class BeneficiariesManagementTests
             CardNumber: "100200",
             FullName: "محمد عبد الله سالم",
             Phone: "0912345678",
-            NationalId: "119850123456",
+            NationalId: "********3456",
             CardExpiryDate: null,
             Status: BeneficiaryStatus.Active,
             StatusReason: null,
@@ -243,7 +244,7 @@ public sealed class BeneficiariesManagementTests
         await control.PerformSearchAsync();
 
         gridBen.Rows.Count.ShouldBe(1);
-        // Masked for operator: "********3456"
+        // Shown as the service returned it.
         gridBen.Rows[0].Cells[4].Value.ShouldBe("********3456");
         lblNid.Text.ShouldBe("********3456");
 

@@ -67,7 +67,6 @@ public static class ModelBuilderExtensions
             new { Key = "Entry.DenialDedupMinutes", Value = "5", UpdatedAtUtc = seedTimeUtc, UpdatedByUserId = (int?)null },
             new { Key = "Entry.PrefillCompanionsFromLastVisit", Value = "true", UpdatedAtUtc = seedTimeUtc, UpdatedByUserId = (int?)null },
             new { Key = "Security.MaxFailedLogins", Value = "5", UpdatedAtUtc = seedTimeUtc, UpdatedByUserId = (int?)null },
-            new { Key = "Security.LockoutMinutes", Value = "15", UpdatedAtUtc = seedTimeUtc, UpdatedByUserId = (int?)null },
-            new { Key = "Ui.MaskNationalIdForOperators", Value = "true", UpdatedAtUtc = seedTimeUtc, UpdatedByUserId = (int?)null });
+            new { Key = "Security.LockoutMinutes", Value = "15", UpdatedAtUtc = seedTimeUtc, UpdatedByUserId = (int?)null });
     }
 }

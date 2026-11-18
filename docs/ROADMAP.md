@@ -242,7 +242,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R6.13 Optimistic concurrency on `Beneficiaries.RowVersion` replaces `UPDLOCK` (ADR-026); add `LastGiftIssuedUtc`
 - [x] R6.14 Architecture test: no raw SQL in `src/` except the backup command
 - [x] R6.15 Remove the seeded `Entry.PlaySoundOnDenial` row that nothing reads (migration `RemoveUnreadSoundSetting`); the app uses `Entry.DenialSoundEnabled`
-- [ ] R6.16 `Ui.MaskNationalIdForOperators` is seeded but never read: check whether national IDs are masked for operators (SPEC §8) and wire the setting or remove it — needs Osama
+- [x] R6.16 Mask national IDs for operators in Application (`ViewFullNationalId` for supervisors and admins); remove the UI copies of the rule and the unused `Ui.MaskNationalIdForOperators` seed row (Osama: hide)
 
 ### R7 — Wording and visual consistency · branch `phase/r7-consistency`
 - [ ] R7.1 One glossary: the card holder is «الزائر» / «الزوار» (Q-R4); remaining terms on Q-R4b

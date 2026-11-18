@@ -198,7 +198,8 @@ public sealed class BeneficiaryServiceTests
         result.Value.FullName.ShouldBe("Fatima Salem");
         result.Value.CardNumber.ShouldBe("CARD-NEW");
         result.Value.Phone.ShouldBe("0919876543");
-        result.Value.NationalId.ShouldBe("119901234567");
+        result.Value.NationalId.ShouldBe("********4567"); // operator view (R6.16)
+        _beneficiaries.Single(x => x.Id == result.Value.Id).NationalId!.Value.ShouldBe("119901234567");
 
         _beneficiaries.Count.ShouldBe(1);
         _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "BeneficiaryRegistered");

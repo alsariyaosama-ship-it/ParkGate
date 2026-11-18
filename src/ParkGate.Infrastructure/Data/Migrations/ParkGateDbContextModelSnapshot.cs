@@ -160,12 +160,6 @@ namespace ParkGate.Infrastructure.Data.Migrations
                             Key = "Security.LockoutMinutes",
                             UpdatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Value = "15"
-                        },
-                        new
-                        {
-                            Key = "Ui.MaskNationalIdForOperators",
-                            UpdatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Value = "true"
                         });
                 });
 

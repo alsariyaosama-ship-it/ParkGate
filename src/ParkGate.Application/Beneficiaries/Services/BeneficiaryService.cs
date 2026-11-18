@@ -80,7 +80,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
             var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
 
-            matches.Add(new BeneficiaryLookupResultDto(beneficiary.ToDto(orgName), preview, lastCompanions));
+            matches.Add(new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName), preview, lastCompanions));
         }
 
         return new CardLookupDto(matches, registeredElsewhere);
@@ -112,7 +112,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
         var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
 
-        return new BeneficiaryLookupResultDto(beneficiary.ToDto(orgName), preview, lastCompanions);
+        return new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName), preview, lastCompanions);
     }
 
     public async Task<Result<BeneficiaryDto>> RegisterAsync(
@@ -182,7 +182,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
 
         await uow.SaveChangesAsync(cancellationToken);
 
-        return beneficiary.ToDto(org.NameAr);
+        return ToViewerDto(beneficiary, org.NameAr);
     }
 
     public async Task<Result<BeneficiaryDto>> UpdateAsync(
@@ -257,7 +257,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
 
         await uow.SaveChangesAsync(cancellationToken);
 
-        return beneficiary.ToDto(org.NameAr);
+        return ToViewerDto(beneficiary, org.NameAr);
     }
 
     public async Task<Result<BeneficiaryDto>> ChangeStatusAsync(
@@ -309,7 +309,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             cancellationToken: cancellationToken);
         await uow.SaveChangesAsync(cancellationToken);
 
-        return beneficiary.ToDto(org?.NameAr ?? string.Empty);
+        return ToViewerDto(beneficiary, org?.NameAr ?? string.Empty);
     }
 
     public async Task<Result<IReadOnlyList<BeneficiaryDto>>> SearchAsync(
@@ -330,7 +330,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var dtos = matches.Select(b =>
         {
             var orgName = orgLookup.TryGetValue(b.OrganizationId, out var name) ? name : string.Empty;
-            return b.ToDto(orgName);
+            return ToViewerDto(b, orgName);
         }).ToList();
 
         return dtos;
@@ -369,6 +369,15 @@ public sealed class BeneficiaryService : IBeneficiaryService
         )).ToList();
 
         return dtos;
+    }
+
+    /// <summary>SPEC §8, R6.16: operators get the national ID masked, so the full number never reaches their screen.</summary>
+    private BeneficiaryDto ToViewerDto(Beneficiary beneficiary, string organizationName)
+    {
+        var dto = beneficiary.ToDto(organizationName);
+        return _currentUser.Has(Permission.ViewFullNationalId)
+            ? dto
+            : dto with { NationalId = NationalIdMask.Mask(dto.NationalId) };
     }
 
     private EligibilityPreviewDto BuildEligibilityPreview(

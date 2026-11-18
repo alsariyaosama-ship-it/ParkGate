@@ -334,7 +334,6 @@ EF Core shape (Infrastructure):
 | `Security.MaxFailedLogins` | `5` | BR-18 |
 | `Security.LockoutMinutes` | `15` | BR-18 |
 | `Security.AutoLockMinutes` | `0` (not seeded) | Minutes of inactivity before the desk locks; 0 = never. Written on the first settings save |
-| `Ui.MaskNationalIdForOperators` | `true` | §8 Security. Seeded, but no code reads it yet (R6.16) |
 | `SyncAgent.LastHeartbeatUtc`, `SyncAgent.PendingCount`, `SyncAgent.FailedCount` | (not seeded) | Written by the sync agent's heartbeat; read by the admin status bar (R2.5) |
 | `CardPattern.MinSample` | `10` | F8, proposed, BR-29: cards needed before a pattern is proposed |
 | `CardPattern.NewSeriesThreshold` | `5` | F8, proposed, BR-29: alerts with one shape before it is proposed as a new series |
@@ -342,6 +341,8 @@ EF Core shape (Infrastructure):
 | `CardPattern.PrefixSharePercent` | `90` | F8, proposed, BR-29: share of numbers that must start with the prefix |
 
 `DatabaseDocumentationTests` checks that every table, column, check constraint and seeded key here matches the EF model (R6.4).
+
+National IDs are masked for operators by a fixed rule, not a setting: users without `ViewFullNationalId` get all but the last four digits replaced (SPEC §8, R6.16). The unused seed row `Ui.MaskNationalIdForOperators` is deleted by migration `RemoveUnusedMaskSetting`.
 
 Settings are read through a typed `ISettingsService` in Application (no raw key strings outside one constants class).
 

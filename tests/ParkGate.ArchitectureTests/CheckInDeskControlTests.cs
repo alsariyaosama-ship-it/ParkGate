@@ -287,8 +287,9 @@ public sealed class CheckInDeskControlTests
     }
 
     [Fact]
-    public void CheckInDeskControl_OperatorRole_ShouldMaskNationalId()
+    public void CheckInDeskControl_OperatorRole_ShowsTheIdMaskedByTheService()
     {
+        // R6.16: Application masks the ID for operators; the desk shows exactly what it receives.
         var operatorUser = new FakeCurrentUser { Role = UserRole.Operator, UserId = 1, UserName = "op1" };
         using var control = new CheckInDeskControl(null, null, null, null, null, operatorUser, null, null, null, null);
 
@@ -299,7 +300,7 @@ public sealed class CheckInDeskControlTests
             CardNumber: "100200",
             FullName: "محمد أحمد علي",
             Phone: "0912345678",
-            NationalId: "119900123456",
+            NationalId: "********3456",
             CardExpiryDate: null,
             Status: BeneficiaryStatus.Active,
             StatusReason: null,
