@@ -10,13 +10,15 @@ public sealed record GiftEligibilityContext
     public int GiftIntervalDays { get; }
     public BeneficiaryStatus HolderStatus { get; }
     public DateTime? LastGiftIssuedUtc { get; }
+    public bool HasEntryToday { get; }
     public DateTime NowUtc { get; }
 
     public GiftEligibilityContext(
         Organization organization,
         Beneficiary holder,
         DateTime? lastGiftIssuedUtc,
-        DateTime nowUtc)
+        DateTime nowUtc,
+        bool hasEntryToday)
     {
         ArgumentNullException.ThrowIfNull(organization);
         ArgumentNullException.ThrowIfNull(holder);
@@ -32,5 +34,6 @@ public sealed record GiftEligibilityContext
         HolderStatus = holder.Status;
         LastGiftIssuedUtc = lastGiftIssuedUtc;
         NowUtc = nowUtc;
+        HasEntryToday = hasEntryToday;
     }
 }

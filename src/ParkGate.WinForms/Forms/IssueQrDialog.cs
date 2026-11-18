@@ -1,10 +1,14 @@
 using System.Drawing;
+using System.Drawing.Printing;
 using System.IO;
 using System.Windows.Forms;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.EntryCards;
+using ParkGate.Application.Organizations.Services;
 using ParkGate.Application.Ports.EntryCards;
+using ParkGate.Application.Settings.Services;
 using ParkGate.WinForms.Common;
+using ParkGate.WinForms.Printing;
 using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
 
@@ -14,18 +18,25 @@ public partial class IssueQrDialog : RtlFormBase
 {
     private readonly IEntryCardIssuer _issuer;
     private readonly IQrImageRenderer _qrRenderer;
+    private readonly IOrganizationService _organizationService;
+    private readonly ISettingsService _settingsService;
     private readonly INotifyService _notifyService;
     private BeneficiaryDto? _beneficiary;
     private IssuedEntryCard? _issuedCard;
+    private int _cooldownMinutes;
 
     public IssueQrDialog(
         IEntryCardIssuer issuer,
         IQrImageRenderer qrRenderer,
+        IOrganizationService organizationService,
+        ISettingsService settingsService,
         INotifyService notifyService)
     {
         InitializeComponent();
         _issuer = issuer ?? throw new ArgumentNullException(nameof(issuer));
         _qrRenderer = qrRenderer ?? throw new ArgumentNullException(nameof(qrRenderer));
+        _organizationService = organizationService ?? throw new ArgumentNullException(nameof(organizationService));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
 
         Theme.ApplyPrimaryButtonStyle(_btnPrint);
@@ -47,6 +58,7 @@ public partial class IssueQrDialog : RtlFormBase
             _lblInstruction.Text = Strings.Ui_IssueQr_02;
             var card = await _issuer.IssueAsync(beneficiary.Id);
             _issuedCard = card;
+            _cooldownMinutes = await GetCooldownMinutesAsync(beneficiary.OrganizationId);
 
             byte[] qrPngBytes = _qrRenderer.RenderPng(card.QrText);
 
@@ -64,6 +76,18 @@ public partial class IssueQrDialog : RtlFormBase
             _picQrCode.Image?.Dispose();
             _picQrCode.Image = null;
         }
+    }
+
+    /// <summary>The card's printed rule: the organization's waiting period, else the park default (BR-03).</summary>
+    private async Task<int> GetCooldownMinutesAsync(int organizationId)
+    {
+        var organization = await _organizationService.GetByIdAsync(organizationId);
+        if (organization.IsSuccess && organization.Value.CooldownMinutes is int minutes)
+        {
+            return minutes;
+        }
+
+        return (await _settingsService.GetSettingsAsync()).DefaultCooldownMinutes;
     }
 
     private void SaveQrImage()
@@ -105,66 +129,17 @@ public partial class IssueQrDialog : RtlFormBase
 
         try
         {
-            if (System.Drawing.Printing.PrinterSettings.InstalledPrinters.Count == 0)
+            if (PrinterSettings.InstalledPrinters.Count == 0)
             {
                 _notifyService.Warning(Strings.Msg_NoPrinterInstalled, Strings.Title_Warning);
                 return;
             }
 
-            using var doc = new System.Drawing.Printing.PrintDocument();
-            if (!doc.PrinterSettings.IsValid && System.Drawing.Printing.PrinterSettings.InstalledPrinters.Count > 0)
+            using var doc = ReceiptPrinter.CreateDocument(ReceiptSlips.EntryCard(_beneficiary.OrganizationName, _cooldownMinutes), _picQrCode.Image);
+            if (!doc.PrinterSettings.IsValid && PrinterSettings.InstalledPrinters.Count > 0)
             {
-                doc.PrinterSettings.PrinterName = System.Drawing.Printing.PrinterSettings.InstalledPrinters[0];
+                doc.PrinterSettings.PrinterName = PrinterSettings.InstalledPrinters[0];
             }
-
-            doc.PrintPage += (s, e) =>
-            {
-                var g = e.Graphics;
-                if (g == null)
-                {
-                    return;
-                }
-
-                using var subFont = new Font("Cairo", 10F, FontStyle.Bold);
-                using var regFont = new Font("Cairo", 9F, FontStyle.Regular);
-                using var smallFont = new Font("Cairo", 9F, FontStyle.Regular);
-
-                // Draw card frame (85mm x 54mm approx in 100dpi is ~320x200)
-                var cardRect = new Rectangle(50, 50, 320, 190);
-                using var borderPen = new Pen(Theme.Primary, 2);
-                using var fillBrush = new SolidBrush(Color.White);
-                g.FillRectangle(fillBrush, cardRect);
-                g.DrawRectangle(borderPen, cardRect);
-
-                // Header
-                var headerRect = new Rectangle(cardRect.Left, cardRect.Top, cardRect.Width, 32);
-                using var headerBrush = new SolidBrush(Theme.Primary);
-                g.FillRectangle(headerBrush, headerRect);
-
-                using var sfCenter = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                g.DrawString(Strings.Ui_IssueQr_09, regFont, Brushes.White, headerRect, sfCenter);
-
-                // Customer info on the right (RTL layout)
-                var infoRect = new Rectangle(cardRect.Left + 140, cardRect.Top + 40, 170, 140);
-                using var sfRtl = new StringFormat { FormatFlags = StringFormatFlags.DirectionRightToLeft };
-                g.DrawString(string.Format(Strings.Ui_IssueQr_10, _beneficiary.FullName), subFont, Brushes.Black, infoRect, sfRtl);
-
-                infoRect.Y += 28;
-                g.DrawString(string.Format(Strings.Ui_IssueQr_11, _beneficiary.CardNumber), regFont, Brushes.Black, infoRect, sfRtl);
-
-                infoRect.Y += 26;
-                g.DrawString(string.Format(Strings.Ui_IssueQr_12, _beneficiary.OrganizationName), smallFont, Brushes.DarkSlateGray, infoRect, sfRtl);
-
-                if (_issuedCard != null)
-                {
-                    infoRect.Y += 24;
-                    g.DrawString(string.Format(Strings.Ui_IssueQr_13, _issuedCard.ExpiresOn), smallFont, Brushes.DarkSlateGray, infoRect, sfRtl);
-                }
-
-                // QR Code on the left
-                var qrRect = new Rectangle(cardRect.Left + 15, cardRect.Top + 45, 120, 120);
-                g.DrawImage(_picQrCode.Image, qrRect);
-            };
 
             using var dlg = new PrintDialog
             {

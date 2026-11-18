@@ -69,7 +69,7 @@ These rules exist because earlier plans failed when the agent guessed names. Fol
 | ID | Rule |
 |---|---|
 | BR-19 | **Organization gift policy:** `GiftEnabled`, `GiftValue` (> 0 when enabled), `GiftIntervalDays` (1–365). Managed by Admin (`ManageOrganizations`). |
-| BR-20 | **Gift eligibility check order** (first failure reported): organization inactive → gifts not enabled for the organization → holder Blocked → holder Suspended → interval not elapsed. Eligible when `nowUtc >= lastGiftIssuedUtc + GiftIntervalDays` or no previous voucher. Time source is the DB clock (BR-05). |
+| BR-20 | **Gift eligibility check order** (first failure reported): organization inactive → gifts not enabled for the organization → holder Blocked → holder Suspended → no granted entry today (BR-30, SPEC) → interval not elapsed. Eligible when `nowUtc >= lastGiftIssuedUtc + GiftIntervalDays` or no previous voucher. Time source is the DB clock (BR-05). |
 | BR-21 | **Override:** only the *interval* denial can be overridden, only by Supervisor/Admin, reason mandatory (≥ 5 chars), recorded on the voucher (`IsOverride`, `OverrideByUserId`, `OverrideReason`). All other denials are not overridable. |
 | BR-22 | **Atomic issue:** the holder row is locked (`UPDLOCK`) via `GetForUpdateAsync` during eligibility check + insert, so two desks cannot issue two gifts in the same interval. |
 | BR-23 | **Voucher QR** is an ECDSA-signed numeric token (same 203-digit format) with a **separate signing context** so an entry-card QR can never be accepted as a gift and vice versa. |
