@@ -10,14 +10,14 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-18 |
-| Last session | S38 — Phase R5 in progress (R5.1–R5.3, R5.5, R5.6, R5.10–R5.12, R5.14 done); PR #20 open (R7.12/R7.14 to `main`) |
+| Last session | S38 — Phase R5: everything done except R5.8, R5.9, R5.13 (waiting on Osama); PR #20 open (R7.12/R7.14 to `main`) |
 | Current phase | Phase R — Remediation. R0–R4, R6, R7 merged (PR #11–#15, #17, #18). PR #19 went into the R7 branch; PR #20 brings R7.12 and R7.14 to `main`. R5 on `phase/r5-desk-ux` |
 | Working branch | `phase/r5-desk-ux` (from `phase/r7-consistency` `62a1e1c`, so it already holds R7.12 and R7.14) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 924 passed (non-integration): 210 domain + 240 application + 95 infrastructure + 379 architecture |
+| .NET Unit tests | 943 passed (non-integration): 210 domain + 240 application + 95 infrastructure + 398 architecture |
 | .NET Integration tests | 57 passed on LocalDB |
 | Web tests | `php artisan test` (PHP 8.4): 101 passed on SQLite (MySQL job runs in CI) |
-| Total tests | 1082 (981 .NET + 101 web); integration and web not re-run in S38 (no Infrastructure or web change) |
+| Total tests | 1101 (1000 .NET + 101 web); integration and web not re-run in S38 (no Infrastructure or web change) |
 | Latest migration | `RemoveUnusedMaskSetting` (S36), after `RemoveUnreadSoundSetting` and `MapDatabaseFilesView` (snapshot only). Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
 
 ## State of the work
@@ -121,8 +121,8 @@
 Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
 **S38 (2026-11-18, `phase/r5-desk-ux`): R5 in progress.** Found at start: PR #18 was merged into `main` before R7.12 and R7.14 reached the R7 branch, and PR #19 was merged into the R7 branch, so `main` lacks them. Opened **PR #20** (`phase/r7-consistency` → `main`). R5 was branched from the R7 branch.
-Done, one commit each, test-first: R5.1 denial banner «يُسمح بالدخول الساعة … — باقي س:دد» (`CooldownText`); R5.2 no message box after registration; R5.3 name 14 pt, card box 16 pt (`Theme.CardNumber`, the one size added to the R7.2 scale); R5.11 search row in a `TableLayoutPanel` (the card box ran under its label at 125 %); R5.12 `RtlGroupBox` (every RTL group box caption lost its last letters); R5.6 «إلغاء العملية… (F8)» above today's grid; R5.10 idle auto-lock (`Security.AutoLockMinutes` was saved but never read; `IdleMonitor`); R5.14 gift offered right after a granted entry for the same visitor (F6, no second scan); R5.5 «(من آخر زيارة)» and tinted counters.
-**Next:** Osama merges PR #20, answers the two questions below, and runs TC-23 to TC-29. Then R5.4 (keyboard counters), R5.7 (sounds, needs a migration seed), R5.8 (1366×768 default, Q-R7 unanswered), R5.9 and R5.13 after his answers. Then open the R5 PR. R6.5 waits on Q-R6.
+Done, one commit each, test-first: R5.1 denial banner «يُسمح بالدخول الساعة … — باقي س:دد» (`CooldownText`); R5.2 no message box after registration; R5.3 name 14 pt, card box 16 pt (`Theme.CardNumber`, the one size added to the R7.2 scale); R5.11 search row in a `TableLayoutPanel` (the card box ran under its label at 125 %); R5.12 `RtlGroupBox` (every RTL group box caption lost its last letters); R5.6 «إلغاء العملية… (F8)» above today's grid; R5.10 idle auto-lock (`Security.AutoLockMinutes` was saved but never read; `IdleMonitor`); R5.14 gift offered right after a granted entry for the same visitor (F6, no second scan); R5.5 «(من آخر زيارة)» and tinted counters; R5.4 Alt+1…9, +/−, Enter in a counter (deviation: focus stays in the card box after a lookup, for the scanner); R5.7 two generated tones (`DeskSounds`), new setting `Entry.SuccessSoundEnabled` (not seeded, as R6.15). R5.8 measured only (see below).
+**Next:** Osama merges PR #20, answers the questions below, and runs TC-23 to TC-31. Then R5.8, R5.9 and R5.13 as he decides, then the R5 PR. R6.5 waits on Q-R6.
 
 **S37 (2026-11-18, `phase/r7-consistency`): R7 done; PR #18 opened.** One commit per task, test-first:
 R7.6 QR through `IQrImageRenderer`; R7.11 `Main` synchronous (it was `async`, so the UI ran on an MTA thread and file/print dialogs threw); R7.7 every message box through `Notify`; R7.8 all designers on `Dpi`; R7.9 one constructor with required services per form/control, no `?? new X(null…)` fallbacks, `TestUi.Create` fills fakes (NSubstitute now in the architecture tests), new ports `ICardScanService` / `IEntryCardIssuer`; R7.10 `InlineRegistrationPanel` and `TodayEntriesPanel` split from the desk; R7.1 glossary («الزائر», «فترة الانتظار», «الشباك», «قسيمة»), `GlossaryTests`; R7.2 type scale 9/10/12/14/20; R7.3 palette in `Theme`, `PaletteTests`; R7.4 Accept/Cancel/tab order/Theme buttons in every dialog; R7.5 web: park-local times (the dashboard and reports printed UTC), glossary, empty chart state; R7.13 clipped text at 125 %.
@@ -154,6 +154,9 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - **R5.13 decision:** buttons, check boxes and tabs cut the last Arabic letters at 125 % («عرض التقر»). `AutoEllipsis` and compatible rendering did not fix it reliably. Proposal: `RtlButton` / `RtlCheckBox` that draw their own text, as `RtlGroupBox` does (touches all 93 buttons and check boxes). Approve or choose another way.
 - **R5.9 decision:** white on the warning amber `#B26A00` is 4.2:1 (below 4.5:1). The plan darkens it to `#9A5B00` (5.4:1), but AGENTS.md §5.10 fixes `#B26A00`. Approve the change to AGENTS.md, or keep `#B26A00` and accept 4.2:1.
 - **R5.6 shortcut:** void is on `F8` (it was free). Confirm, or name another key.
+- **R5.8 decision:** today's grid shows 1.4 rows on 1366×768 at 100 % and on 1920×1080 at 125 %, 3 rows on 1920×1080 at 100 % (target 5). Options in REMEDIATION_PLAN R5.8: (A, recommended) compact desk layout, (B) rebalance only, (C) keep. Also answer Q-R7 (lowest desk resolution).
+- **R5.4 deviation:** focus stays in the card box after a lookup (the plan said: move to the first counter), so a scanned card never lands in a counter. Confirm.
+- **R5.7:** the success sound is on by default. Confirm, or it can default to off.
 
 - **R7 wording to confirm (Q-R4b defaults applied):** «فترة السماح» and «فترة التهدئة» became «فترة الانتظار»; «المحطة» / «محطة العمل» became «الشباك» (menu «الشبابيك»); «الوصل» / «الكوبون» / «الإيصال» became «القسيمة». Two long sentences were shortened (void warning, select-organization header).
 - **R7.12:** print one entry card and one gift voucher on the real 80 mm thermal printer (margins, cutter, QR scans at the desk).
