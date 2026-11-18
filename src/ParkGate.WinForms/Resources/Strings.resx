@@ -683,7 +683,7 @@
     <value>تحديد الجهة للبطاقة</value>
   </data>
   <data name="Header_SelectOrganization" xml:space="preserve">
-    <value>رقم البطاقة مسجل لدى أكثر من جهة، يرجى اختيار الجهة المطلوبة للمتابعة:</value>
+    <value>البطاقة مسجلة لدى أكثر من جهة. اختر الجهة للمتابعة:</value>
   </data>
   <data name="Btn_SelectOrg" xml:space="preserve">
     <value>اختيار ومتابعة</value>

@@ -89,7 +89,7 @@ partial class UsersForm
         this._btnAddUser.ForeColor = System.Drawing.Color.White;
         this._btnAddUser.Location = new System.Drawing.Point(704, 8);
         this._btnAddUser.Name = "_btnAddUser";
-        this._btnAddUser.Size = new System.Drawing.Size(130, 36);
+        this._btnAddUser.Size = new System.Drawing.Size(150, 36);
         this._btnAddUser.TabIndex = 0;
         this._btnAddUser.Text = "+ إضافة مستخدم";
         this._btnAddUser.UseVisualStyleBackColor = false;

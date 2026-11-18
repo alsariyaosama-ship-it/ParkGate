@@ -87,13 +87,14 @@ partial class VoidReasonDialog
         // 
         // _lblWarning
         // 
-        this._lblWarning.AutoSize = true;
+        this._lblWarning.AutoSize = false;
+        this._lblWarning.Dock = System.Windows.Forms.DockStyle.Fill;
         this._lblWarning.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(198)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
         this._lblWarning.Location = new System.Drawing.Point(23, 48);
         this._lblWarning.Name = "_lblWarning";
         this._lblWarning.Size = new System.Drawing.Size(438, 38);
         this._lblWarning.TabIndex = 1;
-        this._lblWarning.Text = "تنبيه: سيؤدي إلغاء الحركة إلى إعادة احتساب آخر دخول مسموح للزائر تلقائياً والسماح بالدخول إذا استوفى الشروط.";
+        this._lblWarning.Text = "تنبيه: الإلغاء يعيد احتساب آخر دخول للزائر تلقائياً.";
         // 
         // _lblReasonPrompt
         // 

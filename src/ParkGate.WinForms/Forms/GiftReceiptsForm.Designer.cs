@@ -72,7 +72,7 @@ partial class GiftReceiptsForm
         _mainLayout.Name = "_mainLayout";
         _mainLayout.Padding = new System.Windows.Forms.Padding(12);
         _mainLayout.RowCount = 3;
-        _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 55F));
+        _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 96F));
         _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
         _mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
         _mainLayout.Size = new System.Drawing.Size(1100, 680);
@@ -199,7 +199,7 @@ partial class GiftReceiptsForm
         _btnExportExcel.Location = new System.Drawing.Point(89, 4);
         _btnExportExcel.Margin = new System.Windows.Forms.Padding(3, 4, 6, 3);
         _btnExportExcel.Name = "_btnExportExcel";
-        _btnExportExcel.Size = new System.Drawing.Size(100, 30);
+        _btnExportExcel.Size = new System.Drawing.Size(112, 30);
         _btnExportExcel.TabIndex = 9;
         _btnExportExcel.Text = "تصدير Excel";
         _btnExportExcel.UseVisualStyleBackColor = true;

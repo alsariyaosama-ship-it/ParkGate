@@ -76,7 +76,7 @@ partial class EditOrganizationDialog
         // _tblLayout
         // 
         this._tblLayout.ColumnCount = 2;
-        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
+        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 220F));
         this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblLayout.Controls.Add(this._lblCode, 0, 0);
         this._tblLayout.Controls.Add(this._txtCode, 1, 0);

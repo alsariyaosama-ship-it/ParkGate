@@ -346,6 +346,7 @@ partial class BeneficiariesControl
         this._tblDetails.Controls.Add(this._lblDetailReason, 1, 7);
         this._tblDetails.Controls.Add(this._lblDetailNotesTitle, 0, 8);
         this._tblDetails.Controls.Add(this._lblDetailNotes, 1, 8);
+        this._tblDetails.AutoScroll = true;
         this._tblDetails.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblDetails.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblDetails.Location = new System.Drawing.Point(6, 23);
@@ -359,7 +360,7 @@ partial class BeneficiariesControl
         this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
         this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
         this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
         this._tblDetails.Size = new System.Drawing.Size(364, 258);
         this._tblDetails.TabIndex = 0;
         // 
@@ -718,9 +719,9 @@ partial class BeneficiariesControl
         this._btnVoidHistoryEntry.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnVoidHistoryEntry.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnVoidHistoryEntry.ForeColor = System.Drawing.Color.White;
-        this._btnVoidHistoryEntry.Location = new System.Drawing.Point(444, 5);
+        this._btnVoidHistoryEntry.Location = new System.Drawing.Point(384, 5);
         this._btnVoidHistoryEntry.Name = "_btnVoidHistoryEntry";
-        this._btnVoidHistoryEntry.Size = new System.Drawing.Size(130, 30);
+        this._btnVoidHistoryEntry.Size = new System.Drawing.Size(170, 30);
         this._btnVoidHistoryEntry.TabIndex = 0;
         this._btnVoidHistoryEntry.Text = "إلغاء العملية (Void)...";
         this._btnVoidHistoryEntry.UseVisualStyleBackColor = false;

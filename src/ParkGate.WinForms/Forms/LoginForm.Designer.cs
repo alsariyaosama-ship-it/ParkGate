@@ -150,7 +150,7 @@ partial class LoginForm
         _tblCard.Margin = new Padding(4);
         _tblCard.Name = "_tblCard";
         _tblCard.RowCount = 12;
-        _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+        _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 48F));
         _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
         _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 12F));
         _tblCard.RowStyles.Add(new RowStyle(SizeType.Absolute, 32F));

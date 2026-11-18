@@ -59,7 +59,7 @@ partial class ConnectionSettingsForm
         // tableLayoutPanelMain
         // 
         this.tableLayoutPanelMain.ColumnCount = 2;
-        this.tableLayoutPanelMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 180F));
+        this.tableLayoutPanelMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
         this.tableLayoutPanelMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this.tableLayoutPanelMain.Controls.Add(this.lblHeader, 0, 0);
         this.tableLayoutPanelMain.Controls.Add(this.lblServer, 0, 1);

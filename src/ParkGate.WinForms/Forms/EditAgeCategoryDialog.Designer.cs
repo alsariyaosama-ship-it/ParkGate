@@ -61,7 +61,7 @@ partial class EditAgeCategoryDialog
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);
         this._pnlHeader.Margin = new System.Windows.Forms.Padding(0);
         this._pnlHeader.Name = "_pnlHeader";
-        this._pnlHeader.Size = new System.Drawing.Size(500, 64);
+        this._pnlHeader.Size = new System.Drawing.Size(500, 76);
         this._pnlHeader.TabIndex = 0;
         // 
         // _lblHeader
@@ -72,7 +72,7 @@ partial class EditAgeCategoryDialog
         this._lblHeader.ForeColor = System.Drawing.Color.White;
         this._lblHeader.Location = new System.Drawing.Point(16, 8);
         this._lblHeader.Name = "_lblHeader";
-        this._lblHeader.Size = new System.Drawing.Size(468, 26);
+        this._lblHeader.Size = new System.Drawing.Size(468, 32);
         this._lblHeader.TabIndex = 0;
         this._lblHeader.Text = "بيانات الفئة العمرية";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -83,9 +83,9 @@ partial class EditAgeCategoryDialog
             | System.Windows.Forms.AnchorStyles.Right)));
         this._lblHeaderSubtitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblHeaderSubtitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(252)))), ((int)(((byte)(231)))));
-        this._lblHeaderSubtitle.Location = new System.Drawing.Point(16, 34);
+        this._lblHeaderSubtitle.Location = new System.Drawing.Point(16, 42);
         this._lblHeaderSubtitle.Name = "_lblHeaderSubtitle";
-        this._lblHeaderSubtitle.Size = new System.Drawing.Size(468, 20);
+        this._lblHeaderSubtitle.Size = new System.Drawing.Size(468, 26);
         this._lblHeaderSubtitle.TabIndex = 1;
         this._lblHeaderSubtitle.Text = "تحديد اسم الفئة العمرية ووصفها وترتيب ظهورها في النظام";
         this._lblHeaderSubtitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -93,7 +93,7 @@ partial class EditAgeCategoryDialog
         // _tblLayout
         // 
         this._tblLayout.ColumnCount = 2;
-        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 130F));
+        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 210F));
         this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblLayout.Controls.Add(this._lblNameAr, 0, 0);
         this._tblLayout.Controls.Add(this._txtNameAr, 1, 0);
@@ -247,7 +247,7 @@ partial class EditAgeCategoryDialog
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(500, 348);
+        this.ClientSize = new System.Drawing.Size(540, 348);
         this.Controls.Add(this._tblLayout);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);

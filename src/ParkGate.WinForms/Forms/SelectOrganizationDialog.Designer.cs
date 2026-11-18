@@ -32,9 +32,9 @@ partial class SelectOrganizationDialog
         this._lblHeader.Location = new System.Drawing.Point(0, 0);
         this._lblHeader.Name = "_lblHeader";
         this._lblHeader.Padding = new System.Windows.Forms.Padding(12, 8, 12, 8);
-        this._lblHeader.Size = new System.Drawing.Size(420, 44);
+        this._lblHeader.Size = new System.Drawing.Size(420, 52);
         this._lblHeader.TabIndex = 2;
-        this._lblHeader.Text = "البطاقة مسجلة لدى أكثر من جهة. اختر الجهة:";
+        this._lblHeader.Text = "البطاقة مسجلة لدى أكثر من جهة. اختر الجهة للمتابعة:";
         this._lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         //
         // _lstOrganizations

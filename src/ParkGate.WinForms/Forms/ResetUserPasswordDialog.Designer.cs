@@ -60,7 +60,7 @@ partial class ResetUserPasswordDialog
         // _tblLayout
         // 
         this._tblLayout.ColumnCount = 2;
-        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
+        this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
         this._tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
         this._tblLayout.Controls.Add(this._lblUserInfoPrompt, 0, 0);
         this._tblLayout.Controls.Add(this._lblUserInfo, 1, 0);
@@ -160,9 +160,9 @@ partial class ResetUserPasswordDialog
         this._btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnSave.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnSave.ForeColor = System.Drawing.Color.White;
-        this._btnSave.Location = new System.Drawing.Point(268, 9);
+        this._btnSave.Location = new System.Drawing.Point(228, 9);
         this._btnSave.Name = "_btnSave";
-        this._btnSave.Size = new System.Drawing.Size(140, 38);
+        this._btnSave.Size = new System.Drawing.Size(180, 38);
         this._btnSave.TabIndex = 0;
         this._btnSave.Text = "تعيين كلمة المرور";
         this._btnSave.UseVisualStyleBackColor = false;
