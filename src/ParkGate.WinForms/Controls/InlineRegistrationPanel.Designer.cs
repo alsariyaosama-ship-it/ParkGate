@@ -48,7 +48,7 @@ partial class InlineRegistrationPanel
         this._grpRegistration.Controls.Add(this._tblRegistration);
         this._grpRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpRegistration.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._grpRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._grpRegistration.Location = new System.Drawing.Point(0, 0);
         this._grpRegistration.Name = "_grpRegistration";
         this._grpRegistration.Padding = new System.Windows.Forms.Padding(8);

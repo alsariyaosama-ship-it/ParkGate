@@ -148,7 +148,7 @@ Maximum 4 production projects. Do not add a project without an ADR (the future F
 7. All user-visible text in `Resources/Strings.resx` (Arabic). No Arabic string literals in `.cs` files except in `Strings.resx` and designer-generated resources.
 8. Display: Western digits 0-9, `dd/MM/yyyy`, `hh:mm tt` with ص/م (`ar-LY` culture with Latin digits). Times shown in park local time converted from UTC.
 9. Normalize Arabic-Indic digits in **every** numeric input (card, phone, national ID, counters).
-10. Colors: granted `#1B873F`, denied `#C62828`, warning `#B26A00`, neutral `#455A64`; never rely on color alone — banner text always states the result.
+10. Colors: granted `#1B873F`, denied `#C62828`, warning `#9A5B00` (darkened from `#B26A00` in R5.9 so white text reaches 4.5:1), neutral `#455A64`; never rely on color alone — banner text always states the result.
 11. Keyboard: Enter = search/confirm, F5 = record entry, F9 = override, F2 = new holder, Esc = clear, Ctrl+F = holder search. Tab order set explicitly.
 
 ---

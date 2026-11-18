@@ -34,7 +34,7 @@ public static class Theme
 
     // Semantic Status Colors
     public static readonly Color Success = Color.FromArgb(27, 135, 63);
-    public static readonly Color Warning = Color.FromArgb(178, 106, 0);
+    public static readonly Color Warning = Color.FromArgb(154, 91, 0);
     public static readonly Color Danger = Color.FromArgb(198, 40, 40);
     public static readonly Color Info = Color.FromArgb(2, 132, 199);
     public static readonly Color Accent = Color.FromArgb(0, 137, 123);

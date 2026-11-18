@@ -568,7 +568,7 @@ partial class BeneficiariesControl
         // 
         // _btnChangeStatus
         // 
-        this._btnChangeStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._btnChangeStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._btnChangeStatus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this._btnChangeStatus.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._btnChangeStatus.ForeColor = System.Drawing.Color.White;

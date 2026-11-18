@@ -512,7 +512,7 @@ partial class CheckInDeskControl
         // 
         // _btnOverride
         // 
-        this._btnOverride.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._btnOverride.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._btnOverride.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnOverride.Enabled = false;
         this._btnOverride.FlatAppearance.BorderSize = 0;

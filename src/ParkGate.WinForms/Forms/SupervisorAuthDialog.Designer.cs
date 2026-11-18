@@ -35,7 +35,7 @@ partial class SupervisorAuthDialog
         // 
         // _pnlHeader
         // 
-        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._pnlHeader.Controls.Add(this._lblHeader);
         this._pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);

@@ -40,7 +40,7 @@ partial class ChangeBeneficiaryStatusDialog
         // 
         // _pnlHeader
         // 
-        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._pnlHeader.Controls.Add(this._lblHeader);
         this._pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
         this._pnlHeader.Location = new System.Drawing.Point(0, 0);
@@ -142,7 +142,7 @@ partial class ChangeBeneficiaryStatusDialog
         // 
         this._radSuspended.AutoSize = true;
         this._radSuspended.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._radSuspended.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._radSuspended.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._radSuspended.Location = new System.Drawing.Point(247, 3);
         this._radSuspended.Name = "_radSuspended";
         this._radSuspended.Size = new System.Drawing.Size(106, 23);
@@ -198,7 +198,7 @@ partial class ChangeBeneficiaryStatusDialog
         // 
         // _btnConfirm
         // 
-        this._btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._btnConfirm.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnConfirm.FlatAppearance.BorderSize = 0;
         this._btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

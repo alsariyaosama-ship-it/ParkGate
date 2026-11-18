@@ -190,7 +190,7 @@ partial class GiftQrDialog
         this._lblOverrideNotice.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblOverrideNotice.AutoSize = true;
         this._lblOverrideNotice.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblOverrideNotice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._lblOverrideNotice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._lblOverrideNotice.Location = new System.Drawing.Point(75, 175);
         this._lblOverrideNotice.Name = "_lblOverrideNotice";
         this._lblOverrideNotice.Size = new System.Drawing.Size(214, 22);

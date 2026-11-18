@@ -96,7 +96,7 @@ partial class GiftOfferPanel
         // 
         // _btnIssueOverride
         // 
-        this._btnIssueOverride.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._btnIssueOverride.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._btnIssueOverride.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnIssueOverride.FlatAppearance.BorderSize = 0;
         this._btnIssueOverride.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
