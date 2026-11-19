@@ -231,6 +231,8 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R5.14 Offer the gift right after a granted entry, without a second scan
 - [x] R5.15 Register a new visitor in a pop-up (the compact desk hid the registration fields)
 - [x] R5.16 Voiding an entry voids its unredeemed gift; a redeemed gift blocks the void (BR-31)
+- [ ] R5.17 Screen to void a gift voucher (gift receipts window)
+- [x] R5.18 Full audit details for every entry and gift operation (who, approver, visitor, day, data)
 
 ### R6 — Database design · branch `phase/r6-database`
 - [x] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script
