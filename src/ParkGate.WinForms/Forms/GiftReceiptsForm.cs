@@ -7,6 +7,7 @@ using ParkGate.Application.GiftVouchers.Services;
 using ParkGate.Application.Organizations.DTOs;
 using ParkGate.Application.Organizations.Services;
 using ParkGate.Application.Ports.Reports;
+using ParkGate.Application.Security;
 using ParkGate.Application.Settings.Services;
 using ParkGate.Domain.Enums;
 using ParkGate.WinForms.Common;
@@ -18,6 +19,9 @@ namespace ParkGate.WinForms.Forms;
 public partial class GiftReceiptsForm : RtlFormBase
 {
     private readonly IGiftReportService _giftReportService;
+    private readonly IGiftVoucherService _giftVoucherService;
+    private readonly ICurrentUser _currentUser;
+    private readonly IFormFactory _formFactory;
     private readonly IGiftExcelExportService _giftExcelExportService;
     private readonly IOrganizationService _organizationService;
     private readonly ISettingsService _settingsService;
@@ -35,9 +39,17 @@ public partial class GiftReceiptsForm : RtlFormBase
         IOrganizationService organizationService,
         ISettingsService settingsService,
         INotifyService notifyService,
-        ILogger<GiftReceiptsForm> logger)
+        ILogger<GiftReceiptsForm> logger,
+        IGiftVoucherService giftVoucherService,
+        ICurrentUser currentUser,
+        IFormFactory formFactory)
     {
         InitializeComponent();
+
+        _giftVoucherService = giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService));
+        _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
+        AskVoidReason = AskVoidReasonWithDialogs;
 
         _giftReportService = giftReportService ?? throw new ArgumentNullException(nameof(giftReportService));
         _giftExcelExportService = giftExcelExportService ?? throw new ArgumentNullException(nameof(giftExcelExportService));
@@ -64,11 +76,13 @@ public partial class GiftReceiptsForm : RtlFormBase
         _btnExportExcel.Text = Strings.Btn_ExportExcel;
         _btnPrintPreview.Text = Strings.Btn_Print;
         _btnClose.Text = Strings.Btn_Close;
+        _btnVoidGift.Text = Strings.Btn_VoidGift;
 
         Theme.ApplyPrimaryButtonStyle(_btnRefresh);
         Theme.ApplyPrimaryButtonStyle(_btnExportExcel);
         Theme.ApplySecondaryButtonStyle(_btnPrintPreview);
         Theme.ApplySecondaryButtonStyle(_btnClose);
+        Theme.ApplySecondaryButtonStyle(_btnVoidGift);
     }
 
     private void SetupColumns()
@@ -177,6 +191,14 @@ public partial class GiftReceiptsForm : RtlFormBase
         _btnExportExcel.Click += async (_, _) => await ExportExcelAsync();
         _btnPrintPreview.Click += (_, _) => ShowPrintPreview();
         _btnClose.Click += (_, _) => Close();
+        _btnVoidGift.Click += async (_, _) =>
+        {
+            if (SelectedReceipt is { } row && CanVoid(row))
+            {
+                await VoidReceiptAsync(row);
+            }
+        };
+        _gridReceipts.SelectionChanged += (_, _) => UpdateVoidButton();
     }
 
     private async Task OnFormLoadAsync()
@@ -252,6 +274,7 @@ public partial class GiftReceiptsForm : RtlFormBase
             _currentReport = result.Value;
             _gridReceipts.DataSource = _currentReport.Rows.ToList();
             UpdateSummaryDisplay(_currentReport);
+            UpdateVoidButton();
         }
         catch (Exception ex)
         {
@@ -261,6 +284,70 @@ public partial class GiftReceiptsForm : RtlFormBase
         finally
         {
             SetBusy(false);
+        }
+    }
+
+    // ── R5.17: void a gift voucher ─────────────────────────────────────────────
+
+    /// <summary>Only a voucher that is issued and not yet redeemed or voided can be voided.</summary>
+    internal static bool CanVoid(GiftReceiptRowDto? row) => row is { Status: GiftVoucherStatus.Issued };
+
+    private GiftReceiptRowDto? SelectedReceipt => _gridReceipts.CurrentRow?.DataBoundItem as GiftReceiptRowDto;
+
+    private void UpdateVoidButton() => _btnVoidGift.Enabled = !_isBusy && CanVoid(SelectedReceipt);
+
+    /// <summary>
+    /// Test seam: asks for the reason, and for a supervisor when the user may not void gifts. Null = cancelled.
+    /// </summary>
+    [System.ComponentModel.Browsable(false)]
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    internal Func<GiftReceiptRowDto, (string Reason, string? ApprovalToken)?> AskVoidReason { get; set; }
+
+    private (string Reason, string? ApprovalToken)? AskVoidReasonWithDialogs(GiftReceiptRowDto row)
+    {
+        if (!_currentUser.Has(Permission.VoidGift))
+        {
+            using var auth = _formFactory.Create<SupervisorAuthDialog>();
+            auth.SetContext(defaultReason: Strings.Ui_VoidGift_DefaultReason);
+            return auth.ShowDialog(this) == DialogResult.OK ? (auth.Reason, auth.ApprovalToken) : null;
+        }
+
+        using var dialog = _formFactory.Create<VoidReasonDialog>();
+        var issuedAt = DateTimeDisplayHelper.ToParkLocalTime(row.IssuedAtUtc, _timeZoneId);
+        var issuedLocal = $"{DateTimeDisplayHelper.FormatDate(issuedAt)} {DateTimeDisplayHelper.FormatTime(issuedAt)}";
+        dialog.SetGiftContext(row.ReceiptNo, row.CardNumber, row.HolderName, issuedLocal, row.Value);
+        return dialog.ShowDialog(this) == DialogResult.OK ? (dialog.Reason, null) : null;
+    }
+
+    /// <summary>Asks, confirms and voids; the service records who voided it, who approved it and why (R5.18).</summary>
+    internal async Task VoidReceiptAsync(GiftReceiptRowDto row)
+    {
+        if (AskVoidReason(row) is not { } answer)
+        {
+            return;
+        }
+
+        if (!_notifyService.Confirm(string.Format(Strings.Msg_ConfirmVoidGift, row.ReceiptNo, row.HolderName), Strings.Title_Confirm))
+        {
+            return;
+        }
+
+        try
+        {
+            var result = await _giftVoucherService.VoidAsync(new VoidGiftVoucherRequest(row.ReceiptNo, answer.Reason), answer.ApprovalToken);
+            if (result.IsFailure)
+            {
+                _notifyService.Warning(ErrorMessages.GetMessage(result.Error));
+                return;
+            }
+
+            _notifyService.Info(string.Format(Strings.Msg_VoidGiftSuccess, row.ReceiptNo));
+            await LoadReportAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to void gift voucher {ReceiptNo}", row.ReceiptNo);
+            _notifyService.Error(UserMessages.Describe(ex));
         }
     }
 
@@ -522,6 +609,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         _dtpToDate.Enabled = !busy;
         _cmbOrganization.Enabled = !busy;
         _cmbStatus.Enabled = !busy;
+        _btnVoidGift.Enabled = !busy && CanVoid(SelectedReceipt);
         Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
     }
 

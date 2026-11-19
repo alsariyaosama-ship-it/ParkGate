@@ -479,6 +479,15 @@ internal class Strings
     internal static string Label_DenialDedupMinutes => GetString(nameof(Label_DenialDedupMinutes));
     internal static string Label_PrefillCompanions => GetString(nameof(Label_PrefillCompanions));
     internal static string Title_RegisterVisitor => GetString(nameof(Title_RegisterVisitor));
+    internal static string Btn_VoidGift => GetString(nameof(Btn_VoidGift));
+    internal static string Btn_ConfirmVoidGift => GetString(nameof(Btn_ConfirmVoidGift));
+    internal static string Title_VoidGift => GetString(nameof(Title_VoidGift));
+    internal static string Header_VoidGift => GetString(nameof(Header_VoidGift));
+    internal static string Ui_VoidGift_Info => GetString(nameof(Ui_VoidGift_Info));
+    internal static string Ui_VoidGift_DefaultReason => GetString(nameof(Ui_VoidGift_DefaultReason));
+    internal static string Msg_ConfirmVoidGift => GetString(nameof(Msg_ConfirmVoidGift));
+    internal static string Msg_VoidGiftSuccess => GetString(nameof(Msg_VoidGiftSuccess));
+    internal static string Ui_VoidGift_Warning => GetString(nameof(Ui_VoidGift_Warning));
     internal static string Label_SuccessSound => GetString(nameof(Label_SuccessSound));
     internal static string Label_DenialSound => GetString(nameof(Label_DenialSound));
     internal static string Label_MaxFailedLogins => GetString(nameof(Label_MaxFailedLogins));

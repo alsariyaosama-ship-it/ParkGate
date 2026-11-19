@@ -2050,4 +2050,31 @@
   <data name="Error_Gift_NoEntryToday" xml:space="preserve">
     <value>لم يسجّل الزائر دخولاً اليوم</value>
   </data>
+  <data name="Btn_VoidGift" xml:space="preserve">
+    <value>إلغاء القسيمة…</value>
+  </data>
+  <data name="Btn_ConfirmVoidGift" xml:space="preserve">
+    <value>إلغاء القسيمة</value>
+  </data>
+  <data name="Title_VoidGift" xml:space="preserve">
+    <value>إلغاء قسيمة هدية</value>
+  </data>
+  <data name="Header_VoidGift" xml:space="preserve">
+    <value>إلغاء قسيمة هدية</value>
+  </data>
+  <data name="Ui_VoidGift_Info" xml:space="preserve">
+    <value>القسيمة رقم {0} · بطاقة {1} · {2}</value>
+  </data>
+  <data name="Ui_VoidGift_DefaultReason" xml:space="preserve">
+    <value>إلغاء قسيمة هدية صدرت خطأً</value>
+  </data>
+  <data name="Msg_ConfirmVoidGift" xml:space="preserve">
+    <value>هل أنت متأكد من إلغاء قسيمة الهدية رقم {0} للزائر {1}؟ لن يمكن استلامها بعد الإلغاء.</value>
+  </data>
+  <data name="Msg_VoidGiftSuccess" xml:space="preserve">
+    <value>تم إلغاء القسيمة رقم {0}.</value>
+  </data>
+  <data name="Ui_VoidGift_Warning" xml:space="preserve">
+    <value>صدرت {0} · القيمة {1} — لن يمكن استلامها بعد الإلغاء.</value>
+  </data>
 </root>

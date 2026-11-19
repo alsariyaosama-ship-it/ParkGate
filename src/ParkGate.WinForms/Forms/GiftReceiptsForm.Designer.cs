@@ -22,6 +22,7 @@ partial class GiftReceiptsForm
     private System.Windows.Forms.DataGridView _gridReceipts;
     private System.Windows.Forms.Panel _summaryPanel;
     private ParkGate.WinForms.Controls.RtlButton _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnVoidGift;
     private System.Windows.Forms.Label _lblSummary;
 
     protected override void Dispose(bool disposing)
@@ -51,6 +52,7 @@ partial class GiftReceiptsForm
         _gridReceipts = new System.Windows.Forms.DataGridView();
         _summaryPanel = new System.Windows.Forms.Panel();
         _btnClose = new ParkGate.WinForms.Controls.RtlButton();
+        _btnVoidGift = new ParkGate.WinForms.Controls.RtlButton();
         _lblSummary = new System.Windows.Forms.Label();
 
         _mainLayout.SuspendLayout();
@@ -238,6 +240,7 @@ partial class GiftReceiptsForm
         // 
         _summaryPanel.Controls.Add(_lblSummary);
         _summaryPanel.Controls.Add(_btnClose);
+        _summaryPanel.Controls.Add(_btnVoidGift);
         _summaryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
         _summaryPanel.Location = new System.Drawing.Point(15, 621);
         _summaryPanel.Name = "_summaryPanel";
@@ -266,6 +269,17 @@ partial class GiftReceiptsForm
         _btnClose.Size = new System.Drawing.Size(100, 44);
         _btnClose.TabIndex = 1;
         _btnClose.Text = "إغلاق";
+        // 
+        // _btnVoidGift
+        // 
+        _btnVoidGift.AutoEllipsis = true;
+        _btnVoidGift.Dock = System.Windows.Forms.DockStyle.Left;
+        _btnVoidGift.Enabled = false;
+        _btnVoidGift.Location = new System.Drawing.Point(100, 0);
+        _btnVoidGift.Name = "_btnVoidGift";
+        _btnVoidGift.Size = new System.Drawing.Size(150, 44);
+        _btnVoidGift.TabIndex = 2;
+        _btnVoidGift.Text = "إلغاء القسيمة…";
 
         // 
         // GiftReceiptsForm
