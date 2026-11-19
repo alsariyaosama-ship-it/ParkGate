@@ -45,6 +45,7 @@ public static class DependencyInjection
         services.AddTransient<EditBeneficiaryDialog>();
         services.AddTransient<ChangeBeneficiaryStatusDialog>();
         services.AddTransient<VoidReasonDialog>();
+        services.AddTransient<RegisterVisitorDialog>();
         services.AddTransient<SelectOrganizationDialog>();
         services.AddTransient<OrganizationsForm>();
         services.AddTransient<EditOrganizationDialog>();

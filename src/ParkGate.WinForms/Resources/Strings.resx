@@ -1105,6 +1105,9 @@
   <data name="Label_PrefillCompanions" xml:space="preserve">
     <value>تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للزائر</value>
   </data>
+  <data name="Title_RegisterVisitor" xml:space="preserve">
+    <value>تسجيل زائر جديد — البطاقة {0}</value>
+  </data>
   <data name="Label_SuccessSound" xml:space="preserve">
     <value>تشغيل تنبيه صوتي عند قبول الدخول</value>
   </data>

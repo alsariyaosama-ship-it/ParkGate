@@ -86,6 +86,7 @@ public partial class CheckInDeskControl : UserControl
         IDeskSounds deskSounds)
     {
         InitializeComponent();
+        ShowRegistrationModal = dialog => dialog.ShowDialog(FindForm());
 
         _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
         _checkInService = checkInService ?? throw new ArgumentNullException(nameof(checkInService));
@@ -721,6 +722,62 @@ public partial class CheckInDeskControl : UserControl
         _btnOverride.Enabled = false;
 
         _registrationPanel.FocusFullName();
+
+        // R5.15: the compact desk (R5.8) has no room for the fields, so they open in a pop-up once this call returns
+        // (the lookup that got here is still on the stack). A desk that is not on a shown window keeps them inline.
+        if (UseRegistrationDialog)
+        {
+            BeginInvoke(OpenRegistrationDialog);
+        }
+    }
+
+    private RegisterVisitorDialog? _registrationDialog;
+
+    private bool UseRegistrationDialog => IsHandleCreated && FindForm() is { Visible: true };
+
+    /// <summary>Test seam: shows the dialog modally over the desk's window.</summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal Func<RegisterVisitorDialog, DialogResult> ShowRegistrationModal { get; set; }
+
+    /// <summary>Moves the registration panel into a pop-up until the visitor is saved or the form is closed.</summary>
+    internal void OpenRegistrationDialog()
+    {
+        if (_registrationDialog != null || !_registrationPanel.Visible)
+        {
+            return;
+        }
+
+        var home = _registrationPanel.Parent;
+        using var dialog = _formFactory.Create<RegisterVisitorDialog>();
+        _registrationDialog = dialog;
+        dialog.Text = string.Format(Strings.Title_RegisterVisitor, DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim()));
+        dialog.ConfirmDiscard = ConfirmDiscardRegistration;
+        dialog.Shown += (_, _) => _registrationPanel.FocusFullName();
+        home?.Controls.Remove(_registrationPanel);
+        dialog.Host(_registrationPanel);
+        _grpHolder.Visible = true;
+
+        DialogResult result;
+        try
+        {
+            result = ShowRegistrationModal(dialog);
+        }
+        finally
+        {
+            dialog.Release(_registrationPanel);
+            home?.Controls.Add(_registrationPanel);
+            _registrationDialog = null;
+        }
+
+        if (result != DialogResult.OK)
+        {
+            // Closed or cancelled: back to the empty desk; the card number stays for another try.
+            HideInlineRegistration();
+            _registrationPanel.ClearFields();
+            _statusBanner.Reset();
+            FocusCardNumberBox();
+        }
     }
 
     /// <summary>
@@ -744,6 +801,13 @@ public partial class CheckInDeskControl : UserControl
 
     public void HideInlineRegistration()
     {
+        if (_registrationDialog is { } dialog && dialog.DialogResult == DialogResult.None)
+        {
+            // The panel's cancel button: close the pop-up without asking again.
+            dialog.ConfirmDiscard = null;
+            dialog.DialogResult = DialogResult.Cancel;
+        }
+
         _registrationPanel.Visible = false;
         _grpHolder.Visible = true;
     }
@@ -1070,6 +1134,11 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
+                    if (_registrationDialog != null)
+                    {
+                        _registrationDialog.DialogResult = DialogResult.OK;
+                    }
+
                     // R5.2: no message box — the operator goes straight on to the holder panel.
                     await LookupCardAsync();
                     if (_activeHolder is not null)

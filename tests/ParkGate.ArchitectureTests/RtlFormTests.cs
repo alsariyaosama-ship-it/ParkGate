@@ -27,6 +27,11 @@ public sealed class RtlFormTests
         // Management lists have no single confirm action: Enter stays with the grid, Esc still closes.
         Type[] lists = [typeof(OrganizationsForm), typeof(AgeCategoriesForm), typeof(UsersForm), typeof(WorkstationsForm)];
         using var dialog = (Form)TestUi.Create(dialogType);
+        if (dialogType == typeof(RegisterVisitorDialog))
+        {
+            // A host: its buttons are the hosted panel's (see RegisterVisitorDialogTests).
+            return;
+        }
 
         if (!lists.Contains(dialogType))
         {
