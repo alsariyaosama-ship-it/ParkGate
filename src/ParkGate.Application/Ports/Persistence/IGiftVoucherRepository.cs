@@ -12,6 +12,9 @@ public interface IGiftVoucherRepository
     /// <summary>Latest IssuedAtUtc among non-voided vouchers; null if none.</summary>
     Task<DateTime?> GetLatestIssuedUtcAsync(Guid beneficiaryId, CancellationToken ct = default);
 
+    /// <summary>Tracked issued or redeemed vouchers of the holder from <paramref name="businessDate"/> (BR-31).</summary>
+    Task<IReadOnlyList<GiftVoucher>> GetNotVoidedForUpdateOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken ct = default);
+
     Task<IReadOnlyList<GiftVoucher>> GetRecentByBeneficiaryAsync(Guid beneficiaryId, int maxResults = 20, CancellationToken ct = default);
 
     void Add(GiftVoucher voucher);

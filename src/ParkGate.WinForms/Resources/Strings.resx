@@ -343,6 +343,9 @@
   <data name="Error_CheckIn_AttemptNotFound" xml:space="preserve">
     <value>لم يتم العثور على محاولة الدخول المطلوبة.</value>
   </data>
+  <data name="Error_CheckIn_GiftAlreadyRedeemed" xml:space="preserve">
+    <value>لا يمكن إلغاء هذا الدخول: استُلمت هدية الزائر المرتبطة به.</value>
+  </data>
   <data name="Error_CheckIn_CannotVoidDeniedAttempt" xml:space="preserve">
     <value>لا يمكن إلغاء محاولة دخول تم رفضها مسبقاً.</value>
   </data>
@@ -827,7 +830,7 @@
     <value>تأكيد الإلغاء</value>
   </data>
   <data name="Msg_ConfirmVoid" xml:space="preserve">
-    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيؤدي ذلك لإعادة احتساب موعد آخر دخول للزائر تلقائياً.</value>
+    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيُعاد احتساب موعد آخر دخول للزائر، وتُلغى معه قسيمة الهدية غير المستلمة لذلك اليوم إن وُجدت.</value>
   </data>
   <data name="Msg_VoidSuccess" xml:space="preserve">
     <value>تم إلغاء عملية الدخول بنجاح.</value>

@@ -312,6 +312,10 @@ public sealed class FakeEntryAttemptRepository : IEntryAttemptRepository
         Task.FromResult(_attempts.Any(a => a.BeneficiaryId == beneficiaryId && a.BusinessDate == businessDate && !a.IsVoided &&
                                            (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)));
 
+    public Task<int> CountGrantedEntriesOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_attempts.Count(a => a.BeneficiaryId == beneficiaryId && a.BusinessDate == businessDate && !a.IsVoided &&
+                                             (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)));
+
     public Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default)
     {
         var day = _attempts.Where(a => a.WorkstationId == workstationId && a.BusinessDate == businessDate).ToList();
@@ -388,6 +392,14 @@ public sealed class FakeGiftVoucherRepository : IGiftVoucherRepository
             .OrderByDescending(v => v.IssuedAtUtc)
             .FirstOrDefault();
         return Task.FromResult(latest?.IssuedAtUtc);
+    }
+
+    public Task<IReadOnlyList<GiftVoucher>> GetNotVoidedForUpdateOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken ct = default)
+    {
+        IReadOnlyList<GiftVoucher> result = _vouchers
+            .Where(v => v.BeneficiaryId == beneficiaryId && v.BusinessDate == businessDate && v.Status != Domain.Enums.GiftVoucherStatus.Voided)
+            .ToList();
+        return Task.FromResult(result);
     }
 
     public Task<IReadOnlyList<GiftVoucher>> GetRecentByBeneficiaryAsync(Guid beneficiaryId, int maxResults = 20, CancellationToken ct = default)

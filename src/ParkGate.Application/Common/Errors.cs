@@ -51,6 +51,7 @@ public static class Errors
         public static readonly Error OverrideReasonRequired = new("CheckIn.OverrideReasonRequired", "A reason of at least 5 characters is required for an override.");
         public static readonly Error OverrideNotAllowed = new("CheckIn.OverrideNotAllowed", "Override is not permitted for blocked holders or inactive organizations.");
         public static readonly Error AttemptNotFound = new("CheckIn.AttemptNotFound", "Entry attempt not found.");
+        public static readonly Error GiftAlreadyRedeemed = new("CheckIn.GiftAlreadyRedeemed", "A gift that rests on this entry was already redeemed (BR-31).");
         public static readonly Error CannotVoidDeniedAttempt = new("CheckIn.CannotVoidDeniedAttempt", "Denied entry attempts cannot be voided.");
         public static readonly Error AlreadyVoided = new("CheckIn.AlreadyVoided", "Entry attempt is already voided.");
         public static readonly Error VoidReasonRequired = new("CheckIn.VoidReasonRequired", "A reason of at least 5 characters is required to void an entry.");

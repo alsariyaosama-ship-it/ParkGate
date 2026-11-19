@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Application.Common;
 using ParkGate.Application.GiftVouchers.DTOs;
 using ParkGate.Domain.Entities;
@@ -89,6 +90,69 @@ public sealed class GiftVoucherConcurrencyTests : IClassFixture<LocalDbTestFixtu
         voided.IsSuccess.ShouldBeTrue();
         await using var verify = _fixture.CreateDbContext();
         (await verify.Beneficiaries.SingleAsync(b => b.Id == holder.Id)).LastGiftIssuedUtc.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task VoidEntry_UnredeemedGift_VoidsTheGiftInTheSameTransaction()
+    {
+        // BR-31: the gift rests on the day's only entry, so voiding the entry voids the gift.
+        using var harness = new ServiceHarness(_fixture);
+        var (org, supervisor, desk) = await SeedAsync("VEG", 5m, UserRole.Supervisor);
+        var holder = await AddHolderAsync(org, "زبون إلغاء الدخول");
+        var issued = await harness.Gifts(supervisor, desk).IssueAsync(new IssueGiftVoucherRequest(holder.Id));
+        issued.IsSuccess.ShouldBeTrue();
+
+        var voided = await harness.CheckIn(supervisor, desk).VoidEntryAsync(new VoidEntryRequest(await EntryIdAsync(holder), "دخول بالخطأ"));
+
+        voided.IsSuccess.ShouldBeTrue();
+        await using var verify = _fixture.CreateDbContext();
+        (await verify.GiftVouchers.SingleAsync(v => v.Id == issued.Value.ReceiptNo)).Status.ShouldBe(GiftVoucherStatus.Voided);
+        (await verify.Beneficiaries.SingleAsync(b => b.Id == holder.Id)).LastGiftIssuedUtc.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task VoidEntry_RedeemedGift_IsRefusedAndNothingChanges()
+    {
+        using var harness = new ServiceHarness(_fixture);
+        var (org, supervisor, desk) = await SeedAsync("VER", 5m, UserRole.Supervisor);
+        var holder = await AddHolderAsync(org, "زبون استلم الهدية");
+        var gifts = harness.Gifts(supervisor, desk);
+        var issued = await gifts.IssueAsync(new IssueGiftVoucherRequest(holder.Id));
+        (await gifts.RedeemAsync(issued.Value.QrText)).IsSuccess.ShouldBeTrue();
+        var entryId = await EntryIdAsync(holder);
+
+        var voided = await harness.CheckIn(supervisor, desk).VoidEntryAsync(new VoidEntryRequest(entryId, "دخول بالخطأ"));
+
+        voided.Error.Code.ShouldBe("CheckIn.GiftAlreadyRedeemed");
+        await using var verify = _fixture.CreateDbContext();
+        (await verify.EntryAttempts.SingleAsync(a => a.Id == entryId)).IsVoided.ShouldBeFalse();
+        (await verify.GiftVouchers.SingleAsync(v => v.Id == issued.Value.ReceiptNo)).Status.ShouldBe(GiftVoucherStatus.Redeemed);
+    }
+
+    [Fact]
+    public async Task CountGrantedEntriesOn_AndGiftsOfTheDay_MatchTheRule()
+    {
+        var (org, user, desk) = await SeedAsync("CGE", 5m);
+        var holder = await AddHolderAsync(org, "زبون العد");
+        await using var context = _fixture.CreateDbContext();
+        var today = ParkToday();
+        var voidedGift = GiftVoucher.Issue(Guid.NewGuid(), 1, holder.Id, org.Id, 5m, DateTime.UtcNow, today, user.Id, desk.Id);
+        voidedGift.Void(user.Id, "قسيمة ملغاة", DateTime.UtcNow);
+        context.GiftVouchers.AddRange(
+            voidedGift,
+            GiftVoucher.Issue(Guid.NewGuid(), 1, holder.Id, org.Id, 5m, DateTime.UtcNow, today, user.Id, desk.Id),
+            GiftVoucher.Issue(Guid.NewGuid(), 1, holder.Id, org.Id, 5m, DateTime.UtcNow.AddDays(-1), today.AddDays(-1), user.Id, desk.Id));
+        context.EntryAttempts.Add(Attempt(holder, org, today, user.Id, desk.Id));
+        await context.SaveChangesAsync();
+
+        (await new ParkGate.Infrastructure.Repositories.EntryAttemptRepository(context).CountGrantedEntriesOnAsync(holder.Id, today)).ShouldBe(2);
+        (await new ParkGate.Infrastructure.Repositories.GiftVoucherRepository(context).GetNotVoidedForUpdateOnAsync(holder.Id, today)).Count.ShouldBe(1);
+    }
+
+    private async Task<Guid> EntryIdAsync(Beneficiary holder)
+    {
+        await using var context = _fixture.CreateDbContext();
+        return await context.EntryAttempts.Where(a => a.BeneficiaryId == holder.Id).Select(a => a.Id).SingleAsync();
     }
 
     private async Task<(Organization Org, User User, Workstation Desk)> SeedAsync(string prefix, decimal value, UserRole role = UserRole.Operator)

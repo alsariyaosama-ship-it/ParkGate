@@ -59,6 +59,7 @@ public static class ErrorMessages
             "CheckIn.OverrideReasonRequired" => Strings.GetString("Error_CheckIn_OverrideReasonRequired"),
             "CheckIn.OverrideNotAllowed" => Strings.GetString("Error_CheckIn_OverrideNotAllowed"),
             "CheckIn.AttemptNotFound" => Strings.GetString("Error_CheckIn_AttemptNotFound"),
+            "CheckIn.GiftAlreadyRedeemed" => Strings.GetString("Error_CheckIn_GiftAlreadyRedeemed"),
             "CheckIn.CannotVoidDeniedAttempt" => Strings.GetString("Error_CheckIn_CannotVoidDeniedAttempt"),
             "CheckIn.AlreadyVoided" => Strings.GetString("Error_CheckIn_AlreadyVoided"),
             "CheckIn.VoidReasonRequired" => Strings.GetString("Error_CheckIn_VoidReasonRequired"),

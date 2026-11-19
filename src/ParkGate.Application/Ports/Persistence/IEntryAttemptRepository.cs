@@ -17,6 +17,9 @@ public interface IEntryAttemptRepository
     /// <summary>True when the holder has a granted or overridden, non-voided entry on <paramref name="businessDate"/>.</summary>
     Task<bool> HasGrantedEntryOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken cancellationToken = default);
 
+    /// <summary>Number of granted or overridden, non-voided entries of the holder on <paramref name="businessDate"/> (BR-31).</summary>
+    Task<int> CountGrantedEntriesOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken cancellationToken = default);
+
     Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default);
 
     void Add(EntryAttempt attempt);

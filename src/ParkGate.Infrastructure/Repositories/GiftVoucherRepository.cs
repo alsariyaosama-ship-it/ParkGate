@@ -27,6 +27,11 @@ public sealed class GiftVoucherRepository : IGiftVoucherRepository
         return await _context.GiftVouchers.SingleOrDefaultAsync(v => v.Token == token, ct);
     }
 
+    public async Task<IReadOnlyList<GiftVoucher>> GetNotVoidedForUpdateOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken ct = default) =>
+        await _context.GiftVouchers
+            .Where(v => v.BeneficiaryId == beneficiaryId && v.BusinessDate == businessDate && v.Status != GiftVoucherStatus.Voided)
+            .ToListAsync(ct);
+
     public async Task<DateTime?> GetLatestIssuedUtcAsync(Guid beneficiaryId, CancellationToken ct = default)
     {
         return await _context.GiftVouchers

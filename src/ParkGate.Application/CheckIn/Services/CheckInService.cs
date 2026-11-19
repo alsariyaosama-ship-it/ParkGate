@@ -397,20 +397,52 @@ public sealed class CheckInService : ICheckInService
             return Errors.Beneficiary.NotFound;
         }
 
+        // BR-31: a gift rests on the day's entry (BR-30). When this is that day's only valid entry, its gifts go with
+        // it; a gift already redeemed cannot be taken back, so the entry then stays. Checked before anything changes.
+        var giftsOfTheDay = await GiftsRestingOnAsync(uow, attempt, cancellationToken);
+        if (giftsOfTheDay.Any(g => g.Status == GiftVoucherStatus.Redeemed))
+        {
+            return Errors.CheckIn.GiftAlreadyRedeemed;
+        }
+
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
 
         attempt.Void(voidedByUserId, request.Reason, nowUtc);
+        foreach (var gift in giftsOfTheDay)
+        {
+            gift.Void(voidedByUserId, request.Reason, nowUtc);
+        }
+
         await uow.SaveChangesAsync(cancellationToken);
 
         var latestRemaining = await uow.Beneficiaries.GetLatestGrantedEntryUtcAsync(holder.Id, cancellationToken);
         holder.RecalculateLastGrantedEntry(latestRemaining);
+        if (giftsOfTheDay.Count > 0)
+        {
+            holder.RecalculateLastGiftIssued(await uow.GiftVouchers.GetLatestIssuedUtcAsync(holder.Id, cancellationToken));
+        }
 
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryVoided", voidedByUserId, actor.WorkstationId, nameof(EntryAttempt), attempt.Id.ToString(), AuditDetails.ToJson(new { request.Reason })));
+        var voidedReceipts = giftsOfTheDay.Select(g => g.Id).ToArray();
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryVoided", voidedByUserId, actor.WorkstationId, nameof(EntryAttempt), attempt.Id.ToString(), AuditDetails.ToJson(new { request.Reason, VoidedGiftReceipts = voidedReceipts })));
+        foreach (var gift in giftsOfTheDay)
+        {
+            uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Voided", voidedByUserId, actor.WorkstationId, nameof(GiftVoucher), gift.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = gift.Id, request.Reason, EntryAttemptId = attempt.Id })));
+        }
+
         await uow.SaveChangesAsync(cancellationToken);
         await uow.CommitAsync(cancellationToken);
 
         return Result.Success();
+    }
+
+    /// <summary>The holder's not-voided gifts of the attempt's day, when no other valid entry of that day remains.</summary>
+    private static async Task<IReadOnlyList<GiftVoucher>> GiftsRestingOnAsync(IUnitOfWork uow, EntryAttempt attempt, CancellationToken ct)
+    {
+        var validEntriesThatDay = await uow.EntryAttempts.CountGrantedEntriesOnAsync(attempt.BeneficiaryId, attempt.BusinessDate, ct);
+        return validEntriesThatDay > 1
+            ? []
+            : await uow.GiftVouchers.GetNotVoidedForUpdateOnAsync(attempt.BeneficiaryId, attempt.BusinessDate, ct);
     }
 
     public async Task<Result<TodayDeskSummaryDto>> GetTodayDeskEntriesAsync(
