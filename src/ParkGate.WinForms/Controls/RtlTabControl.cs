@@ -14,6 +14,15 @@ public class RtlTabControl : TabControl
 {
     private const int TabPaddingLogical = 24;
 
+    private bool _fitPending;
+
+    public RtlTabControl()
+    {
+        // Set once, before any handle exists: changing SizeMode later recreates the native handle, and doing that
+        // while a window is being created on a 125 % screen failed with "Error creating window handle" (T8.4b).
+        SizeMode = TabSizeMode.Fixed;
+    }
+
     /// <summary>Width every tab gets: the longest text plus padding.</summary>
     internal int FittedTabWidth =>
         TabPages.Cast<TabPage>()
@@ -29,34 +38,62 @@ public class RtlTabControl : TabControl
             return;
         }
 
-        SizeMode = TabSizeMode.Fixed;
-        ItemSize = new Size(FittedTabWidth, ItemSize.Height);
+        var width = FittedTabWidth;
+        if (ItemSize.Width != width)
+        {
+            ItemSize = new Size(width, ItemSize.Height);
+        }
     }
 
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        FitTabsToText();
+        ScheduleFit();
     }
 
     protected override void OnFontChanged(EventArgs e)
     {
         base.OnFontChanged(e);
-        FitTabsToText();
+        ScheduleFit();
     }
 
     protected override void OnDpiChangedAfterParent(EventArgs e)
     {
         base.OnDpiChangedAfterParent(e);
-        FitTabsToText();
+        ScheduleFit();
     }
 
     protected override void OnControlAdded(ControlEventArgs e)
     {
         base.OnControlAdded(e);
-        if (IsHandleCreated)
+        ScheduleFit();
+    }
+
+    /// <summary>
+    /// Without a handle the size is only stored. With one, the resize waits until the current message is done, so it
+    /// never runs in the middle of the window's own creation or DPI scaling.
+    /// </summary>
+    private void ScheduleFit()
+    {
+        if (!IsHandleCreated)
         {
             FitTabsToText();
+            return;
         }
+
+        if (_fitPending)
+        {
+            return;
+        }
+
+        _fitPending = true;
+        BeginInvoke(() =>
+        {
+            _fitPending = false;
+            if (!IsDisposed)
+            {
+                FitTabsToText();
+            }
+        });
     }
 }
