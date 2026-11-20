@@ -49,7 +49,7 @@ Ask with options and a recommendation (AGENTS.md §11). Continue with unblocked 
 |---|---|---|---|
 | Q-R3 | Who creates web dashboard users? | Admin-only creation via an artisan command; no self-registration | R1.1 (the removal of `/register` is not blocked; only how users are created) |
 | Q-R4b | The other mixed terms: «فترة الانتظار» vs «فترة التهدئة», «الشباك» vs «المحطة», «قسيمة» vs «كوبون» vs «وصل». | «فترة الانتظار», «الشباك», «قسيمة» | R7.1 (these three only) |
-| Q-R6 | How many desk PCs connect to the SQL Server? Workgroup or domain? | SQL authentication with a least-privilege login | R6.5 |
+| Q-R6 | How many desk PCs connect to the SQL Server? Workgroup or domain? **Answered 2026-11-20: workgroup, at most 4 desks.** | SQL authentication with a least-privilege login | R6.5 |
 | Q-R7 | Lowest screen resolution used at the desks? | Design for 1366×768 at 100 % | R5.8 |
 
 ---

@@ -33,6 +33,7 @@ GiftDenialReason  : 1 OrganizationInactive, 2 GiftsNotEnabled, 3 HolderBlocked,
                     7 DayNotAllowed (F8)
 CardPatternStatus      : 1 Proposed, 2 Approved, 3 Rejected   (F8)
 CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
+CardPatternSource      : 1 Dominant, 2 NewSeries                (F8)
 ```
 
 ## 3. Tables
@@ -267,7 +268,7 @@ Indexes: `UX_GiftVouchers_Token (Token)` unique · `IX_GiftVouchers_Beneficiary_
 
 `GiftVoucher` is **not** synced to the cloud (ADR-020 §5): it is not in `OutboxEntityExtractor.SyncableTypes`.
 
-### 3.13 `OrganizationCardPatterns` — أنماط أرقام البطاقات (F8, proposed — create only when F8 starts)
+### 3.13 `OrganizationCardPatterns` — أنماط أرقام البطاقات (F8)
 | Column | Type | Notes |
 |---|---|---|
 | Id | int IDENTITY PK | |
@@ -275,6 +276,7 @@ Indexes: `UX_GiftVouchers_Token (Token)` unique · `IX_GiftVouchers_Beneficiary_
 | Shape | nvarchar(50) NOT NULL | Character class per position of the normalized number: `D` digit, `L` letter, `-` dash, `O` other. Example `DDDDD` |
 | Prefix | nvarchar(10) NULL | Leading characters shared by most numbers of this shape (`CardPattern.PrefixLength`); NULL when none dominates |
 | Status | tinyint NOT NULL | `CardPatternStatus` |
+| Source | tinyint NOT NULL | `CardPatternSource`. A `Dominant` proposal (the organization's first, learned from its cards) is used provisionally until the Admin decides; a `NewSeries` proposal stops no alert until approved (owner rule: a new series stops alerting only after an Admin approves it) |
 | SampleCount | int NOT NULL | Numbers that matched when it was proposed |
 | ProposedAtUtc | datetime2(3) NOT NULL | DB time |
 | DecidedAtUtc | datetime2(3) NULL | |
@@ -283,7 +285,7 @@ Indexes: `UX_GiftVouchers_Token (Token)` unique · `IX_GiftVouchers_Beneficiary_
 
 Unique `UX_OrganizationCardPatterns_Org_Shape_Prefix` on (`OrganizationId`, `Shape`, `Prefix`).
 
-### 3.14 `CardPatternAlerts` — تنبيهات أرقام غير معتادة (F8, proposed — create only when F8 starts)
+### 3.14 `CardPatternAlerts` — تنبيهات أرقام غير معتادة (F8)
 | Column | Type | Notes |
 |---|---|---|
 | Id | bigint IDENTITY PK | |
@@ -337,10 +339,10 @@ EF Core shape (Infrastructure):
 | `Security.LockoutMinutes` | `15` | BR-18 |
 | `Security.AutoLockMinutes` | `0` (not seeded) | Minutes of inactivity before the desk locks; 0 = never. Written on the first settings save |
 | `SyncAgent.LastHeartbeatUtc`, `SyncAgent.PendingCount`, `SyncAgent.FailedCount` | (not seeded) | Written by the sync agent's heartbeat; read by the admin status bar (R2.5) |
-| `CardPattern.MinSample` | `10` | F8, proposed, BR-29: cards needed before a pattern is proposed |
-| `CardPattern.NewSeriesThreshold` | `5` | F8, proposed, BR-29: alerts with one shape before it is proposed as a new series |
-| `CardPattern.PrefixLength` | `2` | F8, proposed, BR-29 |
-| `CardPattern.PrefixSharePercent` | `90` | F8, proposed, BR-29: share of numbers that must start with the prefix |
+| `CardPattern.MinSample` | `10` | F8, BR-29. Not seeded; the default is in code (as R6.15): cards needed before a pattern is proposed |
+| `CardPattern.NewSeriesThreshold` | `5` | F8, BR-29. Not seeded; the default is in code (as R6.15): alerts with one shape before it is proposed as a new series |
+| `CardPattern.PrefixLength` | `2` | F8, BR-29. Not seeded; the default is in code (as R6.15) |
+| `CardPattern.PrefixSharePercent` | `90` | F8, BR-29. Not seeded; the default is in code (as R6.15): share of numbers that must start with the prefix |
 
 `DatabaseDocumentationTests` checks that every table, column, check constraint and seeded key here matches the EF model (R6.4).
 
