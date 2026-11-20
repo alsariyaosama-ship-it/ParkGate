@@ -203,7 +203,7 @@ Priority: **M** = MVP, **L** = later in MVP roadmap (Phase 6–8).
 The MVP data model and abstractions must make these additive, not rewrites.
 
 ### F1 — QR entry card (built)
-- An Admin issues an entry card to an active holder from «الزوار» (the same permission as editing a holder, `EditBeneficiary`). The QR is the signed token of ADR-028: a random card id, an expiry, the key id and an ECDSA signature. No personal data.
+- A Supervisor or Admin issues an entry card to an active holder from «الزوار» (the same permission as editing a holder, `EditBeneficiary`). The QR is the signed token of ADR-028: a random card id, an expiry, the key id and an ECDSA signature. No personal data.
 - Printed on 80 mm cashier paper with the park and organization names (R7.12), without a logo or personal data.
 - Scanning the card at the desk (keyboard-wedge scanner) checks signature, expiry, revocation and the holder's status, then runs the normal check-in for that holder. Every scan is logged in `CardScanLog`.
 - Reprinting issues a new card id and revokes the old card.
