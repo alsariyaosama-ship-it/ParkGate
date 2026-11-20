@@ -103,14 +103,13 @@ GO
 
 تعتمد المنظومة على الترحيل الذاتي المجمّع بدون الحاجة لتثبيت .NET SDK على جهاز الخادم:
 
-### 4.1 إنشاء حزمة الترحيل (مرة واحدة على جهاز التطوير)
+### 4.1 إنشاء حزمة الترحيل (على جهاز التطوير)
+تبني السكربتات حزمة جديدة في كل مرة، فلا تُستخدم حزمة قديمة تنقصها ترحيلات:
 ```powershell
-dotnet ef migrations bundle `
-    --project src/ParkGate.Infrastructure `
-    --startup-project src/ParkGate.WinForms `
-    -o dist/efbundle.exe `
-    --self-contained -r win-x64
+.\scripts\build-installer.ps1      # dist\database\ParkGate.Migrations.exe داخل المثبّت
+.\scripts\Build-Production.ps1     # artifacts\production\database\ParkGate.Migrations.exe وملف SQL
 ```
+الأمر اليدوي المكافئ يحتاج `--startup-project src/ParkGate.Infrastructure`، لأن مشروع WinForms لا يصلح لأدوات EF.
 
 ### 4.2 تطبيق الحزمة على الخادم
 انسخ ملف `efbundle.exe` إلى الخادم ونفّذه مع تمرير سلسلة الاتصال الخاصة بمستخدم الترحيل:
@@ -286,3 +285,70 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
 | الدخول المسموح والمتجاوز، والقسائم، والزبائن | لا تُحذف | بيانات العمل نفسها (BR-14) |
 
 الحذف، إن اعتُمد، يكون بأمر إداري صريح بعد نسخة احتياطية، وليس تلقائياً.
+
+---
+
+## 10. الترقية من الإصدار 1.0.0 إلى 1.1.0
+
+نفّذ الخطوات بالترتيب. الترقية تحتاج إيقاف العمل على الشبابيك لفترة قصيرة.
+
+### 10.1 قبل الترقية
+1. ابنِ الإصدار على جهاز التطوير:
+   ```powershell
+   .\scripts\build-installer.ps1
+   ```
+   الناتج `dist\installer\ParkGate_Setup_v1.1.0.exe`. البرنامج فيه مضمّن مع .NET 10.0.15، فلا تحتاج أجهزة الشبابيك تثبيت .NET.
+2. أغلق البرنامج على كل الشبابيك.
+3. على جهاز الخادم، افتح PowerShell كمسؤول، ثم خذ نسخة احتياطية:
+   ```powershell
+   & "C:\Program Files\ParkGate\scripts\backup.ps1"
+   ```
+   تأكد أن ملف `.bak` الجديد موجود قبل المتابعة.
+4. أوقف خدمة المزامنة القديمة:
+   ```powershell
+   Stop-Service ParkGateSyncAgent
+   ```
+
+### 10.2 الخادم
+1. شغّل `ParkGate_Setup_v1.1.0.exe` واختر وضع الخادم.
+2. يطبّق المثبّت الترحيلات الجديدة بحزمة `database\ParkGate.Migrations.exe`، ثم يحفظ الاتصال في `connection.dat`.
+   - من الترحيلات الجديدة: جداول بطاقات الدخول تحت EF، وتاريخ آخر هدية، وأيام دخول الجهات.
+   - بيانات بطاقات الدخول القديمة كانت تجريبية، ولا تُنقل (ADR-025).
+3. إذا أردت تطبيق الترحيلات يدويًا بدل المثبّت:
+   ```powershell
+   & "C:\Program Files\ParkGate\database\ParkGate.Migrations.exe" --connection "Server=.\SQLEXPRESS;Database=ParkGate;Trusted_Connection=True;TrustServerCertificate=True"
+   ```
+   الاتصال بحساب Windows للمسؤول. فصل حساب SQL للتشغيل عن حساب الترحيل لم يُنفّذ بعد (R6.5، ينتظر إجابة Q-R6)، لذلك لا تغيّر حساب الاتصال في هذه الترقية.
+
+### 10.3 خدمة المزامنة
+1. أزل الخدمة القديمة:
+   ```powershell
+   & "C:\Program Files\ParkGate\scripts\uninstall-sync-service.ps1"
+   ```
+2. خزّن مفتاح السحابة مشفرًا (§8.1، الخطوة 4):
+   ```powershell
+   & "C:\Program Files\ParkGate\sync-agent\ParkGate.SyncAgent.exe" set-cloud-key
+   ```
+3. افتح `%ProgramData%\ParkGate\appsettings.local.json` واحذف منه `CloudApi:ApiKey` و`AesKey` إن وُجدا. تأكد أن `CloudApi:BaseUrl` يبدأ بـ `https://`.
+4. ثبّت الخدمة الجديدة من مجلد التثبيت:
+   ```powershell
+   & "C:\Program Files\ParkGate\scripts\install-sync-service.ps1"
+   ```
+   يجد السكربت الوكيل في `C:\Program Files\ParkGate\sync-agent` تلقائيًا.
+
+### 10.4 أجهزة الشبابيك
+شغّل `ParkGate_Setup_v1.1.0.exe` على كل شباك واختر وضع الشباك. يبقى الاتصال المحفوظ في `connection.dat` كما هو.
+
+### 10.5 لوحة الويب
+- ابنِ الحزمة وانشرها حسب `docs/DEPLOYMENT_WEB_CPANEL.md` §6. اللوحة تحتاج الآن PHP 8.4.1 أو أحدث.
+- إذا أُنشئت قاعدة السحابة قبل R2، فبنيتها قديمة. في هذه الحالة أعد إنشاءها، ثم أنشئ المستخدم من جديد، ودع الوكيل يعيد الإرسال.
+
+### 10.6 بعد الترقية
+1. افتح «الإعدادات ← التطبيقات» في Windows وتأكد أن إصدار ParkGate هو 1.1.0.
+2. سجّل دخولًا، ثم سجّل دخول زائر تجريبي وألغه بـ F8.
+3. افتح «الجهات» وحدد أيام دخول كل جهة. كل الجهات تبدأ بكل الأيام.
+4. بعد دقيقة تأكد أن حالة المنتزه في لوحة الويب حديثة، وأن سجل الوكيل في `%ProgramData%\ParkGate\logs` لا يحذّر من مفتاح غير مشفّر.
+
+### 10.7 إذا فشلت الترقية
+1. أوقف خدمة المزامنة، ثم استرجع النسخة الاحتياطية من الخطوة 10.1 في SSMS («Restore Database»).
+2. ثبّت مثبّت الإصدار 1.0.0 من جديد على الخادم والشبابيك.
