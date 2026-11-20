@@ -32,7 +32,8 @@ public sealed record EligibilityPreviewDto(
     int EffectiveCooldownMinutes,
     DateTime? LastGrantedEntryUtc,
     DateTime? NextAllowedEntryUtc,
-    int? RemainingCooldownMinutes);
+    int? RemainingCooldownMinutes,
+    WeekDays AllowedEntryDays = WeekDays.All);
 
 public sealed record BeneficiaryLookupResultDto(
     BeneficiaryDto Beneficiary,

@@ -544,6 +544,7 @@ public sealed class CheckInService : ICheckInService
     {
         DenialReason.CooldownActive => Errors.CheckIn.CooldownActive,
         DenialReason.OrganizationInactive => Errors.CheckIn.OrganizationInactive,
+        DenialReason.DayNotAllowed => Errors.CheckIn.DayNotAllowed,
         DenialReason.HolderBlocked => Errors.Beneficiary.Blocked,
         DenialReason.HolderSuspended => Errors.Beneficiary.Suspended,
         DenialReason.CardExpired => Errors.Beneficiary.CardExpired,

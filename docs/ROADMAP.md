@@ -146,7 +146,7 @@ Design: SPEC BR-27..BR-29 and §9 F8, DATABASE §3.1, §3.13, §3.14, ADR-024.
 Owner, 2026-11-20: the entry days come first; days change rarely and by hand, permanently, with the change in the audit trail (no dated schedule). Card-number patterns (BR-29) follow later.
 - [x] T8.1a Domain: allowed weekdays on `Organization` (`WeekDays`), `DayNotAllowed` in the entry and gift policies (table-driven tests)
 - [x] T8.2a Infrastructure: migration for `AllowedEntryDays` and `GiftAnyDay`, integration tests
-- [ ] T8.3a Application: entry and gift use cases and previews apply the days; overrides cover them; the organization policy saves them, audited with the days before and after
+- [x] T8.3a Application: entry and gift use cases and previews apply the days; overrides cover them; the organization policy saves them, audited with the days before and after
 - [ ] T8.4a WinForms: organization dialog (weekdays, gifts on any day); desk banner and gift panel name the allowed days; reports and audit screen show the new reason and days
 - [ ] T8.1b Domain: card-number shape and pattern matcher (table-driven tests)
 - [ ] T8.2b Infrastructure: pattern and alert tables, settings seed, repositories, integration tests

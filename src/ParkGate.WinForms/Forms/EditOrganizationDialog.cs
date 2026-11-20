@@ -155,6 +155,8 @@ public partial class EditOrganizationDialog : RtlFormBase
         var giftEnabled = _chkGiftEnabled.Checked;
         var giftValue = _numGiftValue.Value;
         var giftIntervalDays = (int)_numGiftIntervalDays.Value;
+        var allowedEntryDays = _existingOrg?.AllowedEntryDays ?? ParkGate.Domain.Enums.WeekDays.All;
+        var giftAnyDay = _existingOrg?.GiftAnyDay ?? false;
 
         using (new BusyScope(this, _btnSave, _btnCancel))
         {
@@ -172,7 +174,7 @@ public partial class EditOrganizationDialog : RtlFormBase
                     }
 
                     var orgId = createResult.Value.Id;
-                    var policyRequest = new SetOrganizationPolicyRequest(orgId, maxFreeCompanions, giftEnabled, giftValue, giftIntervalDays);
+                    var policyRequest = new SetOrganizationPolicyRequest(orgId, maxFreeCompanions, giftEnabled, giftValue, giftIntervalDays, allowedEntryDays, giftAnyDay);
                     var policyResult = await _organizationService.SetPolicyAsync(policyRequest);
                     if (!policyResult.IsSuccess)
                     {
@@ -196,7 +198,7 @@ public partial class EditOrganizationDialog : RtlFormBase
                         return;
                     }
 
-                    var policyRequest = new SetOrganizationPolicyRequest(_existingOrg.Id, maxFreeCompanions, giftEnabled, giftValue, giftIntervalDays);
+                    var policyRequest = new SetOrganizationPolicyRequest(_existingOrg.Id, maxFreeCompanions, giftEnabled, giftValue, giftIntervalDays, allowedEntryDays, giftAnyDay);
                     var policyResult = await _organizationService.SetPolicyAsync(policyRequest);
                     if (!policyResult.IsSuccess)
                     {

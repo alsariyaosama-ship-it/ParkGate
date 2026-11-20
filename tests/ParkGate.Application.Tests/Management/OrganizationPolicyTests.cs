@@ -62,7 +62,9 @@ public sealed class OrganizationPolicyTests
             MaxFreeCompanions: 3,
             GiftEnabled: true,
             GiftValue: 50m,
-            GiftIntervalDays: 30);
+            GiftIntervalDays: 30,
+            AllowedEntryDays: WeekDays.All,
+            GiftAnyDay: false);
 
         var result = await _orgSut.SetPolicyAsync(request);
 
@@ -81,7 +83,7 @@ public sealed class OrganizationPolicyTests
         typeof(User).GetProperty(nameof(User.Id))!.SetValue(op, 2);
         _currentUser.SetUser(op);
 
-        var request = new SetOrganizationPolicyRequest(1, null, false, 0m, 30);
+        var request = new SetOrganizationPolicyRequest(1, null, false, 0m, 30, WeekDays.All, false);
         var result = await _orgSut.SetPolicyAsync(request);
 
         result.IsFailure.ShouldBeTrue();
@@ -91,7 +93,7 @@ public sealed class OrganizationPolicyTests
     [Fact]
     public async Task SetPolicyAsync_WhenOrgNotFound_ShouldReturnNotFound()
     {
-        var request = new SetOrganizationPolicyRequest(999, null, false, 0m, 30);
+        var request = new SetOrganizationPolicyRequest(999, null, false, 0m, 30, WeekDays.All, false);
         var result = await _orgSut.SetPolicyAsync(request);
 
         result.IsFailure.ShouldBeTrue();
@@ -101,7 +103,7 @@ public sealed class OrganizationPolicyTests
     [Fact]
     public async Task SetPolicyAsync_WhenGiftEnabledWithZeroValue_ShouldReturnValidationError()
     {
-        var request = new SetOrganizationPolicyRequest(1, null, true, 0m, 30);
+        var request = new SetOrganizationPolicyRequest(1, null, true, 0m, 30, WeekDays.All, false);
         var result = await _orgSut.SetPolicyAsync(request);
 
         result.IsFailure.ShouldBeTrue();
@@ -113,7 +115,7 @@ public sealed class OrganizationPolicyTests
     [Fact]
     public async Task SetPolicyAsync_WhenIntervalOutOfRange_ShouldReturnValidationError()
     {
-        var request = new SetOrganizationPolicyRequest(1, null, false, 0m, 0);
+        var request = new SetOrganizationPolicyRequest(1, null, false, 0m, 0, WeekDays.All, false);
         var result = await _orgSut.SetPolicyAsync(request);
 
         result.IsFailure.ShouldBeTrue();
@@ -125,7 +127,7 @@ public sealed class OrganizationPolicyTests
     [Fact]
     public async Task SetPolicyAsync_WhenMaxCompanionsOutOfRange_ShouldReturnValidationError()
     {
-        var request = new SetOrganizationPolicyRequest(1, 51, false, 0m, 30);
+        var request = new SetOrganizationPolicyRequest(1, 51, false, 0m, 30, WeekDays.All, false);
         var result = await _orgSut.SetPolicyAsync(request);
 
         result.IsFailure.ShouldBeTrue();
@@ -171,5 +173,40 @@ public sealed class OrganizationPolicyTests
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.IsCompanionLimitExempt.ShouldBeFalse();
+    }
+
+    // ── F8: entry days are saved and every change is traced ────────────────
+
+    [Fact]
+    public async Task SetPolicyAsync_EntryDays_SavesThemAndAuditsBeforeAndAfter()
+    {
+        _org.SetEntryDays(WeekDays.Saturday | WeekDays.Wednesday, giftAnyDay: false);
+
+        var result = await _orgSut.SetPolicyAsync(new SetOrganizationPolicyRequest(1, null, false, 0m, 30, WeekDays.Sunday | WeekDays.Wednesday, true));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.AllowedEntryDays.ShouldBe(WeekDays.Sunday | WeekDays.Wednesday);
+        result.Value.GiftAnyDay.ShouldBeTrue();
+        _org.AllowedEntryDays.ShouldBe(WeekDays.Sunday | WeekDays.Wednesday);
+
+        var audit = _uowFactory.CurrentUow.AuditRowsAtLastSave.Single(w => w.Action == "Organization.PolicyChanged");
+        audit.UserId.ShouldBe(1);
+        audit.DetailsJson.ShouldNotBeNull();
+        audit.DetailsJson.ShouldContain("\"OldAllowedEntryDays\":72");   // Saturday + Wednesday
+        audit.DetailsJson.ShouldContain("\"AllowedEntryDays\":9");       // Sunday + Wednesday
+        audit.DetailsJson.ShouldContain("\"OldGiftAnyDay\":false");
+        audit.DetailsJson.ShouldContain("\"GiftAnyDay\":true");
+        audit.DetailsJson.ShouldContain("\"OrganizationCode\":\"SSF\"");
+    }
+
+    [Fact]
+    public async Task SetPolicyAsync_NoEntryDay_ReturnsValidationErrorAndKeepsTheDays()
+    {
+        var result = await _orgSut.SetPolicyAsync(new SetOrganizationPolicyRequest(1, null, false, 0m, 30, WeekDays.None, false));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe("General.ValidationFailed");
+        result.Error.ValidationErrors!.Any(e => e.Code == "EntryDaysRequired").ShouldBeTrue();
+        _org.AllowedEntryDays.ShouldBe(WeekDays.All);
     }
 }

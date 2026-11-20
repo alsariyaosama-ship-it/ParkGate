@@ -419,7 +419,8 @@ public sealed class BeneficiaryService : IBeneficiaryService
             EffectiveCooldownMinutes: decision.EffectiveCooldownMinutes,
             LastGrantedEntryUtc: beneficiary.LastGrantedEntryUtc,
             NextAllowedEntryUtc: decision.NextEligibleAtUtc,
-            RemainingCooldownMinutes: remainingMinutes);
+            RemainingCooldownMinutes: remainingMinutes,
+            AllowedEntryDays: organization.AllowedEntryDays);
     }
 
     private static string GetDenialReasonArabic(DenialReason? reason) => reason switch
@@ -429,6 +430,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
         DenialReason.HolderSuspended => "حساب الزبون موقوف مؤقتاً",
         DenialReason.HolderBlocked => "حساب الزبون محظور",
         DenialReason.OrganizationInactive => "الجهة الراعية غير نشطة",
+        DenialReason.DayNotAllowed => "اليوم ليس من أيام دخول الجهة",
         _ => string.Empty
     };
 
