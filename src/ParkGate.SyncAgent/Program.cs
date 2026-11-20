@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using ParkGate.Application.Ports.Sync;
 using ParkGate.Application.Sync;
 using ParkGate.Infrastructure;
@@ -17,6 +18,18 @@ public static class Program
 
     public static async Task<int> Main(string[] args)
     {
+        // R8.3: set-cloud-key / clear-cloud-key run once and exit; they never start the service.
+        if (CloudKeyCommand.IsCommand(args))
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                Console.Error.WriteLine("The cloud API key is protected with Windows DPAPI; run this on Windows.");
+                return 1;
+            }
+
+            return CloudKeyCommand.Run(args, new DpapiCloudApiKeyStore(), Console.In, Console.Out, CloudKeyCommand.ReadHiddenFromConsole);
+        }
+
         Directory.CreateDirectory(LogDir);
         var logFile = Path.Combine(LogDir, "sync-agent-.txt");
 
@@ -34,6 +47,7 @@ public static class Program
         {
             Log.Information("Starting ParkGate.SyncAgent Host...");
             var host = CreateHostBuilder(args).Build();
+            WarnAboutPlainKey(host);
             await host.RunAsync();
             return 0;
         }
@@ -45,6 +59,16 @@ public static class Program
         finally
         {
             await Log.CloseAndFlushAsync();
+        }
+    }
+
+    /// <summary>A key left in plain JSON still works, but the administrator should move it to DPAPI (R8.3).</summary>
+    private static void WarnAboutPlainKey(IHost host)
+    {
+        var configuration = host.Services.GetRequiredService<IConfiguration>();
+        if (!string.IsNullOrWhiteSpace(configuration["CloudApi:ApiKey"]))
+        {
+            Log.Warning("The cloud API key is stored in plain text in the configuration. Run \"ParkGate.SyncAgent.exe {Command}\" and remove CloudApi:ApiKey from the JSON file.", CloudKeyCommand.SetCommand);
         }
     }
 
@@ -92,6 +116,11 @@ public static class Program
 
                 services.Configure<SyncOptions>(context.Configuration.GetSection("SyncOptions"));
                 services.Configure<CloudApiOptions>(context.Configuration.GetSection("CloudApi"));
+                if (OperatingSystem.IsWindows())
+                {
+                    services.AddSingleton<ICloudApiKeyStore>(new DpapiCloudApiKeyStore());
+                    services.AddSingleton<IPostConfigureOptions<CloudApiOptions>, CloudApiKeyPostConfigure>();
+                }
 
                 services.AddHttpClient<ICloudPushService, CloudPushService>(client =>
                 {

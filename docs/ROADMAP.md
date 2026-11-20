@@ -278,7 +278,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 ### R8 — Build, packaging and deployment · branch `phase/r8-release`
 - [x] R8.1 Fix the doubled backslash in the published `appsettings.json` server path
 - [x] R8.2 Re-enable the NuGet vulnerability audit; pin `System.Security.Cryptography.Pkcs`
-- [ ] R8.3 Store the Sync Agent cloud API key DPAPI-protected, with a CLI switch to set it
+- [x] R8.3 Store the Sync Agent cloud API key DPAPI-protected, with a CLI switch to set it
 - [ ] R8.4 Rebuild the release as `v1.1.0`; delete the stale `artifacts/efbundle.exe`
 - [ ] R8.5 cPanel as the only web deployment path; write `docs/DEPLOYMENT_WEB_CPANEL.md` (Q-R1)
 - [ ] R8.6 "Upgrade from 1.0.0" section in `docs/DEPLOYMENT.md`

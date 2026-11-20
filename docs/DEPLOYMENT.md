@@ -188,7 +188,7 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
 ### 8.1 الإعداد والتهيئة
 1. يتواجد الملف التنفيذي `ParkGate.SyncAgent.exe` في مجلد التثبيت أو النشر.
 2. يستخدم الووركر نفس إعدادات الاتصال المشفرة بتقنية DPAPI من `%ProgramData%\ParkGate\connection.dat` أو من ملف الإعدادات `appsettings.json`.
-3. اضبط إعدادات السحابة في `appsettings.json` (أو `%ProgramData%\ParkGate\appsettings.local.json`):
+3. اضبط إعدادات السحابة في `appsettings.json` (أو `%ProgramData%\ParkGate\appsettings.local.json`)، دون المفتاح:
    ```json
    "SyncOptions": {
      "Enabled": true,
@@ -197,11 +197,17 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
      "MaxRetries": 10
    },
    "CloudApi": {
-     "BaseUrl": "https://api.yourpark.ly/",
-     "ApiKey": "YOUR_CLOUD_API_KEY"
+     "BaseUrl": "https://api.yourpark.ly/"
    }
    ```
-   قيمة `ApiKey` هي نفس قيمة `PARKGATE_API_KEY` في ملف `.env` على الاستضافة.
+4. خزّن مفتاح السحابة مشفرًا بتقنية DPAPI (R8.3). افتح PowerShell كمسؤول في مجلد الوكيل، ثم نفّذ:
+   ```powershell
+   .\ParkGate.SyncAgent.exe set-cloud-key
+   ```
+   يطلب الأمر المفتاح ولا يعرضه أثناء الكتابة. يُحفظ في `%ProgramData%\ParkGate\cloudkey.dat`، ولا يعمل إلا على هذا الجهاز.
+   بعد الحفظ أعد تشغيل خدمة `ParkGate SyncAgent`. لحذف المفتاح نفّذ `.\ParkGate.SyncAgent.exe clear-cloud-key`.
+   المفتاح المشفر له الأولوية. إذا بقي `CloudApi:ApiKey` في ملف JSON يعمل الوكيل، لكنه يكتب تحذيرًا في السجل. احذفه من الملف.
+   قيمة المفتاح هي نفس قيمة `PARKGATE_API_KEY` في ملف `.env` على الاستضافة.
    ولّدها مرة واحدة على السيرفر بالأمر `php artisan parkgate:generate-key`.
    إذا كانت `PARKGATE_API_KEY` فارغة فالسحابة ترفض كل طلبات المزامنة.
    يجب أن يبدأ `BaseUrl` بـ `https://`. الوكيل يرفض أي عنوان آخر ولا يرسل شيئاً، إلا إذا ضبطت `AllowInsecureHttp` على `true` (للتطوير المحلي فقط).
