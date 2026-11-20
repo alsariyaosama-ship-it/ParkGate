@@ -20,9 +20,9 @@ partial class WorkstationsForm
         this._pnlHeader = new System.Windows.Forms.Panel();
         this._lblHeader = new System.Windows.Forms.Label();
         this._pnlToolbar = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnEdit = new System.Windows.Forms.Button();
-        this._btnToggleActive = new System.Windows.Forms.Button();
-        this._btnRefresh = new System.Windows.Forms.Button();
+        this._btnEdit = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnToggleActive = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnRefresh = new ParkGate.WinForms.Controls.RtlButton();
         this._gridWorkstations = new System.Windows.Forms.DataGridView();
         this._colMachineName = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colDisplayName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -31,7 +31,7 @@ partial class WorkstationsForm
         this._colLastSeen = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._pnlFooter = new System.Windows.Forms.Panel();
         this._lblCount = new System.Windows.Forms.Label();
-        this._btnClose = new System.Windows.Forms.Button();
+        this._btnClose = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._pnlToolbar.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._gridWorkstations)).BeginInit();
@@ -244,9 +244,9 @@ partial class WorkstationsForm
     private System.Windows.Forms.Panel _pnlHeader;
     private System.Windows.Forms.Label _lblHeader;
     private System.Windows.Forms.FlowLayoutPanel _pnlToolbar;
-    private System.Windows.Forms.Button _btnEdit;
-    private System.Windows.Forms.Button _btnToggleActive;
-    private System.Windows.Forms.Button _btnRefresh;
+    private ParkGate.WinForms.Controls.RtlButton _btnEdit;
+    private ParkGate.WinForms.Controls.RtlButton _btnToggleActive;
+    private ParkGate.WinForms.Controls.RtlButton _btnRefresh;
     private System.Windows.Forms.DataGridView _gridWorkstations;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colMachineName;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colDisplayName;
@@ -255,5 +255,5 @@ partial class WorkstationsForm
     private System.Windows.Forms.DataGridViewTextBoxColumn _colLastSeen;
     private System.Windows.Forms.Panel _pnlFooter;
     private System.Windows.Forms.Label _lblCount;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
 }

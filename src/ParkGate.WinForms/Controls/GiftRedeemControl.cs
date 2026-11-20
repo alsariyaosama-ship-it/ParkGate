@@ -30,6 +30,8 @@ public partial class GiftRedeemControl : UserControl
 
     private bool _isBusy;
     private bool _denialSoundEnabled = true;
+    private bool _successSoundEnabled = true;
+    private readonly IDeskSounds _deskSounds;
     private string? _timeZoneId = "Libya Standard Time";
 
     public GiftRedeemControl(
@@ -39,7 +41,8 @@ public partial class GiftRedeemControl : UserControl
         ICurrentWorkstation currentWorkstation,
         ISettingsService settingsService,
         INotifyService notifyService,
-        ILogger<GiftRedeemControl> logger)
+        ILogger<GiftRedeemControl> logger,
+        IDeskSounds deskSounds)
     {
         InitializeComponent();
 
@@ -50,6 +53,7 @@ public partial class GiftRedeemControl : UserControl
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _deskSounds = deskSounds ?? throw new ArgumentNullException(nameof(deskSounds));
 
         InitializeControlText();
         Theme.ApplyGridStyle(_gridToday);
@@ -118,6 +122,7 @@ public partial class GiftRedeemControl : UserControl
         {
             var settings = await _settingsService.GetSettingsAsync();
             _denialSoundEnabled = settings.DenialSoundEnabled;
+            _successSoundEnabled = settings.SuccessSoundEnabled;
             _timeZoneId = settings.TimeZoneId;
         }
         catch (Exception ex)
@@ -190,6 +195,11 @@ public partial class GiftRedeemControl : UserControl
                 _lblRedeemedAt.Text = DateTimeDisplayHelper.FormatDateTime(redeemedLocal);
 
                 _txtScan.Clear();
+                if (_successSoundEnabled)
+                {
+                    _deskSounds.PlayGranted();
+                }
+
                 _ = RefreshTodayRedemptionsAsync();
             }
             else
@@ -199,14 +209,7 @@ public partial class GiftRedeemControl : UserControl
 
                 if (_denialSoundEnabled)
                 {
-                    try
-                    {
-                        System.Media.SystemSounds.Exclamation.Play();
-                    }
-                    catch
-                    {
-                        // Audio fallback
-                    }
+                    _deskSounds.PlayDenied();
                 }
             }
         }

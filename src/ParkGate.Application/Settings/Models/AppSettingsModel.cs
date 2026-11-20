@@ -10,7 +10,8 @@ public sealed record AppSettingsModel(
     int LockoutMinutes,
     int AutoLockMinutes,
     string ParkName,
-    string TimeZoneId);
+    string TimeZoneId,
+    bool SuccessSoundEnabled = true);
 
 public sealed record UpdateSettingsRequest(
     int DefaultCooldownMinutes,
@@ -22,4 +23,5 @@ public sealed record UpdateSettingsRequest(
     int LockoutMinutes,
     int AutoLockMinutes,
     string ParkName,
-    string TimeZoneId);
+    string TimeZoneId,
+    bool SuccessSoundEnabled = true);

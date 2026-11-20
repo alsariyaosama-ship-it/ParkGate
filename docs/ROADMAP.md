@@ -215,16 +215,26 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R4.13 Stop clipping on the check-in desk (gift panel, registration buttons) at 120 % DPI
 
 ### R5 — Desk UX improvements · branch `phase/r5-desk-ux`
-- [ ] R5.1 Show the remaining time on denial (SPEC A3)
-- [ ] R5.2 Banner instead of a message box after registration
-- [ ] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
-- [ ] R5.4 Keyboard access to the companion counters
-- [ ] R5.5 Mark companion counts prefilled from the last visit
-- [ ] R5.6 Visible «إلغاء العملية…» button above the today grid
-- [ ] R5.7 Distinct success and denial sounds, with separate settings
-- [ ] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
-- [ ] R5.9 Fix amber banner contrast (below 4.5:1)
-- [ ] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
+- [x] R5.1 Show the remaining time on denial (SPEC A3)
+- [x] R5.2 Banner instead of a message box after registration
+- [x] R5.3 Larger identity text (name 14 pt bold, card number 16 pt)
+- [x] R5.4 Keyboard access to the companion counters
+- [x] R5.5 Mark companion counts prefilled from the last visit
+- [x] R5.6 Visible «إلغاء العملية…» button above the today grid
+- [x] R5.7 Distinct success and denial sounds, with separate settings
+- [x] R5.8 Layout at the minimum resolution (`MinimumSize`, 5 grid rows) — blocked on Q-R7
+- [x] R5.9 Fix amber banner contrast (below 4.5:1)
+- [x] R5.10 Verify, then implement idle auto-lock (FR-AUTH-06)
+- [x] R5.11 Search row in a `TableLayoutPanel` (card box and its label overlap at 125 %)
+- [x] R5.12 Group box captions lose their last letters in RTL («بيانات الزا»), on every screen
+- [x] R5.13 Buttons, check boxes and tabs also lose the last letters of Arabic text («عرض التقر», «بهذه الجه»)
+- [x] R5.14 Offer the gift right after a granted entry, without a second scan
+- [x] R5.15 Register a new visitor in a pop-up (the compact desk hid the registration fields)
+- [x] R5.16 Voiding an entry voids its unredeemed gift; a redeemed gift blocks the void (BR-31)
+- [x] R5.17 Screen to void a gift voucher (gift receipts window)
+- [x] R5.18 Full audit details for every entry and gift operation (who, approver, visitor, day, data)
+- [x] R5.19 Gift receipts window: grid headers cut at 125 % (fixed 44 px header height in `Theme.ApplyGridStyle`) and date boxes show MM/dd instead of dd/MM/yyyy
+- [x] R5.20 Audit trail screen (Reports > سجل التتبع), supervisors and admins
 
 ### R6 — Database design · branch `phase/r6-database`
 - [x] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script

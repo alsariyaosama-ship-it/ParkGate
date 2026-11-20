@@ -32,13 +32,13 @@ partial class EditBeneficiaryDialog
         this._txtNationalId = new System.Windows.Forms.TextBox();
         this._lblExpiryDate = new System.Windows.Forms.Label();
         this._pnlExpiry = new System.Windows.Forms.FlowLayoutPanel();
-        this._chkHasExpiry = new System.Windows.Forms.CheckBox();
+        this._chkHasExpiry = new ParkGate.WinForms.Controls.RtlCheckBox();
         this._dtpExpiryDate = new System.Windows.Forms.DateTimePicker();
         this._lblNotes = new System.Windows.Forms.Label();
         this._txtNotes = new System.Windows.Forms.TextBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSave = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         this._pnlExpiry.SuspendLayout();
@@ -344,11 +344,11 @@ partial class EditBeneficiaryDialog
     private System.Windows.Forms.TextBox _txtNationalId;
     private System.Windows.Forms.Label _lblExpiryDate;
     private System.Windows.Forms.FlowLayoutPanel _pnlExpiry;
-    private System.Windows.Forms.CheckBox _chkHasExpiry;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkHasExpiry;
     private System.Windows.Forms.DateTimePicker _dtpExpiryDate;
     private System.Windows.Forms.Label _lblNotes;
     private System.Windows.Forms.TextBox _txtNotes;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnSave;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

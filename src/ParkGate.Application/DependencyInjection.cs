@@ -48,6 +48,7 @@ public static class DependencyInjection
         services.AddTransient<IReportService, ReportService>();
         services.AddTransient<IGiftVoucherService, GiftVoucherService>();
         services.AddTransient<IGiftReportService, GiftReportService>();
+        services.AddTransient<ParkGate.Application.Audit.IAuditLogService, ParkGate.Application.Audit.AuditLogService>();
         services.AddTransient<ISyncStatusService, SyncStatusService>();
         services.AddTransient<IDatabaseSizeService, DatabaseSizeService>();
 

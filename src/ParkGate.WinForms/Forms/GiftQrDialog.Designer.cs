@@ -30,9 +30,9 @@ partial class GiftQrDialog
         this._lblExpiresOn = new System.Windows.Forms.Label();
         this._lblOverrideNotice = new System.Windows.Forms.Label();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnPrint = new System.Windows.Forms.Button();
-        this._btnSave = new System.Windows.Forms.Button();
-        this._btnClose = new System.Windows.Forms.Button();
+        this._btnPrint = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnClose = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._tblMain.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._picQr)).BeginInit();
@@ -190,7 +190,7 @@ partial class GiftQrDialog
         this._lblOverrideNotice.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblOverrideNotice.AutoSize = true;
         this._lblOverrideNotice.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._lblOverrideNotice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._lblOverrideNotice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._lblOverrideNotice.Location = new System.Drawing.Point(75, 175);
         this._lblOverrideNotice.Name = "_lblOverrideNotice";
         this._lblOverrideNotice.Size = new System.Drawing.Size(214, 22);
@@ -297,7 +297,7 @@ partial class GiftQrDialog
     private System.Windows.Forms.Label _lblExpiresOn;
     private System.Windows.Forms.Label _lblOverrideNotice;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnPrint;
-    private System.Windows.Forms.Button _btnSave;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnPrint;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
 }

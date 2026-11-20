@@ -343,6 +343,9 @@
   <data name="Error_CheckIn_AttemptNotFound" xml:space="preserve">
     <value>لم يتم العثور على محاولة الدخول المطلوبة.</value>
   </data>
+  <data name="Error_CheckIn_GiftAlreadyRedeemed" xml:space="preserve">
+    <value>لا يمكن إلغاء هذا الدخول: استُلمت هدية الزائر المرتبطة به.</value>
+  </data>
   <data name="Error_CheckIn_CannotVoidDeniedAttempt" xml:space="preserve">
     <value>لا يمكن إلغاء محاولة دخول تم رفضها مسبقاً.</value>
   </data>
@@ -625,6 +628,12 @@
   <data name="Title_Companions" xml:space="preserve">
     <value>المرافقون مع الزائر</value>
   </data>
+  <data name="Label_CounterWithShortcut" xml:space="preserve">
+    <value>{0} (Alt+{1}):</value>
+  </data>
+  <data name="Label_FromLastVisit" xml:space="preserve">
+    <value>(من آخر زيارة)</value>
+  </data>
   <data name="Label_TotalPersons" xml:space="preserve">
     <value>الإجمالي مع الزائر: {0} فرد</value>
   </data>
@@ -821,10 +830,13 @@
     <value>تأكيد الإلغاء</value>
   </data>
   <data name="Msg_ConfirmVoid" xml:space="preserve">
-    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيؤدي ذلك لإعادة احتساب موعد آخر دخول للزائر تلقائياً.</value>
+    <value>هل أنت متأكد من إلغاء عملية الدخول المحددة؟ سيُعاد احتساب موعد آخر دخول للزائر، وتُلغى معه قسيمة الهدية غير المستلمة لذلك اليوم إن وُجدت.</value>
   </data>
   <data name="Msg_VoidSuccess" xml:space="preserve">
     <value>تم إلغاء عملية الدخول بنجاح.</value>
+  </data>
+  <data name="Btn_VoidTodayEntry" xml:space="preserve">
+    <value>إلغاء العملية… (F8)</value>
   </data>
   <data name="Menu_VoidTodayEntry" xml:space="preserve">
     <value>إلغاء هذه العملية (Void)...</value>
@@ -1095,6 +1107,12 @@
   </data>
   <data name="Label_PrefillCompanions" xml:space="preserve">
     <value>تعبئة أعداد المرافقين تلقائياً من الزيارة السابقة للزائر</value>
+  </data>
+  <data name="Title_RegisterVisitor" xml:space="preserve">
+    <value>تسجيل زائر جديد — البطاقة {0}</value>
+  </data>
+  <data name="Label_SuccessSound" xml:space="preserve">
+    <value>تشغيل تنبيه صوتي عند قبول الدخول</value>
   </data>
   <data name="Label_DenialSound" xml:space="preserve">
     <value>تشغيل تنبيه صوتي عند رفض الدخول</value>
@@ -1441,6 +1459,9 @@
   <data name="Label_GiftNotEligible" xml:space="preserve">
     <value>الزائر غير مؤهل لاستلام قسيمة هدية: {0}</value>
   </data>
+  <data name="Label_GiftForVisitor" xml:space="preserve">
+    <value>للزائر: {0}</value>
+  </data>
   <data name="Label_GiftNextEligible" xml:space="preserve">
     <value>(موعد الاستحقاق القادم: {0})</value>
   </data>
@@ -1717,8 +1738,14 @@
   <data name="Ui_CheckInDesk_01" xml:space="preserve">
     <value>آخر دخول: {0}</value>
   </data>
-  <data name="Ui_CheckInDesk_02" xml:space="preserve">
-    <value>يسمح بالدخول بعد: {0} (فترة الانتظار: {1} ساعة)</value>
+  <data name="Desk_CooldownAllowedAtToday" xml:space="preserve">
+    <value>يُسمح بالدخول الساعة {0} — باقي {1}</value>
+  </data>
+  <data name="Desk_CooldownAllowedAtOtherDay" xml:space="preserve">
+    <value>يُسمح بالدخول يوم {0} الساعة {1} — باقي {2}</value>
+  </data>
+  <data name="Desk_CooldownAllowedOn" xml:space="preserve">
+    <value>يُسمح بالدخول يوم {0} الساعة {1}</value>
   </data>
   <data name="Ui_CheckInDesk_03" xml:space="preserve">
     <value>البطاقة غير مسجلة — يرجى تسجيل بيانات الزائر</value>
@@ -1743,9 +1770,6 @@
   </data>
   <data name="Ui_CheckInDesk_10" xml:space="preserve">
     <value>تم تسجيل الزائر بنجاح.</value>
-  </data>
-  <data name="Ui_CheckInDesk_11" xml:space="preserve">
-    <value>تم التسجيل</value>
   </data>
   <data name="Ui_CheckInDesk_12" xml:space="preserve">
     <value>فشل التسجيل</value>
@@ -2025,5 +2049,272 @@
   </data>
   <data name="Error_Gift_NoEntryToday" xml:space="preserve">
     <value>لم يسجّل الزائر دخولاً اليوم</value>
+  </data>
+  <data name="Btn_VoidGift" xml:space="preserve">
+    <value>إلغاء القسيمة…</value>
+  </data>
+  <data name="Btn_ConfirmVoidGift" xml:space="preserve">
+    <value>إلغاء القسيمة</value>
+  </data>
+  <data name="Title_VoidGift" xml:space="preserve">
+    <value>إلغاء قسيمة هدية</value>
+  </data>
+  <data name="Header_VoidGift" xml:space="preserve">
+    <value>إلغاء قسيمة هدية</value>
+  </data>
+  <data name="Ui_VoidGift_Info" xml:space="preserve">
+    <value>القسيمة رقم {0} · بطاقة {1} · {2}</value>
+  </data>
+  <data name="Ui_VoidGift_DefaultReason" xml:space="preserve">
+    <value>إلغاء قسيمة هدية صدرت خطأً</value>
+  </data>
+  <data name="Msg_ConfirmVoidGift" xml:space="preserve">
+    <value>هل أنت متأكد من إلغاء قسيمة الهدية رقم {0} للزائر {1}؟ لن يمكن استلامها بعد الإلغاء.</value>
+  </data>
+  <data name="Msg_VoidGiftSuccess" xml:space="preserve">
+    <value>تم إلغاء القسيمة رقم {0}.</value>
+  </data>
+  <data name="Ui_VoidGift_Warning" xml:space="preserve">
+    <value>صدرت {0} · القيمة {1} — لن يمكن استلامها بعد الإلغاء.</value>
+  </data>
+  <data name="Title_AuditLog" xml:space="preserve">
+    <value>سجل التتبع</value>
+  </data>
+  <data name="Menu_AuditLog" xml:space="preserve">
+    <value>سجل التتبع</value>
+  </data>
+  <data name="Label_AuditCategory" xml:space="preserve">
+    <value>نوع العملية:</value>
+  </data>
+  <data name="Label_AuditCard" xml:space="preserve">
+    <value>رقم البطاقة:</value>
+  </data>
+  <data name="Title_AuditDetails" xml:space="preserve">
+    <value>تفاصيل العملية المحددة</value>
+  </data>
+  <data name="Audit_Category_All" xml:space="preserve">
+    <value>كل العمليات</value>
+  </data>
+  <data name="Audit_Category_Entries" xml:space="preserve">
+    <value>الدخول</value>
+  </data>
+  <data name="Audit_Category_Gifts" xml:space="preserve">
+    <value>الهدايا</value>
+  </data>
+  <data name="Audit_Category_Visitors" xml:space="preserve">
+    <value>بيانات الزوار</value>
+  </data>
+  <data name="Audit_Category_Users" xml:space="preserve">
+    <value>المستخدمون والدخول للنظام</value>
+  </data>
+  <data name="Audit_Category_Setup" xml:space="preserve">
+    <value>الجهات والفئات والشبابيك والإعدادات</value>
+  </data>
+  <data name="Audit_Col_Time" xml:space="preserve">
+    <value>الوقت</value>
+  </data>
+  <data name="Audit_Col_Action" xml:space="preserve">
+    <value>العملية</value>
+  </data>
+  <data name="Audit_Col_User" xml:space="preserve">
+    <value>المستخدم</value>
+  </data>
+  <data name="Audit_Col_Desk" xml:space="preserve">
+    <value>الشباك</value>
+  </data>
+  <data name="Audit_Col_Card" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="Audit_Col_Visitor" xml:space="preserve">
+    <value>الزائر</value>
+  </data>
+  <data name="Audit_Col_Reason" xml:space="preserve">
+    <value>السبب</value>
+  </data>
+  <data name="Audit_Col_Operator" xml:space="preserve">
+    <value>نفّذها</value>
+  </data>
+  <data name="Audit_Col_Approver" xml:space="preserve">
+    <value>وافق عليها</value>
+  </data>
+  <data name="Audit_Summary" xml:space="preserve">
+    <value>عدد العمليات: {0}</value>
+  </data>
+  <data name="Audit_SummaryTruncated" xml:space="preserve">
+    <value>عدد العمليات المعروضة: {0} — توجد عمليات أكثر، ضيّق البحث بالتاريخ أو النوع أو البطاقة.</value>
+  </data>
+  <data name="Audit_Action_EntryGranted" xml:space="preserve">
+    <value>تسجيل دخول</value>
+  </data>
+  <data name="Audit_Action_EntryOverridden" xml:space="preserve">
+    <value>دخول بتجاوز المشرف</value>
+  </data>
+  <data name="Audit_Action_EntryVoided" xml:space="preserve">
+    <value>إلغاء دخول</value>
+  </data>
+  <data name="Audit_Action_Gift_Issued" xml:space="preserve">
+    <value>إصدار قسيمة هدية</value>
+  </data>
+  <data name="Audit_Action_Gift_IssuedOverride" xml:space="preserve">
+    <value>إصدار قسيمة هدية استثنائية</value>
+  </data>
+  <data name="Audit_Action_Gift_Redeemed" xml:space="preserve">
+    <value>استلام هدية</value>
+  </data>
+  <data name="Audit_Action_Gift_Voided" xml:space="preserve">
+    <value>إلغاء قسيمة هدية</value>
+  </data>
+  <data name="Audit_Action_BeneficiaryRegistered" xml:space="preserve">
+    <value>تسجيل زائر</value>
+  </data>
+  <data name="Audit_Action_BeneficiaryUpdated" xml:space="preserve">
+    <value>تعديل بيانات زائر</value>
+  </data>
+  <data name="Audit_Action_BeneficiaryStatusChanged" xml:space="preserve">
+    <value>تغيير حالة زائر</value>
+  </data>
+  <data name="Audit_Action_UserLogin" xml:space="preserve">
+    <value>دخول مستخدم للنظام</value>
+  </data>
+  <data name="Audit_Action_UserLoginFailed" xml:space="preserve">
+    <value>محاولة دخول فاشلة</value>
+  </data>
+  <data name="Audit_Action_UserLockedOut" xml:space="preserve">
+    <value>قفل حساب مستخدم</value>
+  </data>
+  <data name="Audit_Action_UserCreated" xml:space="preserve">
+    <value>إنشاء مستخدم</value>
+  </data>
+  <data name="Audit_Action_UserDeactivated" xml:space="preserve">
+    <value>إيقاف مستخدم</value>
+  </data>
+  <data name="Audit_Action_UserReactivated" xml:space="preserve">
+    <value>إعادة تفعيل مستخدم</value>
+  </data>
+  <data name="Audit_Action_UserRoleChanged" xml:space="preserve">
+    <value>تغيير دور مستخدم</value>
+  </data>
+  <data name="Audit_Action_UserPasswordReset" xml:space="preserve">
+    <value>إعادة تعيين كلمة مرور مستخدم</value>
+  </data>
+  <data name="Audit_Action_PasswordChanged" xml:space="preserve">
+    <value>تغيير كلمة المرور</value>
+  </data>
+  <data name="Audit_Action_FirstRunAdminCreated" xml:space="preserve">
+    <value>إنشاء المدير الأول</value>
+  </data>
+  <data name="Audit_Action_OrganizationCreated" xml:space="preserve">
+    <value>إضافة جهة</value>
+  </data>
+  <data name="Audit_Action_OrganizationUpdated" xml:space="preserve">
+    <value>تعديل جهة</value>
+  </data>
+  <data name="Audit_Action_OrganizationDeactivated" xml:space="preserve">
+    <value>إيقاف جهة</value>
+  </data>
+  <data name="Audit_Action_OrganizationReactivated" xml:space="preserve">
+    <value>إعادة تفعيل جهة</value>
+  </data>
+  <data name="Audit_Action_Organization_PolicyChanged" xml:space="preserve">
+    <value>تغيير سياسة جهة</value>
+  </data>
+  <data name="Audit_Action_AgeCategoryCreated" xml:space="preserve">
+    <value>إضافة فئة عمرية</value>
+  </data>
+  <data name="Audit_Action_AgeCategoryUpdated" xml:space="preserve">
+    <value>تعديل فئة عمرية</value>
+  </data>
+  <data name="Audit_Action_AgeCategoryDeactivated" xml:space="preserve">
+    <value>إيقاف فئة عمرية</value>
+  </data>
+  <data name="Audit_Action_AgeCategoryReactivated" xml:space="preserve">
+    <value>إعادة تفعيل فئة عمرية</value>
+  </data>
+  <data name="Audit_Action_WorkstationAutoRegistered" xml:space="preserve">
+    <value>تسجيل شباك تلقائياً</value>
+  </data>
+  <data name="Audit_Action_WorkstationUpdated" xml:space="preserve">
+    <value>تعديل شباك</value>
+  </data>
+  <data name="Audit_Action_WorkstationDeactivated" xml:space="preserve">
+    <value>إيقاف شباك</value>
+  </data>
+  <data name="Audit_Action_WorkstationReactivated" xml:space="preserve">
+    <value>إعادة تفعيل شباك</value>
+  </data>
+  <data name="Audit_Action_SettingsUpdated" xml:space="preserve">
+    <value>تعديل الإعدادات</value>
+  </data>
+  <data name="Audit_Field_BeneficiaryId" xml:space="preserve">
+    <value>معرّف الزائر</value>
+  </data>
+  <data name="Audit_Field_CardNumber" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="Audit_Field_HolderName" xml:space="preserve">
+    <value>الزائر</value>
+  </data>
+  <data name="Audit_Field_OrganizationId" xml:space="preserve">
+    <value>رقم الجهة</value>
+  </data>
+  <data name="Audit_Field_BusinessDate" xml:space="preserve">
+    <value>يوم العمل</value>
+  </data>
+  <data name="Audit_Field_OperatorUserId" xml:space="preserve">
+    <value>نفّذها</value>
+  </data>
+  <data name="Audit_Field_ApprovedByUserId" xml:space="preserve">
+    <value>وافق عليها</value>
+  </data>
+  <data name="Audit_Field_Reason" xml:space="preserve">
+    <value>السبب</value>
+  </data>
+  <data name="Audit_Field_TotalPersons" xml:space="preserve">
+    <value>عدد الأفراد</value>
+  </data>
+  <data name="Audit_Field_Companions" xml:space="preserve">
+    <value>المرافقون (الفئة: العدد)</value>
+  </data>
+  <data name="Audit_Field_Channel" xml:space="preserve">
+    <value>القناة</value>
+  </data>
+  <data name="Audit_Field_AttemptedAtUtc" xml:space="preserve">
+    <value>وقت الدخول</value>
+  </data>
+  <data name="Audit_Field_OriginalResult" xml:space="preserve">
+    <value>نتيجة الدخول الأصلية</value>
+  </data>
+  <data name="Audit_Field_AttemptWorkstationId" xml:space="preserve">
+    <value>رقم شباك الدخول</value>
+  </data>
+  <data name="Audit_Field_VoidedGiftReceipts" xml:space="preserve">
+    <value>قسائم أُلغيت معه</value>
+  </data>
+  <data name="Audit_Field_ReceiptNo" xml:space="preserve">
+    <value>رقم القسيمة</value>
+  </data>
+  <data name="Audit_Field_Value" xml:space="preserve">
+    <value>القيمة</value>
+  </data>
+  <data name="Audit_Field_IssuedAtUtc" xml:space="preserve">
+    <value>وقت الإصدار</value>
+  </data>
+  <data name="Audit_Field_IssuedByUserId" xml:space="preserve">
+    <value>رقم المستخدم الذي أصدرها</value>
+  </data>
+  <data name="Audit_Field_IsOverride" xml:space="preserve">
+    <value>استثنائية</value>
+  </data>
+  <data name="Audit_Field_EntryAttemptId" xml:space="preserve">
+    <value>رقم عملية الدخول</value>
+  </data>
+  <data name="Audit_Field_RedeemedBusinessDate" xml:space="preserve">
+    <value>يوم الاستلام</value>
+  </data>
+  <data name="Audit_Yes" xml:space="preserve">
+    <value>نعم</value>
+  </data>
+  <data name="Audit_No" xml:space="preserve">
+    <value>لا</value>
   </data>
 </root>

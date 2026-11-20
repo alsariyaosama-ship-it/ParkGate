@@ -299,6 +299,8 @@ internal class Strings
     internal static string Btn_CancelReg => GetString(nameof(Btn_CancelReg));
 
     internal static string Title_Companions => GetString(nameof(Title_Companions));
+    internal static string Label_CounterWithShortcut => GetString(nameof(Label_CounterWithShortcut));
+    internal static string Label_FromLastVisit => GetString(nameof(Label_FromLastVisit));
     internal static string Label_TotalPersons => GetString(nameof(Label_TotalPersons));
     internal static string Notice_HolderCounted => GetString(nameof(Notice_HolderCounted));
 
@@ -378,6 +380,7 @@ internal class Strings
     internal static string Btn_ConfirmVoid => GetString(nameof(Btn_ConfirmVoid));
     internal static string Msg_ConfirmVoid => GetString(nameof(Msg_ConfirmVoid));
     internal static string Msg_VoidSuccess => GetString(nameof(Msg_VoidSuccess));
+    internal static string Btn_VoidTodayEntry => GetString(nameof(Btn_VoidTodayEntry));
     internal static string Menu_VoidTodayEntry => GetString(nameof(Menu_VoidTodayEntry));
 
     internal static string Label_CreatedAt => GetString(nameof(Label_CreatedAt));
@@ -475,6 +478,45 @@ internal class Strings
     internal static string Label_MaxGroupSize => GetString(nameof(Label_MaxGroupSize));
     internal static string Label_DenialDedupMinutes => GetString(nameof(Label_DenialDedupMinutes));
     internal static string Label_PrefillCompanions => GetString(nameof(Label_PrefillCompanions));
+    internal static string Title_RegisterVisitor => GetString(nameof(Title_RegisterVisitor));
+    internal static string Btn_VoidGift => GetString(nameof(Btn_VoidGift));
+    internal static string Btn_ConfirmVoidGift => GetString(nameof(Btn_ConfirmVoidGift));
+    internal static string Title_VoidGift => GetString(nameof(Title_VoidGift));
+    internal static string Header_VoidGift => GetString(nameof(Header_VoidGift));
+    internal static string Ui_VoidGift_Info => GetString(nameof(Ui_VoidGift_Info));
+    internal static string Ui_VoidGift_DefaultReason => GetString(nameof(Ui_VoidGift_DefaultReason));
+    internal static string Msg_ConfirmVoidGift => GetString(nameof(Msg_ConfirmVoidGift));
+    internal static string Msg_VoidGiftSuccess => GetString(nameof(Msg_VoidGiftSuccess));
+    internal static string Ui_VoidGift_Warning => GetString(nameof(Ui_VoidGift_Warning));
+    internal static string Title_AuditLog => GetString(nameof(Title_AuditLog));
+    internal static string Menu_AuditLog => GetString(nameof(Menu_AuditLog));
+    internal static string Label_AuditCategory => GetString(nameof(Label_AuditCategory));
+    internal static string Label_AuditCard => GetString(nameof(Label_AuditCard));
+    internal static string Title_AuditDetails => GetString(nameof(Title_AuditDetails));
+    internal static string Audit_Category_All => GetString(nameof(Audit_Category_All));
+    internal static string Audit_Category_Entries => GetString(nameof(Audit_Category_Entries));
+    internal static string Audit_Category_Gifts => GetString(nameof(Audit_Category_Gifts));
+    internal static string Audit_Category_Visitors => GetString(nameof(Audit_Category_Visitors));
+    internal static string Audit_Category_Users => GetString(nameof(Audit_Category_Users));
+    internal static string Audit_Category_Setup => GetString(nameof(Audit_Category_Setup));
+    internal static string Audit_Col_Time => GetString(nameof(Audit_Col_Time));
+    internal static string Audit_Col_Action => GetString(nameof(Audit_Col_Action));
+    internal static string Audit_Col_User => GetString(nameof(Audit_Col_User));
+    internal static string Audit_Col_Desk => GetString(nameof(Audit_Col_Desk));
+    internal static string Audit_Col_Card => GetString(nameof(Audit_Col_Card));
+    internal static string Audit_Col_Visitor => GetString(nameof(Audit_Col_Visitor));
+    internal static string Audit_Col_Reason => GetString(nameof(Audit_Col_Reason));
+    internal static string Audit_Col_Operator => GetString(nameof(Audit_Col_Operator));
+    internal static string Audit_Col_Approver => GetString(nameof(Audit_Col_Approver));
+    internal static string Audit_Summary => GetString(nameof(Audit_Summary));
+    internal static string Audit_SummaryTruncated => GetString(nameof(Audit_SummaryTruncated));
+    internal static string Audit_Field_OperatorUserId => GetString(nameof(Audit_Field_OperatorUserId));
+    internal static string Audit_Field_ApprovedByUserId => GetString(nameof(Audit_Field_ApprovedByUserId));
+    internal static string Audit_Field_ReceiptNo => GetString(nameof(Audit_Field_ReceiptNo));
+    internal static string Audit_Field_Value => GetString(nameof(Audit_Field_Value));
+    internal static string Audit_Yes => GetString(nameof(Audit_Yes));
+    internal static string Audit_No => GetString(nameof(Audit_No));
+    internal static string Label_SuccessSound => GetString(nameof(Label_SuccessSound));
     internal static string Label_DenialSound => GetString(nameof(Label_DenialSound));
     internal static string Label_MaxFailedLogins => GetString(nameof(Label_MaxFailedLogins));
     internal static string Label_LockoutMinutes => GetString(nameof(Label_LockoutMinutes));
@@ -589,6 +631,7 @@ internal class Strings
     internal static string Title_GiftOffer => GetString(nameof(Title_GiftOffer));
     internal static string Label_GiftEligible => GetString(nameof(Label_GiftEligible));
     internal static string Label_GiftNotEligible => GetString(nameof(Label_GiftNotEligible));
+    internal static string Label_GiftForVisitor => GetString(nameof(Label_GiftForVisitor));
     internal static string Label_GiftNextEligible => GetString(nameof(Label_GiftNextEligible));
     internal static string Btn_IssueGift => GetString(nameof(Btn_IssueGift));
     internal static string Btn_IssueGiftOverride => GetString(nameof(Btn_IssueGiftOverride));
@@ -708,7 +751,9 @@ internal class Strings
     internal static string Ui_Beneficiaries_08 => GetString(nameof(Ui_Beneficiaries_08));
     internal static string Ui_Beneficiaries_09 => GetString(nameof(Ui_Beneficiaries_09));
     internal static string Ui_CheckInDesk_01 => GetString(nameof(Ui_CheckInDesk_01));
-    internal static string Ui_CheckInDesk_02 => GetString(nameof(Ui_CheckInDesk_02));
+    internal static string Desk_CooldownAllowedAtToday => GetString(nameof(Desk_CooldownAllowedAtToday));
+    internal static string Desk_CooldownAllowedAtOtherDay => GetString(nameof(Desk_CooldownAllowedAtOtherDay));
+    internal static string Desk_CooldownAllowedOn => GetString(nameof(Desk_CooldownAllowedOn));
     internal static string Ui_CheckInDesk_03 => GetString(nameof(Ui_CheckInDesk_03));
     internal static string Ui_CheckInDesk_04 => GetString(nameof(Ui_CheckInDesk_04));
     internal static string Ui_CheckInDesk_05 => GetString(nameof(Ui_CheckInDesk_05));
@@ -717,7 +762,6 @@ internal class Strings
     internal static string Ui_CheckInDesk_08 => GetString(nameof(Ui_CheckInDesk_08));
     internal static string Ui_CheckInDesk_09 => GetString(nameof(Ui_CheckInDesk_09));
     internal static string Ui_CheckInDesk_10 => GetString(nameof(Ui_CheckInDesk_10));
-    internal static string Ui_CheckInDesk_11 => GetString(nameof(Ui_CheckInDesk_11));
     internal static string Ui_CheckInDesk_12 => GetString(nameof(Ui_CheckInDesk_12));
     internal static string Ui_CheckInDesk_13 => GetString(nameof(Ui_CheckInDesk_13));
     internal static string Ui_CheckInDesk_14 => GetString(nameof(Ui_CheckInDesk_14));

@@ -331,6 +331,7 @@ EF Core shape (Infrastructure):
 | `Entry.DenialDedupMinutes` | `5` | BR-10 |
 | `Entry.PrefillCompanionsFromLastVisit` | `true` | §5.1 step 5 |
 | `Entry.DenialSoundEnabled` | `true` (not seeded) | FR-CHK-08. Written on the first settings save. The old seed row `Entry.PlaySoundOnDenial` was never read and is deleted by migration `RemoveUnreadSoundSetting` (R6.15) |
+| `Entry.SuccessSoundEnabled` | `true` (not seeded) | R5.7: success cue after a recorded entry or a redeemed gift. Written on the first settings save, like `Entry.DenialSoundEnabled` |
 | `Security.MaxFailedLogins` | `5` | BR-18 |
 | `Security.LockoutMinutes` | `15` | BR-18 |
 | `Security.AutoLockMinutes` | `0` (not seeded) | Minutes of inactivity before the desk locks; 0 = never. Written on the first settings save |

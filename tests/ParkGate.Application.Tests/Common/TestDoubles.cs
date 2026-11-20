@@ -312,6 +312,10 @@ public sealed class FakeEntryAttemptRepository : IEntryAttemptRepository
         Task.FromResult(_attempts.Any(a => a.BeneficiaryId == beneficiaryId && a.BusinessDate == businessDate && !a.IsVoided &&
                                            (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)));
 
+    public Task<int> CountGrantedEntriesOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_attempts.Count(a => a.BeneficiaryId == beneficiaryId && a.BusinessDate == businessDate && !a.IsVoided &&
+                                             (a.Result == EntryResult.Allowed || a.Result == EntryResult.Overridden)));
+
     public Task<TodayAttemptTotals> GetTodayTotalsAsync(int workstationId, DateOnly businessDate, CancellationToken cancellationToken = default)
     {
         var day = _attempts.Where(a => a.WorkstationId == workstationId && a.BusinessDate == businessDate).ToList();
@@ -390,6 +394,14 @@ public sealed class FakeGiftVoucherRepository : IGiftVoucherRepository
         return Task.FromResult(latest?.IssuedAtUtc);
     }
 
+    public Task<IReadOnlyList<GiftVoucher>> GetNotVoidedForUpdateOnAsync(Guid beneficiaryId, DateOnly businessDate, CancellationToken ct = default)
+    {
+        IReadOnlyList<GiftVoucher> result = _vouchers
+            .Where(v => v.BeneficiaryId == beneficiaryId && v.BusinessDate == businessDate && v.Status != Domain.Enums.GiftVoucherStatus.Voided)
+            .ToList();
+        return Task.FromResult(result);
+    }
+
     public Task<IReadOnlyList<GiftVoucher>> GetRecentByBeneficiaryAsync(Guid beneficiaryId, int maxResults = 20, CancellationToken ct = default)
     {
         IReadOnlyList<GiftVoucher> result = _vouchers
@@ -420,6 +432,15 @@ public sealed class FakeAuditLogRepository : IAuditLogRepository
 
     public Task<IReadOnlyList<AuditLog>> GetRecentAsync(int count, CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<AuditLog>>(_logs.OrderByDescending(l => l.AtUtc).Take(count).ToList());
+
+    public Task<IReadOnlyList<AuditLog>> SearchAsync(DateTime fromUtc, DateTime toUtc, IReadOnlyCollection<string>? actions, string? detailsFragment, int maxRows, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<AuditLog>>(_logs
+            .Where(l => l.AtUtc >= fromUtc && l.AtUtc < toUtc)
+            .Where(l => actions is null || actions.Contains(l.Action))
+            .Where(l => detailsFragment is null || (l.DetailsJson?.Contains(detailsFragment, StringComparison.Ordinal) ?? false))
+            .OrderByDescending(l => l.AtUtc)
+            .Take(maxRows)
+            .ToList());
 }
 
 public sealed class FakeSyncOutboxRepository : ISyncOutboxRepository

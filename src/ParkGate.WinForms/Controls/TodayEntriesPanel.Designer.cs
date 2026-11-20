@@ -22,7 +22,7 @@ partial class TodayEntriesPanel
     {
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-        this._grpToday = new System.Windows.Forms.GroupBox();
+        this._grpToday = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._gridToday = new System.Windows.Forms.DataGridView();
         this._colTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colCard = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -31,7 +31,11 @@ partial class TodayEntriesPanel
         this._colPersons = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colResult = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._lblTodaySummary = new System.Windows.Forms.Label();
+        this._lblTodayTitle = new System.Windows.Forms.Label();
+        this._pnlTodayActions = new System.Windows.Forms.FlowLayoutPanel();
+        this._btnVoid = new ParkGate.WinForms.Controls.RtlButton();
         this._grpToday.SuspendLayout();
+        this._pnlTodayActions.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._gridToday)).BeginInit();
         this.SuspendLayout();
         // 
@@ -39,17 +43,16 @@ partial class TodayEntriesPanel
         // 
         this._grpToday.BackColor = System.Drawing.Color.White;
         this._grpToday.Controls.Add(this._gridToday);
-        this._grpToday.Controls.Add(this._lblTodaySummary);
+        this._grpToday.Controls.Add(this._pnlTodayActions);
         this._grpToday.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpToday.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._grpToday.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpToday.Location = new System.Drawing.Point(0, 0);
         this._grpToday.Name = "_grpToday";
-        this._grpToday.Padding = new System.Windows.Forms.Padding(6);
+        this._grpToday.Padding = new System.Windows.Forms.Padding(6, 4, 6, 4);
         this._grpToday.Size = new System.Drawing.Size(988, 213);
         this._grpToday.TabIndex = 4;
         this._grpToday.TabStop = false;
-        this._grpToday.Text = "سجل الدخول لهذا اليوم بهذا الشباك (آخر 20 محاولة)";
         // 
         // _gridToday
         // 
@@ -71,8 +74,8 @@ partial class TodayEntriesPanel
         dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
         this._gridToday.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
         this._gridToday.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-        this._gridToday.ColumnHeadersHeight = 36;
-        this._gridToday.RowTemplate.Height = 32;
+        this._gridToday.ColumnHeadersHeight = 30;
+        this._gridToday.RowTemplate.Height = 28;
         this._gridToday.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._colTime,
             this._colCard,
@@ -99,6 +102,35 @@ partial class TodayEntriesPanel
         this._gridToday.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
         this._gridToday.Size = new System.Drawing.Size(976, 152);
         this._gridToday.TabIndex = 0;
+        // 
+        // _pnlTodayActions
+        // 
+        this._pnlTodayActions.AutoSize = true;
+        this._pnlTodayActions.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+        this._pnlTodayActions.Controls.Add(this._lblTodayTitle);
+        this._pnlTodayActions.Controls.Add(this._lblTodaySummary);
+        this._pnlTodayActions.Controls.Add(this._btnVoid);
+        this._pnlTodayActions.Dock = System.Windows.Forms.DockStyle.Bottom;
+        this._pnlTodayActions.Location = new System.Drawing.Point(6, 23);
+        this._pnlTodayActions.Margin = new System.Windows.Forms.Padding(0);
+        this._pnlTodayActions.Name = "_pnlTodayActions";
+        this._pnlTodayActions.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
+        this._pnlTodayActions.Size = new System.Drawing.Size(976, 40);
+        this._pnlTodayActions.TabIndex = 2;
+        this._pnlTodayActions.WrapContents = false;
+        // 
+        // _btnVoid
+        // 
+        this._btnVoid.Enabled = false;
+        this._btnVoid.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._btnVoid.Location = new System.Drawing.Point(776, 0);
+        this._btnVoid.Margin = new System.Windows.Forms.Padding(0);
+        this._btnVoid.MinimumSize = new System.Drawing.Size(200, 36);
+        this._btnVoid.Name = "_btnVoid";
+        this._btnVoid.Size = new System.Drawing.Size(200, 36);
+        this._btnVoid.TabIndex = 0;
+        this._btnVoid.Text = "إلغاء العملية… (F8)";
+        this._btnVoid.UseVisualStyleBackColor = false;
         // 
         // _colTime
         // 
@@ -145,16 +177,28 @@ partial class TodayEntriesPanel
         // _lblTodaySummary
         // 
         this._lblTodaySummary.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
-        this._lblTodaySummary.Dock = System.Windows.Forms.DockStyle.Bottom;
+        this._lblTodaySummary.AutoSize = true;
+        this._lblTodaySummary.Margin = new System.Windows.Forms.Padding(16, 0, 16, 0);
         this._lblTodaySummary.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblTodaySummary.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._lblTodaySummary.Location = new System.Drawing.Point(6, 175);
         this._lblTodaySummary.Name = "_lblTodaySummary";
-        this._lblTodaySummary.Padding = new System.Windows.Forms.Padding(8, 2, 8, 2);
+        this._lblTodaySummary.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
         this._lblTodaySummary.Size = new System.Drawing.Size(976, 32);
         this._lblTodaySummary.TabIndex = 1;
         this._lblTodaySummary.Text = "المقبول: 0 | التجاوز: 0 | المرفوض: 0 | إجمالي الأفراد: 0";
         this._lblTodaySummary.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+        // 
+        // _lblTodayTitle
+        // 
+        this._lblTodayTitle.AutoSize = true;
+        this._lblTodayTitle.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblTodayTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+        this._lblTodayTitle.Margin = new System.Windows.Forms.Padding(0);
+        this._lblTodayTitle.Name = "_lblTodayTitle";
+        this._lblTodayTitle.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
+        this._lblTodayTitle.TabIndex = 3;
+        this._lblTodayTitle.Text = "سجل الدخول لهذا اليوم بهذا الشباك (آخر 20 محاولة)";
         //
         // TodayEntriesPanel
         //
@@ -167,11 +211,13 @@ partial class TodayEntriesPanel
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
         this.Size = new System.Drawing.Size(988, 213);
         this._grpToday.ResumeLayout(false);
+        this._grpToday.PerformLayout();
+        this._pnlTodayActions.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)(this._gridToday)).EndInit();
         this.ResumeLayout(false);
     }
 
-    private System.Windows.Forms.GroupBox _grpToday;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpToday;
     private System.Windows.Forms.DataGridView _gridToday;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colTime;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colCard;
@@ -180,4 +226,7 @@ partial class TodayEntriesPanel
     private System.Windows.Forms.DataGridViewTextBoxColumn _colPersons;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colResult;
     private System.Windows.Forms.Label _lblTodaySummary;
+    private System.Windows.Forms.Label _lblTodayTitle;
+    private System.Windows.Forms.FlowLayoutPanel _pnlTodayActions;
+    private ParkGate.WinForms.Controls.RtlButton _btnVoid;
 }

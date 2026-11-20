@@ -44,6 +44,17 @@ public partial class VoidReasonDialog : RtlFormBase
         _txtReason.Focus();
     }
 
+    /// <summary>R5.17: the same dialog for voiding a gift voucher.</summary>
+    public void SetGiftContext(int receiptNo, string cardNumber, string holderName, string issuedAt, decimal value)
+    {
+        Text = Strings.Title_VoidGift;
+        _lblHeader.Text = Strings.Header_VoidGift;
+        _btnConfirm.Text = Strings.Btn_ConfirmVoidGift;
+        _lblAttemptInfo.Text = string.Format(Strings.Ui_VoidGift_Info, receiptNo, cardNumber, holderName);
+        _lblWarning.Text = string.Format(Strings.Ui_VoidGift_Warning, issuedAt, value.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
+        _txtReason.Focus();
+    }
+
     public void Confirm()
     {
         var reason = _txtReason.Text.Trim();

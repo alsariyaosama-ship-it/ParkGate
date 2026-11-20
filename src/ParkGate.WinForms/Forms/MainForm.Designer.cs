@@ -17,6 +17,7 @@ partial class MainForm
 
             _clockTimer?.Dispose();
             _syncTimer?.Dispose();
+            _idleTimer?.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -49,6 +50,7 @@ partial class MainForm
         _menuDailyReport = new ToolStripMenuItem();
         _menuOrgStatistics = new ToolStripMenuItem();
         _menuGiftReceiptsReport = new ToolStripMenuItem();
+        _menuAuditLog = new ToolStripMenuItem();
         _menuHelp = new ToolStripMenuItem();
         _menuAbout = new ToolStripMenuItem();
         _statusStrip = new StatusStrip();
@@ -64,6 +66,7 @@ partial class MainForm
         _lblWelcomeParkName = new Label();
         _clockTimer = new System.Windows.Forms.Timer(components);
         _syncTimer = new System.Windows.Forms.Timer(components);
+        _idleTimer = new System.Windows.Forms.Timer(components);
         _mainMenuStrip.SuspendLayout();
         _statusStrip.SuspendLayout();
         _mainContainer.SuspendLayout();
@@ -196,7 +199,7 @@ partial class MainForm
         // 
         // _menuReports
         // 
-        _menuReports.DropDownItems.AddRange(new ToolStripItem[] { _menuDailyReport, _menuOrgStatistics, _menuGiftReceiptsReport });
+        _menuReports.DropDownItems.AddRange(new ToolStripItem[] { _menuDailyReport, _menuOrgStatistics, _menuGiftReceiptsReport, _menuAuditLog });
         _menuReports.Name = "_menuReports";
         _menuReports.Size = new Size(74, 36);
         _menuReports.Text = "التقارير";
@@ -218,6 +221,12 @@ partial class MainForm
         _menuGiftReceiptsReport.Name = "_menuGiftReceiptsReport";
         _menuGiftReceiptsReport.Size = new Size(216, 36);
         _menuGiftReceiptsReport.Text = "تقرير قسائم الهدايا";
+        // 
+        // _menuAuditLog
+        // 
+        _menuAuditLog.Name = "_menuAuditLog";
+        _menuAuditLog.Size = new Size(216, 36);
+        _menuAuditLog.Text = "سجل التتبع";
         // 
         // _menuHelp
         // 
@@ -366,6 +375,10 @@ partial class MainForm
         // 
         _syncTimer.Interval = 60000;
         // 
+        // _idleTimer
+        // 
+        _idleTimer.Interval = 30000;
+        // 
         // MainForm
         // 
         AutoScaleDimensions = new SizeF(120F, 120F);
@@ -376,7 +389,7 @@ partial class MainForm
         Controls.Add(_mainMenuStrip);
         MainMenuStrip = _mainMenuStrip;
         Margin = new Padding(4);
-        MinimumSize = new Size(1196, 788);
+        MinimumSize = new Size(1024, 700);
         Name = "MainForm";
         Text = "بوابة منتزه المرح العائلي";
         _mainMenuStrip.ResumeLayout(false);
@@ -415,6 +428,7 @@ partial class MainForm
     private System.Windows.Forms.ToolStripMenuItem _menuDailyReport;
     private System.Windows.Forms.ToolStripMenuItem _menuOrgStatistics;
     private System.Windows.Forms.ToolStripMenuItem _menuGiftReceiptsReport;
+    private System.Windows.Forms.ToolStripMenuItem _menuAuditLog;
     private System.Windows.Forms.ToolStripMenuItem _menuHelp;
     private System.Windows.Forms.ToolStripMenuItem _menuAbout;
     private System.Windows.Forms.StatusStrip _statusStrip;
@@ -430,4 +444,5 @@ partial class MainForm
     private System.Windows.Forms.Label _lblQuickInfo;
     private System.Windows.Forms.Timer _clockTimer;
     private System.Windows.Forms.Timer _syncTimer;
+    private System.Windows.Forms.Timer _idleTimer;
 }

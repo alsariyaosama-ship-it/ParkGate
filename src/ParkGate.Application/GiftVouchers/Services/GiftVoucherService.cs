@@ -148,7 +148,8 @@ public sealed class GiftVoucherService : IGiftVoucherService
         holder.RecordGiftIssued(nowUtc);
         await uow.SaveChangesAsync(ct);
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Issued", actor.UserId, actor.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Issued", actor.UserId, actor.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(
+            GiftTrail(holder, voucher, actor.UserId, null))));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
 
@@ -269,7 +270,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
         await uow.SaveChangesAsync(ct);
         var auditAction = isActualOverride ? "Gift.IssuedOverride" : "Gift.Issued";
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, auditAction, approverUserId, actor.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        uow.AuditLogs.Add(new AuditLog(nowUtc, auditAction, approverUserId, actor.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(
+            GiftTrail(holder, voucher, actor.UserId, approverUserId)
+                .With("Reason", request.Reason.Trim())
+                .With("IsOverride", isActualOverride))));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
 
@@ -357,12 +361,13 @@ public sealed class GiftVoucherService : IGiftVoucherService
         var (userId, workstationId) = actor;
 
         voucher.Redeem(userId, workstationId, nowUtc, businessDate);
+        var holder = await uow.Beneficiaries.GetByIdAsync(voucher.BeneficiaryId, ct);
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Redeemed", userId, workstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, voucher.Value })));
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Redeemed", userId, workstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(
+            (holder is null ? new Dictionary<string, object?> { ["BeneficiaryId"] = voucher.BeneficiaryId, ["OperatorUserId"] = userId } : GiftTrail(holder, voucher, userId, null))
+                .With("RedeemedBusinessDate", businessDate.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)))));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
-
-        var holder = await uow.Beneficiaries.GetByIdAsync(voucher.BeneficiaryId, ct);
         var org = await uow.Organizations.GetByIdAsync(voucher.OrganizationId, ct);
 
         return new GiftRedemptionDto(
@@ -413,11 +418,12 @@ public sealed class GiftVoucherService : IGiftVoucherService
             }
         }
 
-        return await ConcurrencyRetry.RunAsync(retryCt => VoidOnceAsync(request, voidedByUserId, retryCt), ct);
+        var operatorUserId = _currentUser.UserId ?? voidedByUserId;
+        return await ConcurrencyRetry.RunAsync(retryCt => VoidOnceAsync(request, operatorUserId, voidedByUserId, retryCt), ct);
     }
 
     /// <summary>One attempt on a fresh unit of work; <see cref="ConcurrencyRetry"/> repeats it after a lost race (ADR-026).</summary>
-    private async Task<Result> VoidOnceAsync(VoidGiftVoucherRequest request, int voidedByUserId, CancellationToken ct)
+    private async Task<Result> VoidOnceAsync(VoidGiftVoucherRequest request, int operatorUserId, int voidedByUserId, CancellationToken ct)
     {
         await using var uow = _uowFactory.Create();
         await uow.BeginTransactionAsync(ct);
@@ -446,12 +452,24 @@ public sealed class GiftVoucherService : IGiftVoucherService
         await uow.SaveChangesAsync(ct);
         holder?.RecalculateLastGiftIssued(await uow.GiftVouchers.GetLatestIssuedUtcAsync(voucher.BeneficiaryId, ct));
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
-        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Voided", voidedByUserId, _currentWorkstation.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(new { ReceiptNo = voucher.Id, request.Reason })));
+        var trail = holder is null
+            ? new Dictionary<string, object?> { ["BeneficiaryId"] = voucher.BeneficiaryId, ["OperatorUserId"] = operatorUserId, ["ReceiptNo"] = voucher.Id }
+            : GiftTrail(holder, voucher, operatorUserId, voidedByUserId != operatorUserId ? voidedByUserId : null);
+        uow.AuditLogs.Add(new AuditLog(nowUtc, "Gift.Voided", voidedByUserId, _currentWorkstation.WorkstationId, nameof(GiftVoucher), voucher.Id.ToString(), AuditDetails.ToJson(
+            trail.With("Reason", request.Reason))));
         await uow.SaveChangesAsync(ct);
         await uow.CommitAsync(ct);
 
         return Result.Success();
     }
+
+    /// <summary>R5.18: visitor, day, operator and approver plus the voucher itself.</summary>
+    private static Dictionary<string, object?> GiftTrail(Beneficiary holder, GiftVoucher voucher, int operatorUserId, int? approvedByUserId) =>
+        AuditTrail.For(holder, voucher.BusinessDate, operatorUserId, approvedByUserId)
+            .With("ReceiptNo", voucher.Id)
+            .With("Value", voucher.Value)
+            .With("IssuedAtUtc", voucher.IssuedAtUtc)
+            .With("IssuedByUserId", voucher.IssuedByUserId);
 
     private static GiftEligibilityDto MapToEligibilityDto(
         GiftEligibilityDecision decision,

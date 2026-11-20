@@ -27,8 +27,8 @@ partial class EditWorkstationDialog
         this._lblType = new System.Windows.Forms.Label();
         this._cmbType = new System.Windows.Forms.ComboBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSave = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         this._pnlButtons.SuspendLayout();
@@ -216,6 +216,6 @@ partial class EditWorkstationDialog
     private System.Windows.Forms.Label _lblType;
     private System.Windows.Forms.ComboBox _cmbType;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnSave;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

@@ -20,7 +20,7 @@ partial class InlineRegistrationPanel
 
     private void InitializeComponent()
     {
-        this._grpRegistration = new System.Windows.Forms.GroupBox();
+        this._grpRegistration = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblRegistration = new System.Windows.Forms.TableLayoutPanel();
         this._lblRegOrganization = new System.Windows.Forms.Label();
         this._cmbRegOrganization = new System.Windows.Forms.ComboBox();
@@ -35,8 +35,8 @@ partial class InlineRegistrationPanel
         this._lblRegNotes = new System.Windows.Forms.Label();
         this._txtRegNotes = new System.Windows.Forms.TextBox();
         this._pnlRegActions = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSaveReg = new System.Windows.Forms.Button();
-        this._btnCancelReg = new System.Windows.Forms.Button();
+        this._btnSaveReg = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancelReg = new ParkGate.WinForms.Controls.RtlButton();
         this._grpRegistration.SuspendLayout();
         this._tblRegistration.SuspendLayout();
         this._pnlRegActions.SuspendLayout();
@@ -48,7 +48,7 @@ partial class InlineRegistrationPanel
         this._grpRegistration.Controls.Add(this._tblRegistration);
         this._grpRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
         this._grpRegistration.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this._grpRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._grpRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._grpRegistration.Location = new System.Drawing.Point(0, 0);
         this._grpRegistration.Name = "_grpRegistration";
         this._grpRegistration.Padding = new System.Windows.Forms.Padding(8);
@@ -273,7 +273,7 @@ partial class InlineRegistrationPanel
         this.ResumeLayout(false);
     }
 
-    private System.Windows.Forms.GroupBox _grpRegistration;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpRegistration;
     private System.Windows.Forms.TableLayoutPanel _tblRegistration;
     private System.Windows.Forms.Label _lblRegOrganization;
     private System.Windows.Forms.ComboBox _cmbRegOrganization;
@@ -288,6 +288,6 @@ partial class InlineRegistrationPanel
     private System.Windows.Forms.Label _lblRegNotes;
     private System.Windows.Forms.TextBox _txtRegNotes;
     private System.Windows.Forms.FlowLayoutPanel _pnlRegActions;
-    private System.Windows.Forms.Button _btnSaveReg;
-    private System.Windows.Forms.Button _btnCancelReg;
+    private ParkGate.WinForms.Controls.RtlButton _btnSaveReg;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancelReg;
 }

@@ -49,9 +49,9 @@ partial class ConnectionSettingsForm
         this.txtPassword = new System.Windows.Forms.TextBox();
         this.lblStatus = new System.Windows.Forms.Label();
         this.flowLayoutPanelButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this.btnSave = new System.Windows.Forms.Button();
-        this.btnTest = new System.Windows.Forms.Button();
-        this.btnCancel = new System.Windows.Forms.Button();
+        this.btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        this.btnTest = new ParkGate.WinForms.Controls.RtlButton();
+        this.btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this.tableLayoutPanelMain.SuspendLayout();
         this.flowLayoutPanelButtons.SuspendLayout();
         this.SuspendLayout();

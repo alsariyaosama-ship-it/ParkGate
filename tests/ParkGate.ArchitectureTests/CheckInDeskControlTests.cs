@@ -115,6 +115,55 @@ public sealed class CheckInDeskControlTests
         btnOverride.Enabled.ShouldBeFalse();
     }
 
+    [Theory]
+    [InlineData(1024)]
+    [InlineData(1366)]
+    [InlineData(1920)]
+    public void CheckInDeskControl_SearchRow_ControlsNeverOverlap(int width)
+    {
+        // R5.11: the row used absolute positions, and at 125 % the card box ran under its label.
+        using var host = new Form { ClientSize = new Size(width, 700) };
+        using var control = TestUi.Create<CheckInDeskControl>();
+        control.Dock = DockStyle.Fill;
+        host.Controls.Add(control);
+        host.PerformLayout();
+
+        var row = GetField<TableLayoutPanel>(control, "_tblSearch");
+        GetField<Panel>(control, "_pnlSearch").Controls.Cast<Control>().ShouldBe([row]);
+
+        Control[] inOrder =
+        [
+            GetField<Label>(control, "_lblCardNumber"),
+            GetField<TextBox>(control, "_txtCardNumber"),
+            GetField<Label>(control, "_lblOrganization"),
+            GetField<ComboBox>(control, "_cmbOrganization"),
+            GetField<Button>(control, "_btnSearch"),
+        ];
+        for (var i = 0; i < inOrder.Length; i++)
+        {
+            row.GetColumn(inOrder[i]).ShouldBe(i, inOrder[i].Name);
+            for (var j = i + 1; j < inOrder.Length; j++)
+            {
+                inOrder[i].Bounds.IntersectsWith(inOrder[j].Bounds).ShouldBeFalse($"{inOrder[i].Name} / {inOrder[j].Name}");
+            }
+        }
+    }
+
+    [Fact]
+    public void CheckInDeskControl_IdentityText_IsLargerThanBodyText()
+    {
+        // R5.3: the operator reads the name and the card number at a glance.
+        using var control = TestUi.Create<CheckInDeskControl>();
+
+        var name = GetField<Label>(control, "_lblHolderName").Font;
+        var card = GetField<TextBox>(control, "_txtCardNumber").Font;
+
+        name.SizeInPoints.ShouldBe(14F);
+        name.Bold.ShouldBeTrue();
+        card.SizeInPoints.ShouldBe(16F);
+        card.Bold.ShouldBeTrue();
+    }
+
     [Fact]
     public void CheckInDeskControl_ShowHolderInfo_WhenCooldownActive_ShouldDisableRecordEntryAndEnableOverride()
     {
@@ -155,6 +204,8 @@ public sealed class CheckInDeskControlTests
         btnRecord.Enabled.ShouldBeFalse();
         btnOverride.Enabled.ShouldBeTrue();
         banner.State.ShouldBe(BannerState.Denied);
+        banner.Details.ShouldNotBeNull();
+        banner.Details.ShouldContain("10:00");
     }
 
     [Fact]
@@ -231,7 +282,7 @@ public sealed class CheckInDeskControlTests
         flowCounters.Controls.Count.ShouldBe(2);
 
         var firstCounter = flowCounters.Controls[0].ShouldBeOfType<CounterInput>();
-        firstCounter.Title.ShouldBe("بالغ:");
+        firstCounter.Title.ShouldBe("بالغ (Alt+1):");
         firstCounter.Value.ShouldBe(0);
     }
 
@@ -432,6 +483,137 @@ public sealed class CheckInDeskControlTests
         txtCard.SelectionLength.ShouldBe(txtCard.Text.Length);
     }
 
+    [Theory]
+    [InlineData(0)]   // the desk is freed for the next visitor
+    [InlineData(-1)]  // the holder stays on screen
+    public async Task CheckInDeskControl_AfterAGrantedEntry_OffersTheGiftWithoutASecondScan(int autoResetDelayMs)
+    {
+        // R5.14: BR-30 needs today's granted entry, so before the entry the gift is not offered; after it the
+        // operator presses F6 for the same visitor instead of scanning the card again.
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 1, OrganizationName: "صندوق التضامن", CardNumber: "100200",
+            FullName: "محمد أحمد علي", Phone: "0912345678", NationalId: null, CardExpiryDate: null,
+            Status: BeneficiaryStatus.Active, StatusReason: null, LastGrantedEntryUtc: null, Notes: null,
+            CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var gifts = new CountingGiftService();
+        using var control = TestUi.Create<CheckInDeskControl>(new FakeCheckInService(), gifts);
+        control.AutoResetDelayMs = autoResetDelayMs;
+        control.ShowHolderInfo(holder, eligibility);
+        gifts.EntryRecorded = true;
+
+        await control.RecordEntryAsync();
+
+        gifts.LastBeneficiaryId.ShouldBe(holder.Id);
+        var panel = GetField<GiftOfferPanel>(control, "_giftPanel");
+        GetField<Button>(panel, "_btnIssue").Enabled.ShouldBeTrue();
+        GetField<Label>(panel, "_lblDetails").Text.ShouldContain(holder.FullName);
+    }
+
+    [Fact]
+    public async Task GiftOfferPanel_StaleLoadAfterANewScan_IsDiscarded()
+    {
+        var gifts = new CountingGiftService { EntryRecorded = true, Gate = new TaskCompletionSource() };
+        var panel = TestUi.CreateGiftPanel(gifts);
+
+        var stale = panel.LoadAsync(Guid.NewGuid(), "زائر سابق");
+        panel.Clear(); // the next visitor's lookup clears the panel
+        gifts.Gate.SetResult();
+        await stale;
+
+        GetField<Button>(panel, "_btnIssue").Enabled.ShouldBeFalse();
+        GetField<Label>(panel, "_lblDetails").Text.ShouldNotContain("زائر سابق");
+    }
+
+    private sealed class CountingGiftService : ParkGate.Application.GiftVouchers.Services.IGiftVoucherService
+    {
+        public bool EntryRecorded { get; set; }
+
+        public Guid? LastBeneficiaryId { get; private set; }
+
+        public TaskCompletionSource? Gate { get; set; }
+
+        public async Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto>> GetEligibilityAsync(Guid beneficiaryId, CancellationToken ct = default)
+        {
+            LastBeneficiaryId = beneficiaryId;
+            if (Gate != null)
+            {
+                await Gate.Task;
+            }
+
+            return ParkGate.Application.Common.Result.Success(EntryRecorded
+                ? new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(true, null, null, null, false, 10m, null)
+                : new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(false, GiftDenialReason.NoEntryToday, "Gift.NoEntryToday", null, false, 10m, null));
+        }
+
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.IssuedGiftVoucherDto>> IssueAsync(ParkGate.Application.GiftVouchers.DTOs.IssueGiftVoucherRequest request, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.IssuedGiftVoucherDto>> IssueOverrideAsync(ParkGate.Application.GiftVouchers.DTOs.IssueGiftOverrideRequest request, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.GiftRedemptionDto>> RedeemAsync(string? scannedText, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<ParkGate.Application.Common.Result> VoidAsync(ParkGate.Application.GiftVouchers.DTOs.VoidGiftVoucherRequest request, string? supervisorUserId = null, CancellationToken ct = default) => throw new NotImplementedException();
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_CompanionsFromTheLastVisit_AreMarkedUntilTheOperatorChangesOne()
+    {
+        // R5.5: prefilled counts must not pass unnoticed; they are marked until the operator touches a counter.
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 1, OrganizationName: "صندوق التضامن", CardNumber: "100200",
+            FullName: "محمد أحمد علي", Phone: "0912345678", NationalId: null, CardExpiryDate: null,
+            Status: BeneficiaryStatus.Active, StatusReason: null, LastGrantedEntryUtc: DateTime.UtcNow.AddDays(-3),
+            Notes: null, CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: holder.LastGrantedEntryUtc,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var beneficiaries = new FakeBeneficiaryService
+        {
+            LookupReturnResult = [new BeneficiaryLookupResultDto(holder, eligibility, [new CompanionCountDto(1, "طفل", 2)])]
+        };
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries);
+        control.PopulateAgeCategories([new AgeCategoryDto(1, "طفل", "أطفال", 1, true), new AgeCategoryDto(2, "بالغ", "بالغون", 2, true)]);
+        typeof(CheckInDeskControl).GetField("_prefillFromLastVisit", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(control, true);
+        GetField<TextBox>(control, "_txtCardNumber").Text = "100200";
+
+        await control.LookupCardAsync();
+
+        var counters = GetField<List<CounterInput>>(control, "_counterInputs");
+        var total = GetField<Label>(control, "_lblTotalPersons");
+        counters[0].Value.ShouldBe(2);
+        total.Text.ShouldContain(Strings.Label_FromLastVisit);
+        counters.ShouldAllBe(c => c.IsMarkedAsPrefilled);
+
+        counters[1].Increment();
+
+        total.Text.ShouldNotContain(Strings.Label_FromLastVisit);
+        counters.ShouldAllBe(c => !c.IsMarkedAsPrefilled);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_NoCompanionsLastVisit_ShowsNoMark()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 1, OrganizationName: "صندوق التضامن", CardNumber: "100201",
+            FullName: "سالم علي", Phone: "0912345678", NationalId: null, CardExpiryDate: null,
+            Status: BeneficiaryStatus.Active, StatusReason: null, LastGrantedEntryUtc: null,
+            Notes: null, CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var beneficiaries = new FakeBeneficiaryService { LookupReturnResult = [new BeneficiaryLookupResultDto(holder, eligibility, [])] };
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries);
+        control.PopulateAgeCategories([new AgeCategoryDto(1, "طفل", "أطفال", 1, true)]);
+        typeof(CheckInDeskControl).GetField("_prefillFromLastVisit", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(control, true);
+        GetField<TextBox>(control, "_txtCardNumber").Text = "100201";
+
+        await control.LookupCardAsync();
+
+        GetField<Label>(control, "_lblTotalPersons").Text.ShouldNotContain(Strings.Label_FromLastVisit);
+    }
+
     [Fact]
     public async Task CheckInDeskControl_RecordEntryAsync_SendsRequestAndRefreshesDesk()
     {
@@ -540,6 +722,37 @@ public sealed class CheckInDeskControlTests
 
         beneficiaries.LastRegisterRequest.ShouldNotBeNull();
         beneficiaries.LastRegisterRequest.OrganizationId.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_Success_SaysSoInTheBannerWithoutAMessageBox()
+    {
+        var holder = new BeneficiaryDto(
+            Id: Guid.NewGuid(), OrganizationId: 2, OrganizationName: "صندوق التضامن", CardNumber: "560",
+            FullName: "سالم محمود علي الورفلي", Phone: "0912345678", NationalId: null,
+            CardExpiryDate: null, Status: BeneficiaryStatus.Active, StatusReason: null,
+            LastGrantedEntryUtc: null, Notes: null, CreatedAtUtc: DateTime.UtcNow);
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: true, Result: EntryResult.Allowed, DenialReason: null, DenialReasonText: string.Empty,
+            CanBeOverridden: false, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: null,
+            NextAllowedEntryUtc: null, RemainingCooldownMinutes: null);
+        var beneficiaries = new FakeBeneficiaryService { RegisterSucceedsWith = new BeneficiaryLookupResultDto(holder, eligibility, []) };
+        var notify = new FakeNotifyService(confirmAnswer: true);
+        var orgs = new FakeOrganizationService(
+            new ParkGate.Application.Organizations.DTOs.OrganizationDto(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true));
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries, orgs, notify);
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "560";
+
+        control.ShowInlineRegistration("560", orgId: 2);
+        await FillAndSaveRegistrationAsync(control);
+
+        notify.InfoCalls.ShouldBe(0);
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        banner.State.ShouldBe(BannerState.Granted);
+        banner.Details.ShouldBe(Strings.Ui_CheckInDesk_10);
+        GetField<GroupBox>(control, "_grpHolder").Visible.ShouldBeTrue();
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeTrue();
     }
 
     [Fact]
@@ -1026,9 +1239,18 @@ public sealed class CheckInDeskControlTests
 
         public RegisterBeneficiaryRequest? LastRegisterRequest { get; private set; }
 
+        /// <summary>When set, registration succeeds and the holder is found on the next lookup.</summary>
+        public BeneficiaryLookupResultDto? RegisterSucceedsWith { get; set; }
+
         public Task<ParkGate.Application.Common.Result<BeneficiaryDto>> RegisterAsync(RegisterBeneficiaryRequest request, CancellationToken cancellationToken = default)
         {
             LastRegisterRequest = request;
+            if (RegisterSucceedsWith is { } registered)
+            {
+                LookupReturnResult = [registered];
+                return Task.FromResult(ParkGate.Application.Common.Result.Success(registered.Beneficiary));
+            }
+
             return Task.FromResult(ParkGate.Application.Common.Result.Failure<BeneficiaryDto>(ParkGate.Application.Common.Errors.General.NotFound));
         }
 
@@ -1063,7 +1285,9 @@ public sealed class CheckInDeskControlTests
     {
         public int ConfirmCalls { get; private set; }
 
-        public void Info(string message, string? title = null) { }
+        public int InfoCalls { get; private set; }
+
+        public void Info(string message, string? title = null) => InfoCalls++;
         public void Warning(string message, string? title = null) { }
         public void Error(string message, string? title = null) { }
 

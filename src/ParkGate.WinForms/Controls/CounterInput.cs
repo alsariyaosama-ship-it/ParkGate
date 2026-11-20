@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 using ParkGate.Domain.Common;
+using ParkGate.WinForms.Common;
 
 namespace ParkGate.WinForms.Controls;
 
@@ -17,6 +18,9 @@ public partial class CounterInput : UserControl
     private bool _isUpdatingText;
 
     public event EventHandler? ValueChanged;
+
+    /// <summary>Enter in the value box (R5.4): the desk records the entry.</summary>
+    public event EventHandler? ConfirmRequested;
 
     public CounterInput()
     {
@@ -96,6 +100,25 @@ public partial class CounterInput : UserControl
         Value = _minValue;
     }
 
+    /// <summary>Puts the cursor in the value box with the number selected, ready to type over (R5.4).</summary>
+    public void FocusValue()
+    {
+        _txtValue.Focus();
+        _txtValue.SelectAll();
+    }
+
+    /// <summary>True while the value still comes from the visitor's last visit (R5.5).</summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool IsMarkedAsPrefilled { get; private set; }
+
+    /// <summary>Tints the value box while it shows the last visit's count, so it does not pass unnoticed.</summary>
+    public void MarkAsPrefilled(bool marked)
+    {
+        IsMarkedAsPrefilled = marked;
+        _txtValue.BackColor = marked ? Theme.WarningTint : Theme.Surface;
+    }
+
     private void WireEvents()
     {
         _btnDecrement.Click += (_, _) => Decrement();
@@ -159,16 +182,28 @@ public partial class CounterInput : UserControl
 
     private void OnTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.KeyCode == Keys.Up)
+        switch (e.KeyCode)
         {
-            Increment();
-            e.Handled = true;
+            case Keys.Up:
+            case Keys.Add:
+            case Keys.Oemplus: // «+» is Shift with this key, «=» without; both count up
+                Increment();
+                break;
+            case Keys.Down:
+            case Keys.Subtract:
+            case Keys.OemMinus:
+                Decrement();
+                break;
+            case Keys.Enter:
+                ConfirmRequested?.Invoke(this, EventArgs.Empty);
+                break;
+            default:
+                return;
         }
-        else if (e.KeyCode == Keys.Down)
-        {
-            Decrement();
-            e.Handled = true;
-        }
+
+        // The key is a command, not text: «+» must not end up in the value box.
+        e.Handled = true;
+        e.SuppressKeyPress = true;
     }
 
     private void OnControlLeave(object? sender, EventArgs e)

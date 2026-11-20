@@ -34,7 +34,7 @@ public static class Theme
 
     // Semantic Status Colors
     public static readonly Color Success = Color.FromArgb(27, 135, 63);
-    public static readonly Color Warning = Color.FromArgb(178, 106, 0);
+    public static readonly Color Warning = Color.FromArgb(154, 91, 0);
     public static readonly Color Danger = Color.FromArgb(198, 40, 40);
     public static readonly Color Info = Color.FromArgb(2, 132, 199);
     public static readonly Color Accent = Color.FromArgb(0, 137, 123);
@@ -48,6 +48,8 @@ public static class Theme
     public static Font BodyBold => AppFont.CreateFont(10F, FontStyle.Bold);
     public static Font Section => AppFont.CreateFont(12F, FontStyle.Bold);
     public static Font Title => AppFont.CreateFont(14F, FontStyle.Bold);
+    /// <summary>Desk card number box (R5.3): the one input read from a distance.</summary>
+    public static Font CardNumber => AppFont.CreateFont(16F, FontStyle.Bold);
     public static Font Caption => AppFont.CreateFont(9F, FontStyle.Regular);
     public static Font Banner => AppFont.CreateFont(20F, FontStyle.Bold);
 
@@ -59,6 +61,9 @@ public static class Theme
     public const int S5 = 24;
     public const int S6 = 32;
     public const int ControlHeight = 36;
+
+    /// <summary>Grid row height in logical pixels (96 dpi); scaled to the grid's DPI (R5.19).</summary>
+    public const int GridRowHeight = 32;
 
     /// <summary>
     /// Applies the standard modern DataGridView styling per winforms-ui-design skill §6.
@@ -83,8 +88,10 @@ public static class Theme
 
         g.EnableHeadersVisualStyles = false;
         g.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-        g.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-        g.ColumnHeadersHeight = 44;
+        // R5.19: one header line, sized for the grid's DPI; a fixed 44 px hid wrapped text at 125 %, and Arabic
+        // wraps inside words. FitColumnsToHeaders keeps every header readable.
+        g.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        g.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False;
         g.ColumnHeadersDefaultCellStyle.BackColor = SurfaceMuted;
         g.ColumnHeadersDefaultCellStyle.ForeColor = TextSecondary;
         g.ColumnHeadersDefaultCellStyle.SelectionBackColor = SurfaceMuted;
@@ -92,7 +99,7 @@ public static class Theme
         g.ColumnHeadersDefaultCellStyle.Font = AppFont.CreateFont(10F, FontStyle.Bold);
         g.ColumnHeadersDefaultCellStyle.Padding = new Padding(12, 0, 12, 0);
 
-        g.RowTemplate.Height = 40;
+        g.RowTemplate.Height = g.LogicalToDeviceUnits(GridRowHeight);
         g.DefaultCellStyle.BackColor = Surface;
         g.DefaultCellStyle.ForeColor = TextPrimary;
         g.DefaultCellStyle.SelectionBackColor = Selection;
@@ -106,6 +113,24 @@ public static class Theme
             .GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)
             ?.SetValue(g, true, null);
     }
+
+    /// <summary>
+    /// R5.19: no column narrower than its header text, so a header is never cut. When the columns do not fit, the
+    /// grid scrolls sideways instead. Call after the columns are added, and again once the window has its DPI.
+    /// </summary>
+    public static void FitColumnsToHeaders(DataGridView g)
+    {
+        var font = g.ColumnHeadersDefaultCellStyle.Font ?? g.Font;
+        var padding = g.ColumnHeadersDefaultCellStyle.Padding.Horizontal + g.LogicalToDeviceUnits(HeaderTextSlack);
+        foreach (DataGridViewColumn column in g.Columns)
+        {
+            var text = TextRenderer.MeasureText(column.HeaderText ?? string.Empty, font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.SingleLine | TextFormatFlags.NoPadding);
+            column.MinimumWidth = Math.Max(column.MinimumWidth, text.Width + padding);
+        }
+    }
+
+    // Room for the sort glyph the header keeps, plus a little air.
+    private const int HeaderTextSlack = 32;
 
     /// <summary>
     /// Applies primary accent button styling (Emerald Green, Flat, Hand cursor).

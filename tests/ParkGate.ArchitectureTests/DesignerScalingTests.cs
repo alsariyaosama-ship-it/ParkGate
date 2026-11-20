@@ -25,7 +25,8 @@ public sealed class DesignerScalingTests
     public void FormsAndControls_UseTheTypeScale()
     {
         // R7.2: Caption 9, Body 10, Section 12, Title 14, Banner 20 (Theme). Seven sizes between 9 and 12.5 were mixed.
-        double[] scale = [9, 10, 12, 14, 20];
+        // R5.3 adds CardNumber 16 for the desk's card box.
+        double[] scale = [9, 10, 12, 14, 16, 20];
         var root = FindRepoRoot();
         var offenders = Directory.EnumerateFiles(Path.Combine(root, "src", "ParkGate.WinForms"), "*.cs", SearchOption.AllDirectories)
             .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") &&
@@ -36,7 +37,7 @@ public sealed class DesignerScalingTests
                 .Select(size => $"{Path.GetRelativePath(root, f)}: {size}"))
             .ToList();
 
-        offenders.ShouldBeEmpty("Use a Theme size: 9, 10, 12, 14 or 20 pt.");
+        offenders.ShouldBeEmpty("Use a Theme size: 9, 10, 12, 14, 16 or 20 pt.");
     }
 
     [Fact]

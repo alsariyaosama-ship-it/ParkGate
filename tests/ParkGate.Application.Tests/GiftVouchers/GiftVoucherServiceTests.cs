@@ -723,4 +723,76 @@ public sealed class GiftVoucherServiceTests : IDisposable
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("General.ValidationFailed");
     }
+
+    // ── R5.18: every gift operation is traced with who, when and the full context ─────────────
+
+    [Fact]
+    public async Task Audit_GiftIssued_NamesTheVisitorCardOrganizationDayAndOperator()
+    {
+        var issued = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+
+        var row = _uowFactory.CurrentUow.AuditLogRows.Single(r => r.Action == "Gift.Issued");
+        var d = AuditDetailsOf(row);
+        ShouldHaveFields(d, "ReceiptNo", "Value", "BeneficiaryId", "CardNumber", "HolderName", "OrganizationId", "BusinessDate", "OperatorUserId");
+        d.GetProperty("ReceiptNo").GetInt32().ShouldBe(issued.Value.ReceiptNo);
+        d.GetProperty("CardNumber").GetString().ShouldBe("CARD-001");
+        d.GetProperty("OperatorUserId").GetInt32().ShouldBe(_operatorUser.Id);
+        row.UserId.ShouldBe(_operatorUser.Id);
+        row.WorkstationId.ShouldBe(_workstation.Id);
+    }
+
+    [Fact]
+    public async Task Audit_GiftIssuedOverride_RecordsOperatorApproverAndReason()
+    {
+        await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+
+        await _sut.IssueOverrideAsync(new IssueGiftOverrideRequest(_holder.Id, "manager authorized", _approvals.Issue(_supervisorUser.Id, _workstation.Id)));
+
+        var d = AuditDetailsOf(_uowFactory.CurrentUow.AuditLogRows.Single(r => r.Action == "Gift.IssuedOverride"));
+        ShouldHaveFields(d, "ReceiptNo", "Value", "BeneficiaryId", "CardNumber", "HolderName", "OrganizationId", "BusinessDate", "Reason");
+        d.GetProperty("OperatorUserId").GetInt32().ShouldBe(_operatorUser.Id);
+        d.GetProperty("ApprovedByUserId").GetInt32().ShouldBe(_supervisorUser.Id);
+    }
+
+    [Fact]
+    public async Task Audit_GiftRedeemed_RecordsWhoIssuedAndWhoRedeemed()
+    {
+        var issued = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+
+        await _sut.RedeemAsync(issued.Value.QrText);
+
+        var d = AuditDetailsOf(_uowFactory.CurrentUow.AuditLogRows.Single(r => r.Action == "Gift.Redeemed"));
+        ShouldHaveFields(d, "ReceiptNo", "Value", "BeneficiaryId", "CardNumber", "HolderName", "OrganizationId", "IssuedAtUtc", "IssuedByUserId", "BusinessDate", "OperatorUserId");
+    }
+
+    [Fact]
+    public async Task Audit_GiftVoided_WithSupervisorApproval_RecordsOperatorApproverReasonAndVoucher()
+    {
+        var issued = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+
+        await _sut.VoidAsync(new VoidGiftVoucherRequest(issued.Value.ReceiptNo, "printing mistake"), _approvals.Issue(_supervisorUser.Id, _workstation.Id));
+
+        var row = _uowFactory.CurrentUow.AuditLogRows.Single(r => r.Action == "Gift.Voided");
+        var d = AuditDetailsOf(row);
+        ShouldHaveFields(d, "ReceiptNo", "Value", "BeneficiaryId", "CardNumber", "HolderName", "OrganizationId", "IssuedAtUtc", "Reason");
+        d.GetProperty("Reason").GetString().ShouldBe("printing mistake");
+        d.GetProperty("OperatorUserId").GetInt32().ShouldBe(_operatorUser.Id);
+        d.GetProperty("ApprovedByUserId").GetInt32().ShouldBe(_supervisorUser.Id);
+        row.UserId.ShouldBe(_supervisorUser.Id);
+        row.WorkstationId.ShouldBe(_workstation.Id);
+    }
+
+    private static System.Text.Json.JsonElement AuditDetailsOf(AuditLog row)
+    {
+        row.DetailsJson.ShouldNotBeNull($"{row.Action} has no details");
+        return System.Text.Json.JsonDocument.Parse(row.DetailsJson).RootElement;
+    }
+
+    private static void ShouldHaveFields(System.Text.Json.JsonElement details, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            details.TryGetProperty(name, out _).ShouldBeTrue($"missing {name} in {details}");
+        }
+    }
 }

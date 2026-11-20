@@ -38,8 +38,8 @@ partial class ChangePasswordForm
         this.lblConfirmNewPassword = new System.Windows.Forms.Label();
         this.txtConfirmNewPassword = new System.Windows.Forms.TextBox();
         this.flowLayoutPanelButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this.btnChange = new System.Windows.Forms.Button();
-        this.btnCancel = new System.Windows.Forms.Button();
+        this.btnChange = new ParkGate.WinForms.Controls.RtlButton();
+        this.btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this.tableLayoutPanelMain.SuspendLayout();
         this.flowLayoutPanelButtons.SuspendLayout();
         this.SuspendLayout();

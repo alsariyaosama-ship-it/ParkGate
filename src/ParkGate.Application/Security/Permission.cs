@@ -34,6 +34,9 @@ public enum Permission
     OverrideGiftInterval,
     VoidGift,
 
+    // Audit trail (R5.20)
+    ViewAuditLog,
+
     // Personal data (SPEC §8): without it, national IDs are masked except the last four digits
     ViewFullNationalId
 }

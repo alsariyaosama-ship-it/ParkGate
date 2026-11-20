@@ -56,6 +56,11 @@ public partial class InlineRegistrationPanel : UserControl
     /// <summary>The save and cancel buttons, for the desk's busy scope while saving.</summary>
     public Control[] ActionButtons => [_btnSaveReg, _btnCancelReg];
 
+    /// <summary>Enter and Esc buttons for a dialog that hosts this panel (R5.15).</summary>
+    public IButtonControl SaveButton => _btnSaveReg;
+
+    public IButtonControl CancelButtonControl => _btnCancelReg;
+
     public void SetOrganizations(IEnumerable<(int Id, string Name)> organizations)
     {
         _cmbRegOrganization.Items.Clear();

@@ -27,8 +27,8 @@ partial class ResetUserPasswordDialog
         this._lblConfirmPasswordPrompt = new System.Windows.Forms.Label();
         this._txtConfirmPassword = new System.Windows.Forms.TextBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSave = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         this._pnlButtons.SuspendLayout();
@@ -217,6 +217,6 @@ partial class ResetUserPasswordDialog
     private System.Windows.Forms.Label _lblConfirmPasswordPrompt;
     private System.Windows.Forms.TextBox _txtConfirmPassword;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnSave;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

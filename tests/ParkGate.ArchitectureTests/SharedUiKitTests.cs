@@ -69,7 +69,7 @@ public sealed class SharedUiKitTests
 
         banner.State.ShouldBe(BannerState.Warning);
         banner.BackColor.ShouldBe(StatusBanner.ColorWarning);
-        banner.BackColor.ShouldBe(Color.FromArgb(178, 106, 0)); // #B26A00 per AGENTS.md §5.10
+        banner.BackColor.ShouldBe(Color.FromArgb(154, 91, 0)); // #9A5B00 per AGENTS.md §5.10
     }
 
     [Fact]

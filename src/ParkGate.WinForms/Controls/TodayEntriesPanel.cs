@@ -21,7 +21,12 @@ public partial class TodayEntriesPanel : UserControl
         InitializeComponent();
         Theme.ApplyGridStyle(_gridToday);
 
-        _grpToday.Text = Strings.Title_TodayDesk;
+        // R5.8: compact rows so five fit on a 1366x768 desk at 100 %; the title moved into the totals line.
+        _gridToday.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing; // one-word headers
+        _gridToday.ColumnHeadersHeight = LogicalToDeviceUnits(CompactHeaderHeight);
+        _gridToday.RowTemplate.Height = LogicalToDeviceUnits(CompactRowHeight);
+        _gridToday.DefaultCellStyle.Padding = new Padding(3, 0, 3, 0);
+        _lblTodayTitle.Text = Strings.Title_TodayDesk;
         _colTime.HeaderText = Strings.Col_Time;
         _colCard.HeaderText = Strings.Col_CardNumber;
         _colName.HeaderText = Strings.Col_HolderName;
@@ -52,7 +57,22 @@ public partial class TodayEntriesPanel : UserControl
         };
 
         _todayContextMenu.Opening += (_, e) => e.Cancel = SelectedVoidableAttempt == null;
+
+        // R5.6: the same action as a visible button (F8 on the desk); the context menu stays.
+        Theme.ApplySecondaryButtonStyle(_btnVoid);
+        _btnVoid.Text = Strings.Btn_VoidTodayEntry;
+        _btnVoid.Click += (_, _) =>
+        {
+            if (SelectedVoidableAttempt != null)
+            {
+                VoidRequested?.Invoke(this, EventArgs.Empty);
+            }
+        };
+        _gridToday.SelectionChanged += (_, _) => UpdateVoidButton();
     }
+
+    private const int CompactHeaderHeight = 30;
+    private const int CompactRowHeight = 28;
 
     public event EventHandler? VoidRequested;
 
@@ -95,7 +115,10 @@ public partial class TodayEntriesPanel : UserControl
         }
 
         _gridToday.ResumeLayout(true);
+        UpdateVoidButton();
     }
+
+    private void UpdateVoidButton() => _btnVoid.Enabled = SelectedVoidableAttempt != null;
 
     private void AddRow(TodayDeskAttemptDto item, string? timeZoneId)
     {

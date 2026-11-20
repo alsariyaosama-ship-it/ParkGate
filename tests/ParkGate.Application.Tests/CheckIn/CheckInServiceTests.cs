@@ -539,4 +539,64 @@ public sealed class CheckInServiceTests
         result.Value.PersonsPerCategory.ShouldContain(c => c.AgeCategoryId == _childCategory.Id && c.Count == 60);
         result.Value.RecentAttempts.Count.ShouldBe(20);
     }
+
+    // ── R5.18: every entry operation is traced with who, when and the full context ────────────
+
+    [Fact]
+    public async Task Audit_EntryGranted_NamesTheVisitorCompanionsDayAndOperator()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-AUD1"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        await _sut.RecordEntryAsync(new RecordEntryRequest(holder.Id, [new(_childCategory.Id, 2)]));
+
+        var d = AuditDetailsOf(_uowFactory.CurrentUow.AuditLogRows.Single(r => r.Action == "EntryGranted"));
+        ShouldHaveFields(d, "BeneficiaryId", "CardNumber", "HolderName", "OrganizationId", "BusinessDate", "TotalPersons", "Companions", "Channel", "OperatorUserId");
+        d.GetProperty("TotalPersons").GetInt32().ShouldBe(3);
+        d.GetProperty("Companions").GetArrayLength().ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Audit_EntryOverridden_RecordsOperatorApproverAndReason()
+    {
+        var holder = HolderInCooldown("CARD-AUD2");
+
+        await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "حالة خاصة جدا", SupervisorApprovalToken: _approvals.Issue(2, 1)));
+
+        var d = AuditDetailsOf(_uowFactory.CurrentUow.AuditLogRows.Single(r => r.Action == "EntryOverridden"));
+        ShouldHaveFields(d, "BeneficiaryId", "CardNumber", "HolderName", "OrganizationId", "BusinessDate", "TotalPersons", "Reason");
+        d.GetProperty("OperatorUserId").GetInt32().ShouldBe(1);
+        d.GetProperty("ApprovedByUserId").GetInt32().ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Audit_EntryVoided_RecordsTheOriginalEntryOperatorApproverAndReason()
+    {
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-AUD3"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+        var at = _uowFactory.CurrentUow.CurrentDbTime.AddHours(-1);
+        var attempt = EntryAttempt.CreateAllowed(Guid.NewGuid(), holder.Id, _org.Id, at, DateOnly.FromDateTime(at), 720, at.AddHours(12), 1, 1, EntryChannel.Desk);
+        _attempts.Add(attempt);
+
+        await _sut.VoidEntryAsync(new VoidEntryRequest(attempt.Id, "Wrong visitor recorded"), _approvals.Issue(2, 1));
+
+        var d = AuditDetailsOf(_uowFactory.CurrentUow.AuditLogRows.Single(r => r.Action == "EntryVoided"));
+        ShouldHaveFields(d, "BeneficiaryId", "CardNumber", "HolderName", "OrganizationId", "BusinessDate", "AttemptedAtUtc", "OriginalResult", "TotalPersons", "Reason", "VoidedGiftReceipts");
+        d.GetProperty("OperatorUserId").GetInt32().ShouldBe(1);
+        d.GetProperty("ApprovedByUserId").GetInt32().ShouldBe(2);
+    }
+
+    private static System.Text.Json.JsonElement AuditDetailsOf(AuditLog row)
+    {
+        row.DetailsJson.ShouldNotBeNull($"{row.Action} has no details");
+        return System.Text.Json.JsonDocument.Parse(row.DetailsJson).RootElement;
+    }
+
+    private static void ShouldHaveFields(System.Text.Json.JsonElement details, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            details.TryGetProperty(name, out _).ShouldBeTrue($"missing {name} in {details}");
+        }
+    }
 }

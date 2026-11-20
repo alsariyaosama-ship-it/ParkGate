@@ -15,14 +15,14 @@ public enum BannerState
 
 /// <summary>
 /// Status banner control conforming to SPEC §5.3 zone 3 and AGENTS.md §5.10:
-/// Granted (#1B873F), Denied (#C62828), Warning (#B26A00), Neutral (#455A64).
+/// Granted (#1B873F), Denied (#C62828), Warning (#9A5B00), Neutral (#455A64).
 /// Text size >= 20 pt bold with clear Arabic wording.
 /// </summary>
 public partial class StatusBanner : UserControl
 {
     public static readonly Color ColorGranted = Color.FromArgb(27, 135, 63);   // #1B873F
     public static readonly Color ColorDenied = Color.FromArgb(198, 40, 40);    // #C62828
-    public static readonly Color ColorWarning = Color.FromArgb(178, 106, 0);   // #B26A00
+    public static readonly Color ColorWarning = Color.FromArgb(154, 91, 0);   // #9A5B00
     public static readonly Color ColorNeutral = Color.FromArgb(69, 90, 100);   // #455A64
 
     private BannerState _state = BannerState.Neutral;

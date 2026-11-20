@@ -25,8 +25,8 @@ partial class ChangeUserRoleDialog
         this._lblRolePrompt = new System.Windows.Forms.Label();
         this._cmbRole = new System.Windows.Forms.ComboBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnSave = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
+        this._btnSave = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._tblLayout.SuspendLayout();
         this._pnlButtons.SuspendLayout();
@@ -190,6 +190,6 @@ partial class ChangeUserRoleDialog
     private System.Windows.Forms.Label _lblRolePrompt;
     private System.Windows.Forms.ComboBox _cmbRole;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
-    private System.Windows.Forms.Button _btnSave;
-    private System.Windows.Forms.Button _btnCancel;
+    private ParkGate.WinForms.Controls.RtlButton _btnSave;
+    private ParkGate.WinForms.Controls.RtlButton _btnCancel;
 }

@@ -17,11 +17,11 @@ partial class GiftOfferPanel
 
     private void InitializeComponent()
     {
-        this._grpMain = new System.Windows.Forms.GroupBox();
+        this._grpMain = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._tblContent = new System.Windows.Forms.TableLayoutPanel();
         this._flowButtons = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnIssue = new System.Windows.Forms.Button();
-        this._btnIssueOverride = new System.Windows.Forms.Button();
+        this._btnIssue = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnIssueOverride = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlInfo = new System.Windows.Forms.Panel();
         this._lblDetails = new System.Windows.Forms.Label();
         this._lblStatus = new System.Windows.Forms.Label();
@@ -40,12 +40,11 @@ partial class GiftOfferPanel
         this._grpMain.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._grpMain.Location = new System.Drawing.Point(0, 0);
         this._grpMain.Name = "_grpMain";
-        this._grpMain.Padding = new System.Windows.Forms.Padding(8, 4, 8, 4);
+        this._grpMain.Padding = new System.Windows.Forms.Padding(8, 2, 8, 2);
         this._grpMain.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this._grpMain.Size = new System.Drawing.Size(988, 84);
+        this._grpMain.Size = new System.Drawing.Size(988, 46);
         this._grpMain.TabIndex = 0;
         this._grpMain.TabStop = false;
-        this._grpMain.Text = "قسيمة هدية الألعاب";
         // 
         // _tblContent
         // 
@@ -96,7 +95,7 @@ partial class GiftOfferPanel
         // 
         // _btnIssueOverride
         // 
-        this._btnIssueOverride.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(106)))), ((int)(((byte)(0)))));
+        this._btnIssueOverride.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
         this._btnIssueOverride.Cursor = System.Windows.Forms.Cursors.Hand;
         this._btnIssueOverride.FlatAppearance.BorderSize = 0;
         this._btnIssueOverride.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -124,8 +123,9 @@ partial class GiftOfferPanel
         // 
         // _lblDetails
         // 
-        this._lblDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+        this._lblDetails.AutoEllipsis = true;
+        this._lblDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._lblDetails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
         this._lblDetails.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._lblDetails.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
         this._lblDetails.Location = new System.Drawing.Point(4, 18);
@@ -135,8 +135,9 @@ partial class GiftOfferPanel
         // 
         // _lblStatus
         // 
-        this._lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+        this._lblStatus.AutoSize = true;
+        this._lblStatus.Dock = System.Windows.Forms.DockStyle.Right;
+        this._lblStatus.Padding = new System.Windows.Forms.Padding(0, 6, 8, 0);
         this._lblStatus.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this._lblStatus.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(135)))), ((int)(((byte)(63)))));
         this._lblStatus.Location = new System.Drawing.Point(4, 0);
@@ -162,12 +163,12 @@ partial class GiftOfferPanel
         this.ResumeLayout(false);
     }
 
-    private System.Windows.Forms.GroupBox _grpMain;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpMain;
     private System.Windows.Forms.TableLayoutPanel _tblContent;
     private System.Windows.Forms.Panel _pnlInfo;
     private System.Windows.Forms.Label _lblStatus;
     private System.Windows.Forms.Label _lblDetails;
     private System.Windows.Forms.FlowLayoutPanel _flowButtons;
-    private System.Windows.Forms.Button _btnIssue;
-    private System.Windows.Forms.Button _btnIssueOverride;
+    private ParkGate.WinForms.Controls.RtlButton _btnIssue;
+    private ParkGate.WinForms.Controls.RtlButton _btnIssueOverride;
 }

@@ -53,7 +53,11 @@ public partial class CheckInDeskControl : UserControl
     private IReadOnlyList<int> _registeredElsewhereOrgIds = [];
     private int _maxGroupSize = 10;
     private bool _prefillFromLastVisit;
+    private bool _companionsPrefilled; // R5.5: counts came from the last visit and nobody has touched them yet
+    private bool _isPrefilling;
     private bool _denialSoundEnabled;
+    private bool _successSoundEnabled;
+    private readonly IDeskSounds _deskSounds;
     private string? _timeZoneId = "Libya Standard Time";
     private bool _isSearching;
 
@@ -78,9 +82,11 @@ public partial class CheckInDeskControl : UserControl
         ILogger<CheckInDeskControl> logger,
         ParkGate.Application.EntryCards.ICardScanService cardScanService,
         IGiftVoucherService giftVoucherService,
-        ILogger<GiftOfferPanel> giftPanelLogger)
+        ILogger<GiftOfferPanel> giftPanelLogger,
+        IDeskSounds deskSounds)
     {
         InitializeComponent();
+        ShowRegistrationModal = dialog => dialog.ShowDialog(FindForm());
 
         _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
         _checkInService = checkInService ?? throw new ArgumentNullException(nameof(checkInService));
@@ -91,6 +97,7 @@ public partial class CheckInDeskControl : UserControl
         _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
         _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
         _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
+        _deskSounds = deskSounds ?? throw new ArgumentNullException(nameof(deskSounds));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _cardScanService = cardScanService ?? throw new ArgumentNullException(nameof(cardScanService));
         _giftVoucherService = giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService));
@@ -190,6 +197,7 @@ public partial class CheckInDeskControl : UserControl
         };
         _btnClear.Click += (_, _) => ResetDesk();
         _btnNewHolder.Click += (_, _) => StartManualRegistration();
+        _flowCounters.ClientSizeChanged += (_, _) => ResizeCounters();
         _registrationPanel.CancelRequested += (_, _) => HideInlineRegistration();
         _registrationPanel.SaveRequested += async (_, _) => await SaveInlineRegistrationAsync();
         _btnRecordEntry.Click += async (_, _) => await RecordEntryAsync();
@@ -200,6 +208,11 @@ public partial class CheckInDeskControl : UserControl
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
+        if (FocusCounter(keyData))
+        {
+            return true;
+        }
+
         switch (keyData)
         {
             case Keys.F5:
@@ -234,6 +247,15 @@ public partial class CheckInDeskControl : UserControl
                 if (_giftPanel.CanIssueOverride)
                 {
                     _ = _giftPanel.IssueOverrideAsync();
+                    return true;
+                }
+                break;
+
+            case Keys.F8:
+                // R5.6: void the entry selected in today's grid (same as its button and context menu).
+                if (_todayPanel.SelectedVoidableAttempt != null)
+                {
+                    _ = VoidSelectedTodayEntryAsync();
                     return true;
                 }
                 break;
@@ -292,6 +314,7 @@ public partial class CheckInDeskControl : UserControl
             _maxGroupSize = settings.MaxGroupSize;
             _prefillFromLastVisit = settings.PrefillCompanionsFromLastVisit;
             _denialSoundEnabled = settings.DenialSoundEnabled;
+            _successSoundEnabled = settings.SuccessSoundEnabled;
             _timeZoneId = settings.TimeZoneId;
             _giftPanel.SetTimeZone(_timeZoneId);
         }
@@ -357,11 +380,15 @@ public partial class CheckInDeskControl : UserControl
 
         foreach (var cat in categories.OrderBy(c => c.SortOrder))
         {
+            // R5.4: Alt+1…9 goes to counter n; the title shows its shortcut.
+            var number = _counterInputs.Count + 1;
             var counter = new CounterInput
             {
-                Title = $"{cat.NameAr}:",
+                Title = number <= MaxCounterShortcut
+                    ? string.Format(Strings.Label_CounterWithShortcut, cat.NameAr, number)
+                    : $"{cat.NameAr}:",
                 Tag = cat.Id,
-                Width = Math.Max(260, _flowCounters.ClientSize.Width - 12),
+                Width = CounterWidth(),
                 Height = 56,
                 Margin = new Padding(2, 4, 2, 4),
                 MinValue = 0,
@@ -369,7 +396,8 @@ public partial class CheckInDeskControl : UserControl
                 Value = 0
             };
 
-            counter.ValueChanged += (_, _) => UpdateLiveTotalPersons();
+            counter.ValueChanged += (_, _) => OnCounterChanged();
+            counter.ConfirmRequested += async (_, _) => await RecordEntryFromCounterAsync();
             _counterInputs.Add(counter);
             _flowCounters.Controls.Add(counter);
         }
@@ -378,12 +406,96 @@ public partial class CheckInDeskControl : UserControl
         UpdateLiveTotalPersons();
     }
 
+    private const int MaxCounterShortcut = 9;
+    private const int MinCounterWidth = 220;
+
+    private void ResizeCounters()
+    {
+        var width = CounterWidth();
+        foreach (var counter in _counterInputs)
+        {
+            counter.Width = width;
+        }
+    }
+
+    /// <summary>R5.8: two counters per row, so four categories fit in the compact middle area.</summary>
+    private int CounterWidth() =>
+        Math.Max(LogicalToDeviceUnits(MinCounterWidth), (_flowCounters.ClientSize.Width - LogicalToDeviceUnits(16)) / 2);
+
+    // R5.7: each cue has its own setting (Entry.SuccessSoundEnabled, Entry.DenialSoundEnabled).
+    private void PlayGrantedSound()
+    {
+        if (_successSoundEnabled)
+        {
+            _deskSounds.PlayGranted();
+        }
+    }
+
+    private void PlayDeniedSound()
+    {
+        if (_denialSoundEnabled)
+        {
+            _deskSounds.PlayDenied();
+        }
+    }
+
+    /// <summary>Enter in a counter records the entry when it may be recorded (same rule as F5).</summary>
+    private async Task RecordEntryFromCounterAsync()
+    {
+        if (_btnRecordEntry.Enabled)
+        {
+            await RecordEntryAsync();
+        }
+    }
+
+    /// <summary>Alt+1…9: focus counter n (R5.4). False when there is no such counter.</summary>
+    private bool FocusCounter(Keys keyData)
+    {
+        if ((keyData & Keys.Modifiers) != Keys.Alt)
+        {
+            return false;
+        }
+
+        var key = keyData & Keys.KeyCode;
+        var number = key is >= Keys.D1 and <= Keys.D9 ? key - Keys.D1 + 1
+            : key is >= Keys.NumPad1 and <= Keys.NumPad9 ? key - Keys.NumPad1 + 1
+            : 0;
+        if (number == 0 || number > _counterInputs.Count)
+        {
+            return false;
+        }
+
+        _counterInputs[number - 1].FocusValue();
+        return true;
+    }
+
+    private void OnCounterChanged()
+    {
+        if (!_isPrefilling)
+        {
+            MarkCompanionsPrefilled(false);
+        }
+
+        UpdateLiveTotalPersons();
+    }
+
+    private void MarkCompanionsPrefilled(bool prefilled)
+    {
+        _companionsPrefilled = prefilled;
+        foreach (var counter in _counterInputs)
+        {
+            counter.MarkAsPrefilled(prefilled);
+        }
+    }
+
     private void UpdateLiveTotalPersons()
     {
         var companionsCount = _counterInputs.Sum(c => c.Value);
         var totalPersons = 1 + companionsCount; // BR-08: Holder counts as one person
 
-        _lblTotalPersons.Text = string.Format(Strings.Label_TotalPersons, totalPersons);
+        _lblTotalPersons.Text = _companionsPrefilled
+            ? $"{string.Format(Strings.Label_TotalPersons, totalPersons)} {Strings.Label_FromLastVisit}"
+            : string.Format(Strings.Label_TotalPersons, totalPersons);
 
         var limitExceeded = false;
         var maxFreeLimit = 0;
@@ -577,17 +689,14 @@ public partial class CheckInDeskControl : UserControl
                 if (eligibility.NextAllowedEntryUtc.HasValue)
                 {
                     var nextLocal = DateTimeDisplayHelper.ToParkLocalTime(eligibility.NextAllowedEntryUtc.Value, _timeZoneId);
-                    details = string.Format(Strings.Ui_CheckInDesk_02, DateTimeDisplayHelper.FormatDateTime(nextLocal), eligibility.EffectiveCooldownMinutes / 60);
+                    details = CooldownText.Format(nextLocal, eligibility.RemainingCooldownMinutes);
                 }
 
                 _statusBanner.SetDenied(reasonText, details);
                 _btnRecordEntry.Enabled = false;
                 _btnOverride.Enabled = eligibility.CanBeOverridden;
 
-                if (_denialSoundEnabled)
-                {
-                    System.Media.SystemSounds.Exclamation.Play();
-                }
+                PlayDeniedSound();
             }
         }
         else
@@ -613,6 +722,62 @@ public partial class CheckInDeskControl : UserControl
         _btnOverride.Enabled = false;
 
         _registrationPanel.FocusFullName();
+
+        // R5.15: the compact desk (R5.8) has no room for the fields, so they open in a pop-up once this call returns
+        // (the lookup that got here is still on the stack). A desk that is not on a shown window keeps them inline.
+        if (UseRegistrationDialog)
+        {
+            BeginInvoke(OpenRegistrationDialog);
+        }
+    }
+
+    private RegisterVisitorDialog? _registrationDialog;
+
+    private bool UseRegistrationDialog => IsHandleCreated && FindForm() is { Visible: true };
+
+    /// <summary>Test seam: shows the dialog modally over the desk's window.</summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal Func<RegisterVisitorDialog, DialogResult> ShowRegistrationModal { get; set; }
+
+    /// <summary>Moves the registration panel into a pop-up until the visitor is saved or the form is closed.</summary>
+    internal void OpenRegistrationDialog()
+    {
+        if (_registrationDialog != null || !_registrationPanel.Visible)
+        {
+            return;
+        }
+
+        var home = _registrationPanel.Parent;
+        using var dialog = _formFactory.Create<RegisterVisitorDialog>();
+        _registrationDialog = dialog;
+        dialog.Text = string.Format(Strings.Title_RegisterVisitor, DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim()));
+        dialog.ConfirmDiscard = ConfirmDiscardRegistration;
+        dialog.Shown += (_, _) => _registrationPanel.FocusFullName();
+        home?.Controls.Remove(_registrationPanel);
+        dialog.Host(_registrationPanel);
+        _grpHolder.Visible = true;
+
+        DialogResult result;
+        try
+        {
+            result = ShowRegistrationModal(dialog);
+        }
+        finally
+        {
+            dialog.Release(_registrationPanel);
+            home?.Controls.Add(_registrationPanel);
+            _registrationDialog = null;
+        }
+
+        if (result != DialogResult.OK)
+        {
+            // Closed or cancelled: back to the empty desk; the card number stays for another try.
+            HideInlineRegistration();
+            _registrationPanel.ClearFields();
+            _statusBanner.Reset();
+            FocusCardNumberBox();
+        }
     }
 
     /// <summary>
@@ -636,6 +801,13 @@ public partial class CheckInDeskControl : UserControl
 
     public void HideInlineRegistration()
     {
+        if (_registrationDialog is { } dialog && dialog.DialogResult == DialogResult.None)
+        {
+            // The panel's cancel button: close the pop-up without asking again.
+            dialog.ConfirmDiscard = null;
+            dialog.DialogResult = DialogResult.Cancel;
+        }
+
         _registrationPanel.Visible = false;
         _grpHolder.Visible = true;
     }
@@ -714,10 +886,7 @@ public partial class CheckInDeskControl : UserControl
                     if (!scanResult.IsAccepted)
                     {
                         _statusBanner.SetDenied(scanResult.MessageAr, Strings.Ui_CheckInDesk_07);
-                        if (_denialSoundEnabled)
-                        {
-                            System.Media.SystemSounds.Exclamation.Play();
-                        }
+                        PlayDeniedSound();
                         FocusCardNumberBox();
                         return;
                     }
@@ -848,10 +1017,11 @@ public partial class CheckInDeskControl : UserControl
     /// After a granted entry: free the desk at once and keep the success banner for the delay. A card scanned during
     /// the delay is looked up as usual and is not wiped when the delay ends (R4.2). A negative delay keeps the desk.
     /// </summary>
-    private async Task FinishSuccessfulEntryAsync()
+    private async Task FinishSuccessfulEntryAsync(BeneficiaryDto entered)
     {
         if (AutoResetDelayMs < 0)
         {
+            await _giftPanel.LoadAsync(entered.Id, entered.FullName);
             return;
         }
 
@@ -859,6 +1029,10 @@ public partial class CheckInDeskControl : UserControl
         ClearPreviousHolderData();
         _txtCardNumber.Clear();
         FocusCardNumberBox();
+
+        // R5.14: the gift needs today's granted entry (BR-30), so offer it now for the visitor who just entered:
+        // F6 issues it without a second scan. A new scan clears the panel and drops this load.
+        await _giftPanel.LoadAsync(entered.Id, entered.FullName);
 
         if (AutoResetDelayMs > 0)
         {
@@ -889,14 +1063,25 @@ public partial class CheckInDeskControl : UserControl
 
     private void PrefillCompanions(IReadOnlyList<CompanionCountDto> companions)
     {
-        foreach (var comp in companions)
+        _isPrefilling = true;
+        try
         {
-            var counter = _counterInputs.FirstOrDefault(c => c.Tag is int id && id == comp.AgeCategoryId);
-            if (counter != null)
+            foreach (var comp in companions)
             {
-                counter.Value = comp.Count;
+                var counter = _counterInputs.FirstOrDefault(c => c.Tag is int id && id == comp.AgeCategoryId);
+                if (counter != null)
+                {
+                    counter.Value = comp.Count;
+                }
             }
         }
+        finally
+        {
+            _isPrefilling = false;
+        }
+
+        MarkCompanionsPrefilled(_counterInputs.Any(c => c.Value > 0));
+        UpdateLiveTotalPersons();
     }
 
     internal async Task SaveInlineRegistrationAsync()
@@ -949,8 +1134,17 @@ public partial class CheckInDeskControl : UserControl
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)
                 {
-                    _notifyService.Info(Strings.Ui_CheckInDesk_10, Strings.Ui_CheckInDesk_11);
+                    if (_registrationDialog != null)
+                    {
+                        _registrationDialog.DialogResult = DialogResult.OK;
+                    }
+
+                    // R5.2: no message box — the operator goes straight on to the holder panel.
                     await LookupCardAsync();
+                    if (_activeHolder is not null)
+                    {
+                        _statusBanner.SetStatus(_statusBanner.State, _statusBanner.Title, Strings.Ui_CheckInDesk_10);
+                    }
                 }
                 else
                 {
@@ -972,6 +1166,8 @@ public partial class CheckInDeskControl : UserControl
             return;
         }
 
+        var entered = _activeHolder;
+
         var companions = _counterInputs
             .Where(c => c.Value > 0)
             .Select(c => new CompanionRequestDto((int)c.Tag!, c.Value))
@@ -992,15 +1188,13 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted(Strings.Ui_CheckInDesk_13, string.Format(Strings.Ui_CheckInDesk_14, companions.Sum(c => c.Count), result.Value.TotalPersons));
                     await RefreshTodayDeskSummaryAsync();
 
-                    await FinishSuccessfulEntryAsync();
+                    PlayGrantedSound();
+                    await FinishSuccessfulEntryAsync(entered);
                 }
                 else
                 {
                     _statusBanner.SetDenied(ErrorMessages.GetMessage(result.Error));
-                    if (_denialSoundEnabled)
-                    {
-                        System.Media.SystemSounds.Hand.Play();
-                    }
+                    PlayDeniedSound();
                 }
             }
             catch (Exception ex)
@@ -1019,6 +1213,8 @@ public partial class CheckInDeskControl : UserControl
         {
             return;
         }
+
+        var entered = _activeHolder;
 
         var supervisorDialog = _formFactory.Create<SupervisorAuthDialog>();
 
@@ -1051,7 +1247,8 @@ public partial class CheckInDeskControl : UserControl
                     _statusBanner.SetGranted(Strings.Ui_CheckInDesk_18, string.Format(Strings.Ui_CheckInDesk_19, supervisorDialog.SupervisorFullName, supervisorDialog.Reason));
                     await RefreshTodayDeskSummaryAsync();
 
-                    await FinishSuccessfulEntryAsync();
+                    PlayGrantedSound();
+                    await FinishSuccessfulEntryAsync(entered);
                 }
                 else
                 {

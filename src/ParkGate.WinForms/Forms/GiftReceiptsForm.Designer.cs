@@ -16,12 +16,13 @@ partial class GiftReceiptsForm
     private System.Windows.Forms.ComboBox _cmbOrganization;
     private System.Windows.Forms.Label _lblStatus;
     private System.Windows.Forms.ComboBox _cmbStatus;
-    private System.Windows.Forms.Button _btnRefresh;
-    private System.Windows.Forms.Button _btnExportExcel;
-    private System.Windows.Forms.Button _btnPrintPreview;
+    private ParkGate.WinForms.Controls.RtlButton _btnRefresh;
+    private ParkGate.WinForms.Controls.RtlButton _btnExportExcel;
+    private ParkGate.WinForms.Controls.RtlButton _btnPrintPreview;
     private System.Windows.Forms.DataGridView _gridReceipts;
     private System.Windows.Forms.Panel _summaryPanel;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnVoidGift;
     private System.Windows.Forms.Label _lblSummary;
 
     protected override void Dispose(bool disposing)
@@ -45,12 +46,13 @@ partial class GiftReceiptsForm
         _cmbOrganization = new System.Windows.Forms.ComboBox();
         _lblStatus = new System.Windows.Forms.Label();
         _cmbStatus = new System.Windows.Forms.ComboBox();
-        _btnRefresh = new System.Windows.Forms.Button();
-        _btnExportExcel = new System.Windows.Forms.Button();
-        _btnPrintPreview = new System.Windows.Forms.Button();
+        _btnRefresh = new ParkGate.WinForms.Controls.RtlButton();
+        _btnExportExcel = new ParkGate.WinForms.Controls.RtlButton();
+        _btnPrintPreview = new ParkGate.WinForms.Controls.RtlButton();
         _gridReceipts = new System.Windows.Forms.DataGridView();
         _summaryPanel = new System.Windows.Forms.Panel();
-        _btnClose = new System.Windows.Forms.Button();
+        _btnClose = new ParkGate.WinForms.Controls.RtlButton();
+        _btnVoidGift = new ParkGate.WinForms.Controls.RtlButton();
         _lblSummary = new System.Windows.Forms.Label();
 
         _mainLayout.SuspendLayout();
@@ -112,7 +114,8 @@ partial class GiftReceiptsForm
         // 
         // _dtpFromDate
         // 
-        _dtpFromDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+        _dtpFromDate.CustomFormat = "dd/MM/yyyy";
+        _dtpFromDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
         _dtpFromDate.Location = new System.Drawing.Point(884, 5);
         _dtpFromDate.Margin = new System.Windows.Forms.Padding(3, 5, 12, 3);
         _dtpFromDate.Name = "_dtpFromDate";
@@ -133,7 +136,8 @@ partial class GiftReceiptsForm
         // 
         // _dtpToDate
         // 
-        _dtpToDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+        _dtpToDate.CustomFormat = "dd/MM/yyyy";
+        _dtpToDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
         _dtpToDate.Location = new System.Drawing.Point(693, 5);
         _dtpToDate.Margin = new System.Windows.Forms.Padding(3, 5, 12, 3);
         _dtpToDate.Name = "_dtpToDate";
@@ -238,6 +242,7 @@ partial class GiftReceiptsForm
         // 
         _summaryPanel.Controls.Add(_lblSummary);
         _summaryPanel.Controls.Add(_btnClose);
+        _summaryPanel.Controls.Add(_btnVoidGift);
         _summaryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
         _summaryPanel.Location = new System.Drawing.Point(15, 621);
         _summaryPanel.Name = "_summaryPanel";
@@ -266,6 +271,17 @@ partial class GiftReceiptsForm
         _btnClose.Size = new System.Drawing.Size(100, 44);
         _btnClose.TabIndex = 1;
         _btnClose.Text = "إغلاق";
+        // 
+        // _btnVoidGift
+        // 
+        _btnVoidGift.AutoEllipsis = true;
+        _btnVoidGift.Dock = System.Windows.Forms.DockStyle.Left;
+        _btnVoidGift.Enabled = false;
+        _btnVoidGift.Location = new System.Drawing.Point(100, 0);
+        _btnVoidGift.Name = "_btnVoidGift";
+        _btnVoidGift.Size = new System.Drawing.Size(150, 44);
+        _btnVoidGift.TabIndex = 2;
+        _btnVoidGift.Text = "إلغاء القسيمة…";
 
         // 
         // GiftReceiptsForm

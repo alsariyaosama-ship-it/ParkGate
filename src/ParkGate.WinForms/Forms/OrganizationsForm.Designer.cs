@@ -26,11 +26,11 @@ partial class OrganizationsForm
         this._lblHeader = new System.Windows.Forms.Label();
         this._lblHeaderSubtitle = new System.Windows.Forms.Label();
         this._pnlToolbar = new System.Windows.Forms.FlowLayoutPanel();
-        this._btnAdd = new System.Windows.Forms.Button();
-        this._btnEdit = new System.Windows.Forms.Button();
-        this._btnToggleActive = new System.Windows.Forms.Button();
-        this._btnRefresh = new System.Windows.Forms.Button();
-        this._chkActiveOnly = new System.Windows.Forms.CheckBox();
+        this._btnAdd = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnEdit = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnToggleActive = new ParkGate.WinForms.Controls.RtlButton();
+        this._btnRefresh = new ParkGate.WinForms.Controls.RtlButton();
+        this._chkActiveOnly = new ParkGate.WinForms.Controls.RtlCheckBox();
         this._gridOrganizations = new System.Windows.Forms.DataGridView();
         this._colCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -44,7 +44,7 @@ partial class OrganizationsForm
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyleCenter = new System.Windows.Forms.DataGridViewCellStyle();
         this._pnlFooter = new System.Windows.Forms.Panel();
         this._lblCount = new System.Windows.Forms.Label();
-        this._btnClose = new System.Windows.Forms.Button();
+        this._btnClose = new ParkGate.WinForms.Controls.RtlButton();
         this._pnlHeader.SuspendLayout();
         this._pnlToolbar.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._gridOrganizations)).BeginInit();
@@ -395,11 +395,11 @@ partial class OrganizationsForm
     private System.Windows.Forms.Label _lblHeader;
     private System.Windows.Forms.Label _lblHeaderSubtitle;
     private System.Windows.Forms.FlowLayoutPanel _pnlToolbar;
-    private System.Windows.Forms.Button _btnAdd;
-    private System.Windows.Forms.Button _btnEdit;
-    private System.Windows.Forms.Button _btnToggleActive;
-    private System.Windows.Forms.Button _btnRefresh;
-    private System.Windows.Forms.CheckBox _chkActiveOnly;
+    private ParkGate.WinForms.Controls.RtlButton _btnAdd;
+    private ParkGate.WinForms.Controls.RtlButton _btnEdit;
+    private ParkGate.WinForms.Controls.RtlButton _btnToggleActive;
+    private ParkGate.WinForms.Controls.RtlButton _btnRefresh;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkActiveOnly;
     private System.Windows.Forms.DataGridView _gridOrganizations;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colCode;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colName;
@@ -412,5 +412,5 @@ partial class OrganizationsForm
     private System.Windows.Forms.DataGridViewTextBoxColumn _colStatus;
     private System.Windows.Forms.Panel _pnlFooter;
     private System.Windows.Forms.Label _lblCount;
-    private System.Windows.Forms.Button _btnClose;
+    private ParkGate.WinForms.Controls.RtlButton _btnClose;
 }
