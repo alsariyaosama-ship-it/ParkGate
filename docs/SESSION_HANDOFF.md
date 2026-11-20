@@ -10,9 +10,9 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-20 |
-| Last session | S41 — F8 card-number patterns (T8.1b–T8.4b) and the `RtlTabControl` fix (T8.7) on `phase/f8-card-patterns` |
-| Current phase | F8 complete except T8.5 (cloud sync of the two organization fields). R8 PR #23 open. Left: R6.5 (now unblocked), R9 (docs) |
-| Working branch | `phase/f8-card-patterns` (from `phase/r8-release` `a4a2fdc`, because PR #23 was not merged yet) |
+| Last session | S42 — R6.5 least-privilege SQL login on `phase/r6-sql-logins`; PR #23 (R8) and #24 (F8 patterns) merged |
+| Current phase | Phase R: only R9 (docs) left after R6.5. F8 done except T8.5 (cloud sync of the two organization fields) |
+| Working branch | `phase/r6-sql-logins` (from `main` `35048cf`, after PR #24) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 0 warnings (the Pkcs advisories are gone, R8.2) |
 | .NET Unit tests | 1066 passed (non-integration): 264 domain + 283 application + 519 architecture |
 | .NET Integration tests | Infrastructure project 178 passed on LocalDB (integration and non-integration together) |
@@ -120,6 +120,11 @@
 
 Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
+**S42 (2026-11-20): R6.5 on `phase/r6-sql-logins`.** PR #23 was merged with red checks: the web jobs failed because `npm audit fix` (npm 11) dropped an optional `react` peer entry that npm 10 in CI requires, and the .NET job hit a runner timeout (testhost did not connect in 90 s; the re-run passed). The lock file was regenerated with npm 10 in PR #24, which is merged with green checks.
+R6.5: `Setup-ProductionDatabase.ps1` applies migrations with the server administrator's Windows account, checks Mixed Mode, creates `parkgate_app` (`db_datareader`, `db_datawriter`, `db_backupoperator`; the admin "backup now" needs the last one) with a generated password shown once, saves it DPAPI-protected in `connection.dat`, keeps the password on re-runs (`-ResetAppPassword` to change it), opens 1433/1434 on private and domain networks only, removes the 1.0.0 any-profile rules, and warns about a Public network or nothing listening on 1433. The installer now runs it in a visible window. ADR-027 (Proposed): one shared login, no separate SQL migration login.
+Tested on LocalDB with a scratch connection file: create, re-run (password and `connection.dat` unchanged), reset; as `parkgate_app` read, write and backup work, CREATE/DROP/ALTER TABLE are refused. Not run against SQLEXPRESS or from a second PC.
+**Next:** Osama reviews and merges the R6.5 PR, approves ADR-027, runs TC-39 on the real server and one desk (the desk's network must be Private). Rebuild the installer after merging. Then R9 (docs) and T8.5.
+
 **S41 (2026-11-20): F8 card-number patterns on `phase/f8-card-patterns`.** Osama answered Q-R6 (workgroup, at most 4 desks; R6.5 is unblocked) and asked for the patterns before R6.5. One commit each:
 T8.1b `CardShape`, `OrganizationCardPattern`, `CardPatternAlert`, `CardPatternLearner` (pure rules); T8.2b migration `AddCardPatterns`, repositories (unique pattern index covers a NULL prefix too); T8.3b `CardPatternMonitor` runs inside the register and card-change save, `CardPatternService` (Admin: approve, reject, review), `Permission.ManageCardPatterns`, `BeneficiaryDto.HasOpenCardAlert`, audit actions; T8.4b «الإدارة ← أنماط أرقام البطاقات» (two tabs), «رقم غير معتاد» beside the holder name on the desk, a warning after editing a visitor; T8.7 `RtlTabControl` recreated its handle while a window was created on a 125 % screen ("Error creating window handle"); `SettingsForm` failed the same way, so this also affects the merged R5 and the 1.1.0 installer.
 Design choices made without asking (documented in SPEC BR-29 and DATABASE.md §3.13): new column `Source` (Dominant / NewSeries) because a first proposal is used provisionally while a new series must not stop alerting before approval; "dominant" = more than half of the organization's cards; approving closes the matching open alerts; the four `CardPattern.*` settings are not seeded (defaults in code) and have no settings screen.
@@ -166,6 +171,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
+- **R6.5 (S42):** run TC-39 on the real server and one desk; approve ADR-027. The server network was reported as Public by the script on this dev PC.
+- **Protect `main`:** PR #23 could be merged with red checks. A branch protection rule requiring the checks would stop that (Osama's GitHub setting).
 - **F8 patterns (S41):** apply migration `AddCardPatterns`; run TC-37, TC-38; confirm the design choices above (`Source` column, "more than half", approval closes alerts).
 - **Rebuild 1.1.0 after merging:** the installer built in S40 has the `RtlTabControl` crash (settings window at 125 %).
 - **R8 (S40):** try `ParkGate_Setup_v1.1.0.exe` on a test PC (server and desk mode); run `set-cloud-key` on the server; deploy the web from the new cPanel package (host needs PHP >= 8.4.1).
@@ -204,6 +211,11 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S42 — 2026-11-20 — CI fix and R6.5
+- Root cause of the red web jobs: npm 11 rewrote `package-lock.json` without an optional peer (`react`) that npm 10 needs; regenerate with `npx npm@10 install --package-lock-only` and verify with `npx npm@10 ci` before pushing lock changes.
+- PowerShell: `"$name:"` inside a string is a drive-qualified variable; use `${name}:`.
+- LocalDB accepts SQL logins (`IsIntegratedSecurityOnly` = 0), so the login script was tested there with `-ConnectionFile` in the scratchpad and `-SkipFirewall`; the test database and login were dropped afterwards.
 
 ### S41 — 2026-11-20 — F8 card-number patterns; RtlTabControl crash
 - Q-R6 answered: workgroup, at most 4 desks.
@@ -274,10 +286,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Line endings: 18 working files with `eol=crlf` were LF or mixed (the S27 item included); re-checked out, no commit
   needed because the blobs were already LF. Helper scripts `addstr.py` and `extract_arabic.py` live in the scratchpad only.
 - Test counts: architecture 155 → 183 (unit 662 → 690). No Application or Infrastructure change.
-### S32 — 2026-11-14 — Phase R3 complete
-- Baseline green. Did R3.1, R3.3, R3.4, R3.5, R3.6, R3.7, R3.9, R3.10, R3.8, R3.2 in that order, one commit each.
-- R3.10 (EntryCardIssuer client clock) was found in R3.7 and added to the roadmap before doing it.
-- R3.9 needed no production change; the commit is test-only and says so.
-- The approval token is spent only after request validation, so a too-short reason does not cost the supervisor a re-login.
-- A Python edit wrote three test files with LF; fixed by deleting and re-checking them out after the commit.
-- Test counts: .NET unit 620 → 662, integration 40 → 42, web 96 (unchanged).
