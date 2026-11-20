@@ -10,9 +10,9 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-20 |
-| Last session | S43 — R9.1, R9.2, R9.4 on `phase/r9-docs` (R6.5 merged as PR #25) |
-| Current phase | Phase R9 (docs): R9.3 and R9.5 left. Then T8.5 (cloud sync of the two organization fields) |
-| Working branch | `phase/r9-docs` (from `main` `441b417`, after PR #25); pushed, no PR yet |
+| Last session | S44 — R9.3, R9.5 on `phase/r9-docs`; R9 PR opened |
+| Current phase | Phase R9 done (PR waiting for review). Next: production rollout of the desktop app 1.1.0. Web work is paused (Osama, 2026-11-20) |
+| Working branch | `phase/r9-docs` (from `main` `441b417`, after PR #25); pushed, PR open. All code is already on `main` |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 0 warnings (the Pkcs advisories are gone, R8.2) |
 | .NET Unit tests | 1066 passed (non-integration): 264 domain + 283 application + 519 architecture |
 | .NET Integration tests | Infrastructure project 178 passed on LocalDB (integration and non-integration together) |
@@ -119,110 +119,52 @@
 ## Next session — start here
 
 Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
-Osama asked for a new conversation because this one grew too long. Start from here.
 
-**S43 (2026-11-20): R9 on `phase/r9-docs`.** Done, one commit each:
-- R9.2 `DECISIONS.md`: ADR-013 superseded by ADR-028 (signed QR tokens, as built); ADR-029 (outbox immutable, ordered by DB `Sequence`); ADR-030 (entry-card tables under migrations); ADR-002 notes the fifth project. R3.2 = ADR-023 and R6.5 = ADR-027 already existed.
-- R9.1 `SPEC.md` as built: BR-19..BR-26 (gift rules as built: override covers interval and gift day, optimistic concurrency), BR-06 order with the entry day, BR-11, BR-12 (ADR-026), A5, §9 F1/F3/F4/F5 sections, Q6/Q10/Q13/Q14 closed or updated. Entry cards are issued by Supervisors and Admins (`EditBeneficiary`).
-- R9.4 `USER_GUIDE_AR.md` rewritten for 1.1.0; one old term fixed in `TEST_SCRIPT.md`.
+**Priority (Osama, 2026-11-20): the desktop app goes to production and real-world trial. Web work is paused** — do not start T8.5 or other `web/` tasks until he says so.
+
+**S44 (2026-11-20):** R9.3 `AGENTS.md` (five production projects with `ParkGate.SyncAgent`; UI tests live in `ParkGate.ArchitectureTests`; the web test command was left out on Osama's request). R9.5 this handoff. R9 PR opened (`phase/r9-docs` → `main`, docs only).
 
 **Next, in order:**
-1. **R9.3 `AGENTS.md` — needs Osama's approval before editing.** Propose: (a) §3 says "Maximum 4 production projects": now 5 (`ParkGate.SyncAgent`, ADR-018) plus `web/`; (b) add the web test command to §1.1 (`php artisan test` in `web/`, needs PHP >= 8.4.1) and the npm 10 rule for lock files (S42); (c) the UI tests live in `ParkGate.ArchitectureTests` — rename the note or move them to a new `ParkGate.WinForms.Tests` (ask first; recommendation: just document it). Ask him, then edit.
-2. **R9.5** final handoff: known issues and next steps; then open the R9 PR (`phase/r9-docs` → `main`).
-3. **Still waiting on Osama:** approve ADR-022, ADR-023, ADR-027 (all "Proposed"); run TC-36..TC-39 on the real server and a desk; rebuild the installer (`scripts\build-installer.ps1`) because 1.1.0 from S40 has the tab-control crash fixed in T8.7; protect `main` so red checks block a merge.
-4. **T8.5** sync `AllowedEntryDays` and `GiftAnyDay` to the cloud (web migration + `SyncIngestionService`).
+1. Osama reviews and merges the R9 PR.
+2. **Rebuild the installer from `main`** (`scripts\build-installer.ps1`). The S40 build of 1.1.0 lacks T8.7 (tab-control crash at 125 %), F8 card patterns and R6.5; do not ship it.
+3. **Production rollout**, following `docs/DEPLOYMENT.md`: server mode on the real server (SQL Server Express, `Setup-ProductionDatabase.ps1` for migrations and `parkgate_app`, §3–§4), then one desk (§5, network must be Private), first-run admin (§6), readiness check (§7). Upgrading an existing 1.0.0 install: §10. Backups: `scripts\backup.ps1` as Administrator (§9).
+4. **Before opening to visitors:** set each organization's entry days in «الجهات» (all days allowed by default), enable gifts per organization where needed, and run the manual tests on the real machines: TC-36..TC-39, TC-32 (1366×768), TC-38 (125 %), TC-20 (Cairo missing), the R7.12 slips on the 80 mm printer.
+5. Collect trial feedback; each problem becomes a `fix/<name>` branch with a failing test first.
 
-**S42 (2026-11-20): R6.5 on `phase/r6-sql-logins`.** PR #23 was merged with red checks: the web jobs failed because `npm audit fix` (npm 11) dropped an optional `react` peer entry that npm 10 in CI requires, and the .NET job hit a runner timeout (testhost did not connect in 90 s; the re-run passed). The lock file was regenerated with npm 10 in PR #24, which is merged with green checks.
-R6.5: `Setup-ProductionDatabase.ps1` applies migrations with the server administrator's Windows account, checks Mixed Mode, creates `parkgate_app` (`db_datareader`, `db_datawriter`, `db_backupoperator`; the admin "backup now" needs the last one) with a generated password shown once, saves it DPAPI-protected in `connection.dat`, keeps the password on re-runs (`-ResetAppPassword` to change it), opens 1433/1434 on private and domain networks only, removes the 1.0.0 any-profile rules, and warns about a Public network or nothing listening on 1433. The installer now runs it in a visible window. ADR-027 (Proposed): one shared login, no separate SQL migration login.
-Tested on LocalDB with a scratch connection file: create, re-run (password and `connection.dat` unchanged), reset; as `parkgate_app` read, write and backup work, CREATE/DROP/ALTER TABLE are refused. Not run against SQLEXPRESS or from a second PC.
-**Next:** Osama reviews and merges the R6.5 PR, approves ADR-027, runs TC-39 on the real server and one desk (the desk's network must be Private). Rebuild the installer after merging. Then R9 (docs) and T8.5.
+## Known issues (as of 1.1.0)
 
-**S41 (2026-11-20): F8 card-number patterns on `phase/f8-card-patterns`.** Osama answered Q-R6 (workgroup, at most 4 desks; R6.5 is unblocked) and asked for the patterns before R6.5. One commit each:
-T8.1b `CardShape`, `OrganizationCardPattern`, `CardPatternAlert`, `CardPatternLearner` (pure rules); T8.2b migration `AddCardPatterns`, repositories (unique pattern index covers a NULL prefix too); T8.3b `CardPatternMonitor` runs inside the register and card-change save, `CardPatternService` (Admin: approve, reject, review), `Permission.ManageCardPatterns`, `BeneficiaryDto.HasOpenCardAlert`, audit actions; T8.4b «الإدارة ← أنماط أرقام البطاقات» (two tabs), «رقم غير معتاد» beside the holder name on the desk, a warning after editing a visitor; T8.7 `RtlTabControl` recreated its handle while a window was created on a 125 % screen ("Error creating window handle"); `SettingsForm` failed the same way, so this also affects the merged R5 and the 1.1.0 installer.
-Design choices made without asking (documented in SPEC BR-29 and DATABASE.md §3.13): new column `Source` (Dominant / NewSeries) because a first proposal is used provisionally while a new series must not stop alerting before approval; "dominant" = more than half of the organization's cards; approving closes the matching open alerts; the four `CardPattern.*` settings are not seeded (defaults in code) and have no settings screen.
-**Next:** Osama applies migration `AddCardPatterns`, runs TC-37 and TC-38, reviews and merges PR #23 (R8) then the F8 patterns PR. Rebuild the installer after both, because T8.7 fixes a crash that 1.1.0 has. Then R6.5 (SQL logins, workgroup, 4 desks) and R9.
-
-**S40 (2026-11-20): R8 release work on `phase/r8-release`.** Osama merged PR #22 (F8 days) and asked for R8. One commit each:
-R8.1 single backslash in the production server name, read back and checked (the same bug was also in `build-installer.ps1`, fixed in R8.4); R8.2 `System.Security.Cryptography.Pkcs` pinned to 10.0.15 (10.0.12 still had the advisories), `NuGetAudit=false` removed; R8.3 cloud API key in `%ProgramData%\ParkGate\cloudkey.dat` (DPAPI LocalMachine), `ParkGate.SyncAgent.exe set-cloud-key` / `clear-cloud-key`, the stored key wins, a plain JSON key still works with a warning; R8.5 Docker/VPS path deleted, `package-cpanel.ps1` runs the tests and builds a clean package (no dev packages, `.env`, tests, logs or caches), new `docs/DEPLOYMENT_WEB_CPANEL.md`; R8.7 (new) Laravel 13.43 and Symfony 8.1.11 past 9 production advisories, `npm audit fix`, `composer.json` PHP `^8.4.1`; R8.4 version 1.1.0, installer client now self-contained (it was framework-dependent with no runtime check), fresh migration bundle every build, Sync Agent in both build scripts and in the installer (server mode), bundled .NET runtime pinned to 10.0.15 with `-RuntimeVersion` (SDK 10.0.401 bundles 10.0.12, whose Pkcs is vulnerable); R8.6 upgrade guide `DEPLOYMENT.md` §10, §4.1 fixed.
-Built and checked locally: `dist\installer\ParkGate_Setup_v1.1.0.exe` (113 MB), `artifacts\production`, `artifacts\parkgate-web-cpanel.zip`. Not installed on any machine.
-**Next:** Osama reviews and merges the R8 PR, then tries the installer on a test PC (server mode and desk mode) following `DEPLOYMENT.md` §10. Then **R9** (docs), or F8 card-number patterns, as he chooses. R6.5 waits on Q-R6.
-
-**S39 (2026-11-20): R5.15–R5.20 finished and merged (PR #21); F8 entry days built on `phase/f8-entry-days`.**
-R5 after S38, one commit each: R5.15 new-visitor registration in a pop-up (`RegisterVisitorDialog`); R5.16 / BR-31 voiding an entry voids that day's unredeemed gift, a redeemed gift blocks the void; R5.18 every entry and gift audit row carries holder, card, organization, business date, operator and approver (`AuditTrail`); R5.17 void a gift voucher from the gift receipts window; R5.19 one-line grid headers that follow DPI and `dd/MM/yyyy` dates; R5.20 audit trail screen «التقارير ← سجل التتبع» (`Permission.ViewAuditLog`, supervisors and admins). Osama ran TC-23..TC-35 ("almost all fine") and merged PR #21.
-F8 days (Osama, 2026-11-20): days change rarely, by hand and permanently; the change must be in the audit trail. No dated or temporary schedule. One commit each: T8.1a `WeekDays` flags, `Organization.AllowedEntryDays` / `GiftAnyDay`, `DayNotAllowed` (entry 6, gift 7); T8.2a migration `AddOrganizationEntryDays`; T8.3a use cases, previews, override, policy audit with values before and after; T8.4a organization dialog (seven day boxes, «الهدايا في أي يوم»), organizations list column, desk banner «أيام دخول الجهة: …», gift panel, reports, audit screen shows day names.
-**Deviation from SPEC (documented in BR-27):** `DayNotAllowed` is checked after "holder blocked", not right after "organization inactive", because an override skips only the first denial reason; otherwise a supervisor override would let a blocked holder in.
-**Next:** Osama runs TC-36 (migration already applied on both dev databases), reviews the F8 days PR. Then either F8 card-number patterns (T8.1b–T8.4b) or **R8** (release), as Osama chooses. T8.5 (sync the two new fields to the cloud) is still open.
-
-**S38 (2026-11-18, `phase/r5-desk-ux`): R5 in progress.** Found at start: PR #18 was merged into `main` before R7.12 and R7.14 reached the R7 branch, and PR #19 was merged into the R7 branch, so `main` lacks them. Opened **PR #20** (`phase/r7-consistency` → `main`). R5 was branched from the R7 branch.
-Done, one commit each, test-first: R5.1 denial banner «يُسمح بالدخول الساعة … — باقي س:دد» (`CooldownText`); R5.2 no message box after registration; R5.3 name 14 pt, card box 16 pt (`Theme.CardNumber`, the one size added to the R7.2 scale); R5.11 search row in a `TableLayoutPanel` (the card box ran under its label at 125 %); R5.12 `RtlGroupBox` (every RTL group box caption lost its last letters); R5.6 «إلغاء العملية… (F8)» above today's grid; R5.10 idle auto-lock (`Security.AutoLockMinutes` was saved but never read; `IdleMonitor`); R5.14 gift offered right after a granted entry for the same visitor (F6, no second scan); R5.5 «(من آخر زيارة)» and tinted counters; R5.4 Alt+1…9, +/−, Enter in a counter (deviation: focus stays in the card box after a lookup, for the scanner); R5.7 two generated tones (`DeskSounds`), new setting `Entry.SuccessSoundEnabled` (not seeded, as R6.15). After Osama's answers (2026-11-18, he accepted every recommendation, F8 included): R5.9 amber `#9A5B00` and white banner details (AGENTS.md §5.10 updated); R5.13 `RtlButton` / `RtlCheckBox` / `RtlRadioButton` (105 controls) and `RtlTabControl`; R5.8 compact desk (option A): today's grid 5.6 rows on 1366×768 at 100 % (3.7 with the gift line), 8.4 on 1920×1080 at 125 %; `MainForm.MinimumSize` was taller than a 768 screen.
-**Next:** Osama runs TC-23 to TC-32 (especially TC-32 on a real 1366×768 screen and TC-29 at 125 %), reviews and merges the R5 PR. Then the rest of R7 if any, then **R8** (release). R6.5 waits on Q-R6, R5.8 used the 1366×768 default because Q-R7 is still open.
-
-**S37 (2026-11-18, `phase/r7-consistency`): R7 done; PR #18 opened.** One commit per task, test-first:
-R7.6 QR through `IQrImageRenderer`; R7.11 `Main` synchronous (it was `async`, so the UI ran on an MTA thread and file/print dialogs threw); R7.7 every message box through `Notify`; R7.8 all designers on `Dpi`; R7.9 one constructor with required services per form/control, no `?? new X(null…)` fallbacks, `TestUi.Create` fills fakes (NSubstitute now in the architecture tests), new ports `ICardScanService` / `IEntryCardIssuer`; R7.10 `InlineRegistrationPanel` and `TodayEntriesPanel` split from the desk; R7.1 glossary («الزائر», «فترة الانتظار», «الشباك», «قسيمة»), `GlossaryTests`; R7.2 type scale 9/10/12/14/20; R7.3 palette in `Theme`, `PaletteTests`; R7.4 Accept/Cancel/tab order/Theme buttons in every dialog; R7.5 web: park-local times (the dashboard and reports printed UTC), glossary, empty chart state; R7.13 clipped text at 125 %.
-R7.12 (after Osama's wording, 2026-11-18): entry card and gift voucher print on 80 mm cashier paper through `ReceiptSlips` / `ReceiptPrinter` (company, park, QR, visitor's organization, slip text; no logo, no personal data on the entry card, voucher number but no value on the gift slip, 20 mm cutter feed).
-R7.14 (Osama, 2026-11-18): a gift needs gifts enabled for the organization **and** a granted entry today (BR-30, not overridable). PR #19 from `fix/gift-requires-entry`, based on the R7 branch.
-**Next:** Osama prints both slips on the thermal printer, reviews and merges PR #18 and PR #19, then **R5** (desk UX; first item: offer the gift right after a granted entry without a second scan). R6.5 waits on Q-R6.
-
-**S36 (2026-11-18, `phase/r6-database`): R6.3, R6.4, R6.6, R6.8, R6.9, R6.10, R6.11, R6.15 done; R6 PR opened.** Management audit rows are saved in the same unit of work (`UnitOfWorkAuditExtensions.AddAuditAsync`) and `IAuditWriter` is gone (AGENTS.md updated with Osama's OK); `AuditSaveChangesInterceptor` was never registered, it now runs on every context and takes the DB clock; `DatabaseDocumentationTests` keeps `DATABASE.md` in line with the EF model; name search ~350 ms at 100 000 holders (kept); cloud `entry_attempts` composite index; `backup.ps1` restricts its folder and no longer asks Express for `COMPRESSION`; the backup message shows the database size against 10 GB and warns at 70 % (`DatabaseFileRow` → `sys.database_files`, ADR-025 amendment); dead seed row `Entry.PlaySoundOnDenial` deleted.
-Later in S36: R6.16 (operators get national IDs masked by Application; new permission `ViewFullNationalId` for supervisors and admins), retention periods approved by Osama (DEPLOYMENT.md §9.3; no purge feature built), backup ACL step fixed after Osama's elevated run failed on an old log file.
-**Next:** Osama re-runs `scripts\backup.ps1` as Administrator, then reviews and merges PR #17. Then **R7.6–R7.9** (agreed order below). R6.5 waits on Q-R6. A purge command for the approved retention periods is not built; add it as a task when Osama wants it.
-
-**S35 (2026-11-18): R6.1, R6.2, R6.12, R6.13, R6.14.** Entry-card tables are EF entities (migration `AdoptEntryCards`); the DB clock is a mapped `SYSUTCDATETIME`; optimistic concurrency with `ConcurrencyRetry` replaced `UPDLOCK` (migration `AddBeneficiaryLastGiftIssuedUtc`); `EfOnlyDataAccessTests` guards ADR-025. Both dev databases were cleaned of the old entry-card objects with Osama's approval (option A) and migrated.
-
-1. TC-20 (Cairo missing) is still untried, and TC-21's F7 gift override should be re-run on the fixed gift screen. New TC-22 (database size after backup).
-2. Agreed session order (review 2026-11-18): **R6** (done) (database: entry-card tables into migrations, DB-clock audit columns, R6.11 audit in the unit of work) -> **R7.6-R7.9** (UI-layer conformance: no Infrastructure in WinForms, Notify only, Dpi everywhere, no null-service fallbacks) -> **R5** (desk UX, with R7.10 split of `CheckInDeskControl` first) -> rest of **R7** -> **R8** (release) -> **F8** (only on Osama's go-ahead) -> **R9** (docs last). Reason: F8 adds a migration and organization fields, so the schema conventions (R6) and the UI layer (R7) should be settled first.
-   Gift decisions confirmed 2026-11-18: the interval starts when the voucher is issued, and the gift voucher stays a separate QR slip (current F5 behaviour, no change).
-3. WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread — it
-   hangs the test host. Use synchronous fakes or a seam (`SuccessDelay`, `ChooseOrganizationOverride`), and run
-   `dotnet test` with `timeout`.
-4. Edit files with byte-level Python (or the Edit tool); text mode turns CRLF into LF.
-
-Carried over from S25 (do it when a printer is available; it does not block Phase R):
-- Verify QR printing on the user machine with a connected printer or "Microsoft Print to PDF", and confirm
-  with Osama that customer and gift QR printing works without closing the app.
+- The cloud sync agent sends `AllowedEntryDays` and `GiftAnyDay` nowhere yet (T8.5, paused with the web); the local desktop app is not affected.
+- No purge command for the approved retention periods (DEPLOYMENT.md §9.3); add it as a task when needed.
+- Q-R7 (lowest desk resolution) is open; 1366×768 at 100 % is assumed.
+- `main` is not protected; a PR can be merged with red checks (GitHub branch protection, Osama's setting).
+- `dotnet ef database update` is refused by the agent's tool classifier; Osama applies migrations on the dev databases himself (`AddCardPatterns` still pending on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate`).
+- WinForms tests: never let an awaited continuation touch a control whose handle exists on another thread (hangs the test host); use synchronous fakes or seams, and run `dotnet test` with `timeout`.
+- Edit files with the Edit tool or byte-level Python; `sed -i` turns CRLF into LF.
 
 ## Blockers / waiting on the user
 
-- **R6.5 (S42):** run TC-39 on the real server and one desk; approve ADR-027. The server network was reported as Public by the script on this dev PC.
-- **Protect `main`:** PR #23 could be merged with red checks. A branch protection rule requiring the checks would stop that (Osama's GitHub setting).
-- **F8 patterns (S41):** apply migration `AddCardPatterns`; run TC-37, TC-38; confirm the design choices above (`Source` column, "more than half", approval closes alerts).
-- **Rebuild 1.1.0 after merging:** the installer built in S40 has the `RtlTabControl` crash (settings window at 125 %).
-- **R8 (S40):** try `ParkGate_Setup_v1.1.0.exe` on a test PC (server and desk mode); run `set-cloud-key` on the server; deploy the web from the new cPanel package (host needs PHP >= 8.4.1).
-- **Local PHP:** the first `php` on PATH is herd-lite 8.4.0, too old for the updated packages. Update Herd Lite or put PHP 8.4.27 first on PATH (its `php.ini` needs `openssl`, `mbstring`, `fileinfo`, `curl`, `pdo_sqlite`, `intl` enabled).
-- **Keep the bundled runtime current:** raise `-RuntimeVersion` in both build scripts when a new .NET 10 servicing release ships, or install a newer SDK.
-- **F8 (S39):** migration `AddOrganizationEntryDays` applied on both dev databases by Osama. Run TC-36. Confirm the check order deviation in BR-27.
-- **Before release:** existing organizations start with every day allowed; set each organization's days in «الجهات».
-- **Answered 2026-11-18:** R5.8 option A, R5.13 own-drawn text, R5.9 `#9A5B00`, F8, focus stays in the card box (R5.4), success sound on by default. Still open: Q-R7 (lowest desk resolution; 1366×768 at 100 % assumed).
+**Desktop (current priority):**
+- Merge the R9 PR; rebuild the installer from `main`; install on the real server and one desk (see Next session).
+- Run TC-36..TC-39 on the real machines; approve **ADR-022, ADR-023, ADR-027** (still "Proposed").
+- Confirm F8 design choices: card patterns (`Source` column, "more than half", approval closes alerts) and the BR-27 check order.
+- Apply migration `AddCardPatterns` on the dev databases.
+- Print one entry card and one gift voucher on the 80 mm thermal printer.
+- Confirm the R7 wording («فترة الانتظار», «الشباك», «القسيمة»), the one-minute settings cache (R3.6) and the R4.2 deviation.
+- Delete the empty test folder `C:\ParkGate_R69_Test`.
+- Keep the bundled runtime current: raise `-RuntimeVersion` in both build scripts when a new .NET 10 servicing release ships.
 
-- **R7 wording to confirm (Q-R4b defaults applied):** «فترة السماح» and «فترة التهدئة» became «فترة الانتظار»; «المحطة» / «محطة العمل» became «الشباك» (menu «الشبابيك»); «الوصل» / «الكوبون» / «الإيصال» became «القسيمة». Two long sentences were shortened (void warning, select-organization header).
-- **R7.12:** print one entry card and one gift voucher on the real 80 mm thermal printer (margins, cutter, QR scans at the desk).
-- **Visible R7 changes to try:** management windows at 125 % (Dpi scaling, no clipping), the gift receipts window has a close button, Esc closes users/workstations lists, web times are park-local.
-
-- **R6.9 re-run:** `scripts\backup.ps1` as Administrator after commit `4a53206` (ownership + child ACL reset).
-- Delete the empty test folder `C:\ParkGate_R69_Test` left by the agent's non-elevated test run (the tool blocks deletes at `C:\`).
-- **Behaviour change (R6.3):** `CreatedByUserId`, `UpdatedAtUtc` and `UpdatedByUserId` are now filled on holders, organizations and users; they were always NULL before.
-- ~~Apply the three migrations on SQLEXPRESS~~ **Done in S31** (backup first: `C:\ProgramData\ParkGateackups\ParkGate_before_R2.bak`). The 7 pending outbox rows got sequences 1–11 with the re-queued ones and contain no phone, national ID, token or key id. Install the new SyncAgent build before it runs again (still the old one until R8.4).
-- **Redeploy the web** after R2: the existing Laravel migration was edited in place (no `phone`/`national_id`, heartbeat counts, gift columns and `gift_vouchers`). On an already-created cloud database, re-import `web/database/mysql_schema.sql` (it is generated now and drops and recreates every table, so it also wipes `users`: create the user again with `parkgate:create-user`), then let the agent re-queue.
-- Remove `AesKey` from the agent's `appsettings` and `PARKGATE_AES_KEY` from the host `.env` (ignored now). Set `CloudApi:BaseUrl` to an `https://` address.
-- Q-R2b answered 2026-11-13: `Notes` and `StatusReason` **are synced**. R2.6 excludes only `Phone`
-  and `NationalId`. R2.6 is unblocked.
-- Q-R3 answered 2026-11-13: users are created with `parkgate:create-user` from the cPanel Terminal.
-- Osama's local `web/.env` still holds the old default sync key and the `APP_KEY` that was published in
-  `.env.production.example` (R1.3). Harmless for dev; regenerate both (`key:generate`,
-  `parkgate:generate-key`) and set the agent's `CloudApi:ApiKey` to match.
-- **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
-  while `composer.json` still says `^8.3`. CI uses PHP 8.4. Confirm the host offers PHP 8.4 before R8.5,
-  and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
-- Still open (the plan's defaults apply if unanswered): Q-R4b (glossary, R7.1), Q-R7 (lowest desk resolution, R5.8).
-- **Approve ADR-022** (gift token excluded from the cloud) **and ADR-023** (single-use supervisor approval tokens).
-- **Confirm the one-minute settings cache** (R3.6): a setting saved on one desk reaches the others within a minute.
-- **Confirm the R4.2 deviation:** a card number typed by hand during the success banner is not looked up until Enter.
-- **Run the manual test script** (TC-01 to TC-21); R4 is not done until it passes.
-- Decisions already made by Osama are in the plan's §2.1 — do not re-ask them.
+**Web (paused by Osama, 2026-11-20 — keep for later):**
+- T8.5 cloud sync of the two organization fields; deploy from the cPanel package (host PHP >= 8.4.1); `set-cloud-key` on the server; regenerate `APP_KEY` and the sync key; `CloudApi:BaseUrl` over `https://`; re-import `web/database/mysql_schema.sql` on an existing cloud database.
+- Local PHP: herd-lite 8.4.0 on PATH is too old; PHP 8.4.27 works.
+- When web work resumes, add to `AGENTS.md` §1.1 (needs approval): `php artisan test` in `web/` and the npm 10 rule for lock files (S42 log).
 
 ---
 
 ## Session Log (last 10 sessions)
+
+### S44 — 2026-11-20 — R9.3, R9.5; R9 PR
+- Baseline green (1175 non-integration). Osama: web paused, desktop app to production first; the web items of R9.3 were dropped.
+- Handoff rewritten around the production rollout; old desktop and web blockers split.
 
 ### S43 — 2026-11-20 — R9.1, R9.2, R9.4
 - Checking role permissions with `awk` on `RolePermissions.cs` gave a wrong "0"; read the file instead. The first SPEC edit said only Admins issue entry cards and was corrected.
@@ -284,13 +226,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ### S35 — 2026-11-18 — Phase R6: R6.1, R6.2, R6.12, R6.13, R6.14
 - See "Next session" for the summary. Tests 755 green.
-
-### S34 — 2026-11-15 — PR #15, manual tests, gift screen fix
-
-- Merged `main` (PR #14) into `phase/r4-desk-ui`, opened PR #15, ticked R0, R1 and R2.7 in the remediation plan, ignored VS-generated `.resx` files.
-- Osama ran TC-14–TC-21; the F7 step of TC-21 could not run because the gift screen rendered broken.
-- R4.11: `GiftRedeemControl` had `AutoScaleDimensions` 7x17 with `AutoScaleMode.Dpi` (sizes multiplied by about 7). Fixed to 96x96; new `DesignerScalingTests` guards every designer.
-- R4.12: the scan row overlapped on wide windows; now a `TableLayoutPanel`. Both verified by rendering the control headless (before: one huge button; after: correct rows).
-- R4.13: Osama reported the gift panel and the registration buttons clipped on the desk. Cause: `GiftOfferPanel` in Font scaling mode inside a Dpi parent, and too little height for the registration group. Fixed and verified by rendering at 1920x890 and 1366x640. Gifts are disabled for every organization in the dev databases (`GiftEnabled = 0`), which is why the offer panel never showed; enable it per organization in Management > Organizations.
-- Tests: 691 unit/architecture, 42 integration, all green. Tip: if the app is running it locks `bin\`; build with `--artifacts-path artifacts/verify` (git-ignored).
-
