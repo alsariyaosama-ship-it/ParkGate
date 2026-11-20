@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ParkGate.Domain.Entities;
+using ParkGate.Domain.Enums;
 
 namespace ParkGate.Infrastructure.Data.Configurations;
 
@@ -14,6 +15,7 @@ public sealed class OrganizationConfiguration : IEntityTypeConfiguration<Organiz
             t.HasCheckConstraint("CK_Organizations_MaxFreeCompanions", "[MaxFreeCompanions] IS NULL OR ([MaxFreeCompanions] >= 0 AND [MaxFreeCompanions] <= 50)");
             t.HasCheckConstraint("CK_Organizations_GiftIntervalDays", "[GiftIntervalDays] >= 1 AND [GiftIntervalDays] <= 365");
             t.HasCheckConstraint("CK_Organizations_GiftValue", "[GiftEnabled] = 0 OR [GiftValue] > 0");
+            t.HasCheckConstraint("CK_Organizations_AllowedEntryDays", "[AllowedEntryDays] >= 1 AND [AllowedEntryDays] <= 127");
         });
 
         builder.HasKey(x => x.Id);
@@ -47,6 +49,17 @@ public sealed class OrganizationConfiguration : IEntityTypeConfiguration<Organiz
         builder.Property(x => x.GiftIntervalDays)
             .IsRequired()
             .HasDefaultValue(Organization.DefaultGiftIntervalDays);
+
+        // F8, BR-27 / BR-28. Existing organizations get every day and no gifts on other days.
+        builder.Property(x => x.AllowedEntryDays)
+            .HasColumnType("tinyint")
+            .IsRequired()
+            .HasDefaultValue(WeekDays.All)
+            .HasSentinel(WeekDays.None);
+
+        builder.Property(x => x.GiftAnyDay)
+            .IsRequired()
+            .HasDefaultValue(false);
 
         builder.Property(x => x.IsDefault)
             .IsRequired();
