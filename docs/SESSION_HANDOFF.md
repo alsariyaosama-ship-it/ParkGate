@@ -18,7 +18,7 @@
 | .NET Integration tests | Infrastructure project 160 passed on LocalDB (integration and non-integration together) |
 | Web tests | `php artisan test` (PHP 8.4): 101 passed on SQLite (MySQL job runs in CI) |
 | Total tests | 1161 .NET + 101 web (web not re-run since S37; no web change) |
-| Latest migration | `AddOrganizationEntryDays` (S39, F8). **Not yet applied** on LocalDB `ParkGate_Dev` or SQLEXPRESS `ParkGate`: the tool refused `dotnet ef database update`, Osama runs it |
+| Latest migration | `AddOrganizationEntryDays` (S39, F8). Applied by Osama on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` (2026-11-20) |
 
 ## State of the work
 
@@ -124,7 +124,7 @@ Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cl
 R5 after S38, one commit each: R5.15 new-visitor registration in a pop-up (`RegisterVisitorDialog`); R5.16 / BR-31 voiding an entry voids that day's unredeemed gift, a redeemed gift blocks the void; R5.18 every entry and gift audit row carries holder, card, organization, business date, operator and approver (`AuditTrail`); R5.17 void a gift voucher from the gift receipts window; R5.19 one-line grid headers that follow DPI and `dd/MM/yyyy` dates; R5.20 audit trail screen «التقارير ← سجل التتبع» (`Permission.ViewAuditLog`, supervisors and admins). Osama ran TC-23..TC-35 ("almost all fine") and merged PR #21.
 F8 days (Osama, 2026-11-20): days change rarely, by hand and permanently; the change must be in the audit trail. No dated or temporary schedule. One commit each: T8.1a `WeekDays` flags, `Organization.AllowedEntryDays` / `GiftAnyDay`, `DayNotAllowed` (entry 6, gift 7); T8.2a migration `AddOrganizationEntryDays`; T8.3a use cases, previews, override, policy audit with values before and after; T8.4a organization dialog (seven day boxes, «الهدايا في أي يوم»), organizations list column, desk banner «أيام دخول الجهة: …», gift panel, reports, audit screen shows day names.
 **Deviation from SPEC (documented in BR-27):** `DayNotAllowed` is checked after "holder blocked", not right after "organization inactive", because an override skips only the first denial reason; otherwise a supervisor override would let a blocked holder in.
-**Next:** Osama applies the migration (`dotnet ef database update --project src/ParkGate.Infrastructure --startup-project src/ParkGate.Infrastructure`, and with `--connection` for SQLEXPRESS), runs TC-36, reviews the F8 days PR. Then either F8 card-number patterns (T8.1b–T8.4b) or **R8** (release), as Osama chooses. T8.5 (sync the two new fields to the cloud) is still open.
+**Next:** Osama runs TC-36 (migration already applied on both dev databases), reviews the F8 days PR. Then either F8 card-number patterns (T8.1b–T8.4b) or **R8** (release), as Osama chooses. T8.5 (sync the two new fields to the cloud) is still open.
 
 **S38 (2026-11-18, `phase/r5-desk-ux`): R5 in progress.** Found at start: PR #18 was merged into `main` before R7.12 and R7.14 reached the R7 branch, and PR #19 was merged into the R7 branch, so `main` lacks them. Opened **PR #20** (`phase/r7-consistency` → `main`). R5 was branched from the R7 branch.
 Done, one commit each, test-first: R5.1 denial banner «يُسمح بالدخول الساعة … — باقي س:دد» (`CooldownText`); R5.2 no message box after registration; R5.3 name 14 pt, card box 16 pt (`Theme.CardNumber`, the one size added to the R7.2 scale); R5.11 search row in a `TableLayoutPanel` (the card box ran under its label at 125 %); R5.12 `RtlGroupBox` (every RTL group box caption lost its last letters); R5.6 «إلغاء العملية… (F8)» above today's grid; R5.10 idle auto-lock (`Security.AutoLockMinutes` was saved but never read; `IdleMonitor`); R5.14 gift offered right after a granted entry for the same visitor (F6, no second scan); R5.5 «(من آخر زيارة)» and tinted counters; R5.4 Alt+1…9, +/−, Enter in a counter (deviation: focus stays in the card box after a lookup, for the scanner); R5.7 two generated tones (`DeskSounds`), new setting `Entry.SuccessSoundEnabled` (not seeded, as R6.15). After Osama's answers (2026-11-18, he accepted every recommendation, F8 included): R5.9 amber `#9A5B00` and white banner details (AGENTS.md §5.10 updated); R5.13 `RtlButton` / `RtlCheckBox` / `RtlRadioButton` (105 controls) and `RtlTabControl`; R5.8 compact desk (option A): today's grid 5.6 rows on 1366×768 at 100 % (3.7 with the gift line), 8.4 on 1920×1080 at 125 %; `MainForm.MinimumSize` was taller than a 768 screen.
@@ -156,7 +156,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
-- **F8 (S39):** apply migration `AddOrganizationEntryDays` on both dev databases (the agent was not allowed to). Run TC-36. Confirm the check order deviation in BR-27.
+- **F8 (S39):** migration `AddOrganizationEntryDays` applied on both dev databases by Osama. Run TC-36. Confirm the check order deviation in BR-27.
 - **Before release:** existing organizations start with every day allowed; set each organization's days in «الجهات».
 - **Answered 2026-11-18:** R5.8 option A, R5.13 own-drawn text, R5.9 `#9A5B00`, F8, focus stays in the card box (R5.4), success sound on by default. Still open: Q-R7 (lowest desk resolution; 1366×768 at 100 % assumed).
 
