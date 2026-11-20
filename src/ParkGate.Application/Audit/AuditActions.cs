@@ -7,7 +7,11 @@ public static class AuditActions
     {
         [AuditCategory.Entries] = ["EntryGranted", "EntryOverridden", "EntryVoided"],
         [AuditCategory.Gifts] = ["Gift.Issued", "Gift.IssuedOverride", "Gift.Redeemed", "Gift.Voided"],
-        [AuditCategory.Visitors] = ["BeneficiaryRegistered", "BeneficiaryUpdated", "BeneficiaryStatusChanged"],
+        [AuditCategory.Visitors] =
+        [
+            "BeneficiaryRegistered", "BeneficiaryUpdated", "BeneficiaryStatusChanged",
+            "CardPatternAlert.Raised", "CardPatternAlert.Reviewed",
+        ],
         [AuditCategory.Users] =
         [
             "UserLogin", "UserLoginFailed", "UserLockedOut", "UserCreated", "UserDeactivated", "UserReactivated",
@@ -16,7 +20,8 @@ public static class AuditActions
         [AuditCategory.Setup] =
         [
             "OrganizationCreated", "OrganizationUpdated", "OrganizationDeactivated", "OrganizationReactivated",
-            "Organization.PolicyChanged", "AgeCategoryCreated", "AgeCategoryUpdated", "AgeCategoryDeactivated",
+            "Organization.PolicyChanged", "CardPattern.Proposed", "CardPattern.Approved", "CardPattern.Rejected",
+            "AgeCategoryCreated", "AgeCategoryUpdated", "AgeCategoryDeactivated",
             "AgeCategoryReactivated", "WorkstationAutoRegistered", "WorkstationUpdated", "WorkstationDeactivated",
             "WorkstationReactivated", "SettingsUpdated",
         ],

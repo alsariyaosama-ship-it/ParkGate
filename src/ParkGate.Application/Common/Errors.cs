@@ -81,6 +81,15 @@ public static class Errors
         public static readonly Error InvalidPolicy = new("Gift.InvalidPolicy", "Gift policy configuration is invalid.");
     }
 
+    public static class CardPattern
+    {
+        public static readonly Error NotFound = new("CardPattern.NotFound", "Card-number pattern not found.");
+        public static readonly Error AlreadyDecided = new("CardPattern.AlreadyDecided", "The pattern was already approved or rejected.");
+        public static readonly Error AlertNotFound = new("CardPattern.AlertNotFound", "Card-number alert not found.");
+        public static readonly Error AlertAlreadyReviewed = new("CardPattern.AlertAlreadyReviewed", "The alert was already reviewed.");
+        public static readonly Error NoteTooLong = new("CardPattern.NoteTooLong", "The review note is longer than 250 characters.");
+    }
+
     public static class Organization
     {
         public static readonly Error NotFound = new("Organization.NotFound", "Organization not found.");

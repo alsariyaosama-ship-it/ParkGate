@@ -16,7 +16,8 @@ public sealed record BeneficiaryDto(
     string? StatusReason,
     DateTime? LastGrantedEntryUtc,
     string? Notes,
-    DateTime CreatedAtUtc);
+    DateTime CreatedAtUtc,
+    bool HasOpenCardAlert = false); // F8, BR-29: the number does not look like the organization's usual numbers
 
 public sealed record CompanionCountDto(
     int AgeCategoryId,
