@@ -282,6 +282,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [ ] R8.4 Rebuild the release as `v1.1.0`; delete the stale `artifacts/efbundle.exe`
 - [ ] R8.5 cPanel as the only web deployment path; write `docs/DEPLOYMENT_WEB_CPANEL.md` (Q-R1)
 - [ ] R8.6 "Upgrade from 1.0.0" section in `docs/DEPLOYMENT.md`
+- [x] R8.7 Web: update `laravel/framework` and `symfony/*` past their security advisories (found in R8.5: 9 advisories in production packages); PHP >= 8.4.1
 
 ### R9 — Documentation sync · branch `phase/r9-docs`
 - [ ] R9.1 `SPEC.md`: F1 as built, F3/F4/F5 rules, the A5/BR-11 mismatch, close answered questions
