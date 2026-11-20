@@ -287,7 +287,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 
 ### R9 — Documentation sync · branch `phase/r9-docs`
 - [ ] R9.1 `SPEC.md`: F1 as built, F3/F4/F5 rules, the A5/BR-11 mismatch, close answered questions
-- [ ] R9.2 `DECISIONS.md`: supersede ADR-013; new ADRs for R2.1, R2.2, R3.2, R6.1, R6.5
+- [x] R9.2 `DECISIONS.md`: ADR-013 superseded by ADR-028; ADR-029 (R2.1, R2.2), ADR-030 (R6.1); R3.2 and R6.5 are ADR-023 and ADR-027
 - [ ] R9.3 `AGENTS.md` (needs Osama's approval): project count, web test command, UI test location
 - [ ] R9.4 `USER_GUIDE_AR.md` and `TEST_SCRIPT.md`: new shortcuts, registration, void button, glossary
 - [ ] R9.5 `SESSION_HANDOFF.md`: final state, known issues, next steps
