@@ -30,6 +30,7 @@ public static class RolePermissions
             Permission.RedeemGift,
             Permission.OverrideGiftInterval,
             Permission.VoidGift,
+            Permission.ViewAuditLog,
             Permission.ViewFullNationalId
         ],
 
@@ -52,6 +53,7 @@ public static class RolePermissions
             Permission.RedeemGift,
             Permission.OverrideGiftInterval,
             Permission.VoidGift,
+            Permission.ViewAuditLog,
             Permission.ViewFullNationalId
         ]
     };

@@ -104,6 +104,7 @@ public partial class MainForm : RtlFormBase
         _menuDailyReport.Text = Strings.Menu_DailyReport;
         _menuOrgStatistics.Text = Strings.Menu_OrgStatistics;
         _menuGiftReceiptsReport.Text = Strings.Menu_GiftReceiptsReport;
+        _menuAuditLog.Text = Strings.Menu_AuditLog;
 
         _menuHelp.Text = Strings.Menu_Help;
         _menuAbout.Text = Strings.Menu_About;
@@ -161,7 +162,9 @@ public partial class MainForm : RtlFormBase
         _menuDailyReport.Visible = canViewReports;
         _menuOrgStatistics.Visible = canViewReports;
         _menuGiftReceiptsReport.Visible = canViewReports;
-        _menuReports.Visible = canViewReports;
+        var canViewAudit = _currentUser.Has(Permission.ViewAuditLog);
+        _menuAuditLog.Visible = canViewAudit;
+        _menuReports.Visible = canViewReports || canViewAudit;
 
         _beneficiariesControl?.ApplyPermissions();
     }
@@ -201,6 +204,7 @@ public partial class MainForm : RtlFormBase
         _menuDailyReport.Click += (_, _) => ShowReports(0);
         _menuOrgStatistics.Click += (_, _) => ShowReports(2);
         _menuGiftReceiptsReport.Click += (_, _) => ShowGiftReceiptsReport();
+        _menuAuditLog.Click += (_, _) => ShowAuditLog();
 
         _menuAbout.Click += OnAboutClicked;
     }
@@ -671,6 +675,18 @@ public partial class MainForm : RtlFormBase
         {
             form.ShowDialog(this);
         }
+    }
+
+    /// <summary>R5.20: the audit trail, for supervisors and admins.</summary>
+    public void ShowAuditLog()
+    {
+        if (!_currentUser.Has(Permission.ViewAuditLog))
+        {
+            return;
+        }
+
+        using var form = _formFactory.Create<AuditLogForm>();
+        form.ShowDialog(this);
     }
 
     public void ShowSettings()

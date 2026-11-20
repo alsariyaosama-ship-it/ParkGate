@@ -234,6 +234,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R5.17 Screen to void a gift voucher (gift receipts window)
 - [x] R5.18 Full audit details for every entry and gift operation (who, approver, visitor, day, data)
 - [x] R5.19 Gift receipts window: grid headers cut at 125 % (fixed 44 px header height in `Theme.ApplyGridStyle`) and date boxes show MM/dd instead of dd/MM/yyyy
+- [x] R5.20 Audit trail screen (Reports > سجل التتبع), supervisors and admins
 
 ### R6 — Database design · branch `phase/r6-database`
 - [x] R6.1 Entry-card tables as EF entities and migration (EF only, ADR-025); remove the initializer, procedures, view and SQL script

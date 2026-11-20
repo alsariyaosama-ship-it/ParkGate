@@ -50,6 +50,7 @@ partial class MainForm
         _menuDailyReport = new ToolStripMenuItem();
         _menuOrgStatistics = new ToolStripMenuItem();
         _menuGiftReceiptsReport = new ToolStripMenuItem();
+        _menuAuditLog = new ToolStripMenuItem();
         _menuHelp = new ToolStripMenuItem();
         _menuAbout = new ToolStripMenuItem();
         _statusStrip = new StatusStrip();
@@ -198,7 +199,7 @@ partial class MainForm
         // 
         // _menuReports
         // 
-        _menuReports.DropDownItems.AddRange(new ToolStripItem[] { _menuDailyReport, _menuOrgStatistics, _menuGiftReceiptsReport });
+        _menuReports.DropDownItems.AddRange(new ToolStripItem[] { _menuDailyReport, _menuOrgStatistics, _menuGiftReceiptsReport, _menuAuditLog });
         _menuReports.Name = "_menuReports";
         _menuReports.Size = new Size(74, 36);
         _menuReports.Text = "التقارير";
@@ -220,6 +221,12 @@ partial class MainForm
         _menuGiftReceiptsReport.Name = "_menuGiftReceiptsReport";
         _menuGiftReceiptsReport.Size = new Size(216, 36);
         _menuGiftReceiptsReport.Text = "تقرير قسائم الهدايا";
+        // 
+        // _menuAuditLog
+        // 
+        _menuAuditLog.Name = "_menuAuditLog";
+        _menuAuditLog.Size = new Size(216, 36);
+        _menuAuditLog.Text = "سجل التتبع";
         // 
         // _menuHelp
         // 
@@ -421,6 +428,7 @@ partial class MainForm
     private System.Windows.Forms.ToolStripMenuItem _menuDailyReport;
     private System.Windows.Forms.ToolStripMenuItem _menuOrgStatistics;
     private System.Windows.Forms.ToolStripMenuItem _menuGiftReceiptsReport;
+    private System.Windows.Forms.ToolStripMenuItem _menuAuditLog;
     private System.Windows.Forms.ToolStripMenuItem _menuHelp;
     private System.Windows.Forms.ToolStripMenuItem _menuAbout;
     private System.Windows.Forms.StatusStrip _statusStrip;

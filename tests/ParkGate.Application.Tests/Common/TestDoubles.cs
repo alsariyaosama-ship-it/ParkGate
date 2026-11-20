@@ -432,6 +432,15 @@ public sealed class FakeAuditLogRepository : IAuditLogRepository
 
     public Task<IReadOnlyList<AuditLog>> GetRecentAsync(int count, CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<AuditLog>>(_logs.OrderByDescending(l => l.AtUtc).Take(count).ToList());
+
+    public Task<IReadOnlyList<AuditLog>> SearchAsync(DateTime fromUtc, DateTime toUtc, IReadOnlyCollection<string>? actions, string? detailsFragment, int maxRows, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<AuditLog>>(_logs
+            .Where(l => l.AtUtc >= fromUtc && l.AtUtc < toUtc)
+            .Where(l => actions is null || actions.Contains(l.Action))
+            .Where(l => detailsFragment is null || (l.DetailsJson?.Contains(detailsFragment, StringComparison.Ordinal) ?? false))
+            .OrderByDescending(l => l.AtUtc)
+            .Take(maxRows)
+            .ToList());
 }
 
 public sealed class FakeSyncOutboxRepository : ISyncOutboxRepository
