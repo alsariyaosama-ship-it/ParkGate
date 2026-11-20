@@ -82,7 +82,8 @@ Name: "{autodesktop}\{#MyAppArabicName}"; Filename: "{app}\{#MyAppExeName}"; Tas
 
 [Run]
 ; 1. Configure server (run migrations, save connection, set firewall) in Server mode only
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\scripts\Setup-ProductionDatabase.ps1"" -SqlServer "".\SQLEXPRESS"" -Database ""ParkGate"" -MigrationBundlePath ""{app}\database\ParkGate.Migrations.exe"""; StatusMsg: "جاري إنشاء وترقية قاعدة البيانات وضبط الاتصال بالخادم..."; Flags: runhidden; Check: IsServerMode
+; Visible window (R6.5): it shows the generated parkgate_app password once and waits for Enter.
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\scripts\Setup-ProductionDatabase.ps1"" -SqlServer "".\SQLEXPRESS"" -Database ""ParkGate"" -MigrationBundlePath ""{app}\database\ParkGate.Migrations.exe"""; StatusMsg: "جاري إنشاء وترقية قاعدة البيانات وضبط الاتصال بالخادم..."; Check: IsServerMode
 
 ; 2. Launch ParkGate application
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchApp}"; Flags: nowait postinstall skipifsilent
