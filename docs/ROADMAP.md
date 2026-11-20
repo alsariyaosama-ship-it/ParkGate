@@ -151,7 +151,8 @@ Owner, 2026-11-20: the entry days come first; days change rarely and by hand, pe
 - [x] T8.1b Domain: card-number shape and pattern matcher (table-driven tests)
 - [x] T8.2b Infrastructure: pattern and alert tables, settings seed, repositories, integration tests
 - [x] T8.3b Application: pattern check on register and card change writes alerts; Admin use cases to approve or reject patterns and review alerts
-- [ ] T8.4b WinForms: amber pattern note; Admin pattern and alert screens
+- [x] T8.4b WinForms: amber pattern note; Admin pattern and alert screens
+- [x] T8.7 `RtlTabControl` (R5.13) failed with "Error creating window handle" when a window with tabs was created on a 125 % screen (`SettingsForm` too); found by the T8.4b screen check
 - [ ] T8.5 Sync: add `AllowedEntryDays` and `GiftAnyDay` to the cloud schema (Q14)
 - [ ] T8.6 Docs and `TEST_SCRIPT.md` steps for BR-27..BR-29
 

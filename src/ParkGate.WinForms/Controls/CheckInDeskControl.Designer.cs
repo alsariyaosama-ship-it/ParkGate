@@ -47,6 +47,7 @@ partial class CheckInDeskControl
         this._lblHolderLastEntry = new System.Windows.Forms.Label();
         this._lblHolderStatusTitle = new System.Windows.Forms.Label();
         this._lblHolderStatus = new System.Windows.Forms.Label();
+        this._lblCardAlert = new System.Windows.Forms.Label();
         this._grpCompanions = new ParkGate.WinForms.Controls.RtlGroupBox();
         this._pnlCompanionsTotal = new System.Windows.Forms.Panel();
         this._lblFreeCompanions = new System.Windows.Forms.Label();
@@ -258,6 +259,7 @@ partial class CheckInDeskControl
         this._tblHolder.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
         this._tblHolder.Controls.Add(this._lblHolderNameTitle, 0, 0);
         this._tblHolder.Controls.Add(this._lblHolderName, 1, 0);
+        this._tblHolder.Controls.Add(this._lblCardAlert, 3, 0);
         this._tblHolder.Controls.Add(this._lblHolderPhoneTitle, 0, 1);
         this._tblHolder.Controls.Add(this._lblHolderPhone, 1, 1);
         this._tblHolder.Controls.Add(this._lblHolderOrgTitle, 2, 1);
@@ -432,6 +434,19 @@ partial class CheckInDeskControl
         this._lblHolderStatus.Size = new System.Drawing.Size(13, 17);
         this._lblHolderStatus.TabIndex = 13;
         this._lblHolderStatus.Text = "-";
+        // 
+        // _lblCardAlert
+        // 
+        this._lblCardAlert.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._lblCardAlert.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+        this._lblCardAlert.AutoEllipsis = true;
+        this._lblCardAlert.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblCardAlert.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(91)))), ((int)(((byte)(0)))));
+        this._lblCardAlert.Name = "_lblCardAlert";
+        this._lblCardAlert.Size = new System.Drawing.Size(200, 20);
+        this._lblCardAlert.TabIndex = 14;
+        this._lblCardAlert.Text = "رقم غير معتاد";
+        this._lblCardAlert.Visible = false;
         // 
         // _grpCompanions
         // 
@@ -704,6 +719,7 @@ partial class CheckInDeskControl
     private System.Windows.Forms.Label _lblHolderLastEntry;
     private System.Windows.Forms.Label _lblHolderStatusTitle;
     private System.Windows.Forms.Label _lblHolderStatus;
+    private System.Windows.Forms.Label _lblCardAlert;
     private ParkGate.WinForms.Controls.RtlGroupBox _grpCompanions;
     private System.Windows.Forms.FlowLayoutPanel _flowCounters;
     private System.Windows.Forms.Panel _pnlCompanionsTotal;
