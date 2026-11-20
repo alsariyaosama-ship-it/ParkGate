@@ -64,38 +64,42 @@ New-NetFirewallRule -DisplayName "ParkGate SQL Browser (UDP 1434)" `
 
 ---
 
-## 3. تهيئة قواعد البيانات والمستخدمين (SQL Logins)
+## 3. قاعدة البيانات وحساب الدخول (R6.5)
 
-لضمان أعلى معايير الأمان (Least Privilege) وفق مبادئ ParkGate:
+لا يُثبَّت SQL Server إلا على جهاز الخادم. أجهزة الشبابيك عليها برنامج ParkGate فقط، وتتصل بالخادم عبر الشبكة.
 
-1. افتح **SQL Server Management Studio (SSMS)** وسجل الدخول كـ `sa`.
-2. أنشئ قاعدة البيانات:
-```sql
-CREATE DATABASE ParkGate
-COLLATE Arabic_100_CI_AS;
-GO
+### 3.1 الحسابان
+| الحساب | من يستخدمه | الصلاحيات |
+|---|---|---|
+| حساب Windows للمسؤول على الخادم | سكربت الإعداد فقط، عند التثبيت والترقية | ينشئ قاعدة البيانات ويعدّل بنيتها (الترحيلات) |
+| `parkgate_app` (حساب SQL) | البرنامج على كل الشبابيك، والخادم، وخدمة المزامنة | قراءة وكتابة ونسخ احتياطي فقط (`db_datareader`، `db_datawriter`، `db_backupoperator`). لا يستطيع إنشاء الجداول ولا حذفها ولا تعديلها |
+
+حساب واحد تشترك فيه الشبابيك كلها. أما من فعل ماذا فيُعرف من مستخدمي ParkGate وسجل التتبع، وليس من حساب SQL.
+
+### 3.2 السكربت
+ينفّذه المثبّت تلقائيًا في وضع الخادم، في نافذة ظاهرة. ويمكن تشغيله يدويًا كمسؤول:
+```powershell
+& "C:\Program Files\ParkGate\scripts\Setup-ProductionDatabase.ps1" -MigrationBundlePath "C:\Program Files\ParkGate\database\ParkGate.Migrations.exe"
 ```
+ماذا يفعل:
+1. يطبّق الترحيلات بحساب Windows للمسؤول.
+2. يتأكد أن SQL Server يقبل حسابات SQL (Mixed Mode، القسم 2.1). إن لم يكن كذلك يتوقف ويشرح السبب.
+3. ينشئ `parkgate_app` بكلمة مرور قوية يولّدها، ويعرضها **مرة واحدة** وينتظر الضغط على Enter. سجّلها في مكان آمن، لأنك ستحتاجها على كل شباك.
+4. يحفظ الاتصال بهذا الحساب مشفرًا في `%ProgramData%\ParkGate\connection.dat` على الخادم.
+5. يفتح المنفذين 1433 و1434 في جدار الحماية للشبكات الخاصة فقط، ويحذف قواعد الإصدار 1.0.0 المفتوحة لكل الشبكات.
+6. ينبّه إذا كانت شبكة الخادم مصنفة «عامة» (Public)، أو إذا لم يكن SQL Server يستمع على المنفذ 1433.
 
-3. أنشئ المستخدمين والصلاحيات:
-- **مستخدم التشغيل اليومي (`ParkGateAppUser`):** يمتلك صلاحيات القراءة والكتابة فقط دون صلاحيات تعديل البنية (DDL):
-```sql
-CREATE LOGIN ParkGateAppUser WITH PASSWORD = 'Strong_Password_App_2026!', CHECK_POLICY = ON;
-USE ParkGate;
-CREATE USER ParkGateAppUser FOR LOGIN ParkGateAppUser;
-ALTER ROLE db_datareader ADD MEMBER ParkGateAppUser;
-ALTER ROLE db_datawriter ADD MEMBER ParkGateAppUser;
-GRANT EXECUTE TO ParkGateAppUser;
-GO
-```
+تشغيل السكربت مرة ثانية، كما في الترقية، **لا يغيّر كلمة المرور** ولا يكتب فوق `connection.dat`.
 
-- **مستخدم النشر والترحيل (`ParkGateDeployUser`):** يُستخدم فقط لتطبيق ترحيلات EF Core:
-```sql
-CREATE LOGIN ParkGateDeployUser WITH PASSWORD = 'Strong_Password_Deploy_2026!', CHECK_POLICY = ON;
-USE ParkGate;
-CREATE USER ParkGateDeployUser FOR LOGIN ParkGateDeployUser;
-ALTER ROLE db_owner ADD MEMBER ParkGateDeployUser;
-GO
+### 3.3 تغيير كلمة المرور
+إذا تسربت كلمة المرور أو نُسيت:
+```powershell
+& "C:\Program Files\ParkGate\scripts\Setup-ProductionDatabase.ps1" -MigrationBundlePath "C:\Program Files\ParkGate\database\ParkGate.Migrations.exe" -ResetAppPassword
 ```
+يعرض السكربت كلمة المرور الجديدة ويحدّث اتصال الخادم. ثم أدخلها على كل شباك من شاشة الاتصال (القسم 5.3).
+
+### 3.4 شبكة الخادم
+في Workgroup يصنّف Windows الشبكة أحيانًا «عامة». حينها لا تصل الشبابيك إلى SQL Server. غيّرها إلى «خاصة» من: الإعدادات ← الشبكة ← خصائص الاتصال ← شبكة خاصة.
 
 ---
 
@@ -112,9 +116,9 @@ GO
 الأمر اليدوي المكافئ يحتاج `--startup-project src/ParkGate.Infrastructure`، لأن مشروع WinForms لا يصلح لأدوات EF.
 
 ### 4.2 تطبيق الحزمة على الخادم
-انسخ ملف `efbundle.exe` إلى الخادم ونفّذه مع تمرير سلسلة الاتصال الخاصة بمستخدم الترحيل:
+سكربت الإعداد (القسم 3.2) يطبّق الحزمة تلقائيًا. لتطبيقها يدويًا، نفّذها على الخادم كمسؤول بحساب Windows:
 ```powershell
-.\efbundle.exe --connection "Server=localhost\SQLEXPRESS;Database=ParkGate;User Id=ParkGateDeployUser;Password=Strong_Password_Deploy_2026!;TrustServerCertificate=True;"
+.\ParkGate.Migrations.exe --connection "Server=.\SQLEXPRESS;Database=ParkGate;Trusted_Connection=True;TrustServerCertificate=True"
 ```
 
 سيقوم الملف بإنشاء كافة الجداول والقيود (Constraints) والفهارس وتعبئة البيانات الأولية (البذور Seed Data) تلقائياً.
@@ -149,8 +153,8 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
    - **الخادم (Server):** عنوان IP الخادم (مثال: `192.168.1.100\SQLEXPRESS` أو `192.168.1.100,1433`).
    - **قاعدة البيانات:** `ParkGate`.
    - **نوع المصادقة:** مصادقة SQL Server.
-   - **المستخدم:** `ParkGateAppUser`.
-   - **كلمة المرور:** `Strong_Password_App_2026!`.
+   - **المستخدم:** `parkgate_app`.
+   - **كلمة المرور:** التي عرضها سكربت الإعداد على الخادم (القسم 3.2).
 3. اضغط **اختبار الاتصال** للتأكد من نجاح الاتصال بالخادم عبر الشبكة المحلية.
 4. اضغط **حفظ ومتابعة**.
 5. يقوم البرنامج بتشفير بيانات الاتصال وتخزينها بأمان في `%ProgramData%\ParkGate\connection.dat` باستخدام تقنية **Windows DPAPI** بنطاق الجهاز (`DataProtectionScope.LocalMachine`)، بحيث لا تظهر كلمات المرور كنص مقروء في أي ملف نصي أو إعدادات مفتوحة.
@@ -318,7 +322,8 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
    ```powershell
    & "C:\Program Files\ParkGate\database\ParkGate.Migrations.exe" --connection "Server=.\SQLEXPRESS;Database=ParkGate;Trusted_Connection=True;TrustServerCertificate=True"
    ```
-   الاتصال بحساب Windows للمسؤول. فصل حساب SQL للتشغيل عن حساب الترحيل لم يُنفّذ بعد (R6.5، ينتظر إجابة Q-R6)، لذلك لا تغيّر حساب الاتصال في هذه الترقية.
+   الاتصال بحساب Windows للمسؤول، وهو حساب الترحيل (القسم 3.1).
+4. في أول ترقية ينشئ المثبّت الحساب `parkgate_app` ويعرض كلمة مروره مرة واحدة (القسم 3.2). سجّلها، لأن الشبابيك تحتاجها في الخطوة 10.4.
 
 ### 10.3 خدمة المزامنة
 1. أزل الخدمة القديمة:
@@ -337,7 +342,8 @@ dotnet publish src/ParkGate.WinForms/ParkGate.WinForms.csproj `
    يجد السكربت الوكيل في `C:\Program Files\ParkGate\sync-agent` تلقائيًا.
 
 ### 10.4 أجهزة الشبابيك
-شغّل `ParkGate_Setup_v1.1.0.exe` على كل شباك واختر وضع الشباك. يبقى الاتصال المحفوظ في `connection.dat` كما هو.
+شغّل `ParkGate_Setup_v1.1.0.exe` على كل شباك واختر وضع الشباك.
+ثم افتح البرنامج، وغيّر الاتصال إلى حساب SQL `parkgate_app` بكلمة المرور التي عرضها سكربت الخادم (القسم 5.3). بعد ذلك لا تحتاج الشبابيك حسابات Windows مطابقة للخادم.
 
 ### 10.5 لوحة الويب
 - ابنِ الحزمة وانشرها حسب `docs/DEPLOYMENT_WEB_CPANEL.md` §6. اللوحة تحتاج الآن PHP 8.4.1 أو أحدث.

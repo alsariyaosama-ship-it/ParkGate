@@ -185,6 +185,14 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 
 ---
 
+### ADR-027 — One least-privilege SQL login for the desks; migrations with the server administrator
+- **Status:** Proposed (R6.5, 2026-11-20; Q-R6: workgroup, at most 4 desks)
+- **Context:** The server setup stored a Windows-authentication connection for every client. In a workgroup the server does not know the desks' Windows accounts, so desks needed matching local accounts. The documented `ParkGateAppUser` / `ParkGateDeployUser` logins were never created by any script, and the firewall rules were open on every network profile.
+- **Decision:** `Setup-ProductionDatabase.ps1` creates one SQL login, `parkgate_app`, shared by every desk, the server and the Sync Agent: `db_datareader`, `db_datawriter`, `db_backupoperator` (the admin "backup now"), never `db_owner` or `db_ddladmin`. The password is generated (letters and digits, no look-alikes), shown once, and stored only DPAPI-protected in `connection.dat`; `CHECK_EXPIRATION = OFF` so an expiry cannot stop every desk at once. Migrations run with the server administrator's Windows account, so there is no second SQL password to keep (the plan proposed a separate migration login). The firewall rules allow private and domain networks only.
+- **Consequences:** A stolen desk password can read and change data but cannot drop or alter tables. Who did what is still traced by ParkGate users and the audit trail, not by the SQL login. Mixed Mode must be on (DEPLOYMENT.md 2.1); the script stops with an explanation if it is not. Re-running the script never changes the password; `-ResetAppPassword` does, and then every desk needs the new one.
+
+---
+
 <!-- Template for new ADRs:
 ### ADR-0XX — Title
 - **Status:** Proposed | Accepted | Superseded by ADR-0YY
