@@ -9,6 +9,8 @@
     <Company>شركة الركاز المتين لتقنية المعلومات</Company>
     <Product>ParkGate</Product>
     <NeutralLanguage>ar-LY</NeutralLanguage>
+    <!-- Release version (R8.4); the installer takes the same number. -->
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <!-- Warnings are errors everywhere except the WinForms project (designer noise). Keep WinForms warning-free anyway. -->

@@ -30,6 +30,8 @@ if ([string]::IsNullOrWhiteSpace($BinaryPath)) {
     $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
     $rootDir = Split-Path -Parent $scriptDir
     $candidates = @(
+        Join-Path $rootDir "sync-agent\ParkGate.SyncAgent.exe",
+        Join-Path $rootDir "dist\sync-agent\ParkGate.SyncAgent.exe",
         Join-Path $rootDir "publish\sync-agent\ParkGate.SyncAgent.exe",
         Join-Path $rootDir "src\ParkGate.SyncAgent\bin\Release\net10.0\publish\ParkGate.SyncAgent.exe",
         Join-Path $rootDir "src\ParkGate.SyncAgent\bin\Release\net10.0\ParkGate.SyncAgent.exe",
