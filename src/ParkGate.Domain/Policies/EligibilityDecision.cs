@@ -53,7 +53,7 @@ public sealed record EligibilityDecision
 
     /// <summary>
     /// Determines whether a denial reason can be overridden by a supervisor per BR-11.
-    /// Allowed for: cooldown, expired card, suspended holder.
+    /// Allowed for: cooldown, expired card, suspended holder, not an entry day (BR-27).
     /// Not allowed for: blocked holder, inactive organization.
     /// </summary>
     public static bool CanOverride(DenialReason reason)
@@ -63,6 +63,7 @@ public sealed record EligibilityDecision
             Enums.DenialReason.CooldownActive => true,
             Enums.DenialReason.CardExpired => true,
             Enums.DenialReason.HolderSuspended => true,
+            Enums.DenialReason.DayNotAllowed => true,
             Enums.DenialReason.HolderBlocked => false,
             Enums.DenialReason.OrganizationInactive => false,
             _ => false

@@ -11,6 +11,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
 {
     private readonly RollingIntervalGiftEligibilityPolicy _policy = new();
     private readonly DateTime _baseTimeUtc = new(2026, 10, 4, 12, 0, 0, DateTimeKind.Utc);
+    private static readonly DateOnly Today = new(2026, 10, 4);
 
     // --- Helpers ---
 
@@ -60,7 +61,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     public void Evaluate_NoGrantedEntryToday_DeniedAndNotOverridable()
     {
         // Owner, 2026-11-18: a gift only for a visitor who already entered today.
-        var context = new GiftEligibilityContext(ActiveOrg(), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: false);
+        var context = new GiftEligibilityContext(ActiveOrg(), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: false, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -72,7 +73,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     [Fact]
     public void Evaluate_NoEntryTodayAndIntervalNotElapsed_ReportsNoEntryFirst()
     {
-        var context = new GiftEligibilityContext(ActiveOrg(), ActiveHolder(), _baseTimeUtc.AddDays(-1), _baseTimeUtc, hasEntryToday: false);
+        var context = new GiftEligibilityContext(ActiveOrg(), ActiveHolder(), _baseTimeUtc.AddDays(-1), _baseTimeUtc, hasEntryToday: false, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -83,7 +84,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     [Fact]
     public void Evaluate_GiftsNotEnabledAndNoEntryToday_ReportsGiftsNotEnabled()
     {
-        var context = new GiftEligibilityContext(ActiveOrg(giftEnabled: false), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: false);
+        var context = new GiftEligibilityContext(ActiveOrg(giftEnabled: false), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: false, businessDate: Today);
 
         _policy.Evaluate(context).Reason.ShouldBe(GiftDenialReason.GiftsNotEnabled);
     }
@@ -97,7 +98,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     [Fact]
     public void Evaluate_NoPreviousGift_ReturnsEligible()
     {
-        var context = new GiftEligibilityContext(ActiveOrg(), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(ActiveOrg(), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -120,7 +121,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
         var boundary = lastGiftUtc.AddDays(intervalDays);
         var nowUtc = boundary.AddSeconds(secondOffset);
 
-        var context = new GiftEligibilityContext(ActiveOrg(intervalDays: intervalDays), ActiveHolder(), lastGiftUtc, nowUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(ActiveOrg(intervalDays: intervalDays), ActiveHolder(), lastGiftUtc, nowUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -137,7 +138,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     [Fact]
     public void Evaluate_OrganizationInactive_ReturnsDenied_CannotBeOverridden()
     {
-        var context = new GiftEligibilityContext(InactiveOrg(), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(InactiveOrg(), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -149,7 +150,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     [Fact]
     public void Evaluate_GiftsNotEnabled_ReturnsDenied_CannotBeOverridden()
     {
-        var context = new GiftEligibilityContext(ActiveOrg(giftEnabled: false), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(ActiveOrg(giftEnabled: false), ActiveHolder(), null, _baseTimeUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -161,7 +162,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     [Fact]
     public void Evaluate_HolderBlocked_ReturnsDenied_CannotBeOverridden()
     {
-        var context = new GiftEligibilityContext(ActiveOrg(), BlockedHolder(), null, _baseTimeUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(ActiveOrg(), BlockedHolder(), null, _baseTimeUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -173,7 +174,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     [Fact]
     public void Evaluate_HolderSuspended_ReturnsDenied_CannotBeOverridden()
     {
-        var context = new GiftEligibilityContext(ActiveOrg(), SuspendedHolder(), null, _baseTimeUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(ActiveOrg(), SuspendedHolder(), null, _baseTimeUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -187,7 +188,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
     {
         // Both Blocked and interval not elapsed — Blocked wins (check order 3 before 5)
         var lastGiftUtc = _baseTimeUtc.AddDays(-1); // only 1 day passed, interval is 30
-        var context = new GiftEligibilityContext(ActiveOrg(), BlockedHolder(), lastGiftUtc, _baseTimeUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(ActiveOrg(), BlockedHolder(), lastGiftUtc, _baseTimeUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 
@@ -203,7 +204,7 @@ public sealed class RollingIntervalGiftEligibilityPolicyTests
         org.Deactivate();
         // GiftEnabled defaults to false, intervalDays defaults to DefaultGiftIntervalDays
         // Don't call ConfigureGift to keep gifts disabled
-        var context = new GiftEligibilityContext(org, BlockedHolder(), null, _baseTimeUtc, hasEntryToday: true);
+        var context = new GiftEligibilityContext(org, BlockedHolder(), null, _baseTimeUtc, hasEntryToday: true, businessDate: Today);
 
         var decision = _policy.Evaluate(context);
 

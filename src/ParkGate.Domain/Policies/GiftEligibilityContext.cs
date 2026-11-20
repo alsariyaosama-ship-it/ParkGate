@@ -11,6 +11,9 @@ public sealed record GiftEligibilityContext
     public BeneficiaryStatus HolderStatus { get; }
     public DateTime? LastGiftIssuedUtc { get; }
     public bool HasEntryToday { get; }
+
+    /// <summary>F8, BR-28: today is an entry day of the organization, or its gifts are given on any day.</summary>
+    public bool IsGiftDay { get; }
     public DateTime NowUtc { get; }
 
     public GiftEligibilityContext(
@@ -18,7 +21,8 @@ public sealed record GiftEligibilityContext
         Beneficiary holder,
         DateTime? lastGiftIssuedUtc,
         DateTime nowUtc,
-        bool hasEntryToday)
+        bool hasEntryToday,
+        DateOnly businessDate)
     {
         ArgumentNullException.ThrowIfNull(organization);
         ArgumentNullException.ThrowIfNull(holder);
@@ -35,5 +39,6 @@ public sealed record GiftEligibilityContext
         LastGiftIssuedUtc = lastGiftIssuedUtc;
         NowUtc = nowUtc;
         HasEntryToday = hasEntryToday;
+        IsGiftDay = organization.GiftAnyDay || organization.IsEntryDay(businessDate);
     }
 }

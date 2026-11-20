@@ -21,5 +21,5 @@ public sealed record GiftEligibilityDecision
         new(true, null, null, false);
 
     public static GiftEligibilityDecision Denied(GiftDenialReason reason, DateTime? nextEligibleAtUtc = null) =>
-        new(false, reason, nextEligibleAtUtc, reason == GiftDenialReason.IntervalNotElapsed);
+        new(false, reason, nextEligibleAtUtc, reason is GiftDenialReason.IntervalNotElapsed or GiftDenialReason.DayNotAllowed);
 }

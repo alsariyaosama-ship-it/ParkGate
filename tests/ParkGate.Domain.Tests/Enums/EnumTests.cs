@@ -33,6 +33,7 @@ public sealed class EnumTests
         ((byte)DenialReason.HolderBlocked).ShouldBe((byte)3);
         ((byte)DenialReason.CardExpired).ShouldBe((byte)4);
         ((byte)DenialReason.OrganizationInactive).ShouldBe((byte)5);
+        ((byte)DenialReason.DayNotAllowed).ShouldBe((byte)6);
     }
 
     [Fact]

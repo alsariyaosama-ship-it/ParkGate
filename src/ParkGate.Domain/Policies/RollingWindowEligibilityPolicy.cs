@@ -28,19 +28,26 @@ public sealed class RollingWindowEligibilityPolicy : IEntryEligibilityPolicy
             return EligibilityDecision.Denied(DenialReason.HolderBlocked, effectiveCooldownMinutes);
         }
 
-        // 3. Holder Suspended
+        // 3. Not an entry day of the organization (BR-27). After "blocked" on purpose: an override skips only the
+        // first reason, so every reason that cannot be overridden must come before this one.
+        if (!context.AllowedEntryDays.Includes(context.LocalTodayDate.DayOfWeek))
+        {
+            return EligibilityDecision.Denied(DenialReason.DayNotAllowed, effectiveCooldownMinutes);
+        }
+
+        // 4. Holder Suspended
         if (context.BeneficiaryStatus == BeneficiaryStatus.Suspended)
         {
             return EligibilityDecision.Denied(DenialReason.HolderSuspended, effectiveCooldownMinutes);
         }
 
-        // 4. Card expired (CardExpiryDate < today local)
+        // 5. Card expired (CardExpiryDate < today local)
         if (context.CardExpiryDate.HasValue && context.CardExpiryDate.Value < context.LocalTodayDate)
         {
             return EligibilityDecision.Denied(DenialReason.CardExpired, effectiveCooldownMinutes);
         }
 
-        // 5. Cooldown check (BR-03, BR-04)
+        // 6. Cooldown check (BR-03, BR-04)
         if (context.LastGrantedEntryUtc.HasValue)
         {
             var nextEligibleAtUtc = context.LastGrantedEntryUtc.Value.AddMinutes(effectiveCooldownMinutes);

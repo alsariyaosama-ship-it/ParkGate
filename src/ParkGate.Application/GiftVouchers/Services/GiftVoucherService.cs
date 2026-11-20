@@ -73,7 +73,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, await GetTimeZoneIdAsync(uow, ct));
         var enteredToday = await uow.EntryAttempts.HasGrantedEntryOnAsync(holder.Id, businessDate, ct);
 
-        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday);
+        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday, businessDate);
         var decision = _policy.Evaluate(context);
 
         return MapToEligibilityDto(decision, org.GiftValue, lastIssuedUtc);
@@ -121,7 +121,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         var lastIssuedUtc = await uow.GiftVouchers.GetLatestIssuedUtcAsync(holder.Id, ct);
         var enteredToday = await uow.EntryAttempts.HasGrantedEntryOnAsync(holder.Id, businessDate, ct);
-        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday);
+        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday, businessDate);
         var decision = _policy.Evaluate(context);
 
         if (!decision.IsEligible)
@@ -236,7 +236,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         var lastIssuedUtc = await uow.GiftVouchers.GetLatestIssuedUtcAsync(holder.Id, ct);
         var enteredToday = await uow.EntryAttempts.HasGrantedEntryOnAsync(holder.Id, businessDate, ct);
-        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday);
+        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday, businessDate);
         var decision = _policy.Evaluate(context);
 
         if (!decision.IsEligible && !decision.CanBeOverridden)

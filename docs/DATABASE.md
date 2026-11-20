@@ -29,7 +29,8 @@ UserRole          : 1 Operator, 2 Supervisor, 3 Admin
 WorkstationType   : 1 Desk, 2 Gate (F2)
 GiftVoucherStatus : 1 Issued, 2 Redeemed, 3 Voided
 GiftDenialReason  : 1 OrganizationInactive, 2 GiftsNotEnabled, 3 HolderBlocked,
-                    4 HolderSuspended, 5 IntervalNotElapsed, 6 DayNotAllowed (F8)
+                    4 HolderSuspended, 5 IntervalNotElapsed, 6 NoEntryToday (BR-30),
+                    7 DayNotAllowed (F8)
 CardPatternStatus      : 1 Proposed, 2 Approved, 3 Rejected   (F8)
 CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 ```
@@ -49,8 +50,8 @@ CardPatternAlertStatus : 1 Open, 2 Reviewed                    (F8)
 | GiftEnabled | bit NOT NULL | F5. Default 0 |
 | GiftValue | decimal(10,3) NOT NULL | F5. Default 0. CHECK `GiftEnabled = 0 OR GiftValue > 0` (`CK_Organizations_GiftValue`) |
 | GiftIntervalDays | int NOT NULL | F5. Default 30. CHECK 1..365 (`CK_Organizations_GiftIntervalDays`) |
-| AllowedEntryDays | tinyint NOT NULL | F8, proposed (add when F8 starts), BR-27. Bit mask, bit 0 = Sunday … bit 6 = Saturday (.NET `DayOfWeek`). Default 127 (all days). CHECK 1..127 (`CK_Organizations_AllowedEntryDays`) |
-| GiftAnyDay | bit NOT NULL | F8, proposed (add when F8 starts), BR-28. Default 0 = gifts only on allowed entry days |
+| AllowedEntryDays | tinyint NOT NULL | F8, BR-27. Bit mask, bit 0 = Sunday … bit 6 = Saturday (.NET `DayOfWeek`). Default 127 (all days). CHECK 1..127 (`CK_Organizations_AllowedEntryDays`) |
+| GiftAnyDay | bit NOT NULL | F8, BR-28. Default 0 = gifts only on allowed entry days |
 | audit columns, RowVersion | | |
 
 ### 3.2 `Beneficiaries` — حاملو البطاقات
