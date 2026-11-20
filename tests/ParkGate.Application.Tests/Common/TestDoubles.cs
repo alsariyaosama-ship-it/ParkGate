@@ -194,6 +194,9 @@ public sealed class FakeBeneficiaryRepository : IBeneficiaryRepository
     public Task<Beneficiary?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         Task.FromResult(_beneficiaries.FirstOrDefault(b => b.Id == id));
 
+    public Task<IReadOnlyList<string>> GetCardNumbersByOrganizationAsync(int organizationId, CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<string>>(_beneficiaries.Where(b => b.OrganizationId == organizationId).Select(b => b.CardNumber.Value).ToList());
+
     public Task<IReadOnlyList<Beneficiary>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
     {
         var idSet = ids.ToHashSet();
@@ -492,6 +495,65 @@ public sealed class FakeSyncOutboxRepository : ISyncOutboxRepository
     }
 }
 
+/// <summary>F8: in-memory patterns; ids are given on Add, as the database would on save.</summary>
+public sealed class FakeCardPatternRepository : ICardPatternRepository
+{
+    private int _nextId = 1;
+
+    public List<OrganizationCardPattern> Patterns { get; } = [];
+
+    public Task<IReadOnlyList<OrganizationCardPattern>> GetByOrganizationAsync(int organizationId, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<OrganizationCardPattern>>(Patterns.Where(p => p.OrganizationId == organizationId).ToList());
+
+    public Task<OrganizationCardPattern?> GetByIdAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Patterns.FirstOrDefault(p => p.Id == id));
+
+    public Task<IReadOnlyList<OrganizationCardPattern>> ListAsync(CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<OrganizationCardPattern>>(Patterns.OrderByDescending(p => p.ProposedAtUtc).ToList());
+
+    public void Add(OrganizationCardPattern pattern)
+    {
+        typeof(OrganizationCardPattern).GetProperty(nameof(OrganizationCardPattern.Id))!.SetValue(pattern, _nextId++);
+        Patterns.Add(pattern);
+    }
+}
+
+/// <summary>F8: in-memory alerts.</summary>
+public sealed class FakeCardPatternAlertRepository : ICardPatternAlertRepository
+{
+    private long _nextId = 1;
+
+    public List<CardPatternAlert> Alerts { get; } = [];
+
+    public void Add(CardPatternAlert alert)
+    {
+        typeof(CardPatternAlert).GetProperty(nameof(CardPatternAlert.Id))!.SetValue(alert, _nextId++);
+        Alerts.Add(alert);
+    }
+
+    public Task<CardPatternAlert?> GetByIdAsync(long id, CancellationToken ct = default) =>
+        Task.FromResult(Alerts.FirstOrDefault(a => a.Id == id));
+
+    public Task<IReadOnlyList<string>> GetOpenCardNumbersAsync(int organizationId, string shape, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<string>>(Open(organizationId, shape).Select(a => a.CardNumber).ToList());
+
+    public Task<IReadOnlyList<CardPatternAlert>> GetOpenForUpdateAsync(int organizationId, string shape, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<CardPatternAlert>>(Open(organizationId, shape).ToList());
+
+    public Task<IReadOnlyList<CardPatternAlert>> ListAsync(bool openOnly, int maxRows, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<CardPatternAlert>>(Alerts
+            .Where(a => !openOnly || a.Status == ParkGate.Domain.CardPatterns.CardPatternAlertStatus.Open)
+            .OrderByDescending(a => a.CreatedAtUtc).ThenByDescending(a => a.Id).Take(maxRows).ToList());
+
+    public Task<IReadOnlySet<Guid>> GetBeneficiariesWithOpenAlertsAsync(IReadOnlyCollection<Guid> beneficiaryIds, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlySet<Guid>>(Alerts
+            .Where(a => a.Status == ParkGate.Domain.CardPatterns.CardPatternAlertStatus.Open && beneficiaryIds.Contains(a.BeneficiaryId))
+            .Select(a => a.BeneficiaryId).ToHashSet());
+
+    private IEnumerable<CardPatternAlert> Open(int organizationId, string shape) =>
+        Alerts.Where(a => a.OrganizationId == organizationId && a.Shape == shape && a.Status == ParkGate.Domain.CardPatterns.CardPatternAlertStatus.Open);
+}
+
 public sealed class FakeUnitOfWork : IUnitOfWork
 {
     public IUserRepository Users { get; }
@@ -504,6 +566,10 @@ public sealed class FakeUnitOfWork : IUnitOfWork
     public IAuditLogRepository AuditLogs { get; }
     public ISyncOutboxRepository SyncOutboxes { get; }
     public IGiftVoucherRepository GiftVouchers { get; }
+    public ICardPatternRepository CardPatterns => CardPatternsFake;
+    public ICardPatternAlertRepository CardPatternAlerts => CardPatternAlertsFake;
+    public FakeCardPatternRepository CardPatternsFake { get; } = new();
+    public FakeCardPatternAlertRepository CardPatternAlertsFake { get; } = new();
 
     public DateTime CurrentDbTime { get; set; } = new(2026, 10, 5, 10, 0, 0, DateTimeKind.Utc);
     public int SaveChangesCalls { get; private set; }

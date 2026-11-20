@@ -24,6 +24,8 @@ public class ParkGateDbContext : DbContext
     public DbSet<QrSigningKey> QrSigningKeys => Set<QrSigningKey>();
     public DbSet<EntryCard> EntryCards => Set<EntryCard>();
     public DbSet<CardScan> CardScanLog => Set<CardScan>();
+    public DbSet<OrganizationCardPattern> OrganizationCardPatterns => Set<OrganizationCardPattern>();
+    public DbSet<CardPatternAlert> CardPatternAlerts => Set<CardPatternAlert>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

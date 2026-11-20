@@ -148,12 +148,13 @@ Owner, 2026-11-20: the entry days come first; days change rarely and by hand, pe
 - [x] T8.2a Infrastructure: migration for `AllowedEntryDays` and `GiftAnyDay`, integration tests
 - [x] T8.3a Application: entry and gift use cases and previews apply the days; overrides cover them; the organization policy saves them, audited with the days before and after
 - [x] T8.4a WinForms: organization dialog (weekdays, gifts on any day); desk banner and gift panel name the allowed days; reports and audit screen show the new reason and days
-- [ ] T8.1b Domain: card-number shape and pattern matcher (table-driven tests)
-- [ ] T8.2b Infrastructure: pattern and alert tables, settings seed, repositories, integration tests
-- [ ] T8.3b Application: pattern check on register and card change writes alerts; Admin use cases to approve or reject patterns and review alerts
-- [ ] T8.4b WinForms: amber pattern note; Admin pattern and alert screens
+- [x] T8.1b Domain: card-number shape and pattern matcher (table-driven tests)
+- [x] T8.2b Infrastructure: pattern and alert tables, settings seed, repositories, integration tests
+- [x] T8.3b Application: pattern check on register and card change writes alerts; Admin use cases to approve or reject patterns and review alerts
+- [x] T8.4b WinForms: amber pattern note; Admin pattern and alert screens
+- [x] T8.7 `RtlTabControl` (R5.13) failed with "Error creating window handle" when a window with tabs was created on a 125 % screen (`SettingsForm` too); found by the T8.4b screen check
 - [ ] T8.5 Sync: add `AllowedEntryDays` and `GiftAnyDay` to the cloud schema (Q14)
-- [ ] T8.6 Docs and `TEST_SCRIPT.md` steps for BR-27..BR-29
+- [x] T8.6 Docs and `TEST_SCRIPT.md` steps for BR-27..BR-29 (TC-36, TC-37, TC-38)
 
 **Done when:** an entry and a gift on a non-allowed day are denied and can be overridden; an unusual number raises an alert without blocking; a new series stops alerting only after an Admin approves it.
 

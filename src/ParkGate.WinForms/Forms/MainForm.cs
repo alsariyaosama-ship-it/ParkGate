@@ -94,6 +94,7 @@ public partial class MainForm : RtlFormBase
         _menuManagement.Text = Strings.Menu_Management;
         _menuBeneficiaries.Text = Strings.Menu_Beneficiaries;
         _menuOrganizations.Text = Strings.Menu_Organizations;
+        _menuCardPatterns.Text = Strings.Menu_CardPatterns;
         _menuAgeCategories.Text = Strings.Menu_AgeCategories;
         _menuUsers.Text = Strings.Menu_Users;
         _menuWorkstations.Text = Strings.Menu_Workstations;
@@ -141,6 +142,8 @@ public partial class MainForm : RtlFormBase
 
         _menuBeneficiaries.Visible = canManageBeneficiaries;
         _menuOrganizations.Visible = canManageOrganizations;
+        var canManageCardPatterns = _currentUser.Has(Permission.ManageCardPatterns);
+        _menuCardPatterns.Visible = canManageCardPatterns;
         _menuAgeCategories.Visible = canManageAgeCategories;
         _menuUsers.Visible = canManageUsers;
         _menuWorkstations.Visible = canManageWorkstations;
@@ -151,6 +154,7 @@ public partial class MainForm : RtlFormBase
 
         _menuManagement.Visible = canManageBeneficiaries ||
                                   canManageOrganizations ||
+                                  canManageCardPatterns ||
                                   canManageAgeCategories ||
                                   canManageUsers ||
                                   canManageWorkstations ||
@@ -196,6 +200,7 @@ public partial class MainForm : RtlFormBase
         _menuGiftRedemption.Click += (_, _) => ShowGiftRedeem();
         _menuBeneficiaries.Click += (_, _) => ShowBeneficiaries();
         _menuOrganizations.Click += (_, _) => ShowOrganizations();
+        _menuCardPatterns.Click += (_, _) => ShowCardPatterns();
         _menuAgeCategories.Click += (_, _) => ShowAgeCategories();
         _menuUsers.Click += (_, _) => ShowUsers();
         _menuWorkstations.Click += (_, _) => ShowWorkstations();
@@ -678,6 +683,17 @@ public partial class MainForm : RtlFormBase
     }
 
     /// <summary>R5.20: the audit trail, for supervisors and admins.</summary>
+    public void ShowCardPatterns()
+    {
+        if (!_currentUser.Has(Permission.ManageCardPatterns))
+        {
+            return;
+        }
+
+        using var form = _formFactory.Create<CardPatternsForm>();
+        form.ShowDialog(this);
+    }
+
     public void ShowAuditLog()
     {
         if (!_currentUser.Has(Permission.ViewAuditLog))

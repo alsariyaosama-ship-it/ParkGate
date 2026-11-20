@@ -54,6 +54,7 @@ public static class RolePermissions
             Permission.OverrideGiftInterval,
             Permission.VoidGift,
             Permission.ViewAuditLog,
+            Permission.ManageCardPatterns,
             Permission.ViewFullNationalId
         ]
     };

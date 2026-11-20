@@ -37,6 +37,9 @@ public enum Permission
     // Audit trail (R5.20)
     ViewAuditLog,
 
+    // Card-number patterns and their alerts (F8, BR-29): Admin only
+    ManageCardPatterns,
+
     // Personal data (SPEC §8): without it, national IDs are masked except the last four digits
     ViewFullNationalId
 }

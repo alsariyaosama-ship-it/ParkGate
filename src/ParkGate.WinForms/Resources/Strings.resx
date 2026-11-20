@@ -2383,4 +2383,166 @@
   <data name="Audit_Field_GiftAnyDay" xml:space="preserve">
     <value>الهدايا في أي يوم</value>
   </data>
+  <data name="Menu_CardPatterns" xml:space="preserve">
+    <value>أنماط أرقام البطاقات</value>
+  </data>
+  <data name="Title_CardPatterns" xml:space="preserve">
+    <value>أنماط أرقام البطاقات</value>
+  </data>
+  <data name="Tab_CardPatterns" xml:space="preserve">
+    <value>الأنماط</value>
+  </data>
+  <data name="Tab_CardPatternAlerts" xml:space="preserve">
+    <value>التنبيهات</value>
+  </data>
+  <data name="CardPattern_Hint" xml:space="preserve">
+    <value>يقترح البرنامج الأنماط من أرقام البطاقات المسجلة، ولا يعتمد أي نمط إلا المدير. في شكل الرقم تعني العلامة # رقمًا، ويعني الحرف A حرفًا.</value>
+  </data>
+  <data name="Btn_ApprovePattern" xml:space="preserve">
+    <value>اعتماد النمط</value>
+  </data>
+  <data name="Btn_RejectPattern" xml:space="preserve">
+    <value>رفض النمط</value>
+  </data>
+  <data name="Label_ShowReviewedAlerts" xml:space="preserve">
+    <value>إظهار التنبيهات المراجَعة أيضًا</value>
+  </data>
+  <data name="Label_ReviewNote" xml:space="preserve">
+    <value>ملاحظة (اختيارية):</value>
+  </data>
+  <data name="Btn_MarkReviewed" xml:space="preserve">
+    <value>تمت المراجعة</value>
+  </data>
+  <data name="Btn_SuspendOrBlockHolder" xml:space="preserve">
+    <value>إيقاف أو حظر الزائر…</value>
+  </data>
+  <data name="CardPattern_Col_Organization" xml:space="preserve">
+    <value>الجهة</value>
+  </data>
+  <data name="CardPattern_Col_Shape" xml:space="preserve">
+    <value>شكل الرقم</value>
+  </data>
+  <data name="CardPattern_Col_Source" xml:space="preserve">
+    <value>المصدر</value>
+  </data>
+  <data name="CardPattern_Col_Status" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="CardPattern_Col_Sample" xml:space="preserve">
+    <value>عدد البطاقات</value>
+  </data>
+  <data name="CardPattern_Col_Proposed" xml:space="preserve">
+    <value>اقتُرح في</value>
+  </data>
+  <data name="CardPattern_Col_Decision" xml:space="preserve">
+    <value>القرار</value>
+  </data>
+  <data name="CardPattern_Col_Time" xml:space="preserve">
+    <value>الوقت</value>
+  </data>
+  <data name="CardPattern_Col_Card" xml:space="preserve">
+    <value>رقم البطاقة</value>
+  </data>
+  <data name="CardPattern_Col_Holder" xml:space="preserve">
+    <value>الزائر</value>
+  </data>
+  <data name="CardPattern_Col_By" xml:space="preserve">
+    <value>الموظف</value>
+  </data>
+  <data name="CardPattern_Col_Desk" xml:space="preserve">
+    <value>الشباك</value>
+  </data>
+  <data name="CardPattern_Col_Note" xml:space="preserve">
+    <value>ملاحظة المراجعة</value>
+  </data>
+  <data name="CardPattern_SourceDominant" xml:space="preserve">
+    <value>أول نمط للجهة</value>
+  </data>
+  <data name="CardPattern_SourceNewSeries" xml:space="preserve">
+    <value>سلسلة جديدة</value>
+  </data>
+  <data name="CardPattern_StatusProposedActive" xml:space="preserve">
+    <value>مقترح، يُعمل به مؤقتًا</value>
+  </data>
+  <data name="CardPattern_StatusProposed" xml:space="preserve">
+    <value>مقترح، ينتظر الاعتماد</value>
+  </data>
+  <data name="CardPattern_StatusApproved" xml:space="preserve">
+    <value>معتمد</value>
+  </data>
+  <data name="CardPattern_StatusRejected" xml:space="preserve">
+    <value>مرفوض</value>
+  </data>
+  <data name="CardPattern_AlertOpen" xml:space="preserve">
+    <value>مفتوح</value>
+  </data>
+  <data name="CardPattern_AlertReviewedBy" xml:space="preserve">
+    <value>راجعه {0}</value>
+  </data>
+  <data name="CardPattern_Summary" xml:space="preserve">
+    <value>أنماط تنتظر قرارك: {0} · تنبيهات مفتوحة: {1}</value>
+  </data>
+  <data name="Msg_ConfirmApprovePattern" xml:space="preserve">
+    <value>اعتماد النمط {0} للجهة {1}؟ لن تُنبّه الأرقام التي تشبهه بعد ذلك، وتُغلق تنبيهاتها المفتوحة.</value>
+  </data>
+  <data name="Msg_ConfirmRejectPattern" xml:space="preserve">
+    <value>رفض النمط {0} للجهة {1}؟ ستبقى الأرقام التي تشبهه تُنبّه.</value>
+  </data>
+  <data name="Msg_PatternApproved" xml:space="preserve">
+    <value>اعتُمد النمط، وأُغلق {0} تنبيه مفتوح.</value>
+  </data>
+  <data name="Msg_PatternRejected" xml:space="preserve">
+    <value>رُفض النمط.</value>
+  </data>
+  <data name="Desk_CardPatternAlert" xml:space="preserve">
+    <value>رقم غير معتاد</value>
+  </data>
+  <data name="Msg_EditBeneficiaryCardAlert" xml:space="preserve">
+    <value>تم حفظ بيانات الزائر. رقم البطاقة لا يشبه أرقام هذه الجهة المعتادة، فأُبلغ المدير.</value>
+  </data>
+  <data name="Error_CardPattern_NotFound" xml:space="preserve">
+    <value>النمط غير موجود.</value>
+  </data>
+  <data name="Error_CardPattern_AlreadyDecided" xml:space="preserve">
+    <value>اتُّخذ قرار في هذا النمط من قبل.</value>
+  </data>
+  <data name="Error_CardPattern_AlertNotFound" xml:space="preserve">
+    <value>التنبيه غير موجود.</value>
+  </data>
+  <data name="Error_CardPattern_AlertAlreadyReviewed" xml:space="preserve">
+    <value>رُوجع هذا التنبيه من قبل.</value>
+  </data>
+  <data name="Error_CardPattern_NoteTooLong" xml:space="preserve">
+    <value>الملاحظة أطول من 250 حرفًا.</value>
+  </data>
+  <data name="Audit_Action_CardPattern_Proposed" xml:space="preserve">
+    <value>اقتراح نمط أرقام بطاقات</value>
+  </data>
+  <data name="Audit_Action_CardPattern_Approved" xml:space="preserve">
+    <value>اعتماد نمط أرقام بطاقات</value>
+  </data>
+  <data name="Audit_Action_CardPattern_Rejected" xml:space="preserve">
+    <value>رفض نمط أرقام بطاقات</value>
+  </data>
+  <data name="Audit_Action_CardPatternAlert_Raised" xml:space="preserve">
+    <value>تنبيه: رقم بطاقة غير معتاد</value>
+  </data>
+  <data name="Audit_Action_CardPatternAlert_Reviewed" xml:space="preserve">
+    <value>مراجعة تنبيه رقم بطاقة</value>
+  </data>
+  <data name="Audit_Field_Shape" xml:space="preserve">
+    <value>شكل الرقم</value>
+  </data>
+  <data name="Audit_Field_Prefix" xml:space="preserve">
+    <value>بداية الرقم</value>
+  </data>
+  <data name="Audit_Field_Source" xml:space="preserve">
+    <value>المصدر</value>
+  </data>
+  <data name="Audit_Field_SampleCount" xml:space="preserve">
+    <value>عدد البطاقات</value>
+  </data>
+  <data name="Audit_Field_ClosedAlerts" xml:space="preserve">
+    <value>التنبيهات المغلقة</value>
+  </data>
 </root>

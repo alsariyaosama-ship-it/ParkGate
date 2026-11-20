@@ -162,7 +162,14 @@ public partial class EditBeneficiaryDialog : RtlFormBase
                 if (result.IsSuccess)
                 {
                     UpdatedBeneficiary = result.Value;
-                    _notifyService.Info(Strings.Msg_EditBeneficiarySuccess);
+                    if (result.Value.HasOpenCardAlert)
+                    {
+                        _notifyService.Warning(Strings.Msg_EditBeneficiaryCardAlert); // F8, BR-29: saved anyway
+                    }
+                    else
+                    {
+                        _notifyService.Info(Strings.Msg_EditBeneficiarySuccess);
+                    }
 
                     DialogResult = DialogResult.OK;
                     Close();

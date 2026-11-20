@@ -12,6 +12,8 @@ public interface IUnitOfWork : IAsyncDisposable, IDisposable
     IAuditLogRepository AuditLogs { get; }
     ISyncOutboxRepository SyncOutboxes { get; }
     IGiftVoucherRepository GiftVouchers { get; }
+    ICardPatternRepository CardPatterns { get; }
+    ICardPatternAlertRepository CardPatternAlerts { get; }
 
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitAsync(CancellationToken cancellationToken = default);

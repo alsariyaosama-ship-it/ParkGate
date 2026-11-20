@@ -47,6 +47,7 @@ public static class DependencyInjection
         services.AddTransient<VoidReasonDialog>();
         services.AddTransient<RegisterVisitorDialog>();
         services.AddTransient<AuditLogForm>();
+        services.AddTransient<CardPatternsForm>();
         services.AddTransient<SelectOrganizationDialog>();
         services.AddTransient<OrganizationsForm>();
         services.AddTransient<EditOrganizationDialog>();

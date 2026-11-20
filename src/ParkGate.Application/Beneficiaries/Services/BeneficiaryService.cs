@@ -1,5 +1,6 @@
 using FluentValidation;
 using ParkGate.Application.Beneficiaries.DTOs;
+using ParkGate.Application.CardPatterns;
 using ParkGate.Application.Common;
 using ParkGate.Application.Ports.Persistence;
 using ParkGate.Application.Security;
@@ -64,6 +65,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var nowUtc = await uow.GetDbUtcNowAsync(cancellationToken);
         var localToday = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
+        var alerted = await uow.CardPatternAlerts.GetBeneficiariesWithOpenAlertsAsync(beneficiaries.Select(b => b.Id).ToList(), cancellationToken);
         var matches = new List<BeneficiaryLookupResultDto>();
         var registeredElsewhere = new List<OrganizationRefDto>();
         foreach (var beneficiary in beneficiaries)
@@ -80,7 +82,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
             var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
 
-            matches.Add(new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName), preview, lastCompanions));
+            matches.Add(new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName, alerted.Contains(beneficiary.Id)), preview, lastCompanions));
         }
 
         return new CardLookupDto(matches, registeredElsewhere);
@@ -111,8 +113,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
 
         var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
         var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
+        var alerted = await uow.CardPatternAlerts.GetBeneficiariesWithOpenAlertsAsync([beneficiary.Id], cancellationToken);
 
-        return new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName), preview, lastCompanions);
+        return new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName, alerted.Contains(beneficiary.Id)), preview, lastCompanions);
     }
 
     public async Task<Result<BeneficiaryDto>> RegisterAsync(
@@ -180,9 +183,12 @@ public sealed class BeneficiaryService : IBeneficiaryService
             entityId: beneficiary.Id.ToString(),
             cancellationToken: cancellationToken);
 
+        // F8, BR-29: never blocks the registration; an unusual number only raises an alert for the Admin.
+        var alerted = await CardPatternMonitor.CheckAsync(uow, beneficiary, _currentUser.UserId, _currentWorkstation.WorkstationId, cancellationToken);
+
         await uow.SaveChangesAsync(cancellationToken);
 
-        return ToViewerDto(beneficiary, org.NameAr);
+        return ToViewerDto(beneficiary, org.NameAr, alerted);
     }
 
     public async Task<Result<BeneficiaryDto>> UpdateAsync(
@@ -255,9 +261,14 @@ public sealed class BeneficiaryService : IBeneficiaryService
             detailsJson: cardChange,
             cancellationToken: cancellationToken);
 
+        // F8, BR-29: a changed card number is checked like a new one.
+        var alerted = cardChange is not null &&
+            await CardPatternMonitor.CheckAsync(uow, beneficiary, _currentUser.UserId, _currentWorkstation.WorkstationId, cancellationToken);
+        alerted |= (await uow.CardPatternAlerts.GetBeneficiariesWithOpenAlertsAsync([beneficiary.Id], cancellationToken)).Contains(beneficiary.Id);
+
         await uow.SaveChangesAsync(cancellationToken);
 
-        return ToViewerDto(beneficiary, org.NameAr);
+        return ToViewerDto(beneficiary, org.NameAr, alerted);
     }
 
     public async Task<Result<BeneficiaryDto>> ChangeStatusAsync(
@@ -372,9 +383,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
     }
 
     /// <summary>SPEC §8, R6.16: operators get the national ID masked, so the full number never reaches their screen.</summary>
-    private BeneficiaryDto ToViewerDto(Beneficiary beneficiary, string organizationName)
+    private BeneficiaryDto ToViewerDto(Beneficiary beneficiary, string organizationName, bool hasOpenCardAlert = false)
     {
-        var dto = beneficiary.ToDto(organizationName);
+        var dto = beneficiary.ToDto(organizationName) with { HasOpenCardAlert = hasOpenCardAlert };
         return _currentUser.Has(Permission.ViewFullNationalId)
             ? dto
             : dto with { NationalId = NationalIdMask.Mask(dto.NationalId) };

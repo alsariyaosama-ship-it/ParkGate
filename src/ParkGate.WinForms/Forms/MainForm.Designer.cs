@@ -40,6 +40,7 @@ partial class MainForm
         _menuBeneficiaries = new ToolStripMenuItem();
         _menuManagementSep1 = new ToolStripSeparator();
         _menuOrganizations = new ToolStripMenuItem();
+        _menuCardPatterns = new ToolStripMenuItem();
         _menuAgeCategories = new ToolStripMenuItem();
         _menuUsers = new ToolStripMenuItem();
         _menuWorkstations = new ToolStripMenuItem();
@@ -140,7 +141,7 @@ partial class MainForm
         // 
         // _menuManagement
         // 
-        _menuManagement.DropDownItems.AddRange(new ToolStripItem[] { _menuBeneficiaries, _menuManagementSep1, _menuOrganizations, _menuAgeCategories, _menuUsers, _menuWorkstations, _menuManagementSep2, _menuSettings, _menuBackupNow });
+        _menuManagement.DropDownItems.AddRange(new ToolStripItem[] { _menuBeneficiaries, _menuManagementSep1, _menuOrganizations, _menuCardPatterns, _menuAgeCategories, _menuUsers, _menuWorkstations, _menuManagementSep2, _menuSettings, _menuBackupNow });
         _menuManagement.Name = "_menuManagement";
         _menuManagement.Size = new Size(71, 36);
         _menuManagement.Text = "الإدارة";
@@ -161,6 +162,12 @@ partial class MainForm
         _menuOrganizations.Name = "_menuOrganizations";
         _menuOrganizations.Size = new Size(312, 36);
         _menuOrganizations.Text = "الجهات والمنظمات";
+        // 
+        // _menuCardPatterns
+        // 
+        _menuCardPatterns.Name = "_menuCardPatterns";
+        _menuCardPatterns.Size = new Size(312, 36);
+        _menuCardPatterns.Text = "أنماط أرقام البطاقات";
         // 
         // _menuAgeCategories
         // 
@@ -418,6 +425,7 @@ partial class MainForm
     private System.Windows.Forms.ToolStripMenuItem _menuBeneficiaries;
     private System.Windows.Forms.ToolStripSeparator _menuManagementSep1;
     private System.Windows.Forms.ToolStripMenuItem _menuOrganizations;
+    private System.Windows.Forms.ToolStripMenuItem _menuCardPatterns;
     private System.Windows.Forms.ToolStripMenuItem _menuAgeCategories;
     private System.Windows.Forms.ToolStripMenuItem _menuUsers;
     private System.Windows.Forms.ToolStripMenuItem _menuWorkstations;

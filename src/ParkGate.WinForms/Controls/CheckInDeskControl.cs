@@ -126,6 +126,7 @@ public partial class CheckInDeskControl : UserControl
         _lblHolderNameTitle.Text = Strings.Label_HolderName;
         _lblHolderPhoneTitle.Text = Strings.Label_HolderPhone;
         _lblHolderOrgTitle.Text = Strings.Label_HolderOrg;
+        _lblCardAlert.Text = Strings.Desk_CardPatternAlert;
         _lblHolderNatIdTitle.Text = Strings.Label_HolderNationalId;
         _lblHolderExpiryTitle.Text = Strings.Label_HolderExpiry;
         _lblHolderLastEntryTitle.Text = Strings.Label_HolderLastEntry;
@@ -619,7 +620,20 @@ public partial class CheckInDeskControl : UserControl
         _lblHolderLastEntry.Text = "-";
         _lblHolderStatus.Text = "-";
         _lblHolderStatus.ForeColor = Theme.TextPrimary;
+        ShowCardAlert(false);
     }
+
+    /// <summary>
+    /// F8, BR-29: the number does not look like its organization's usual numbers. Amber and never blocking; the
+    /// name gives up its last column only while the note shows, so the compact desk keeps its height.
+    /// </summary>
+    private void ShowCardAlert(bool show)
+    {
+        _lblCardAlert.Visible = show;
+        _tblHolder.SetColumnSpan(_lblHolderName, show ? 2 : 3);
+    }
+
+    internal bool IsCardAlertShown => _lblCardAlert.Visible;
 
     public void ShowHolderInfo(BeneficiaryDto holder, EligibilityPreviewDto? eligibility)
     {
@@ -630,6 +644,7 @@ public partial class CheckInDeskControl : UserControl
 
         _lblHolderName.Text = holder.FullName;
         _lblHolderPhone.Text = holder.Phone;
+        ShowCardAlert(holder.HasOpenCardAlert);
         _lblHolderOrg.Text = holder.OrganizationName;
 
         // Operators receive the ID already masked from the Application layer (SPEC §8, R6.16).
