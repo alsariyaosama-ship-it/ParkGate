@@ -2,6 +2,8 @@ using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using ParkGate.Application.Organizations.DTOs;
 using ParkGate.Application.Organizations.Services;
+using ParkGate.Domain.Enums;
+using ParkGate.WinForms.Controls;
 using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
@@ -52,6 +54,14 @@ public partial class EditOrganizationDialog : RtlFormBase
         _lblGiftValue.Text = Strings.Label_Org_GiftValue;
         _lblGiftInterval.Text = Strings.Label_Org_GiftInterval;
 
+        _grpEntryDays.Text = Strings.Grp_Org_EntryDays;
+        foreach (var (day, box) in DayBoxes)
+        {
+            box.Text = WeekDaysText.Name(day);
+        }
+
+        _chkGiftAnyDay.Text = Strings.Label_Org_GiftAnyDay;
+
         _btnSave.Text = Strings.Btn_Save;
         _btnCancel.Text = Strings.Btn_Cancel;
     }
@@ -73,6 +83,7 @@ public partial class EditOrganizationDialog : RtlFormBase
             var enabled = _chkGiftEnabled.Checked;
             _numGiftValue.Enabled = enabled;
             _numGiftIntervalDays.Enabled = enabled;
+            _chkGiftAnyDay.Enabled = enabled;
         };
 
         _btnSave.Click += async (_, _) => await SaveAsync();
@@ -121,7 +132,31 @@ public partial class EditOrganizationDialog : RtlFormBase
         _numGiftIntervalDays.Value = org.GiftIntervalDays >= 1 && org.GiftIntervalDays <= 365 ? org.GiftIntervalDays : 30;
         _numGiftValue.Enabled = org.GiftEnabled;
         _numGiftIntervalDays.Enabled = org.GiftEnabled;
+
+        // F8, BR-27 / BR-28
+        foreach (var (day, box) in DayBoxes)
+        {
+            box.Checked = org.AllowedEntryDays.Includes(day);
+        }
+
+        _chkGiftAnyDay.Checked = org.GiftAnyDay;
+        _chkGiftAnyDay.Enabled = org.GiftEnabled;
     }
+
+    /// <summary>The seven day boxes, Saturday first as on screen.</summary>
+    private (DayOfWeek Day, RtlCheckBox Box)[] DayBoxes =>
+    [
+        (DayOfWeek.Saturday, _chkDaySaturday),
+        (DayOfWeek.Sunday, _chkDaySunday),
+        (DayOfWeek.Monday, _chkDayMonday),
+        (DayOfWeek.Tuesday, _chkDayTuesday),
+        (DayOfWeek.Wednesday, _chkDayWednesday),
+        (DayOfWeek.Thursday, _chkDayThursday),
+        (DayOfWeek.Friday, _chkDayFriday),
+    ];
+
+    internal WeekDays SelectedEntryDays =>
+        DayBoxes.Where(d => d.Box.Checked).Aggregate(WeekDays.None, (days, d) => days | d.Day.ToWeekDays());
 
     public async Task SaveAsync()
     {
@@ -155,8 +190,15 @@ public partial class EditOrganizationDialog : RtlFormBase
         var giftEnabled = _chkGiftEnabled.Checked;
         var giftValue = _numGiftValue.Value;
         var giftIntervalDays = (int)_numGiftIntervalDays.Value;
-        var allowedEntryDays = _existingOrg?.AllowedEntryDays ?? ParkGate.Domain.Enums.WeekDays.All;
-        var giftAnyDay = _existingOrg?.GiftAnyDay ?? false;
+        var allowedEntryDays = SelectedEntryDays;
+        if (allowedEntryDays == WeekDays.None)
+        {
+            ShowWarning(Strings.Val_EntryDaysRequired);
+            _chkDaySaturday.Focus();
+            return;
+        }
+
+        var giftAnyDay = _chkGiftAnyDay.Checked;
 
         using (new BusyScope(this, _btnSave, _btnCancel))
         {

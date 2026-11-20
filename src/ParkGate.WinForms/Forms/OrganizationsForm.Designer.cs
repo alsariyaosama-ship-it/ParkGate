@@ -40,6 +40,7 @@ partial class OrganizationsForm
         this._colGiftEnabled = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colGiftValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colGiftInterval = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        this._colEntryDays = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
         System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyleCenter = new System.Windows.Forms.DataGridViewCellStyle();
         this._pnlFooter = new System.Windows.Forms.Panel();
@@ -213,6 +214,7 @@ partial class OrganizationsForm
             this._colCode,
             this._colName,
             this._colCooldown,
+            this._colEntryDays,
             this._colMaxCompanions,
             this._colGiftEnabled,
             this._colGiftValue,
@@ -292,6 +294,14 @@ partial class OrganizationsForm
         this._colGiftValue.MinimumWidth = 85;
         this._colGiftValue.Name = "_colGiftValue";
         this._colGiftValue.ReadOnly = true;
+        // 
+        // _colEntryDays
+        // 
+        this._colEntryDays.FillWeight = 22F;
+        this._colEntryDays.HeaderText = "أيام الدخول";
+        this._colEntryDays.MinimumWidth = 110;
+        this._colEntryDays.Name = "_colEntryDays";
+        this._colEntryDays.ReadOnly = true;
         // 
         // _colGiftInterval
         // 
@@ -409,6 +419,7 @@ partial class OrganizationsForm
     private System.Windows.Forms.DataGridViewTextBoxColumn _colGiftEnabled;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colGiftValue;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colGiftInterval;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _colEntryDays;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colStatus;
     private System.Windows.Forms.Panel _pnlFooter;
     private System.Windows.Forms.Label _lblCount;

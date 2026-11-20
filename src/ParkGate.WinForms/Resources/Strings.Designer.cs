@@ -516,6 +516,12 @@ internal class Strings
     internal static string Audit_Field_Value => GetString(nameof(Audit_Field_Value));
     internal static string Audit_Yes => GetString(nameof(Audit_Yes));
     internal static string Audit_No => GetString(nameof(Audit_No));
+    internal static string Grp_Org_EntryDays => GetString(nameof(Grp_Org_EntryDays));
+    internal static string Label_Org_GiftAnyDay => GetString(nameof(Label_Org_GiftAnyDay));
+    internal static string Val_EntryDaysRequired => GetString(nameof(Val_EntryDaysRequired));
+    internal static string Text_EveryDay => GetString(nameof(Text_EveryDay));
+    internal static string Denial_DayNotAllowed => GetString(nameof(Denial_DayNotAllowed));
+    internal static string Desk_AllowedEntryDays => GetString(nameof(Desk_AllowedEntryDays));
     internal static string Label_SuccessSound => GetString(nameof(Label_SuccessSound));
     internal static string Label_DenialSound => GetString(nameof(Label_DenialSound));
     internal static string Label_MaxFailedLogins => GetString(nameof(Label_MaxFailedLogins));

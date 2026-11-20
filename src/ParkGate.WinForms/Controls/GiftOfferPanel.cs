@@ -152,7 +152,11 @@ public partial class GiftOfferPanel : UserControl
                 _lblStatus.Text = string.Format(Strings.Label_GiftNotEligible, ErrorMessages.GetMessage(reasonError));
                 _lblStatus.ForeColor = Theme.Warning;
 
-                if (eligibility.NextEligibleAtUtc.HasValue)
+                if (eligibility.Reason == Domain.Enums.GiftDenialReason.DayNotAllowed)
+                {
+                    _lblDetails.Text = string.Format(Strings.Desk_AllowedEntryDays, WeekDaysText.Format(eligibility.AllowedEntryDays));
+                }
+                else if (eligibility.NextEligibleAtUtc.HasValue)
                 {
                     var nextLocal = DateTimeDisplayHelper.ToParkLocalTime(eligibility.NextEligibleAtUtc.Value, _timeZoneId);
                     _lblDetails.Text = string.Format(Strings.Label_GiftNextEligible, DateTimeDisplayHelper.FormatDateTime(nextLocal));

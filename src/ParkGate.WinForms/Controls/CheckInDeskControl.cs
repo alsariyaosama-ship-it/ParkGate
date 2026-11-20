@@ -686,7 +686,11 @@ public partial class CheckInDeskControl : UserControl
 
                 string? details = null;
 
-                if (eligibility.NextAllowedEntryUtc.HasValue)
+                if (eligibility.DenialReason == DenialReason.DayNotAllowed)
+                {
+                    details = string.Format(Strings.Desk_AllowedEntryDays, WeekDaysText.Format(eligibility.AllowedEntryDays));
+                }
+                else if (eligibility.NextAllowedEntryUtc.HasValue)
                 {
                     var nextLocal = DateTimeDisplayHelper.ToParkLocalTime(eligibility.NextAllowedEntryUtc.Value, _timeZoneId);
                     details = CooldownText.Format(nextLocal, eligibility.RemainingCooldownMinutes);
@@ -1272,6 +1276,7 @@ public partial class CheckInDeskControl : UserControl
         DenialReason.HolderSuspended => Strings.Denial_HolderSuspended,
         DenialReason.HolderBlocked => Strings.Denial_HolderBlocked,
         DenialReason.OrganizationInactive => Strings.Denial_OrganizationInactive,
+        DenialReason.DayNotAllowed => Strings.Denial_DayNotAllowed,
         _ => Strings.Banner_Denied
     };
 

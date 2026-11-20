@@ -943,6 +943,7 @@ public partial class ReportsControl : UserControl
         DenialReason.HolderSuspended => Strings.Ui_Reports_16,
         DenialReason.CardExpired => Strings.Ui_Reports_17,
         DenialReason.OrganizationInactive => Strings.Ui_Reports_18,
+        DenialReason.DayNotAllowed => Strings.Denial_DayNotAllowed,
         DenialReason.CooldownActive => Strings.Denial_CooldownActive,
         _ => reason.ToString()
     };

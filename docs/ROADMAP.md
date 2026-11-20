@@ -147,7 +147,7 @@ Owner, 2026-11-20: the entry days come first; days change rarely and by hand, pe
 - [x] T8.1a Domain: allowed weekdays on `Organization` (`WeekDays`), `DayNotAllowed` in the entry and gift policies (table-driven tests)
 - [x] T8.2a Infrastructure: migration for `AllowedEntryDays` and `GiftAnyDay`, integration tests
 - [x] T8.3a Application: entry and gift use cases and previews apply the days; overrides cover them; the organization policy saves them, audited with the days before and after
-- [ ] T8.4a WinForms: organization dialog (weekdays, gifts on any day); desk banner and gift panel name the allowed days; reports and audit screen show the new reason and days
+- [x] T8.4a WinForms: organization dialog (weekdays, gifts on any day); desk banner and gift panel name the allowed days; reports and audit screen show the new reason and days
 - [ ] T8.1b Domain: card-number shape and pattern matcher (table-driven tests)
 - [ ] T8.2b Infrastructure: pattern and alert tables, settings seed, repositories, integration tests
 - [ ] T8.3b Application: pattern check on register and card change writes alerts; Admin use cases to approve or reject patterns and review alerts
