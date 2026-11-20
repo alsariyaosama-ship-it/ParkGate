@@ -28,6 +28,8 @@ public sealed class UnitOfWork : IUnitOfWork
         AuditLogs = new AuditLogRepository(context);
         SyncOutboxes = new SyncOutboxRepository(context);
         GiftVouchers = new GiftVoucherRepository(context);
+        CardPatterns = new CardPatternRepository(context);
+        CardPatternAlerts = new CardPatternAlertRepository(context);
     }
 
     public IBeneficiaryRepository Beneficiaries { get; }
@@ -40,6 +42,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public IAuditLogRepository AuditLogs { get; }
     public ISyncOutboxRepository SyncOutboxes { get; }
     public IGiftVoucherRepository GiftVouchers { get; }
+    public ICardPatternRepository CardPatterns { get; }
+    public ICardPatternAlertRepository CardPatternAlerts { get; }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {

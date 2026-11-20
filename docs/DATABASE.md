@@ -277,7 +277,7 @@ Indexes: `UX_GiftVouchers_Token (Token)` unique · `IX_GiftVouchers_Beneficiary_
 | Prefix | nvarchar(10) NULL | Leading characters shared by most numbers of this shape (`CardPattern.PrefixLength`); NULL when none dominates |
 | Status | tinyint NOT NULL | `CardPatternStatus` |
 | Source | tinyint NOT NULL | `CardPatternSource`. A `Dominant` proposal (the organization's first, learned from its cards) is used provisionally until the Admin decides; a `NewSeries` proposal stops no alert until approved (owner rule: a new series stops alerting only after an Admin approves it) |
-| SampleCount | int NOT NULL | Numbers that matched when it was proposed |
+| SampleCount | int NOT NULL | Numbers behind the suggestion (registered cards or open alerts) |
 | ProposedAtUtc | datetime2(3) NOT NULL | DB time |
 | DecidedAtUtc | datetime2(3) NULL | |
 | DecidedByUserId | int NULL FK → Users | Admin only |

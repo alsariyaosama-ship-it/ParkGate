@@ -48,6 +48,15 @@ public sealed class BeneficiaryRepository : IBeneficiaryRepository
             .SingleOrDefaultAsync(b => b.OrganizationId == organizationId && b.CardNumber == cardNumber, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<string>> GetCardNumbersByOrganizationAsync(int organizationId, CancellationToken cancellationToken = default)
+    {
+        var cards = await _context.Beneficiaries.AsNoTracking()
+            .Where(b => b.OrganizationId == organizationId)
+            .Select(b => b.CardNumber)
+            .ToListAsync(cancellationToken);
+        return cards.Select(c => c.Value).ToList();
+    }
+
     public async Task<bool> ExistsNationalIdAsync(NationalId nationalId, Guid? excludeId = null, CancellationToken cancellationToken = default)
     {
         return await _context.Beneficiaries

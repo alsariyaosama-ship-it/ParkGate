@@ -11,6 +11,9 @@ public interface IBeneficiaryRepository
     Task<Beneficiary?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Beneficiary>> GetByCardNumberAsync(CardNumber cardNumber, CancellationToken cancellationToken = default);
     Task<Beneficiary?> GetByOrgAndCardAsync(int organizationId, CardNumber cardNumber, CancellationToken cancellationToken = default);
+
+    /// <summary>F8, BR-29: every registered card number of the organization (learning its usual pattern).</summary>
+    Task<IReadOnlyList<string>> GetCardNumbersByOrganizationAsync(int organizationId, CancellationToken cancellationToken = default);
     Task<bool> ExistsNationalIdAsync(NationalId nationalId, Guid? excludeId = null, CancellationToken cancellationToken = default);
     Task<DateTime?> GetLatestGrantedEntryUtcAsync(Guid beneficiaryId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Beneficiary>> SearchAsync(string searchTerm, int maxResults = 50, CancellationToken cancellationToken = default);
