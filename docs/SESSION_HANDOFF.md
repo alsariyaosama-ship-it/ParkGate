@@ -10,14 +10,14 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-20 |
-| Last session | S39 — R5.15–R5.20 merged (PR #21); F8 entry days (T8.1a–T8.4a) on `phase/f8-entry-days` |
-| Current phase | Phase R merged through R5 (PR #11–#21). **F8 entry days** started on Osama's go-ahead (2026-11-20); card-number patterns (T8.xb) not started. R8 (release) still to do |
-| Working branch | `phase/f8-entry-days` (from `main` `3da249d`, after PR #21) |
-| Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2); WinForms has no other warning |
-| .NET Unit tests | 1001 passed (non-integration): 236 domain + 268 application + 497 architecture |
-| .NET Integration tests | Infrastructure project 160 passed on LocalDB (integration and non-integration together) |
-| Web tests | `php artisan test` (PHP 8.4): 101 passed on SQLite (MySQL job runs in CI) |
-| Total tests | 1161 .NET + 101 web (web not re-run since S37; no web change) |
+| Last session | S40 — Phase R8 (release 1.1.0) on `phase/r8-release`; F8 days merged (PR #22) |
+| Current phase | Phase R8 done, PR open. Left: R6.5 (Q-R6), R9 (docs), F8 card-number patterns (T8.xb), T8.5 |
+| Working branch | `phase/r8-release` (from `main` `e055551`, after PR #22) |
+| Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 0 warnings (the Pkcs advisories are gone, R8.2) |
+| .NET Unit tests | 1110 passed (non-integration): 236 domain + 268 application + 109 infrastructure + 497 architecture |
+| .NET Integration tests | Infrastructure project 174 passed on LocalDB (integration and non-integration together) |
+| Web tests | `php artisan test`: 101 passed. Needs PHP >= 8.4.1 now (R8.7); the herd-lite `php` 8.4.0 on PATH is too old, PHP 8.4.27 from WinGet works |
+| Total tests | 1271 .NET (incl. integration) + 101 web |
 | Latest migration | `AddOrganizationEntryDays` (S39, F8). Applied by Osama on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` (2026-11-20) |
 
 ## State of the work
@@ -120,6 +120,11 @@
 
 Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
+**S40 (2026-11-20): R8 release work on `phase/r8-release`.** Osama merged PR #22 (F8 days) and asked for R8. One commit each:
+R8.1 single backslash in the production server name, read back and checked (the same bug was also in `build-installer.ps1`, fixed in R8.4); R8.2 `System.Security.Cryptography.Pkcs` pinned to 10.0.15 (10.0.12 still had the advisories), `NuGetAudit=false` removed; R8.3 cloud API key in `%ProgramData%\ParkGate\cloudkey.dat` (DPAPI LocalMachine), `ParkGate.SyncAgent.exe set-cloud-key` / `clear-cloud-key`, the stored key wins, a plain JSON key still works with a warning; R8.5 Docker/VPS path deleted, `package-cpanel.ps1` runs the tests and builds a clean package (no dev packages, `.env`, tests, logs or caches), new `docs/DEPLOYMENT_WEB_CPANEL.md`; R8.7 (new) Laravel 13.43 and Symfony 8.1.11 past 9 production advisories, `npm audit fix`, `composer.json` PHP `^8.4.1`; R8.4 version 1.1.0, installer client now self-contained (it was framework-dependent with no runtime check), fresh migration bundle every build, Sync Agent in both build scripts and in the installer (server mode), bundled .NET runtime pinned to 10.0.15 with `-RuntimeVersion` (SDK 10.0.401 bundles 10.0.12, whose Pkcs is vulnerable); R8.6 upgrade guide `DEPLOYMENT.md` §10, §4.1 fixed.
+Built and checked locally: `dist\installer\ParkGate_Setup_v1.1.0.exe` (113 MB), `artifacts\production`, `artifacts\parkgate-web-cpanel.zip`. Not installed on any machine.
+**Next:** Osama reviews and merges the R8 PR, then tries the installer on a test PC (server mode and desk mode) following `DEPLOYMENT.md` §10. Then **R9** (docs), or F8 card-number patterns, as he chooses. R6.5 waits on Q-R6.
+
 **S39 (2026-11-20): R5.15–R5.20 finished and merged (PR #21); F8 entry days built on `phase/f8-entry-days`.**
 R5 after S38, one commit each: R5.15 new-visitor registration in a pop-up (`RegisterVisitorDialog`); R5.16 / BR-31 voiding an entry voids that day's unredeemed gift, a redeemed gift blocks the void; R5.18 every entry and gift audit row carries holder, card, organization, business date, operator and approver (`AuditTrail`); R5.17 void a gift voucher from the gift receipts window; R5.19 one-line grid headers that follow DPI and `dd/MM/yyyy` dates; R5.20 audit trail screen «التقارير ← سجل التتبع» (`Permission.ViewAuditLog`, supervisors and admins). Osama ran TC-23..TC-35 ("almost all fine") and merged PR #21.
 F8 days (Osama, 2026-11-20): days change rarely, by hand and permanently; the change must be in the audit trail. No dated or temporary schedule. One commit each: T8.1a `WeekDays` flags, `Organization.AllowedEntryDays` / `GiftAnyDay`, `DayNotAllowed` (entry 6, gift 7); T8.2a migration `AddOrganizationEntryDays`; T8.3a use cases, previews, override, policy audit with values before and after; T8.4a organization dialog (seven day boxes, «الهدايا في أي يوم»), organizations list column, desk banner «أيام دخول الجهة: …», gift panel, reports, audit screen shows day names.
@@ -156,6 +161,9 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
+- **R8 (S40):** try `ParkGate_Setup_v1.1.0.exe` on a test PC (server and desk mode); run `set-cloud-key` on the server; deploy the web from the new cPanel package (host needs PHP >= 8.4.1).
+- **Local PHP:** the first `php` on PATH is herd-lite 8.4.0, too old for the updated packages. Update Herd Lite or put PHP 8.4.27 first on PATH (its `php.ini` needs `openssl`, `mbstring`, `fileinfo`, `curl`, `pdo_sqlite`, `intl` enabled).
+- **Keep the bundled runtime current:** raise `-RuntimeVersion` in both build scripts when a new .NET 10 servicing release ships, or install a newer SDK.
 - **F8 (S39):** migration `AddOrganizationEntryDays` applied on both dev databases by Osama. Run TC-36. Confirm the check order deviation in BR-27.
 - **Before release:** existing organizations start with every day allowed; set each organization's days in «الجهات».
 - **Answered 2026-11-18:** R5.8 option A, R5.13 own-drawn text, R5.9 `#9A5B00`, F8, focus stays in the card box (R5.4), success sound on by default. Still open: Q-R7 (lowest desk resolution; 1366×768 at 100 % assumed).
@@ -190,6 +198,13 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S40 — 2026-11-20 — Phase R8 (release 1.1.0)
+- PR #22 merged. Baseline green (1096 unit).
+- R8.2: pinning Pkcs 10.0.12 did not clear the advisory; 10.0.15 did. The WinForms client does not use the package: its Pkcs comes from the Windows Desktop runtime pack, so self-contained builds pin `RuntimeFrameworkVersion` too.
+- With the pinned runtime, `dotnet ef migrations script --no-build` failed ("install or update .NET"): the client publish rebuilt Infrastructure for 10.0.15. The script step now builds normally.
+- R8.5 found 9 Composer advisories in production packages (R8.7). Symfony 8.1.11 needs PHP 8.4.1; the herd-lite PHP is 8.4.0, so composer and the web tests ran on PHP 8.4.27 with a scratch `php.ini` (`PHPRC`).
+- `dotnet ef database update` is still refused by the tool's classifier; not needed this session.
 
 ### S39 — 2026-11-20 — R5.15–R5.20; F8 entry days (T8.1a–T8.4a)
 - R5.15–R5.20 committed on `phase/r5-desk-ux`; Osama merged PR #21. F8 started from `main` on his request; patterns split off as T8.xb.
@@ -266,13 +281,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Osama said the app is not in production yet. Merged PR #13 (merge commit), took an uncompressed backup (Express has no
   `COMPRESSION`), applied the three migrations with `dotnet ef database update --project src/ParkGate.Infrastructure
   --connection "Server=.\SQLEXPRESS;..."` and checked `__EFMigrationsHistory` and the outbox.
-### S30 — 2026-11-13 — Phase R2: R2.7
-- Did R2.7 test-first: extractor + exclusion list, data migration, web ingestion/model/summary/Vue, ADR-022.
-- Osama approved `laravel/boost` (dev only). Installed v2.10 with `boost:install --guidelines` only; no MCP server and no
-  skills (its docs search calls an external service). It rewrote `web/AGENTS.md` and `web/CLAUDE.md`. Composer is not on the
-  Bash PATH here; run it from PowerShell. Root `AGENTS.md` §2 still lists the approved packages: add Boost there when you approve.
-- `dotnet ef` needs `--project src/ParkGate.Infrastructure` only (the design-time factory lives there); the WinForms
-  project is not a valid startup project.
-- Ran Pint over all web PHP in a separate `style` commit (R9.6, 14 files, tests still 89 green). New web PHP must pass
-  `vendor/bin/pint --dirty --format agent`.
-- Test counts: .NET unit 617 → 620, integration 38 → 39, web 79 → 89.
