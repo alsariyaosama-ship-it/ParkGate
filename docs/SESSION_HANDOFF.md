@@ -10,9 +10,9 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-20 |
-| Last session | S42 — R6.5 least-privilege SQL login on `phase/r6-sql-logins`; PR #23 (R8) and #24 (F8 patterns) merged |
-| Current phase | Phase R: only R9 (docs) left after R6.5. F8 done except T8.5 (cloud sync of the two organization fields) |
-| Working branch | `phase/r6-sql-logins` (from `main` `35048cf`, after PR #24) |
+| Last session | S43 — R9.1, R9.2, R9.4 on `phase/r9-docs` (R6.5 merged as PR #25) |
+| Current phase | Phase R9 (docs): R9.3 and R9.5 left. Then T8.5 (cloud sync of the two organization fields) |
+| Working branch | `phase/r9-docs` (from `main` `441b417`, after PR #25); pushed, no PR yet |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 0 warnings (the Pkcs advisories are gone, R8.2) |
 | .NET Unit tests | 1066 passed (non-integration): 264 domain + 283 application + 519 architecture |
 | .NET Integration tests | Infrastructure project 178 passed on LocalDB (integration and non-integration together) |
@@ -119,6 +119,18 @@
 ## Next session — start here
 
 Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
+Osama asked for a new conversation because this one grew too long. Start from here.
+
+**S43 (2026-11-20): R9 on `phase/r9-docs`.** Done, one commit each:
+- R9.2 `DECISIONS.md`: ADR-013 superseded by ADR-028 (signed QR tokens, as built); ADR-029 (outbox immutable, ordered by DB `Sequence`); ADR-030 (entry-card tables under migrations); ADR-002 notes the fifth project. R3.2 = ADR-023 and R6.5 = ADR-027 already existed.
+- R9.1 `SPEC.md` as built: BR-19..BR-26 (gift rules as built: override covers interval and gift day, optimistic concurrency), BR-06 order with the entry day, BR-11, BR-12 (ADR-026), A5, §9 F1/F3/F4/F5 sections, Q6/Q10/Q13/Q14 closed or updated. Entry cards are issued by Supervisors and Admins (`EditBeneficiary`).
+- R9.4 `USER_GUIDE_AR.md` rewritten for 1.1.0; one old term fixed in `TEST_SCRIPT.md`.
+
+**Next, in order:**
+1. **R9.3 `AGENTS.md` — needs Osama's approval before editing.** Propose: (a) §3 says "Maximum 4 production projects": now 5 (`ParkGate.SyncAgent`, ADR-018) plus `web/`; (b) add the web test command to §1.1 (`php artisan test` in `web/`, needs PHP >= 8.4.1) and the npm 10 rule for lock files (S42); (c) the UI tests live in `ParkGate.ArchitectureTests` — rename the note or move them to a new `ParkGate.WinForms.Tests` (ask first; recommendation: just document it). Ask him, then edit.
+2. **R9.5** final handoff: known issues and next steps; then open the R9 PR (`phase/r9-docs` → `main`).
+3. **Still waiting on Osama:** approve ADR-022, ADR-023, ADR-027 (all "Proposed"); run TC-36..TC-39 on the real server and a desk; rebuild the installer (`scripts\build-installer.ps1`) because 1.1.0 from S40 has the tab-control crash fixed in T8.7; protect `main` so red checks block a merge.
+4. **T8.5** sync `AllowedEntryDays` and `GiftAnyDay` to the cloud (web migration + `SyncIngestionService`).
 
 **S42 (2026-11-20): R6.5 on `phase/r6-sql-logins`.** PR #23 was merged with red checks: the web jobs failed because `npm audit fix` (npm 11) dropped an optional `react` peer entry that npm 10 in CI requires, and the .NET job hit a runner timeout (testhost did not connect in 90 s; the re-run passed). The lock file was regenerated with npm 10 in PR #24, which is merged with green checks.
 R6.5: `Setup-ProductionDatabase.ps1` applies migrations with the server administrator's Windows account, checks Mixed Mode, creates `parkgate_app` (`db_datareader`, `db_datawriter`, `db_backupoperator`; the admin "backup now" needs the last one) with a generated password shown once, saves it DPAPI-protected in `connection.dat`, keeps the password on re-runs (`-ResetAppPassword` to change it), opens 1433/1434 on private and domain networks only, removes the 1.0.0 any-profile rules, and warns about a Public network or nothing listening on 1433. The installer now runs it in a visible window. ADR-027 (Proposed): one shared login, no separate SQL migration login.
@@ -212,6 +224,10 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Session Log (last 10 sessions)
 
+### S43 — 2026-11-20 — R9.1, R9.2, R9.4
+- Checking role permissions with `awk` on `RolePermissions.cs` gave a wrong "0"; read the file instead. The first SPEC edit said only Admins issue entry cards and was corrected.
+- The old user guide had two sections numbered 8, said backups are compressed (Express cannot, R6.9) and listed shortcuts that no longer matched.
+
 ### S42 — 2026-11-20 — CI fix and R6.5
 - Root cause of the red web jobs: npm 11 rewrote `package-lock.json` without an optional peer (`react`) that npm 10 needs; regenerate with `npx npm@10 install --package-lock-only` and verify with `npx npm@10 ci` before pushing lock changes.
 - PowerShell: `"$name:"` inside a string is a drive-qualified variable; use `${name}:`.
@@ -278,11 +294,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - R4.13: Osama reported the gift panel and the registration buttons clipped on the desk. Cause: `GiftOfferPanel` in Font scaling mode inside a Dpi parent, and too little height for the registration group. Fixed and verified by rendering at 1920x890 and 1366x640. Gifts are disabled for every organization in the dev databases (`GiftEnabled = 0`), which is why the offer panel never showed; enable it per organization in Management > Organizations.
 - Tests: 691 unit/architecture, 42 integration, all green. Tip: if the app is running it locks `bin\`; build with `--artifacts-path artifacts/verify` (git-ignored).
 
-### S33 — 2026-11-14 — Phase R4 code complete
-- PR #14 was still open, so `phase/r4-desk-ui` was branched from `phase/r3-application` (handoff option).
-- Order: R4.1, R4.3, R4.4, R4.5, R4.6, R4.9, R4.7, R4.2, R4.8, R4.10, then TEST_SCRIPT TC-14..TC-21.
-- Two test hangs: `Task.Yield`/`Task.Delay` continuations touched controls owned by the test thread. Fixed with seams.
-- A heredoc with Arabic and quotes broke Bash parsing once; files with Arabic are written with the Write tool now.
-- Line endings: 18 working files with `eol=crlf` were LF or mixed (the S27 item included); re-checked out, no commit
-  needed because the blobs were already LF. Helper scripts `addstr.py` and `extract_arabic.py` live in the scratchpad only.
-- Test counts: architecture 155 → 183 (unit 662 → 690). No Application or Infrastructure change.
