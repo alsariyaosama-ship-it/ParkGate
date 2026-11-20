@@ -276,7 +276,7 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R7.13 Text still clipped at 125 % (found in R7.8, older than it): `ResetUserPasswordDialog` prompt and button, `UsersForm` add button, `SelectOrganizationDialog` and `VoidReasonDialog` long texts, `GiftReceiptsForm` export/print buttons outside the filter panel, `BeneficiariesControl` details rows 8-9 and void button, `ConnectionSettingsForm` labels, `EditAgeCategoryDialog` description label, page headers in `LoginForm`/`OrganizationsForm`/`AgeCategoriesForm`
 
 ### R8 — Build, packaging and deployment · branch `phase/r8-release`
-- [ ] R8.1 Fix the doubled backslash in the published `appsettings.json` server path
+- [x] R8.1 Fix the doubled backslash in the published `appsettings.json` server path
 - [ ] R8.2 Re-enable the NuGet vulnerability audit; pin `System.Security.Cryptography.Pkcs`
 - [ ] R8.3 Store the Sync Agent cloud API key DPAPI-protected, with a CLI switch to set it
 - [ ] R8.4 Rebuild the release as `v1.1.0`; delete the stale `artifacts/efbundle.exe`

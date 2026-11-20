@@ -247,7 +247,7 @@ Every schema change needs a new migration, a `docs/DATABASE.md` update, and Osam
 
 ## Phase R8 — Build, packaging and deployment · branch `phase/r8-release`
 
-- [ ] **R8.1 [Verified] Wrong server path in the published `appsettings.json`.** `scripts/Build-Production.ps1` assigns `"Server=.\\SQLEXPRESS;…"` in PowerShell, where `\\` is two characters; the file ends up with a doubled backslash. Use a single backslash. Add a Pester or simple script check that reads the output JSON and asserts the server value.
+- [x] **R8.1 [Verified] Wrong server path in the published `appsettings.json`.** `scripts/Build-Production.ps1` assigns `"Server=.\\SQLEXPRESS;…"` in PowerShell, where `\\` is two characters; the file ends up with a doubled backslash. Use a single backslash. Add a Pester or simple script check that reads the output JSON and asserts the server value.
 - [ ] **R8.2 [Verified] Vulnerability audit is disabled** (`--property:NuGetAudit=false` in the production build) while the handoff reports 16 warnings for `System.Security.Cryptography.Pkcs` 9.0.11. Find the package that pulls it in, pin a fixed version in `Directory.Packages.props` (transitive pinning is already enabled), remove the `NuGetAudit=false` flags. Ask before adding any new package (AGENTS.md §2).
 - [ ] **R8.3 Sync Agent secret.** `CloudApi:ApiKey` is read from plain JSON in `%ProgramData%\ParkGate\appsettings.local.json`. Store it DPAPI-protected next to `connection.dat`, with a small CLI switch on the agent to set it (`ParkGate.SyncAgent.exe set-cloud-key`).
 - [ ] **R8.4 Rebuild the release.** Bump to `v1.1.0`, rebuild the client, migration bundle and installer with `Build-Production.ps1` + `build-installer.ps1`. Delete the stale `artifacts/efbundle.exe`. Do not commit binaries.

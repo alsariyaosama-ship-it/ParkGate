@@ -48,11 +48,20 @@ Invoke-DotNet @(
 )
 
 Write-Host "Configuring production client appsettings.json for SQLEXPRESS..."
+# PowerShell has no "\\" escape: one backslash here is one backslash in the JSON value (R8.1).
+$productionServer = ".\SQLEXPRESS"
 $clientAppSettings = Join-Path $clientPath "appsettings.json"
 if (Test-Path $clientAppSettings) {
     $json = Get-Content $clientAppSettings -Raw | ConvertFrom-Json
-    $json.ConnectionStrings.DefaultConnection = "Server=.\\SQLEXPRESS;Database=ParkGate;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+    $json.ConnectionStrings.DefaultConnection = "Server=$productionServer;Database=ParkGate;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
     $json | ConvertTo-Json -Depth 10 | Set-Content $clientAppSettings -Encoding UTF8
+
+    # Read the file back and check the server name exactly as the client will see it.
+    $written = (Get-Content $clientAppSettings -Raw | ConvertFrom-Json).ConnectionStrings.DefaultConnection
+    $writtenServer = (($written -split ';') | Where-Object { $_ -like 'Server=*' } | Select-Object -First 1).Substring(7)
+    if ($writtenServer -ne $productionServer) {
+        throw "appsettings.json has server '$writtenServer', expected '$productionServer'."
+    }
 }
 
 Write-Host "Generating idempotent EF Core SQL script..."
