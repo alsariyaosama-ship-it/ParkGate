@@ -67,11 +67,12 @@ src/
   ParkGate.Application/     net10.0          use cases, ports (interfaces), DTOs, validators, permissions, Result types. → Domain
   ParkGate.Infrastructure/  net10.0          EF Core DbContext, configurations, migrations, repositories, UoW, password hasher, clock, settings store. → Application, Domain
   ParkGate.WinForms/        net10.0-windows  forms, controls, presenters/view logic, composition root (Program.cs). → Application, Domain; → Infrastructure ONLY for DI registration in the composition root
+  ParkGate.SyncAgent/       net10.0          Windows service on the server that pushes the sync outbox to the cloud (ADR-018). → Application, Domain, Infrastructure; no WinForms
 tests/
   ParkGate.Domain.Tests/
   ParkGate.Application.Tests/
   ParkGate.Infrastructure.Tests/   (Category=Integration, LocalDB)
-  ParkGate.ArchitectureTests/      (enforces the rules below by reflection)
+  ParkGate.ArchitectureTests/      (enforces the rules below by reflection; also holds the WinForms UI tests, built with `TestUi.Create`)
 docs/   scripts/   .github/
 ```
 
@@ -81,7 +82,7 @@ docs/   scripts/   .github/
 - Infrastructure references Application + Domain. No WinForms.
 - WinForms never uses `DbContext`, repositories, or EF types directly — only Application services/ports. The single exception is `Program.cs` / `DependencyInjection` registration calling `services.AddInfrastructure(...)`.
 
-Maximum 4 production projects. Do not add a project without an ADR (the future F2 gate host is the planned exception).
+Maximum 5 production projects (the fifth is `ParkGate.SyncAgent`, ADR-018). Do not add a project without an ADR (the future F2 gate host is the planned exception). UI tests stay in `ParkGate.ArchitectureTests`; do not add a separate WinForms test project without asking.
 
 ---
 
