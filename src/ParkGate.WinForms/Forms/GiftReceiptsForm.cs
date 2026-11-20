@@ -61,6 +61,7 @@ public partial class GiftReceiptsForm : RtlFormBase
         InitializeFormText();
         Theme.ApplyGridStyle(_gridReceipts);
         SetupColumns();
+        Theme.FitColumnsToHeaders(_gridReceipts);
         WireEvents();
     }
 
@@ -203,6 +204,7 @@ public partial class GiftReceiptsForm : RtlFormBase
 
     private async Task OnFormLoadAsync()
     {
+        Theme.FitColumnsToHeaders(_gridReceipts); // now at the window's DPI
         try
         {
             var settings = await _settingsService.GetSettingsAsync();

@@ -114,7 +114,8 @@ partial class GiftReceiptsForm
         // 
         // _dtpFromDate
         // 
-        _dtpFromDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+        _dtpFromDate.CustomFormat = "dd/MM/yyyy";
+        _dtpFromDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
         _dtpFromDate.Location = new System.Drawing.Point(884, 5);
         _dtpFromDate.Margin = new System.Windows.Forms.Padding(3, 5, 12, 3);
         _dtpFromDate.Name = "_dtpFromDate";
@@ -135,7 +136,8 @@ partial class GiftReceiptsForm
         // 
         // _dtpToDate
         // 
-        _dtpToDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+        _dtpToDate.CustomFormat = "dd/MM/yyyy";
+        _dtpToDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
         _dtpToDate.Location = new System.Drawing.Point(693, 5);
         _dtpToDate.Margin = new System.Windows.Forms.Padding(3, 5, 12, 3);
         _dtpToDate.Name = "_dtpToDate";

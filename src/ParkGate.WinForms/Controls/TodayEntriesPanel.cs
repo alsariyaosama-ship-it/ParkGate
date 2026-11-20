@@ -22,6 +22,7 @@ public partial class TodayEntriesPanel : UserControl
         Theme.ApplyGridStyle(_gridToday);
 
         // R5.8: compact rows so five fit on a 1366x768 desk at 100 %; the title moved into the totals line.
+        _gridToday.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing; // one-word headers
         _gridToday.ColumnHeadersHeight = LogicalToDeviceUnits(CompactHeaderHeight);
         _gridToday.RowTemplate.Height = LogicalToDeviceUnits(CompactRowHeight);
         _gridToday.DefaultCellStyle.Padding = new Padding(3, 0, 3, 0);
