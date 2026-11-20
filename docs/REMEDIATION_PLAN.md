@@ -263,7 +263,7 @@ Every schema change needs a new migration, a `docs/DATABASE.md` update, and Osam
 - [x] **R9.1 SPEC.md** — add F1 (as built: signed tokens, not the opaque-hash design), F3, F4, F5 rules (BR-19 onward, including the companion limit and gift rules now only in `F5_GIFT_VOUCHERS_PLAN.md`), fix the A5/BR-11 mismatch (override for suspended holders), and close answered questions.
 - [x] **R9.2 DECISIONS.md** — mark ADR-013 as superseded by the signed-token design; add ADRs for R2.1/R2.2 (outbox immutability and sequence ordering), R3.2 (supervisor approval tokens), R6.1 (entry cards under migrations), R6.5 (SQL login model).
 - [ ] **R9.3 AGENTS.md** (needs Osama's approval) — project count is now 5 production projects plus `web/`; add the web test command to the session protocol; rename the misleading note that UI tests live in `ParkGate.ArchitectureTests`, or move them to a new `ParkGate.WinForms.Tests` project (ask first).
-- [ ] **R9.4 USER_GUIDE_AR.md and TEST_SCRIPT.md** — new shortcuts, registration with organization choice, void button, glossary.
+- [x] **R9.4 USER_GUIDE_AR.md and TEST_SCRIPT.md** — new shortcuts, registration with organization choice, void button, glossary.
 - [ ] **R9.5 SESSION_HANDOFF.md** — final state, known issues, next steps.
 
 ---
