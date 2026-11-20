@@ -10,15 +10,15 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-20 |
-| Last session | S40 — Phase R8 (release 1.1.0) on `phase/r8-release`; F8 days merged (PR #22) |
-| Current phase | Phase R8 done, PR open. Left: R6.5 (Q-R6), R9 (docs), F8 card-number patterns (T8.xb), T8.5 |
-| Working branch | `phase/r8-release` (from `main` `e055551`, after PR #22) |
+| Last session | S41 — F8 card-number patterns (T8.1b–T8.4b) and the `RtlTabControl` fix (T8.7) on `phase/f8-card-patterns` |
+| Current phase | F8 complete except T8.5 (cloud sync of the two organization fields). R8 PR #23 open. Left: R6.5 (now unblocked), R9 (docs) |
+| Working branch | `phase/f8-card-patterns` (from `phase/r8-release` `a4a2fdc`, because PR #23 was not merged yet) |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 0 warnings (the Pkcs advisories are gone, R8.2) |
-| .NET Unit tests | 1110 passed (non-integration): 236 domain + 268 application + 109 infrastructure + 497 architecture |
-| .NET Integration tests | Infrastructure project 174 passed on LocalDB (integration and non-integration together) |
+| .NET Unit tests | 1066 passed (non-integration): 264 domain + 283 application + 519 architecture |
+| .NET Integration tests | Infrastructure project 178 passed on LocalDB (integration and non-integration together) |
 | Web tests | `php artisan test`: 101 passed. Needs PHP >= 8.4.1 now (R8.7); the herd-lite `php` 8.4.0 on PATH is too old, PHP 8.4.27 from WinGet works |
-| Total tests | 1271 .NET (incl. integration) + 101 web |
-| Latest migration | `AddOrganizationEntryDays` (S39, F8). Applied by Osama on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` (2026-11-20) |
+| Total tests | 1244 .NET (incl. integration) + 101 web |
+| Latest migration | `AddCardPatterns` (S41, F8: `OrganizationCardPatterns`, `CardPatternAlerts`). **Not yet applied** on LocalDB `ParkGate_Dev` or SQLEXPRESS `ParkGate`; Osama runs `dotnet ef database update` as for `AddOrganizationEntryDays` |
 
 ## State of the work
 
@@ -120,6 +120,11 @@
 
 Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
 
+**S41 (2026-11-20): F8 card-number patterns on `phase/f8-card-patterns`.** Osama answered Q-R6 (workgroup, at most 4 desks; R6.5 is unblocked) and asked for the patterns before R6.5. One commit each:
+T8.1b `CardShape`, `OrganizationCardPattern`, `CardPatternAlert`, `CardPatternLearner` (pure rules); T8.2b migration `AddCardPatterns`, repositories (unique pattern index covers a NULL prefix too); T8.3b `CardPatternMonitor` runs inside the register and card-change save, `CardPatternService` (Admin: approve, reject, review), `Permission.ManageCardPatterns`, `BeneficiaryDto.HasOpenCardAlert`, audit actions; T8.4b «الإدارة ← أنماط أرقام البطاقات» (two tabs), «رقم غير معتاد» beside the holder name on the desk, a warning after editing a visitor; T8.7 `RtlTabControl` recreated its handle while a window was created on a 125 % screen ("Error creating window handle"); `SettingsForm` failed the same way, so this also affects the merged R5 and the 1.1.0 installer.
+Design choices made without asking (documented in SPEC BR-29 and DATABASE.md §3.13): new column `Source` (Dominant / NewSeries) because a first proposal is used provisionally while a new series must not stop alerting before approval; "dominant" = more than half of the organization's cards; approving closes the matching open alerts; the four `CardPattern.*` settings are not seeded (defaults in code) and have no settings screen.
+**Next:** Osama applies migration `AddCardPatterns`, runs TC-37 and TC-38, reviews and merges PR #23 (R8) then the F8 patterns PR. Rebuild the installer after both, because T8.7 fixes a crash that 1.1.0 has. Then R6.5 (SQL logins, workgroup, 4 desks) and R9.
+
 **S40 (2026-11-20): R8 release work on `phase/r8-release`.** Osama merged PR #22 (F8 days) and asked for R8. One commit each:
 R8.1 single backslash in the production server name, read back and checked (the same bug was also in `build-installer.ps1`, fixed in R8.4); R8.2 `System.Security.Cryptography.Pkcs` pinned to 10.0.15 (10.0.12 still had the advisories), `NuGetAudit=false` removed; R8.3 cloud API key in `%ProgramData%\ParkGate\cloudkey.dat` (DPAPI LocalMachine), `ParkGate.SyncAgent.exe set-cloud-key` / `clear-cloud-key`, the stored key wins, a plain JSON key still works with a warning; R8.5 Docker/VPS path deleted, `package-cpanel.ps1` runs the tests and builds a clean package (no dev packages, `.env`, tests, logs or caches), new `docs/DEPLOYMENT_WEB_CPANEL.md`; R8.7 (new) Laravel 13.43 and Symfony 8.1.11 past 9 production advisories, `npm audit fix`, `composer.json` PHP `^8.4.1`; R8.4 version 1.1.0, installer client now self-contained (it was framework-dependent with no runtime check), fresh migration bundle every build, Sync Agent in both build scripts and in the installer (server mode), bundled .NET runtime pinned to 10.0.15 with `-RuntimeVersion` (SDK 10.0.401 bundles 10.0.12, whose Pkcs is vulnerable); R8.6 upgrade guide `DEPLOYMENT.md` §10, §4.1 fixed.
 Built and checked locally: `dist\installer\ParkGate_Setup_v1.1.0.exe` (113 MB), `artifacts\production`, `artifacts\parkgate-web-cpanel.zip`. Not installed on any machine.
@@ -161,6 +166,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
+- **F8 patterns (S41):** apply migration `AddCardPatterns`; run TC-37, TC-38; confirm the design choices above (`Source` column, "more than half", approval closes alerts).
+- **Rebuild 1.1.0 after merging:** the installer built in S40 has the `RtlTabControl` crash (settings window at 125 %).
 - **R8 (S40):** try `ParkGate_Setup_v1.1.0.exe` on a test PC (server and desk mode); run `set-cloud-key` on the server; deploy the web from the new cPanel package (host needs PHP >= 8.4.1).
 - **Local PHP:** the first `php` on PATH is herd-lite 8.4.0, too old for the updated packages. Update Herd Lite or put PHP 8.4.27 first on PATH (its `php.ini` needs `openssl`, `mbstring`, `fileinfo`, `curl`, `pdo_sqlite`, `intl` enabled).
 - **Keep the bundled runtime current:** raise `-RuntimeVersion` in both build scripts when a new .NET 10 servicing release ships, or install a newer SDK.
@@ -187,8 +194,7 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - **cPanel PHP version.** `web/composer.lock` resolves Symfony 8 / Laravel 13.36, which need PHP ≥ 8.4,
   while `composer.json` still says `^8.3`. CI uses PHP 8.4. Confirm the host offers PHP 8.4 before R8.5,
   and raise `composer.json` to `^8.4` (or re-lock for 8.3) to match.
-- Still open (the plan's defaults apply if unanswered): Q-R4b (glossary, R7.1), Q-R6 (desk PCs and
-  workgroup/domain, R6.5), Q-R7 (lowest desk resolution, R5.8).
+- Still open (the plan's defaults apply if unanswered): Q-R4b (glossary, R7.1), Q-R7 (lowest desk resolution, R5.8).
 - **Approve ADR-022** (gift token excluded from the cloud) **and ADR-023** (single-use supervisor approval tokens).
 - **Confirm the one-minute settings cache** (R3.6): a setting saved on one desk reaches the others within a minute.
 - **Confirm the R4.2 deviation:** a card number typed by hand during the success banner is not looked up until Enter.
@@ -198,6 +204,13 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S41 — 2026-11-20 — F8 card-number patterns; RtlTabControl crash
+- Q-R6 answered: workgroup, at most 4 desks.
+- `DatabaseDocumentationTests` skips any table row whose notes contain the word "proposed"; the `SampleCount` note had to be reworded.
+- EF filters a unique index on a nullable column (`[Prefix] IS NOT NULL`) by default; `HasFilter(null)` keeps one pattern per shape without a prefix.
+- The real-screen probe hung on a modal "Error creating window handle". Unit tests at 96 dpi never reproduce it; the probe's generic path creates windows off-screen at (-20000, -20000), where no DPI scaling happens, so earlier probes missed it. New probe switches: `PROBE_ONSCREEN=1` (create on screen) and a `ThreadException` handler that writes `error.txt` and exits.
+- Grid cells with card numbers and shapes use LRE/PDF, or "AA-##" shows as "##-AA" in an RTL cell.
 
 ### S40 — 2026-11-20 — Phase R8 (release 1.1.0)
 - PR #22 merged. Baseline green (1096 unit).
@@ -268,16 +281,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - The approval token is spent only after request validation, so a too-short reason does not cost the supervisor a re-login.
 - A Python edit wrote three test files with LF; fixed by deleting and re-checking them out after the commit.
 - Test counts: .NET unit 620 → 662, integration 40 → 42, web 96 (unchanged).
-### S31 — 2026-11-13 — Phase R2: R2.9 and the end-to-end test
-- Baseline was green (620 unit, 87 infra, 154 architecture; web 89). Did R2.9 test-first in two commits, then the end-to-end test.
-- `phpunit.xml` does not force the SQLite values, so the MySQL job only sets `DB_*` env vars; no change to the default run.
-- The generator cannot open a connection: it uses an anonymous `MySqlConnection` subclass that pins `isMaria()` to false and
-  `getServerVersion()` to 8.0.36, because the grammar asks the server for both when it builds `uuid` and `date` columns.
-- The generated file uses lower-case SQL from Laravel's grammar and now includes `jobs`, `job_batches`, `failed_jobs`
-  (they were missing from the hand-written file).
-- The plan asked for a PHP and .NET end-to-end run; the test is .NET-only (the web ingestion side has its own tests, and
-  the whole web suite runs on MySQL). A single run across both stacks would need a running web server in CI.
-- Test counts: .NET integration 39 → 40, web 89 → 96. Pushed; GitHub `web` (both jobs) green.
-- Osama said the app is not in production yet. Merged PR #13 (merge commit), took an uncompressed backup (Express has no
-  `COMPRESSION`), applied the three migrations with `dotnet ef database update --project src/ParkGate.Infrastructure
-  --connection "Server=.\SQLEXPRESS;..."` and checked `__EFMigrationsHistory` and the outbox.
