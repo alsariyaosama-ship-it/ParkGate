@@ -3,7 +3,9 @@
 
 #define MyAppName "ParkGate"
 #define MyAppArabicName "بوابة منتزه المرح العائلي"
-#define MyAppVersion "1.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "1.1.0"
+#endif
 #define MyAppPublisher "منتزه المرح العائلي"
 #define MyAppExeName "ParkGate.WinForms.exe"
 #define MyAppAssocName MyAppName + " File"
@@ -68,6 +70,10 @@ Source: "..\scripts\backup.ps1"; DestDir: "{app}\scripts"; Flags: ignoreversion
 Source: "..\scripts\Setup-ProductionDatabase.ps1"; DestDir: "{app}\scripts"; Flags: ignoreversion; Check: IsServerMode
 ; Database migration bundle (installed and executed in server mode only)
 Source: "..\dist\database\ParkGate.Migrations.exe"; DestDir: "{app}\database"; Flags: ignoreversion; Check: IsServerMode
+; Sync Agent and its service scripts (server mode only). The service is installed by hand after set-cloud-key (DEPLOYMENT.md §8).
+Source: "..\dist\sync-agent\*"; DestDir: "{app}\sync-agent"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsServerMode
+Source: "..\scripts\install-sync-service.ps1"; DestDir: "{app}\scripts"; Flags: ignoreversion; Check: IsServerMode
+Source: "..\scripts\uninstall-sync-service.ps1"; DestDir: "{app}\scripts"; Flags: ignoreversion; Check: IsServerMode
 
 [Icons]
 Name: "{group}\{#MyAppArabicName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "{#MyAppArabicName}"; IconFilename: "{app}\Resources\Icons\app.ico"

@@ -2,10 +2,13 @@
 param(
     [string]$Configuration = "Release",
     [string]$Runtime = "win-x64",
-    [string]$OutputRoot = "artifacts\production"
+    [string]$OutputRoot = "artifacts\production",
+    [string]$RuntimeVersion = "10.0.15"
 )
 
 $ErrorActionPreference = "Stop"
+# The .NET runtime bundled into self-contained apps. Keep it on the latest servicing release: the SDK alone
+# bundles the runtime it shipped with (10.0.401 -> 10.0.12, whose Pkcs has GHSA-846f-f764-76mx; R8.2).
 Set-StrictMode -Version Latest
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
@@ -13,6 +16,8 @@ $winFormsProject = Join-Path $repositoryRoot "src\ParkGate.WinForms\ParkGate.Win
 $infrastructureProject = Join-Path $repositoryRoot "src\ParkGate.Infrastructure\ParkGate.Infrastructure.csproj"
 $outputPath = Join-Path $repositoryRoot $OutputRoot
 $clientPath = Join-Path $outputPath "client"
+$agentPath = Join-Path $outputPath "sync-agent"
+$agentProject = Join-Path $repositoryRoot "src\ParkGate.SyncAgent\ParkGate.SyncAgent.csproj"
 $databasePath = Join-Path $outputPath "database"
 $migrationBundlePath = Join-Path $databasePath "ParkGate.Migrations.exe"
 $migrationScriptPath = Join-Path $databasePath "ParkGate.Migrations.sql"
@@ -41,6 +46,7 @@ Invoke-DotNet @(
     "--runtime", $Runtime,
     "--self-contained", "true",
     "--output", $clientPath,
+    "--property:RuntimeFrameworkVersion=$RuntimeVersion",
     "--property:PublishReadyToRun=true",
     "--property:DebugType=None",
     "--property:DebugSymbols=false"
@@ -63,11 +69,25 @@ if (Test-Path $clientAppSettings) {
     }
 }
 
+Write-Host "Publishing the Sync Agent ($Runtime, self-contained)..."
+Invoke-DotNet @(
+    "publish",
+    $agentProject,
+    "--configuration", $Configuration,
+    "--runtime", $Runtime,
+    "--self-contained", "true",
+    "--output", $agentPath,
+    "--property:RuntimeFrameworkVersion=$RuntimeVersion",
+    "--property:DebugType=None",
+    "--property:DebugSymbols=false"
+)
+
 Write-Host "Generating idempotent EF Core SQL script..."
+# No --no-build: the client publish built Infrastructure for the pinned $RuntimeVersion, which the dotnet-ef
+# tool cannot load when that runtime is not installed on this machine. A normal build fixes the runtimeconfig.
 Invoke-DotNet @(
     "ef", "migrations", "script",
     "--idempotent",
-    "--no-build",
     "--context", "ParkGateDbContext",
     "--configuration", $Configuration,
     "--project", $infrastructureProject,
@@ -104,5 +124,6 @@ Invoke-DotNet @(
 
 Write-Host "Production artifacts created under $outputPath"
 Write-Host "Client package: $clientPath"
+Write-Host "Sync Agent:     $agentPath"
 Write-Host "SQL migration:  $migrationScriptPath"
 Write-Host "Migration exe:  $migrationBundlePath"
