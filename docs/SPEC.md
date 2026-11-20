@@ -83,7 +83,7 @@ Permissions are enforced in the **Application layer**. Hiding UI elements is a c
 | A2 | Card found in more than one organization | Operator chooses the organization from a short list, then continue. |
 | A3 | Within cooldown | **Red banner** «مرفوض — دخل قبل أقل من {N} ساعة», showing last granted entry time, the time entry becomes allowed, and remaining time (ساعات:دقائق). Warning sound if enabled. Register button disabled. A denied attempt is logged (BR-10). |
 | A4 | Holder suspended / blocked, card expired, or organization inactive | Red banner with the specific reason (BR-06 order). Denied attempt logged. |
-| A5 | Supervisor override (from A3 or expired card in A4) | Supervisor presses **F9 «تجاوز»**, authenticates if the logged-in user is not a supervisor (username + password prompt), enters a mandatory reason. Entry recorded as `Overridden`. Not available for Blocked holders or inactive organizations (BR-11). |
+| A5 | Supervisor override (from A3, or from A4 for a suspended holder or an expired card, or on a day that is not an entry day of the organization, BR-27) | Supervisor presses **F9 «تجاوز»**, authenticates if the logged-in user is not a supervisor (username + password; the approval is a single-use token, ADR-023), enters a mandatory reason. Entry recorded as `Overridden`. Not available for Blocked holders or inactive organizations (BR-11). |
 | A6 | Two desks submit the same holder at the same moment | Exactly one is granted; the other receives the A3 result (BR-12). |
 | A7 | Database server unreachable | Clear Arabic message «تعذّر الاتصال بالخادم», retry button; nothing is recorded locally. |
 | A8 | Operator recorded the wrong holder | Supervisor voids the entry with a reason (BR-13). |
@@ -111,24 +111,32 @@ Keyboard-first: the whole flow must be possible without a mouse.
 | BR-03 | The window is **rolling** and measured from the holder's **last granted entry** (`Allowed` or `Overridden`, not voided). Denied attempts never reset it. |
 | BR-04 | Eligible when `nowUtc >= lastGrantedUtc + cooldown`. Exactly on the boundary = eligible. No previous entry = eligible. |
 | BR-05 | **Time source:** the database server clock (`SYSUTCDATETIME()`) is the only clock used for rules and timestamps. Client PC clocks are never trusted. Stored in UTC, displayed in park local time (setting `Park.TimeZoneId`). |
-| BR-06 | **Check order** (first failure is reported): organization inactive → holder Blocked → holder Suspended → card expired (`CardExpiryDate < today local`) → cooldown. |
+| BR-06 | **Check order** (first failure is reported): organization inactive → holder Blocked → not an entry day of the organization (BR-27) → holder Suspended → card expired (`CardExpiryDate < today local`) → cooldown. Every reason that cannot be overridden comes before the ones that can, because an override skips only the first reason. |
 | BR-07 | **Companions:** a count per active age category, each ≥ 0. Group size (holder + companions) must be ≤ setting `Entry.MaxGroupSize` (default 10). |
 | BR-08 | The **holder counts as one person** and is not included in companion counts. `TotalPersons = 1 + Σ companions`. (Confirmed by the client — Q2.) |
 | BR-09 | Each entry stores a snapshot of companion counts. Later edits to the holder never change history. |
 | BR-10 | Every denied attempt is logged. **Dedupe:** if the same holder was denied at the same workstation within `Entry.DenialDedupMinutes` (default 5), do not insert a new row. |
-| BR-11 | **Override:** Supervisor/Admin only, reason mandatory (≥ 5 characters), recorded as `Overridden`, counts as a granted entry for BR-03. Allowed for: cooldown, expired card, suspended holder. Not allowed for: Blocked holder, inactive organization. |
-| BR-12 | **Concurrency:** eligibility check and entry insert run in one transaction holding an update lock on the holder row (see DATABASE.md §4). Two desks can never both grant the same window. |
+| BR-11 | **Override:** Supervisor/Admin only, reason mandatory (≥ 5 characters), recorded as `Overridden`, counts as a granted entry for BR-03. Allowed for: cooldown, expired card, suspended holder, not an entry day (BR-27). Not allowed for: Blocked holder, inactive organization. |
+| BR-12 | **Concurrency:** optimistic (ADR-026). Every grant updates the holder row, whose `RowVersion` makes a concurrent grant fail at save; the use case retries from the start (at most 3 times) and the retry is judged by the normal rules. Two desks can never both grant the same window. See DATABASE.md §4. |
 | BR-13 | **Void:** entry records are immutable. A Supervisor can void a granted entry with a reason. Voiding recalculates `LastGrantedEntryUtc` from the latest remaining non-voided granted entry. Denied attempts cannot be voided. |
 | BR-14 | Holders, organizations, users and age categories are **never hard-deleted**; they are deactivated/suspended. |
 | BR-15 | **Phone (required):** Libyan mobile normalized to `09XXXXXXXX`. Accept `+2189…`, `002189…`, `2189…` and Arabic-Indic digits as input. |
 | BR-16 | **National ID (optional):** digits only after normalization, exactly 12 digits when present. Unique when present (filtered unique index). |
 | BR-17 | **Audit:** create/update of holders, status changes, overrides, voids, settings changes, user management and logins are written to the audit log with user, workstation and DB time. |
 | BR-18 | **Account lockout:** after `Security.MaxFailedLogins` (default 5) failures, the account is locked for `Security.LockoutMinutes` (default 15). |
+| BR-19 | **Organization gift policy (F5):** `GiftEnabled`, `GiftValue` (> 0 when enabled), `GiftIntervalDays` (1–365). Managed by Admin (`ManageOrganizations`). |
+| BR-20 | **Gift check order** (first failure is reported): organization inactive → gifts not enabled → holder Blocked → holder Suspended → no granted entry today (BR-30) → not a gift day (BR-28) → interval not elapsed. Eligible when `nowUtc >= lastGiftIssuedUtc + GiftIntervalDays`, or no earlier voucher. The interval starts when a voucher is issued; voided vouchers do not count. DB clock (BR-05). |
+| BR-21 | **Gift override:** only "interval not elapsed" and "not a gift day" can be overridden, by Supervisor/Admin, reason ≥ 5 characters, recorded on the voucher (`IsOverride`, `OverrideByUserId`, `OverrideReason`). |
+| BR-22 | **Atomic issue:** issuing updates the holder's `LastGiftIssuedUtc`, so two desks issuing at once conflict on the holder's `RowVersion` and the loser retries (ADR-026). |
+| BR-23 | **Voucher QR:** the signed 203-digit token of ADR-028 with its own signing context, so an entry-card QR is never accepted as a gift and the reverse. Printed on 80 mm paper with the voucher number and no value. |
+| BR-24 | **Redemption is single-use:** `Issued → Redeemed` in one save, guarded by the voucher's `RowVersion`; a second scan gets "already redeemed". Redeemer, desk and DB time are stored. A voucher expires at the end of its business date. A Supervisor can void an issued voucher with a reason (`VoidGift`); redeemed vouchers never change. |
+| BR-25 | **Free-companion limit:** when `Organization.MaxFreeCompanions` is set, the companions in categories not flagged `IsCompanionLimitExempt` must not exceed it; otherwise check-in and override are refused (`CheckIn.ExceedsFreeCompanionLimit`). The holder is not counted. BR-07 still applies to the whole group. |
+| BR-26 | **Infant exemption:** an age category flagged `IsCompanionLimitExempt` never counts toward BR-25. The seeded «رضيع» is flagged; Admin can change the flag. |
 | BR-27 | **Entry days (F8, ADR-024):** each organization has allowed weekdays (`AllowedEntryDays`, default all seven). The weekday is that of the park-local business date from the database clock (BR-05). On another day the entry is denied with `DayNotAllowed`, and the banner names the allowed days. Checked right after "holder blocked" in the BR-06 order (not right after "organization inactive"): an override skips only the first denial reason, so every reason that cannot be overridden must come first. A Supervisor can override it (BR-11). The days are changed by hand in the organization dialog (Admin, `ManageOrganizations`); the change applies from the next lookup and is written to the audit trail with the days before and after (owner, 2026-11-20). There is no dated or temporary schedule. |
 | BR-28 | **Gift days (F8):** a gift follows the organization's entry days (BR-27), unless the organization's `GiftAnyDay` option is on. On another day the gift is denied with `DayNotAllowed`, checked after `NoEntryToday` (BR-30); the supervisor gift override can still issue it (Q13). |
+| BR-29 | **Card-number pattern alert (F8):** when a holder is registered or their card number changes, the number's shape (length, character class per position, and a prefix shared by most numbers) is compared with the organization's patterns. A mismatch shows a non-blocking amber note to the operator and writes an alert for the Admin. After `CardPattern.MinSample` (default 10) cards, the dominant shape is proposed and used provisionally until the Admin decides. A shape that reaches `CardPattern.NewSeriesThreshold` (default 5) alerts is proposed as a new series. **Only an Admin approves a pattern**; it is never approved automatically. A rejected pattern keeps alerting, and its holders stay on the review list. **Built rules (S41):** the shape is one class per character (`D` digit, `L` letter, `-` dash, `O` other). The first pattern is proposed when the organization has `MinSample` cards and one shape holds more than half of them; its prefix is the first `PrefixLength` characters when `PrefixSharePercent` of those numbers share them. This first (dominant) proposal is used provisionally until the Admin decides; a new-series proposal stops no alert until approved. Approving a pattern closes the open alerts it matches. The check runs in the same save as the registration or card change, and the desk shows «رقم غير معتاد» beside the name of a holder with an open alert. Only Admins see «الإدارة ← أنماط أرقام البطاقات» (`ManageCardPatterns`); every proposal, decision, alert and review is in the audit trail. |
 | BR-30 | **Gift only after today's entry (owner, 2026-11-18):** a gift voucher is issued only when the organization has gifts enabled (`GiftEnabled`) **and** the holder has a granted or overridden, non-voided entry on today's park business date (BR-05). Otherwise the gift is denied with `NoEntryToday`, checked right after the holder status in the BR-20 order. It is **not overridable**, not even by the supervisor gift override (BR-21). |
 | BR-31 | **Voiding an entry and its gift (owner, 2026-11-19):** a gift rests on the day's entry (BR-30). When the voided entry is the holder's only granted or overridden, non-voided entry of that business date, that day's unredeemed gift vouchers are voided with it, in the same transaction and with the same reason and approver, and the gift interval is recalculated (BR-21). If a gift of that day was **already redeemed**, the entry **cannot be voided** (`CheckIn.GiftAlreadyRedeemed`), with no exception. When another valid entry of that day remains, the gifts are not touched. |
-| BR-29 | **Card-number pattern alert (F8):** when a holder is registered or their card number changes, the number's shape (length, character class per position, and a prefix shared by most numbers) is compared with the organization's patterns. A mismatch shows a non-blocking amber note to the operator and writes an alert for the Admin. After `CardPattern.MinSample` (default 10) cards, the dominant shape is proposed and used provisionally until the Admin decides. A shape that reaches `CardPattern.NewSeriesThreshold` (default 5) alerts is proposed as a new series. **Only an Admin approves a pattern**; it is never approved automatically. A rejected pattern keeps alerting, and its holders stay on the review list. **Built rules (S41):** the shape is one class per character (`D` digit, `L` letter, `-` dash, `O` other). The first pattern is proposed when the organization has `MinSample` cards and one shape holds more than half of them; its prefix is the first `PrefixLength` characters when `PrefixSharePercent` of those numbers share them. This first (dominant) proposal is used provisionally until the Admin decides; a new-series proposal stops no alert until approved. Approving a pattern closes the open alerts it matches. The check runs in the same save as the registration or card change, and the desk shows «رقم غير معتاد» beside the name of a holder with an open alert. Only Admins see «الإدارة ← أنماط أرقام البطاقات» (`ManageCardPatterns`); every proposal, decision, alert and review is in the audit trail. |
 
 ## 7. Functional requirements
 
@@ -190,15 +198,15 @@ Priority: **M** = MVP, **L** = later in MVP roadmap (Phase 6–8).
 | Data | SQL Server Express limits (10 GB per database) are far above expected volume. Daily backups required (Phase 8). |
 | Maintainability | Clean Architecture (4 projects), SOLID, DI, automated tests on rules and use cases, CI on GitHub. |
 
-## 9. Future requirements (design for now, build only when approved)
+## 9. Additional features (F1, F3, F4, F5, F8 built; F2 future; F6, F7 recommendations only)
 
 The MVP data model and abstractions must make these additive, not rewrites.
 
-### F1 — QR credential
-- Issue a QR to a holder; QR content is an **opaque random token** (≥ 128 bits, base64url), never personal data.
-- Only the **SHA-256 hash** of the token is stored. Reprinting = issuing a new token and revoking the old one.
-- Scanning the QR at the desk (keyboard-wedge scanner) resolves to the holder and runs the same check-in flow with `Channel = QrDesk`.
-- Print a card-size QR with the holder's name and organization logo.
+### F1 — QR entry card (built)
+- A Supervisor or Admin issues an entry card to an active holder from «الزوار» (the same permission as editing a holder, `EditBeneficiary`). The QR is the signed token of ADR-028: a random card id, an expiry, the key id and an ECDSA signature. No personal data.
+- Printed on 80 mm cashier paper with the park and organization names (R7.12), without a logo or personal data.
+- Scanning the card at the desk (keyboard-wedge scanner) checks signature, expiry, revocation and the holder's status, then runs the normal check-in for that holder. Every scan is logged in `CardScanLog`.
+- Reprinting issues a new card id and revokes the old card.
 
 ### F2 — Electronic gate / turnstile
 - A separate host process (e.g. Windows Service `ParkGate.GateService`) reusing Domain + Application; hardware behind `IGateController` (relay over TCP/serial, vendor SDK).
@@ -209,10 +217,17 @@ The MVP data model and abstractions must make these additive, not rewrites.
   - Recommendation: B if the fund defines family membership, otherwise C.
 - Gate failures must fail **closed** (stay locked) and alert the desk.
 
-### F3 — Cloud read-only dashboard (hybrid)
-- One-way push from the local DB (source of truth) to a cloud store; the cloud never writes back.
-- Push only what dashboards need. **Phone and national ID are never pushed** (ADR-021); notes and status reason are (Q-R2b).
-- Change tracking via `rowversion` / `CreatedAtUtc` watermark; a background sync worker with retry; works when internet is intermittent.
+### F3 — Cloud sync agent (built)
+- One-way push from the local database (the source of truth) to the cloud; the cloud never writes back.
+- Changes are captured in `SyncOutboxes` in the same save as the business change. Rows are immutable and ordered by a database sequence (ADR-029). The Sync Agent (a Windows service, ADR-018) pushes batches over HTTPS with an API key stored with DPAPI (R8.3), retries on failure and sends a heartbeat.
+- **Phone and national ID never leave the park** (ADR-021); notes and status reason do (Q-R2b). Gift vouchers sync without their redeemable token (ADR-022).
+
+### F4 — Cloud web dashboard (built)
+- Laravel + Inertia (Vue 3) in `web/`, Arabic RTL, on cPanel hosting (DEPLOYMENT_WEB_CPANEL.md). Users are created with `php artisan parkgate:create-user`; there is no self-registration.
+- Today's figures, organizations summary, hourly chart, reports and a holder search, all in park-local time (R7.5). A park status indicator from the heartbeat.
+
+### F5 — Gift vouchers and free-companion limit (built)
+- Rules BR-19 to BR-26, BR-30 and BR-31. The desk offers the gift right after a granted entry (R5.14); the gift redemption screen scans the voucher; «التقارير ← تقرير قسائم الهدايا» lists vouchers and lets a Supervisor void one (R5.17).
 
 ### F6 — Phone verification (recommendation to park management, not built)
 - Highest assurance option. After each free entry or gift, the holder receives an SMS or WhatsApp notification; sensitive actions (gift issue, lost-card replacement, new registration) require a one-time code sent to the holder's phone.
@@ -245,12 +260,12 @@ Defaults below are applied until the user answers. An agent must not change a de
 | Q3 | Rolling 12 h window, or "once per calendar day / per opening day"? | **Answered 2026-10-04:** rolling window in hours (BR-02/BR-03), chosen for finer control | — |
 | Q4 | Maximum group size? Limits per category? | Max 10 total, no per-category limit | — |
 | Q5 | Which holder fields are required by the client (national ID, card expiry)? | Name + phone required; others optional | — |
-| Q6 | How many desks? Is an offline fallback needed if the server PC fails? | Up to 10 desks, no offline mode | — |
+| Q6 | How many desks? Is an offline fallback needed if the server PC fails? | **Answered 2026-11-20 (Q-R6):** at most 4 desks in a workgroup; no offline mode. One SQL login for the desks (ADR-027) | — |
 | Q7 | Do other organizations get different rules (cooldown, group size)? | Per-organization cooldown only | — |
 | Q8 | Does the park invoice the fund for free entries? What report format does the fund require? | **Answered 2026-10-04:** no financial claims; per-organization statistics are important (FR-RPT-03) | — |
 | Q9 | Must card validity be checked against the fund's own database? | **Answered 2026-11-16:** no integration now; the physical card is the reference (ADR-024). The organization's number list is recommended (F7) | — |
-| Q10 | Operating hours — any rule tied to closing time? | None | — |
+| Q10 | Operating hours — any rule tied to closing time? | **Answered (Q-R5):** the park closes at midnight (last entry about 23:00), so the calendar date is the business date | — |
 | Q11 | Gate group handling: Option A, B or C (§9 F2)? | **Deferred by the client** until F2 is scheduled | F2 |
 | Q12 | Which data may go to the cloud? | Answered (Q-R2/Q-R2b): everything except phone and national ID | F3 |
-| Q13 | May the supervisor gift override issue a gift on a day the organization does not allow (BR-28)? | Yes, like the entry override (BR-27) | F8 |
-| Q14 | Do the new F8 fields, patterns and alerts sync to the cloud? | Organization fields yes (part of its payload); patterns and alerts stay local | F8 |
+| Q13 | May the supervisor gift override issue a gift on a day the organization does not allow (BR-28)? | **Answered and built:** yes, like the entry override (BR-21) | — |
+| Q14 | Do the new F8 fields, patterns and alerts sync to the cloud? | **Decided:** the two organization fields yes, patterns and alerts stay local. The organization fields are not synced yet (T8.5) | T8.5 |

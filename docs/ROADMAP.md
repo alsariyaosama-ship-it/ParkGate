@@ -286,11 +286,11 @@ Task detail, findings and the test-first requirement for each task live in `docs
 - [x] R8.7 Web: update `laravel/framework` and `symfony/*` past their security advisories (found in R8.5: 9 advisories in production packages); PHP >= 8.4.1
 
 ### R9 — Documentation sync · branch `phase/r9-docs`
-- [ ] R9.1 `SPEC.md`: F1 as built, F3/F4/F5 rules, the A5/BR-11 mismatch, close answered questions
-- [ ] R9.2 `DECISIONS.md`: supersede ADR-013; new ADRs for R2.1, R2.2, R3.2, R6.1, R6.5
-- [ ] R9.3 `AGENTS.md` (needs Osama's approval): project count, web test command, UI test location
-- [ ] R9.4 `USER_GUIDE_AR.md` and `TEST_SCRIPT.md`: new shortcuts, registration, void button, glossary
-- [ ] R9.5 `SESSION_HANDOFF.md`: final state, known issues, next steps
+- [x] R9.1 `SPEC.md`: F1 as built, F3/F4/F5 rules, the A5/BR-11 mismatch, close answered questions
+- [x] R9.2 `DECISIONS.md`: ADR-013 superseded by ADR-028; ADR-029 (R2.1, R2.2), ADR-030 (R6.1); R3.2 and R6.5 are ADR-023 and ADR-027
+- [x] R9.3 `AGENTS.md` (approved 2026-11-20): five production projects with `ParkGate.SyncAgent`, UI tests documented in ArchitectureTests; web items left out on Osama's request (desktop first)
+- [x] R9.4 `USER_GUIDE_AR.md` rewritten for 1.1.0 (roles, shortcuts, registration pop-up, F8 void and gifts, entry days, card patterns, audit trail); `TEST_SCRIPT.md` glossary fix
+- [x] R9.5 `SESSION_HANDOFF.md`: final state, known issues, next steps (desktop rollout first)
 - [x] R9.6 Format all web PHP with Pint (done early in S30, in its own `style` commit; run `vendor/bin/pint --dirty --format agent` after each PHP change)
 
 **Done when:** R0–R9 are ticked, every phase PR is merged, and the acceptance line at the end of each phase in `docs/REMEDIATION_PLAN.md` holds.

@@ -11,7 +11,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Consequences:** Core layers stay Windows-independent and reusable by a future gate service or cloud worker.
 
 ### ADR-002 — Clean Architecture in 4 production projects
-- **Status:** Accepted
+- **Status:** Accepted; ADR-018 adds a fifth project, `ParkGate.SyncAgent` (plus the separate `web/` Laravel app, ADR-019)
 - **Context:** Client asked for clean architecture, max 4 layers, DI and SOLID.
 - **Decision:** Domain, Application, Infrastructure, WinForms. Dependency rule in AGENTS.md §3, enforced by `ParkGate.ArchitectureTests`.
 - **Consequences:** Slightly more ceremony than a 2-tier app; rules testable without UI or DB.
@@ -77,7 +77,7 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Consequences:** Installation step documented in DEPLOYMENT.md.
 
 ### ADR-013 — QR token is opaque; store only its hash (F1)
-- **Status:** Accepted (applies when F1 is approved)
+- **Status:** Superseded by ADR-028 (F1 was built with signed tokens)
 - **Context:** QR must not expose personal data and must be revocable.
 - **Decision:** Random ≥128-bit token, SHA-256 hash stored, reprint = new token.
 - **Consequences:** A leaked DB cannot be used to forge QR codes.
@@ -190,6 +190,30 @@ Append-only. To change a decision, add a new ADR that supersedes the old one and
 - **Context:** The server setup stored a Windows-authentication connection for every client. In a workgroup the server does not know the desks' Windows accounts, so desks needed matching local accounts. The documented `ParkGateAppUser` / `ParkGateDeployUser` logins were never created by any script, and the firewall rules were open on every network profile.
 - **Decision:** `Setup-ProductionDatabase.ps1` creates one SQL login, `parkgate_app`, shared by every desk, the server and the Sync Agent: `db_datareader`, `db_datawriter`, `db_backupoperator` (the admin "backup now"), never `db_owner` or `db_ddladmin`. The password is generated (letters and digits, no look-alikes), shown once, and stored only DPAPI-protected in `connection.dat`; `CHECK_EXPIRATION = OFF` so an expiry cannot stop every desk at once. Migrations run with the server administrator's Windows account, so there is no second SQL password to keep (the plan proposed a separate migration login). The firewall rules allow private and domain networks only.
 - **Consequences:** A stolen desk password can read and change data but cannot drop or alter tables. Who did what is still traced by ParkGate users and the audit trail, not by the SQL login. Mixed Mode must be on (DEPLOYMENT.md 2.1); the script stops with an explanation if it is not. Re-running the script never changes the password; `-ResetAppPassword` does, and then every desk needs the new one.
+
+---
+
+### ADR-028 — Signed QR tokens for entry cards and gift vouchers (F1, F5)
+- **Status:** Accepted (as built; supersedes ADR-013)
+- **Context:** ADR-013 planned an opaque random token with only its hash stored. F1 was built differently and the desk must verify a scan fast, offline from the cloud, without trusting the printed text.
+- **Decision:** A QR is 84 bytes written as 203 decimal digits (Numeric QR mode, immune to the keyboard layout of a USB wedge scanner): format version, signing key id, a random 128-bit card id (never a database id), the expiry as days since 2025-01-01, and an ECDSA P-256 / SHA-256 signature over a purpose context (`ParkGate.EntryCard/v1`, and a separate context for gift vouchers, ADR-020) plus the body. Keys live in `QrSigningKeys` with an id, so they can be rotated. The database keeps the card id; revocation sets `EntryCards.RevokedAtUtc`, and a reprint issues a new card id.
+- **Consequences:** No personal data in the QR. A copy of the database alone cannot forge a QR (the private key is needed), and a scan is checked by signature, then expiry, then revocation. A signature from one purpose is useless for the other.
+
+---
+
+### ADR-029 — The sync outbox is immutable and ordered by a database sequence
+- **Status:** Accepted (as built in R2.1 and R2.2)
+- **Context:** The Sync Agent re-encrypted an outbox payload after every failed push, because it wrote the encrypted text back to the tracked row (R2.1). The deduplicator picked the newest change of an entity by `CreatedAtUtc` stamped from each desk's own clock, so a desk with a clock behind could make an older write win (R2.2).
+- **Decision:** `SyncOutbox.PayloadJson` is written once and sent exactly as stored; nothing updates it. Each row gets `Sequence bigint IDENTITY` from the database; ordering and "last write wins" use `Sequence`, never a client clock. `CreatedAtUtc` stays, with a `SYSUTCDATETIME()` default, for display only.
+- **Consequences:** A retry after a failure sends byte-identical data. Desk clock skew cannot reorder changes. The cloud applies batches in `Sequence` order (ADR-018, ADR-021).
+
+---
+
+### ADR-030 — Entry-card tables are ordinary EF entities under migrations
+- **Status:** Accepted (Osama, 2026-11-18, R6.1)
+- **Context:** `QrSigningKeys`, `EntryCards` and `CardScanLog`, a view and three stored procedures were defined twice (a SQL script and a string in the client) and created by the client at startup, against ADR-011, needing DDL rights on the app login.
+- **Decision:** The three tables are EF entities with configurations and a migration (`AdoptEntryCards`); the view and procedures are gone and their logic is LINQ in repositories (ADR-025). The client never changes the schema.
+- **Consequences:** One schema definition. The app login needs no DDL rights, which made ADR-027 possible. Entry-card rows created before R6.1 were test data and were not kept.
 
 ---
 
