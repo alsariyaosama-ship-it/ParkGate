@@ -41,7 +41,6 @@ Invoke-DotNet @(
     "--runtime", $Runtime,
     "--self-contained", "true",
     "--output", $clientPath,
-    "--property:NuGetAudit=false",
     "--property:PublishReadyToRun=true",
     "--property:DebugType=None",
     "--property:DebugSymbols=false"
@@ -80,16 +79,14 @@ Write-Host "Building the infrastructure project for the migration bundle..."
 Invoke-DotNet @(
     "restore",
     $infrastructureProject,
-    "--runtime", $Runtime,
-    "--property:NuGetAudit=false"
+    "--runtime", $Runtime
 )
 Invoke-DotNet @(
     "build",
     $infrastructureProject,
     "--configuration", $Configuration,
     "--runtime", $Runtime,
-    "--no-restore",
-    "--property:NuGetAudit=false"
+    "--no-restore"
 )
 
 Write-Host "Generating self-contained EF Core migration bundle..."
