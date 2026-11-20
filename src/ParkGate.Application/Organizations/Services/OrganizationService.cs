@@ -207,15 +207,22 @@ public sealed class OrganizationService : IOrganizationService
             return Errors.Organization.NotFound;
         }
 
-        var oldCompanions = org.MaxFreeCompanions;
-        var oldGiftEnabled = org.GiftEnabled;
-        var oldGiftValue = org.GiftValue;
-        var oldInterval = org.GiftIntervalDays;
+        // The audit row keeps the policy before and after, so a changed entry day can be traced (F8, owner 2026-11-20).
+        var before = new
+        {
+            org.MaxFreeCompanions,
+            org.GiftEnabled,
+            org.GiftValue,
+            org.GiftIntervalDays,
+            org.AllowedEntryDays,
+            org.GiftAnyDay,
+        };
 
         try
         {
             org.SetMaxFreeCompanions(request.MaxFreeCompanions);
             org.ConfigureGift(request.GiftEnabled, request.GiftValue, request.GiftIntervalDays);
+            org.SetEntryDays(request.AllowedEntryDays, request.GiftAnyDay);
         }
         catch (ArgumentOutOfRangeException ex)
         {
@@ -228,7 +235,23 @@ public sealed class OrganizationService : IOrganizationService
             workstationId: _currentWorkstation.WorkstationId,
             entityName: nameof(Organization),
             entityId: org.Id.ToString(),
-            detailsJson: AuditDetails.ToJson(new { request.MaxFreeCompanions, request.GiftEnabled, request.GiftValue, request.GiftIntervalDays }),
+            detailsJson: AuditDetails.ToJson(new
+            {
+                OrganizationCode = org.Code,
+                OrganizationName = org.NameAr,
+                OldMaxFreeCompanions = before.MaxFreeCompanions,
+                request.MaxFreeCompanions,
+                OldGiftEnabled = before.GiftEnabled,
+                request.GiftEnabled,
+                OldGiftValue = before.GiftValue,
+                request.GiftValue,
+                OldGiftIntervalDays = before.GiftIntervalDays,
+                request.GiftIntervalDays,
+                OldAllowedEntryDays = (byte)before.AllowedEntryDays,
+                AllowedEntryDays = (byte)request.AllowedEntryDays,
+                OldGiftAnyDay = before.GiftAnyDay,
+                request.GiftAnyDay,
+            }),
             cancellationToken: cancellationToken);
 
         await uow.SaveChangesAsync(cancellationToken);

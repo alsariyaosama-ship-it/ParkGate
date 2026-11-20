@@ -73,10 +73,10 @@ public sealed class GiftVoucherService : IGiftVoucherService
         var businessDate = TimeZoneHelper.GetLocalBusinessDate(nowUtc, await GetTimeZoneIdAsync(uow, ct));
         var enteredToday = await uow.EntryAttempts.HasGrantedEntryOnAsync(holder.Id, businessDate, ct);
 
-        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday);
+        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday, businessDate);
         var decision = _policy.Evaluate(context);
 
-        return MapToEligibilityDto(decision, org.GiftValue, lastIssuedUtc);
+        return MapToEligibilityDto(decision, org.GiftValue, lastIssuedUtc) with { AllowedEntryDays = org.AllowedEntryDays };
     }
 
     public async Task<Result<IssuedGiftVoucherDto>> IssueAsync(
@@ -121,7 +121,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         var lastIssuedUtc = await uow.GiftVouchers.GetLatestIssuedUtcAsync(holder.Id, ct);
         var enteredToday = await uow.EntryAttempts.HasGrantedEntryOnAsync(holder.Id, businessDate, ct);
-        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday);
+        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday, businessDate);
         var decision = _policy.Evaluate(context);
 
         if (!decision.IsEligible)
@@ -236,7 +236,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
 
         var lastIssuedUtc = await uow.GiftVouchers.GetLatestIssuedUtcAsync(holder.Id, ct);
         var enteredToday = await uow.EntryAttempts.HasGrantedEntryOnAsync(holder.Id, businessDate, ct);
-        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday);
+        var context = new GiftEligibilityContext(org, holder, lastIssuedUtc, nowUtc, enteredToday, businessDate);
         var decision = _policy.Evaluate(context);
 
         if (!decision.IsEligible && !decision.CanBeOverridden)
@@ -484,6 +484,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
             GiftDenialReason.HolderSuspended => Errors.Gift.HolderSuspended.Code,
             GiftDenialReason.IntervalNotElapsed => Errors.Gift.IntervalNotElapsed.Code,
             GiftDenialReason.NoEntryToday => Errors.Gift.NoEntryToday.Code,
+            GiftDenialReason.DayNotAllowed => Errors.Gift.DayNotAllowed.Code,
             _ => null
         };
 
@@ -505,6 +506,7 @@ public sealed class GiftVoucherService : IGiftVoucherService
         GiftDenialReason.HolderSuspended => Errors.Gift.HolderSuspended,
         GiftDenialReason.IntervalNotElapsed => Errors.Gift.IntervalNotElapsed,
         GiftDenialReason.NoEntryToday => Errors.Gift.NoEntryToday,
+        GiftDenialReason.DayNotAllowed => Errors.Gift.DayNotAllowed,
         _ => Errors.Gift.NotEnabled
     };
 

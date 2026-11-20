@@ -9,7 +9,8 @@ public sealed record GiftEligibilityDto(
     DateTime? NextEligibleAtUtc,
     bool CanBeOverridden,
     decimal GiftValue,
-    DateTime? LastGiftIssuedUtc);
+    DateTime? LastGiftIssuedUtc,
+    WeekDays AllowedEntryDays = WeekDays.All);
 
 public sealed record IssueGiftVoucherRequest(Guid BeneficiaryId);
 

@@ -22,6 +22,8 @@ public static class ModelBuilderExtensions
             GiftEnabled = false,
             GiftValue = 0m,
             GiftIntervalDays = 30,
+            AllowedEntryDays = ParkGate.Domain.Enums.WeekDays.All,
+            GiftAnyDay = false,
             CreatedAtUtc = seedTimeUtc,
             CreatedByUserId = (int?)null,
             UpdatedAtUtc = (DateTime?)null,

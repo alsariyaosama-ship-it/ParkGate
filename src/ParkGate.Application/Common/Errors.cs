@@ -46,6 +46,7 @@ public static class Errors
     {
         public static readonly Error CooldownActive = new("CheckIn.CooldownActive", "Entry cooldown period is still active.");
         public static readonly Error OrganizationInactive = new("CheckIn.OrganizationInactive", "Organization is inactive.");
+        public static readonly Error DayNotAllowed = new("CheckIn.DayNotAllowed", "Today is not an entry day of the organization (BR-27).");
         public static readonly Error ExceedsMaxGroupSize = new("CheckIn.ExceedsMaxGroupSize", "Total group size exceeds the maximum allowed limit.");
         public static readonly Error NegativeCompanions = new("CheckIn.NegativeCompanions", "Companion counts cannot be negative.");
         public static readonly Error OverrideReasonRequired = new("CheckIn.OverrideReasonRequired", "A reason of at least 5 characters is required for an override.");
@@ -66,6 +67,7 @@ public static class Errors
         public static readonly Error HolderSuspended = new("Gift.HolderSuspended", "Holder is suspended from receiving gifts.");
         public static readonly Error IntervalNotElapsed = new("Gift.IntervalNotElapsed", "Gift interval period has not yet elapsed.");
         public static readonly Error NoEntryToday = new("Gift.NoEntryToday", "The holder has no granted entry today.");
+        public static readonly Error DayNotAllowed = new("Gift.DayNotAllowed", "Today is not a gift day of the organization (BR-28).");
         public static readonly Error OverrideReasonRequired = new("Gift.OverrideReasonRequired", "A reason of at least 5 characters is required for gift interval override.");
         public static readonly Error OverrideNotAllowed = new("Gift.OverrideNotAllowed", "Override is not permitted for this denial reason.");
         public static readonly Error NotFound = new("Gift.NotFound", "Gift voucher not found.");

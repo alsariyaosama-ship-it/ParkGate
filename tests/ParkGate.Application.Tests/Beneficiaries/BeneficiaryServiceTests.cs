@@ -366,4 +366,21 @@ public sealed class BeneficiaryServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.Count.ShouldBe(2);
     }
+
+    // ── F8, BR-27: the lookup says the day is wrong and which days are allowed ──
+
+    [Fact]
+    public async Task LookupByCardNumberAsync_NotAnEntryDay_PreviewNamesTheAllowedDays()
+    {
+        _org.SetEntryDays(WeekDays.Saturday | WeekDays.Thursday, giftAnyDay: false);
+        _beneficiaries.Add(new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-DAY"), "Ali Omar", PhoneNumber.Create("0912345678")));
+
+        var result = await _sut.LookupByCardNumberAsync("CARD-DAY");
+
+        var eligibility = result.Value.Matches.Single().Eligibility;
+        eligibility.IsEligible.ShouldBeFalse();
+        eligibility.DenialReason.ShouldBe(DenialReason.DayNotAllowed);
+        eligibility.CanBeOverridden.ShouldBeTrue();
+        eligibility.AllowedEntryDays.ShouldBe(WeekDays.Saturday | WeekDays.Thursday);
+    }
 }

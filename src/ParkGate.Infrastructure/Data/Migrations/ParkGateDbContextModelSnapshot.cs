@@ -682,6 +682,11 @@ namespace ParkGate.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<byte>("AllowedEntryDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint")
+                        .HasDefaultValue((byte)127);
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -698,6 +703,11 @@ namespace ParkGate.Infrastructure.Data.Migrations
 
                     b.Property<int?>("CreatedByUserId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("GiftAnyDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("GiftEnabled")
                         .ValueGeneratedOnAdd()
@@ -755,6 +765,8 @@ namespace ParkGate.Infrastructure.Data.Migrations
 
                     b.ToTable("Organizations", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Organizations_AllowedEntryDays", "[AllowedEntryDays] >= 1 AND [AllowedEntryDays] <= 127");
+
                             t.HasCheckConstraint("CK_Organizations_CooldownMinutes", "[CooldownMinutes] IS NULL OR ([CooldownMinutes] >= 1 AND [CooldownMinutes] <= 10080)");
 
                             t.HasCheckConstraint("CK_Organizations_GiftIntervalDays", "[GiftIntervalDays] >= 1 AND [GiftIntervalDays] <= 365");
@@ -768,8 +780,10 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         new
                         {
                             Id = 1,
+                            AllowedEntryDays = (byte)127,
                             Code = "SSF",
                             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            GiftAnyDay = false,
                             GiftEnabled = false,
                             GiftIntervalDays = 30,
                             GiftValue = 0m,

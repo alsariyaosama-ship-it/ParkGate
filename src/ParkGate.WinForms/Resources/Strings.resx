@@ -2317,4 +2317,70 @@
   <data name="Audit_No" xml:space="preserve">
     <value>لا</value>
   </data>
+  <data name="Grp_Org_EntryDays" xml:space="preserve">
+    <value>أيام الدخول</value>
+  </data>
+  <data name="Label_Org_GiftAnyDay" xml:space="preserve">
+    <value>الهدايا في أي يوم، وليس في أيام الدخول فقط</value>
+  </data>
+  <data name="Val_EntryDaysRequired" xml:space="preserve">
+    <value>اختر يوم دخول واحدًا على الأقل.</value>
+  </data>
+  <data name="Text_EveryDay" xml:space="preserve">
+    <value>كل الأيام</value>
+  </data>
+  <data name="Denial_DayNotAllowed" xml:space="preserve">
+    <value>اليوم ليس من أيام دخول الجهة</value>
+  </data>
+  <data name="Desk_AllowedEntryDays" xml:space="preserve">
+    <value>أيام دخول الجهة: {0}</value>
+  </data>
+  <data name="Error_CheckIn_DayNotAllowed" xml:space="preserve">
+    <value>اليوم ليس من أيام دخول جهة هذا الزائر.</value>
+  </data>
+  <data name="Error_Gift_DayNotAllowed" xml:space="preserve">
+    <value>اليوم ليس من أيام الهدايا لجهة هذا الزائر.</value>
+  </data>
+  <data name="Audit_Field_OrganizationCode" xml:space="preserve">
+    <value>رمز الجهة</value>
+  </data>
+  <data name="Audit_Field_OrganizationName" xml:space="preserve">
+    <value>اسم الجهة</value>
+  </data>
+  <data name="Audit_Field_OldMaxFreeCompanions" xml:space="preserve">
+    <value>حد المرافقين قبل التعديل</value>
+  </data>
+  <data name="Audit_Field_MaxFreeCompanions" xml:space="preserve">
+    <value>حد المرافقين</value>
+  </data>
+  <data name="Audit_Field_OldGiftEnabled" xml:space="preserve">
+    <value>الهدايا مفعلة قبل التعديل</value>
+  </data>
+  <data name="Audit_Field_GiftEnabled" xml:space="preserve">
+    <value>الهدايا مفعلة</value>
+  </data>
+  <data name="Audit_Field_OldGiftValue" xml:space="preserve">
+    <value>قيمة الهدية قبل التعديل</value>
+  </data>
+  <data name="Audit_Field_GiftValue" xml:space="preserve">
+    <value>قيمة الهدية</value>
+  </data>
+  <data name="Audit_Field_OldGiftIntervalDays" xml:space="preserve">
+    <value>مدة الانتظار بين هديتين قبل التعديل</value>
+  </data>
+  <data name="Audit_Field_GiftIntervalDays" xml:space="preserve">
+    <value>مدة الانتظار بين هديتين</value>
+  </data>
+  <data name="Audit_Field_OldAllowedEntryDays" xml:space="preserve">
+    <value>أيام الدخول قبل التعديل</value>
+  </data>
+  <data name="Audit_Field_AllowedEntryDays" xml:space="preserve">
+    <value>أيام الدخول</value>
+  </data>
+  <data name="Audit_Field_OldGiftAnyDay" xml:space="preserve">
+    <value>الهدايا في أي يوم قبل التعديل</value>
+  </data>
+  <data name="Audit_Field_GiftAnyDay" xml:space="preserve">
+    <value>الهدايا في أي يوم</value>
+  </data>
 </root>

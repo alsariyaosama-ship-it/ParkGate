@@ -36,6 +36,16 @@ partial class EditOrganizationDialog
         this._numGiftValue = new System.Windows.Forms.NumericUpDown();
         this._lblGiftInterval = new System.Windows.Forms.Label();
         this._numGiftIntervalDays = new System.Windows.Forms.NumericUpDown();
+        this._grpEntryDays = new ParkGate.WinForms.Controls.RtlGroupBox();
+        this._flpEntryDays = new System.Windows.Forms.FlowLayoutPanel();
+        this._chkDaySaturday = new ParkGate.WinForms.Controls.RtlCheckBox();
+        this._chkDaySunday = new ParkGate.WinForms.Controls.RtlCheckBox();
+        this._chkDayMonday = new ParkGate.WinForms.Controls.RtlCheckBox();
+        this._chkDayTuesday = new ParkGate.WinForms.Controls.RtlCheckBox();
+        this._chkDayWednesday = new ParkGate.WinForms.Controls.RtlCheckBox();
+        this._chkDayThursday = new ParkGate.WinForms.Controls.RtlCheckBox();
+        this._chkDayFriday = new ParkGate.WinForms.Controls.RtlCheckBox();
+        this._chkGiftAnyDay = new ParkGate.WinForms.Controls.RtlCheckBox();
         this._pnlButtons = new System.Windows.Forms.FlowLayoutPanel();
         this._btnSave = new ParkGate.WinForms.Controls.RtlButton();
         this._btnCancel = new ParkGate.WinForms.Controls.RtlButton();
@@ -43,6 +53,8 @@ partial class EditOrganizationDialog
         this._tblLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._numCooldownHours)).BeginInit();
         this._grpPolicy.SuspendLayout();
+        this._grpEntryDays.SuspendLayout();
+        this._flpEntryDays.SuspendLayout();
         this._tblPolicyLayout.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this._numMaxFreeCompanions)).BeginInit();
         ((System.ComponentModel.ISupportInitialize)(this._numGiftValue)).BeginInit();
@@ -87,17 +99,20 @@ partial class EditOrganizationDialog
         this._tblLayout.Controls.Add(this._chkIsDefault, 1, 3);
         this._tblLayout.Controls.Add(this._grpPolicy, 0, 4);
         this._tblLayout.SetColumnSpan(this._grpPolicy, 2);
+        this._tblLayout.Controls.Add(this._grpEntryDays, 0, 5);
+        this._tblLayout.SetColumnSpan(this._grpEntryDays, 2);
         this._tblLayout.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblLayout.Location = new System.Drawing.Point(0, 50);
         this._tblLayout.Name = "_tblLayout";
         this._tblLayout.Padding = new System.Windows.Forms.Padding(16, 12, 16, 12);
-        this._tblLayout.RowCount = 5;
+        this._tblLayout.RowCount = 6;
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
-        this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 184F));
-        this._tblLayout.Size = new System.Drawing.Size(520, 364);
+        this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 204F));
+        this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 120F));
+        this._tblLayout.Size = new System.Drawing.Size(620, 504);
         this._tblLayout.TabIndex = 1;
         // 
         // _lblCode
@@ -288,13 +303,130 @@ partial class EditOrganizationDialog
         this._numGiftIntervalDays.TabIndex = 6;
         this._numGiftIntervalDays.Value = new decimal(new int[] { 30, 0, 0, 0 });
         // 
+        // _grpEntryDays
+        // 
+        this._grpEntryDays.Controls.Add(this._flpEntryDays);
+        this._grpEntryDays.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._grpEntryDays.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._grpEntryDays.Location = new System.Drawing.Point(19, 349);
+        this._grpEntryDays.Name = "_grpEntryDays";
+        this._grpEntryDays.Padding = new System.Windows.Forms.Padding(8);
+        this._grpEntryDays.Size = new System.Drawing.Size(482, 114);
+        this._grpEntryDays.TabIndex = 8;
+        this._grpEntryDays.TabStop = false;
+        this._grpEntryDays.Text = "أيام الدخول";
+        // 
+        // _flpEntryDays
+        // 
+        this._flpEntryDays.Controls.Add(this._chkDaySaturday);
+        this._flpEntryDays.Controls.Add(this._chkDaySunday);
+        this._flpEntryDays.Controls.Add(this._chkDayMonday);
+        this._flpEntryDays.Controls.Add(this._chkDayTuesday);
+        this._flpEntryDays.Controls.Add(this._chkDayWednesday);
+        this._flpEntryDays.Controls.Add(this._chkDayThursday);
+        this._flpEntryDays.Controls.Add(this._chkDayFriday);
+        this._flpEntryDays.Controls.Add(this._chkGiftAnyDay);
+        this._flpEntryDays.SetFlowBreak(this._chkDayFriday, true);
+        this._flpEntryDays.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._flpEntryDays.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this._flpEntryDays.Location = new System.Drawing.Point(8, 26);
+        this._flpEntryDays.Name = "_flpEntryDays";
+        this._flpEntryDays.Size = new System.Drawing.Size(466, 80);
+        this._flpEntryDays.TabIndex = 0;
+        // 
+        // _chkDaySaturday
+        // 
+        this._chkDaySaturday.AutoSize = true;
+        this._chkDaySaturday.Checked = true;
+        this._chkDaySaturday.CheckState = System.Windows.Forms.CheckState.Checked;
+        this._chkDaySaturday.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
+        this._chkDaySaturday.Name = "_chkDaySaturday";
+        this._chkDaySaturday.Size = new System.Drawing.Size(70, 23);
+        this._chkDaySaturday.TabIndex = 0;
+        this._chkDaySaturday.Text = "السبت";
+        // 
+        // _chkDaySunday
+        // 
+        this._chkDaySunday.AutoSize = true;
+        this._chkDaySunday.Checked = true;
+        this._chkDaySunday.CheckState = System.Windows.Forms.CheckState.Checked;
+        this._chkDaySunday.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
+        this._chkDaySunday.Name = "_chkDaySunday";
+        this._chkDaySunday.Size = new System.Drawing.Size(70, 23);
+        this._chkDaySunday.TabIndex = 1;
+        this._chkDaySunday.Text = "الأحد";
+        // 
+        // _chkDayMonday
+        // 
+        this._chkDayMonday.AutoSize = true;
+        this._chkDayMonday.Checked = true;
+        this._chkDayMonday.CheckState = System.Windows.Forms.CheckState.Checked;
+        this._chkDayMonday.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
+        this._chkDayMonday.Name = "_chkDayMonday";
+        this._chkDayMonday.Size = new System.Drawing.Size(70, 23);
+        this._chkDayMonday.TabIndex = 2;
+        this._chkDayMonday.Text = "الاثنين";
+        // 
+        // _chkDayTuesday
+        // 
+        this._chkDayTuesday.AutoSize = true;
+        this._chkDayTuesday.Checked = true;
+        this._chkDayTuesday.CheckState = System.Windows.Forms.CheckState.Checked;
+        this._chkDayTuesday.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
+        this._chkDayTuesday.Name = "_chkDayTuesday";
+        this._chkDayTuesday.Size = new System.Drawing.Size(70, 23);
+        this._chkDayTuesday.TabIndex = 3;
+        this._chkDayTuesday.Text = "الثلاثاء";
+        // 
+        // _chkDayWednesday
+        // 
+        this._chkDayWednesday.AutoSize = true;
+        this._chkDayWednesday.Checked = true;
+        this._chkDayWednesday.CheckState = System.Windows.Forms.CheckState.Checked;
+        this._chkDayWednesday.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
+        this._chkDayWednesday.Name = "_chkDayWednesday";
+        this._chkDayWednesday.Size = new System.Drawing.Size(70, 23);
+        this._chkDayWednesday.TabIndex = 4;
+        this._chkDayWednesday.Text = "الأربعاء";
+        // 
+        // _chkDayThursday
+        // 
+        this._chkDayThursday.AutoSize = true;
+        this._chkDayThursday.Checked = true;
+        this._chkDayThursday.CheckState = System.Windows.Forms.CheckState.Checked;
+        this._chkDayThursday.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
+        this._chkDayThursday.Name = "_chkDayThursday";
+        this._chkDayThursday.Size = new System.Drawing.Size(70, 23);
+        this._chkDayThursday.TabIndex = 5;
+        this._chkDayThursday.Text = "الخميس";
+        // 
+        // _chkDayFriday
+        // 
+        this._chkDayFriday.AutoSize = true;
+        this._chkDayFriday.Checked = true;
+        this._chkDayFriday.CheckState = System.Windows.Forms.CheckState.Checked;
+        this._chkDayFriday.Margin = new System.Windows.Forms.Padding(3, 3, 6, 3);
+        this._chkDayFriday.Name = "_chkDayFriday";
+        this._chkDayFriday.Size = new System.Drawing.Size(70, 23);
+        this._chkDayFriday.TabIndex = 6;
+        this._chkDayFriday.Text = "الجمعة";
+        // 
+        // _chkGiftAnyDay
+        // 
+        this._chkGiftAnyDay.AutoSize = true;
+        this._chkGiftAnyDay.Margin = new System.Windows.Forms.Padding(3, 8, 3, 3);
+        this._chkGiftAnyDay.Name = "_chkGiftAnyDay";
+        this._chkGiftAnyDay.Size = new System.Drawing.Size(300, 23);
+        this._chkGiftAnyDay.TabIndex = 7;
+        this._chkGiftAnyDay.Text = "الهدايا في أي يوم، وليس في أيام الدخول فقط";
+        // 
         // _pnlButtons
         // 
         this._pnlButtons.Controls.Add(this._btnSave);
         this._pnlButtons.Controls.Add(this._btnCancel);
         this._pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._pnlButtons.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight;
-        this._pnlButtons.Location = new System.Drawing.Point(0, 414);
+        this._pnlButtons.Location = new System.Drawing.Point(0, 554);
         this._pnlButtons.Name = "_pnlButtons";
         this._pnlButtons.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
         this._pnlButtons.Size = new System.Drawing.Size(520, 56);
@@ -337,7 +469,7 @@ partial class EditOrganizationDialog
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(520, 470);
+        this.ClientSize = new System.Drawing.Size(620, 610);
         this.Controls.Add(this._tblLayout);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);
@@ -353,6 +485,9 @@ partial class EditOrganizationDialog
         this._tblLayout.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)(this._numCooldownHours)).EndInit();
         this._grpPolicy.ResumeLayout(false);
+        this._grpEntryDays.ResumeLayout(false);
+        this._flpEntryDays.ResumeLayout(false);
+        this._flpEntryDays.PerformLayout();
         this._tblPolicyLayout.ResumeLayout(false);
         this._tblPolicyLayout.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)(this._numMaxFreeCompanions)).EndInit();
@@ -381,6 +516,16 @@ partial class EditOrganizationDialog
     private System.Windows.Forms.NumericUpDown _numGiftValue;
     private System.Windows.Forms.Label _lblGiftInterval;
     private System.Windows.Forms.NumericUpDown _numGiftIntervalDays;
+    private ParkGate.WinForms.Controls.RtlGroupBox _grpEntryDays;
+    private System.Windows.Forms.FlowLayoutPanel _flpEntryDays;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDaySaturday;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDaySunday;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDayMonday;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDayTuesday;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDayWednesday;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDayThursday;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkDayFriday;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkGiftAnyDay;
     private System.Windows.Forms.FlowLayoutPanel _pnlButtons;
     private ParkGate.WinForms.Controls.RtlButton _btnSave;
     private ParkGate.WinForms.Controls.RtlButton _btnCancel;

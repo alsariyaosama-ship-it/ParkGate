@@ -82,4 +82,16 @@ public sealed class AuditLogFormTests
         form.ShownRows.Count.ShouldBe(1);
         form.SummaryText.ShouldBe(string.Format(Strings.Audit_SummaryTruncated, 1));
     }
+
+    [Fact]
+    public void FormatDetails_EntryDaysChange_ShowsTheDaysBeforeAndAfterByName()
+    {
+        var row = new AuditEntryDto(1, DateTime.UtcNow, "Organization.PolicyChanged", null, null, "Organization", "1", null, null, null, null, null,
+            """{"OldAllowedEntryDays":72,"AllowedEntryDays":9}""");
+
+        var lines = AuditLogForm.FormatDetails(row).Split(Environment.NewLine);
+
+        lines[0].ShouldBe(Strings.GetString("Audit_Field_OldAllowedEntryDays") + ": السبت" + Strings.Text_ListSeparator + "الأربعاء");
+        lines[1].ShouldBe(Strings.GetString("Audit_Field_AllowedEntryDays") + ": الأحد" + Strings.Text_ListSeparator + "الأربعاء");
+    }
 }

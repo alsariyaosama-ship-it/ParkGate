@@ -9,16 +9,16 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-11-18 |
-| Last session | S38 — Phase R5 complete (R5.1–R5.14); R5 PR opened; PR #20 merged |
-| Current phase | Phase R — Remediation. R0–R4, R6, R7 merged (PR #11–#15, #17, #18, #20). R5 PR open from `phase/r5-desk-ux` |
-| Working branch | `phase/r5-desk-ux` (from `phase/r7-consistency` `62a1e1c`, so it already holds R7.12 and R7.14) |
-| Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2) |
-| .NET Unit tests | 960 passed (non-integration): 210 domain + 240 application + 95 infrastructure + 415 architecture |
-| .NET Integration tests | 57 passed on LocalDB |
+| Last updated | 2026-11-20 |
+| Last session | S39 — R5.15–R5.20 merged (PR #21); F8 entry days (T8.1a–T8.4a) on `phase/f8-entry-days` |
+| Current phase | Phase R merged through R5 (PR #11–#21). **F8 entry days** started on Osama's go-ahead (2026-11-20); card-number patterns (T8.xb) not started. R8 (release) still to do |
+| Working branch | `phase/f8-entry-days` (from `main` `3da249d`, after PR #21) |
+| Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 16 warnings — all NU1902/NU1903 for `System.Security.Cryptography.Pkcs` 9.0.11 (R8.2); WinForms has no other warning |
+| .NET Unit tests | 1001 passed (non-integration): 236 domain + 268 application + 497 architecture |
+| .NET Integration tests | Infrastructure project 160 passed on LocalDB (integration and non-integration together) |
 | Web tests | `php artisan test` (PHP 8.4): 101 passed on SQLite (MySQL job runs in CI) |
-| Total tests | 1118 (1017 .NET + 101 web); integration and web not re-run in S38 (no Infrastructure or web change) |
-| Latest migration | `RemoveUnusedMaskSetting` (S36), after `RemoveUnreadSoundSetting` and `MapDatabaseFilesView` (snapshot only). Both applied on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` |
+| Total tests | 1161 .NET + 101 web (web not re-run since S37; no web change) |
+| Latest migration | `AddOrganizationEntryDays` (S39, F8). Applied by Osama on LocalDB `ParkGate_Dev` and SQLEXPRESS `ParkGate` (2026-11-20) |
 
 ## State of the work
 
@@ -118,7 +118,13 @@
 
 ## Next session — start here
 
-Run Phase R sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
+Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cloud (see S26 log).
+
+**S39 (2026-11-20): R5.15–R5.20 finished and merged (PR #21); F8 entry days built on `phase/f8-entry-days`.**
+R5 after S38, one commit each: R5.15 new-visitor registration in a pop-up (`RegisterVisitorDialog`); R5.16 / BR-31 voiding an entry voids that day's unredeemed gift, a redeemed gift blocks the void; R5.18 every entry and gift audit row carries holder, card, organization, business date, operator and approver (`AuditTrail`); R5.17 void a gift voucher from the gift receipts window; R5.19 one-line grid headers that follow DPI and `dd/MM/yyyy` dates; R5.20 audit trail screen «التقارير ← سجل التتبع» (`Permission.ViewAuditLog`, supervisors and admins). Osama ran TC-23..TC-35 ("almost all fine") and merged PR #21.
+F8 days (Osama, 2026-11-20): days change rarely, by hand and permanently; the change must be in the audit trail. No dated or temporary schedule. One commit each: T8.1a `WeekDays` flags, `Organization.AllowedEntryDays` / `GiftAnyDay`, `DayNotAllowed` (entry 6, gift 7); T8.2a migration `AddOrganizationEntryDays`; T8.3a use cases, previews, override, policy audit with values before and after; T8.4a organization dialog (seven day boxes, «الهدايا في أي يوم»), organizations list column, desk banner «أيام دخول الجهة: …», gift panel, reports, audit screen shows day names.
+**Deviation from SPEC (documented in BR-27):** `DayNotAllowed` is checked after "holder blocked", not right after "organization inactive", because an override skips only the first denial reason; otherwise a supervisor override would let a blocked holder in.
+**Next:** Osama runs TC-36 (migration already applied on both dev databases), reviews the F8 days PR. Then either F8 card-number patterns (T8.1b–T8.4b) or **R8** (release), as Osama chooses. T8.5 (sync the two new fields to the cloud) is still open.
 
 **S38 (2026-11-18, `phase/r5-desk-ux`): R5 in progress.** Found at start: PR #18 was merged into `main` before R7.12 and R7.14 reached the R7 branch, and PR #19 was merged into the R7 branch, so `main` lacks them. Opened **PR #20** (`phase/r7-consistency` → `main`). R5 was branched from the R7 branch.
 Done, one commit each, test-first: R5.1 denial banner «يُسمح بالدخول الساعة … — باقي س:دد» (`CooldownText`); R5.2 no message box after registration; R5.3 name 14 pt, card box 16 pt (`Theme.CardNumber`, the one size added to the R7.2 scale); R5.11 search row in a `TableLayoutPanel` (the card box ran under its label at 125 %); R5.12 `RtlGroupBox` (every RTL group box caption lost its last letters); R5.6 «إلغاء العملية… (F8)» above today's grid; R5.10 idle auto-lock (`Security.AutoLockMinutes` was saved but never read; `IdleMonitor`); R5.14 gift offered right after a granted entry for the same visitor (F6, no second scan); R5.5 «(من آخر زيارة)» and tinted counters; R5.4 Alt+1…9, +/−, Enter in a counter (deviation: focus stays in the card box after a lookup, for the scanner); R5.7 two generated tones (`DeskSounds`), new setting `Entry.SuccessSoundEnabled` (not seeded, as R6.15). After Osama's answers (2026-11-18, he accepted every recommendation, F8 included): R5.9 amber `#9A5B00` and white banner details (AGENTS.md §5.10 updated); R5.13 `RtlButton` / `RtlCheckBox` / `RtlRadioButton` (105 controls) and `RtlTabControl`; R5.8 compact desk (option A): today's grid 5.6 rows on 1366×768 at 100 % (3.7 with the gift line), 8.4 on 1920×1080 at 125 %; `MainForm.MinimumSize` was taller than a 768 screen.
@@ -150,6 +156,8 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 
 ## Blockers / waiting on the user
 
+- **F8 (S39):** migration `AddOrganizationEntryDays` applied on both dev databases by Osama. Run TC-36. Confirm the check order deviation in BR-27.
+- **Before release:** existing organizations start with every day allowed; set each organization's days in «الجهات».
 - **Answered 2026-11-18:** R5.8 option A, R5.13 own-drawn text, R5.9 `#9A5B00`, F8, focus stays in the card box (R5.4), success sound on by default. Still open: Q-R7 (lowest desk resolution; 1366×768 at 100 % assumed).
 
 - **R7 wording to confirm (Q-R4b defaults applied):** «فترة السماح» and «فترة التهدئة» became «فترة الانتظار»; «المحطة» / «محطة العمل» became «الشباك» (menu «الشبابيك»); «الوصل» / «الكوبون» / «الإيصال» became «القسيمة». Two long sentences were shortened (void warning, select-organization header).
@@ -182,6 +190,14 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 ---
 
 ## Session Log (last 10 sessions)
+
+### S39 — 2026-11-20 — R5.15–R5.20; F8 entry days (T8.1a–T8.4a)
+- R5.15–R5.20 committed on `phase/r5-desk-ux`; Osama merged PR #21. F8 started from `main` on his request; patterns split off as T8.xb.
+- `GiftDenialReason` 6 was already `NoEntryToday` (BR-30), so the gift `DayNotAllowed` is 7; DATABASE.md §2 corrected.
+- The seeded SSF organization needed the new values in `HasData`, or the migration got an empty `UpdateData`.
+- `dotnet ef database update` was refused by the tool's safety classifier; the migration is only applied on the integration test databases.
+- Real-screen probe (`layoutprobe orgdlg`, built with `--artifacts-path art`): the dialog had to grow to 620 px so the seven days fit on one line; the gift policy box was already clipping its last row and got 20 px more.
+- R5.20 left seven CS8604 warnings in `AuditLogForm`; fixed.
 
 ### S38 — 2026-11-18 — Phase R5 complete (R5.1–R5.14)
 - Baseline green (885 unit). PR #20 opened for the two R7 commits missing from `main`. Tests: architecture 340 → 379.
@@ -260,10 +276,3 @@ Carried over from S25 (do it when a printer is available; it does not block Phas
 - Ran Pint over all web PHP in a separate `style` commit (R9.6, 14 files, tests still 89 green). New web PHP must pass
   `vendor/bin/pint --dirty --format agent`.
 - Test counts: .NET unit 617 → 620, integration 38 → 39, web 79 → 89.
-### S29 — 2026-11-13 — Phase R2: R2.1–R2.6, R2.8, R1.8
-- Created `phase/r2-sync` from `phase/r1-web-security` (PR #12 still open) and pushed it.
-- Did R2.6 → R1.8 → R2.1 → R2.2 → R2.3 → R2.4 → R2.5 → R2.8, one commit each, test-first. Left R2.7, R2.9.
-- Found that nothing sent a cloud heartbeat; added it inside R2.5 (see State of the work).
-- Web `date` casts changed to `date:Y-m-d`: SQLite stored `2026-11-13 00:00:00`, MySQL `2026-11-13`, which hid a
-  date-comparison bug from the tests (relevant to R2.9).
-- Test counts: .NET unit 588 → 617, integration 34 → 38, web 58 → 79.

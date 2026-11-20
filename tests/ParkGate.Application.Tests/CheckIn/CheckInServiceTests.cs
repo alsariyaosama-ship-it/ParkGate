@@ -599,4 +599,62 @@ public sealed class CheckInServiceTests
             details.TryGetProperty(name, out _).ShouldBeTrue($"missing {name} in {details}");
         }
     }
+
+    // ── F8, BR-27: entry days ───────────────────────────────────────────────
+
+    [Fact]
+    public async Task RecordEntryAsync_NotAnEntryDay_IsDeniedWithDayNotAllowed()
+    {
+        _org.SetEntryDays(WeekDays.Thursday, giftAnyDay: false);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-DAY"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.RecordEntryAsync(new RecordEntryRequest(holder.Id, []));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.CheckIn.DayNotAllowed.Code);
+        _attempts.ShouldContain(a => a.Result == EntryResult.Denied && a.DenialReason == DenialReason.DayNotAllowed);
+        holder.LastGrantedEntryUtc.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task RecordEntryAsync_OnAnEntryDay_IsGranted()
+    {
+        _org.SetEntryDays(WeekDays.Monday | WeekDays.Thursday, giftAnyDay: false);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-DAY"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.RecordEntryAsync(new RecordEntryRequest(holder.Id, []));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Result.ShouldBe(EntryResult.Allowed);
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_NotAnEntryDay_SupervisorCanLetTheHolderIn()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        _org.SetEntryDays(WeekDays.Thursday, giftAnyDay: false);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-DAY"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "Visit agreed with the fund"));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Result.ShouldBe(EntryResult.Overridden);
+    }
+
+    [Fact]
+    public async Task OverrideEntryAsync_BlockedHolderOnAnotherDay_StaysRefused()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        _org.SetEntryDays(WeekDays.Thursday, giftAnyDay: false);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-DAY"), "Ali Salem", PhoneNumber.Create("0912345678"));
+        holder.Block("Card stolen reported");
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.OverrideEntryAsync(new OverrideEntryRequest(holder.Id, "Attempting override on blocked card"));
+
+        result.Error.Code.ShouldBe(Errors.CheckIn.OverrideNotAllowed.Code);
+    }
 }

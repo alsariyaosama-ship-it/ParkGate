@@ -38,7 +38,13 @@ public sealed class RollingIntervalGiftEligibilityPolicy : IGiftEligibilityPolic
             return GiftEligibilityDecision.Denied(GiftDenialReason.NoEntryToday);
         }
 
-        // 6. Interval check
+        // 6. Not a gift day (BR-28). After every reason that cannot be overridden, because an override skips only the first.
+        if (!context.IsGiftDay)
+        {
+            return GiftEligibilityDecision.Denied(GiftDenialReason.DayNotAllowed);
+        }
+
+        // 7. Interval check
         if (context.LastGiftIssuedUtc.HasValue)
         {
             var nextEligibleAtUtc = context.LastGiftIssuedUtc.Value.AddDays(context.GiftIntervalDays);

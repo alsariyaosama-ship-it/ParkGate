@@ -1,4 +1,5 @@
 using ParkGate.Domain.Entities;
+using ParkGate.Domain.Enums;
 
 namespace ParkGate.Application.Organizations.DTOs;
 
@@ -12,7 +13,9 @@ public sealed record OrganizationDto(
     int? MaxFreeCompanions = null,
     bool GiftEnabled = false,
     decimal GiftValue = 0m,
-    int GiftIntervalDays = 30);
+    int GiftIntervalDays = 30,
+    WeekDays AllowedEntryDays = WeekDays.All,
+    bool GiftAnyDay = false);
 
 public sealed record CreateOrganizationRequest(
     string Code,
@@ -32,7 +35,9 @@ public sealed record SetOrganizationPolicyRequest(
     int? MaxFreeCompanions,
     bool GiftEnabled,
     decimal GiftValue,
-    int GiftIntervalDays);
+    int GiftIntervalDays,
+    WeekDays AllowedEntryDays,
+    bool GiftAnyDay);
 
 public static class OrganizationMappingExtensions
 {
@@ -47,5 +52,7 @@ public static class OrganizationMappingExtensions
             org.MaxFreeCompanions,
             org.GiftEnabled,
             org.GiftValue,
-            org.GiftIntervalDays);
+            org.GiftIntervalDays,
+            org.AllowedEntryDays,
+            org.GiftAnyDay);
 }

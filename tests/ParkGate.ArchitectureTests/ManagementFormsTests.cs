@@ -13,6 +13,7 @@ using ParkGate.Application.Users.Services;
 using ParkGate.Application.Workstations.DTOs;
 using ParkGate.Application.Workstations.Services;
 using ParkGate.Domain.Enums;
+using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Forms;
 using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
@@ -170,6 +171,72 @@ public sealed class ManagementFormsTests
         fakeService.PoliciesSet[0].GiftIntervalDays.ShouldBe(40);
     }
 
+    // ── F8: entry days ──────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task EditOrganizationDialog_EntryDays_LoadAndSaveTheChosenDays()
+    {
+        var existing = new OrganizationDto(5, "SSF", "صندوق التضامن", null, false, true, GiftEnabled: true, GiftValue: 10m,
+            AllowedEntryDays: ParkGate.Domain.Enums.WeekDays.Saturday | ParkGate.Domain.Enums.WeekDays.Wednesday);
+        var fakeService = new FakeOrganizationService([existing]);
+
+        using var dialog = TestUi.Create<EditOrganizationDialog>(fakeService, new FakeNotifyService());
+        dialog.SetOrganization(existing);
+
+        GetField<CheckBox>(dialog, "_chkDaySaturday").Checked.ShouldBeTrue();
+        GetField<CheckBox>(dialog, "_chkDaySunday").Checked.ShouldBeFalse();
+        GetField<CheckBox>(dialog, "_chkDayWednesday").Checked.ShouldBeTrue();
+        GetField<CheckBox>(dialog, "_chkGiftAnyDay").Checked.ShouldBeFalse();
+
+        // Saturday and Wednesday become Sunday and Wednesday.
+        GetField<CheckBox>(dialog, "_chkDaySaturday").Checked = false;
+        GetField<CheckBox>(dialog, "_chkDaySunday").Checked = true;
+        GetField<CheckBox>(dialog, "_chkGiftAnyDay").Checked = true;
+        await dialog.SaveAsync();
+
+        fakeService.PoliciesSet.Single().AllowedEntryDays.ShouldBe(ParkGate.Domain.Enums.WeekDays.Sunday | ParkGate.Domain.Enums.WeekDays.Wednesday);
+        fakeService.PoliciesSet.Single().GiftAnyDay.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task EditOrganizationDialog_NoEntryDay_WarnsAndSavesNothing()
+    {
+        var existing = new OrganizationDto(5, "SSF", "صندوق التضامن", null, false, true);
+        var fakeService = new FakeOrganizationService([existing]);
+        var fakeNotify = new FakeNotifyService();
+
+        using var dialog = TestUi.Create<EditOrganizationDialog>(fakeService, fakeNotify);
+        dialog.SetOrganization(existing);
+        foreach (var name in new[] { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" })
+        {
+            GetField<CheckBox>(dialog, "_chkDay" + name).Checked = false;
+        }
+
+        await dialog.SaveAsync();
+
+        fakeNotify.Warnings.ShouldContain(Strings.Val_EntryDaysRequired);
+        fakeService.Updated.ShouldBeEmpty();
+        fakeService.PoliciesSet.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void EditOrganizationDialog_NewOrganization_HasEveryDayChecked()
+    {
+        using var dialog = TestUi.Create<EditOrganizationDialog>(new FakeOrganizationService([]), new FakeNotifyService());
+
+        dialog.SelectedEntryDays.ShouldBe(ParkGate.Domain.Enums.WeekDays.All);
+        GetField<CheckBox>(dialog, "_chkDaySaturday").Text.ShouldBe(WeekDaysText.Name(DayOfWeek.Saturday));
+    }
+
+    [Fact]
+    public void WeekDaysText_Format_NamesTheDaysSaturdayFirst()
+    {
+        WeekDaysText.Format(ParkGate.Domain.Enums.WeekDays.Wednesday | ParkGate.Domain.Enums.WeekDays.Saturday)
+            .ShouldBe(WeekDaysText.Name(DayOfWeek.Saturday) + Strings.Text_ListSeparator + WeekDaysText.Name(DayOfWeek.Wednesday));
+        WeekDaysText.Name(DayOfWeek.Saturday).ShouldBe("السبت");
+        WeekDaysText.Format(ParkGate.Domain.Enums.WeekDays.All).ShouldBe(Strings.Text_EveryDay);
+    }
+
     [Fact]
     public void EditOrganizationDialog_GiftControls_ShouldBeDisabledWhenGiftsOff()
     {
@@ -204,12 +271,13 @@ public sealed class ManagementFormsTests
         var grid = GetField<DataGridView>(form, "_gridOrganizations");
         grid.Rows.Count.ShouldBe(1);
         var row = grid.Rows[0];
-        row.Cells[3].Value.ShouldBe("3");
-        row.Cells[4].Value.ShouldBe("مفعلة");
-        row.Cells[5].Value.ShouldNotBeNull();
-        row.Cells[5].Value!.ToString()!.ShouldContain("12.5");
+        row.Cells[3].Value.ShouldBe(Strings.Text_EveryDay);
+        row.Cells[4].Value.ShouldBe("3");
+        row.Cells[5].Value.ShouldBe("مفعلة");
         row.Cells[6].Value.ShouldNotBeNull();
-        row.Cells[6].Value!.ToString()!.ShouldContain("14");
+        row.Cells[6].Value!.ToString()!.ShouldContain("12.5");
+        row.Cells[7].Value.ShouldNotBeNull();
+        row.Cells[7].Value!.ToString()!.ShouldContain("14");
     }
 
     #endregion
@@ -601,7 +669,9 @@ public sealed class ManagementFormsTests
                 MaxFreeCompanions = request.MaxFreeCompanions,
                 GiftEnabled = request.GiftEnabled,
                 GiftValue = request.GiftValue,
-                GiftIntervalDays = request.GiftIntervalDays
+                GiftIntervalDays = request.GiftIntervalDays,
+                AllowedEntryDays = request.AllowedEntryDays,
+                GiftAnyDay = request.GiftAnyDay
             };
             return Task.FromResult(Result<OrganizationDto>.Success(updated));
         }

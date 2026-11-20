@@ -60,6 +60,7 @@ public partial class OrganizationsForm : RtlFormBase
         _colGiftEnabled.HeaderText = Strings.Col_Org_GiftEnabled;
         _colGiftValue.HeaderText = Strings.Col_Org_GiftValue;
         _colGiftInterval.HeaderText = Strings.Col_Org_GiftInterval;
+        _colEntryDays.HeaderText = Strings.Grp_Org_EntryDays;
         _colDefault.HeaderText = Strings.Col_Org_Default;
         _colStatus.HeaderText = Strings.Col_Org_Status;
     }
@@ -149,6 +150,7 @@ public partial class OrganizationsForm : RtlFormBase
                 org.Code,
                 org.NameAr,
                 cooldownText,
+                WeekDaysText.Format(org.AllowedEntryDays),
                 maxCompanionsText,
                 giftEnabledText,
                 giftValueText,

@@ -551,6 +551,7 @@ public sealed class ClosedXmlExcelExportService : IExcelExportService
         DenialReason.HolderSuspended => "المستفيد موقوف",
         DenialReason.CardExpired => "البطاقة منتهية الصلاحية",
         DenialReason.OrganizationInactive => "الجهة غير نشطة",
+        DenialReason.DayNotAllowed => "ليس من أيام دخول الجهة",
         DenialReason.CooldownActive => "فترة التهدئة نشطة (سبق الدخول)",
         _ => reason.ToString()
     };

@@ -155,13 +155,13 @@ public partial class AuditLogForm : RtlFormBase
             var index = _gridAudit.Rows.Add(
                 LocalTime(row.AtUtc, _timeZoneId),
                 ActionName(row.Action),
-                row.ActorName,
-                row.WorkstationName,
-                row.CardNumber,
-                row.HolderName,
-                row.Reason,
-                row.OperatorName,
-                row.ApprovedByName);
+                row.ActorName ?? string.Empty,
+                row.WorkstationName ?? string.Empty,
+                row.CardNumber ?? string.Empty,
+                row.HolderName ?? string.Empty,
+                row.Reason ?? string.Empty,
+                row.OperatorName ?? string.Empty,
+                row.ApprovedByName ?? string.Empty);
             _gridAudit.Rows[index].Tag = row;
         }
 
@@ -235,6 +235,8 @@ public partial class AuditLogForm : RtlFormBase
             JsonValueKind.String when property.Name.EndsWith("AtUtc", StringComparison.Ordinal) &&
                                       value.TryGetDateTime(out var at) => LocalTime(DateTime.SpecifyKind(at, DateTimeKind.Utc), timeZoneId),
             JsonValueKind.String => value.GetString() ?? string.Empty,
+            JsonValueKind.Number when property.Name.EndsWith("EntryDays", StringComparison.Ordinal) && value.TryGetByte(out var days) =>
+                WeekDaysText.Format((Domain.Enums.WeekDays)days),
             JsonValueKind.Number => value.GetRawText(),
             JsonValueKind.Array => string.Join(Strings.Text_ListSeparator, value.EnumerateArray().Select(FormatItem)),
             _ => value.GetRawText(),

@@ -795,4 +795,53 @@ public sealed class GiftVoucherServiceTests : IDisposable
             details.TryGetProperty(name, out _).ShouldBeTrue($"missing {name} in {details}");
         }
     }
+
+    // ── F8, BR-28: gift days ────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetEligibilityAsync_NotAnEntryDay_IsDeniedOverridableAndNamesTheDays()
+    {
+        _org.SetEntryDays(WeekDays.Thursday, giftAnyDay: false);
+
+        var result = await _sut.GetEligibilityAsync(_holder.Id);
+
+        result.Value.IsEligible.ShouldBeFalse();
+        result.Value.Reason.ShouldBe(GiftDenialReason.DayNotAllowed);
+        result.Value.ReasonCode.ShouldBe(Errors.Gift.DayNotAllowed.Code);
+        result.Value.CanBeOverridden.ShouldBeTrue();
+        result.Value.AllowedEntryDays.ShouldBe(WeekDays.Thursday);
+    }
+
+    [Fact]
+    public async Task IssueAsync_NotAnEntryDay_IsRefused()
+    {
+        _org.SetEntryDays(WeekDays.Thursday, giftAnyDay: false);
+
+        var result = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+
+        result.Error.ShouldBe(Errors.Gift.DayNotAllowed);
+        _giftRepo.Vouchers.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task IssueAsync_GiftAnyDay_IssuesOnAnotherDay()
+    {
+        _org.SetEntryDays(WeekDays.Thursday, giftAnyDay: true);
+
+        var result = await _sut.IssueAsync(new IssueGiftVoucherRequest(_holder.Id));
+
+        result.IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task IssueOverrideAsync_NotAnEntryDay_SupervisorCanIssue()
+    {
+        _currentUser.SetUser(_supervisorUser);
+        _org.SetEntryDays(WeekDays.Thursday, giftAnyDay: false);
+
+        var result = await _sut.IssueOverrideAsync(new IssueGiftOverrideRequest(_holder.Id, "valid reason here"));
+
+        result.IsSuccess.ShouldBeTrue();
+        _giftRepo.Vouchers.Single().IsOverride.ShouldBeTrue();
+    }
 }

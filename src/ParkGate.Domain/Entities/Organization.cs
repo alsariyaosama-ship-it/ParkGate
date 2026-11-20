@@ -1,4 +1,5 @@
 ﻿using ParkGate.Domain.Common;
+using ParkGate.Domain.Enums;
 
 namespace ParkGate.Domain.Entities;
 
@@ -26,6 +27,12 @@ public sealed class Organization : IAuditableEntity
     public bool GiftEnabled { get; private set; }
     public decimal GiftValue { get; private set; }
     public int GiftIntervalDays { get; private set; } = DefaultGiftIntervalDays;
+
+    /// <summary>F8, BR-27: weekdays on which the organization's holders may enter. Default: every day.</summary>
+    public WeekDays AllowedEntryDays { get; private set; } = WeekDays.All;
+
+    /// <summary>F8, BR-28: gifts on any day, not only on <see cref="AllowedEntryDays"/>.</summary>
+    public bool GiftAnyDay { get; private set; }
 
     public DateTime CreatedAtUtc { get; set; }
     public int? CreatedByUserId { get; set; }
@@ -93,6 +100,21 @@ public sealed class Organization : IAuditableEntity
         GiftValue = Math.Round(value, 3, MidpointRounding.AwayFromZero);
         GiftIntervalDays = intervalDays;
     }
+
+    /// <summary>F8: sets the entry days (at least one) and whether gifts are given on any day.</summary>
+    public void SetEntryDays(WeekDays allowedEntryDays, bool giftAnyDay)
+    {
+        if (!allowedEntryDays.IsValidEntryDays())
+        {
+            throw new ArgumentOutOfRangeException(nameof(allowedEntryDays), "At least one entry day is required.");
+        }
+
+        AllowedEntryDays = allowedEntryDays;
+        GiftAnyDay = giftAnyDay;
+    }
+
+    /// <summary>True when holders of this organization may enter on <paramref name="businessDate"/> (BR-27).</summary>
+    public bool IsEntryDay(DateOnly businessDate) => AllowedEntryDays.Includes(businessDate.DayOfWeek);
 
     private static void ValidateCode(string code)
     {

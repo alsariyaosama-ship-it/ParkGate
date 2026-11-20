@@ -52,6 +52,7 @@ public sealed class ModelMetadataTests
 
             var checkConstraints = entity.GetCheckConstraints();
             checkConstraints.ShouldContain(c => c.Name == "CK_Organizations_CooldownMinutes");
+            checkConstraints.ShouldContain(c => c.Name == "CK_Organizations_AllowedEntryDays");
 
             var rowVersion = entity.FindProperty(nameof(Organization.RowVersion))!;
             rowVersion.IsConcurrencyToken.ShouldBeTrue();

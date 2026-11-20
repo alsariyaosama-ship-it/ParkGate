@@ -17,6 +17,9 @@ public sealed record EligibilityContext
     public DateTime NowUtc { get; }
     public DateOnly LocalTodayDate { get; }
 
+    /// <summary>F8, BR-27: the organization's entry days.</summary>
+    public WeekDays AllowedEntryDays { get; }
+
     public EligibilityContext(
         bool isOrganizationActive,
         int? organizationCooldownMinutes,
@@ -25,8 +28,14 @@ public sealed record EligibilityContext
         DateOnly? cardExpiryDate,
         DateTime? lastGrantedEntryUtc,
         DateTime nowUtc,
-        DateOnly localTodayDate)
+        DateOnly localTodayDate,
+        WeekDays allowedEntryDays = WeekDays.All)
     {
+        if (!allowedEntryDays.IsValidEntryDays())
+        {
+            throw new ArgumentOutOfRangeException(nameof(allowedEntryDays), "At least one entry day is required.");
+        }
+
         if (defaultCooldownMinutes <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(defaultCooldownMinutes), "Default cooldown must be positive.");
@@ -55,6 +64,7 @@ public sealed record EligibilityContext
         LastGrantedEntryUtc = lastGrantedEntryUtc;
         NowUtc = nowUtc;
         LocalTodayDate = localTodayDate;
+        AllowedEntryDays = allowedEntryDays;
     }
 
     public EligibilityContext(
@@ -71,7 +81,8 @@ public sealed record EligibilityContext
             beneficiary.CardExpiryDate,
             beneficiary.LastGrantedEntryUtc,
             nowUtc,
-            localTodayDate)
+            localTodayDate,
+            organization.AllowedEntryDays)
     {
     }
 }

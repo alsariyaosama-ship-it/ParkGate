@@ -209,6 +209,43 @@ public sealed class CheckInDeskControlTests
     }
 
     [Fact]
+    public void CheckInDeskControl_NotAnEntryDay_BannerNamesTheAllowedDaysAndOffersOverride()
+    {
+        using var control = TestUi.Create<CheckInDeskControl>();
+        var holder = new BeneficiaryDto(
+            Guid.NewGuid(), 1, "صندوق التضامن", "100200", "محمد أحمد علي", "0912345678", null, null,
+            BeneficiaryStatus.Active, null, null, null, DateTime.UtcNow.AddDays(-100));
+        var eligibility = new EligibilityPreviewDto(
+            IsEligible: false, Result: EntryResult.Denied, DenialReason: DenialReason.DayNotAllowed, DenialReasonText: string.Empty,
+            CanBeOverridden: true, EffectiveCooldownMinutes: 720, LastGrantedEntryUtc: null, NextAllowedEntryUtc: null,
+            RemainingCooldownMinutes: null, AllowedEntryDays: WeekDays.Saturday | WeekDays.Wednesday);
+
+        control.ShowHolderInfo(holder, eligibility);
+
+        var banner = GetField<StatusBanner>(control, "_statusBanner");
+        banner.State.ShouldBe(BannerState.Denied);
+        banner.Title.ShouldBe(Strings.Denial_DayNotAllowed);
+        banner.Details.ShouldBe(string.Format(Strings.Desk_AllowedEntryDays, "السبت" + Strings.Text_ListSeparator + "الأربعاء"));
+        GetField<Button>(control, "_btnOverride").Enabled.ShouldBeTrue();
+        GetField<Button>(control, "_btnRecordEntry").Enabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task GiftOfferPanel_NotAGiftDay_NamesTheAllowedDays()
+    {
+        var gifts = new CountingGiftService
+        {
+            Eligibility = new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(
+                false, GiftDenialReason.DayNotAllowed, "Gift.DayNotAllowed", null, true, 10m, null, WeekDays.Sunday),
+        };
+        var panel = TestUi.CreateGiftPanel(gifts);
+
+        await panel.LoadAsync(Guid.NewGuid(), "محمد");
+
+        GetField<Label>(panel, "_lblDetails").Text.ShouldBe(string.Format(Strings.Desk_AllowedEntryDays, "الأحد"));
+    }
+
+    [Fact]
     public void CheckInDeskControl_ShowInlineRegistration_ShouldToggleVisibility()
     {
         using var control = TestUi.Create<CheckInDeskControl>();
@@ -532,6 +569,8 @@ public sealed class CheckInDeskControlTests
     {
         public bool EntryRecorded { get; set; }
 
+        public ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto? Eligibility { get; set; }
+
         public Guid? LastBeneficiaryId { get; private set; }
 
         public TaskCompletionSource? Gate { get; set; }
@@ -544,9 +583,9 @@ public sealed class CheckInDeskControlTests
                 await Gate.Task;
             }
 
-            return ParkGate.Application.Common.Result.Success(EntryRecorded
+            return ParkGate.Application.Common.Result.Success(Eligibility ?? (EntryRecorded
                 ? new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(true, null, null, null, false, 10m, null)
-                : new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(false, GiftDenialReason.NoEntryToday, "Gift.NoEntryToday", null, false, 10m, null));
+                : new ParkGate.Application.GiftVouchers.DTOs.GiftEligibilityDto(false, GiftDenialReason.NoEntryToday, "Gift.NoEntryToday", null, false, 10m, null)));
         }
 
         public Task<ParkGate.Application.Common.Result<ParkGate.Application.GiftVouchers.DTOs.IssuedGiftVoucherDto>> IssueAsync(ParkGate.Application.GiftVouchers.DTOs.IssueGiftVoucherRequest request, CancellationToken ct = default) => throw new NotImplementedException();
