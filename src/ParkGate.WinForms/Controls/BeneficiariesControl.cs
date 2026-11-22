@@ -284,7 +284,7 @@ public partial class BeneficiariesControl : UserControl
                     b.CardNumber,
                     b.OrganizationName,
                     b.FullName,
-                    b.Phone,
+                    b.Phone ?? "-",
                     displayNid,
                     statusText,
                     lastEntryText,
@@ -368,7 +368,7 @@ public partial class BeneficiariesControl : UserControl
         _lblDetailName.Text = b.FullName;
         _lblDetailCard.Text = b.CardNumber;
         _lblDetailOrg.Text = b.OrganizationName;
-        _lblDetailPhone.Text = b.Phone;
+        _lblDetailPhone.Text = b.Phone ?? "-";
         _lblDetailNid.Text = FormatNationalId(b.NationalId);
         _lblDetailExpiry.Text = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? Strings.Ui_Beneficiaries_04;
 
@@ -557,7 +557,7 @@ public partial class BeneficiariesControl : UserControl
                 row.Cells[_colCardNumber.Index].Value = updated.CardNumber;
                 row.Cells[_colOrganization.Index].Value = updated.OrganizationName;
                 row.Cells[_colFullName.Index].Value = updated.FullName;
-                row.Cells[_colPhone.Index].Value = updated.Phone;
+                row.Cells[_colPhone.Index].Value = updated.Phone ?? "-";
                 row.Cells[_colNationalId.Index].Value = FormatNationalId(updated.NationalId);
                 row.Cells[_colExpiryDate.Index].Value = updated.CardExpiryDate?.ToString("dd/MM/yyyy") ?? "-";
             }

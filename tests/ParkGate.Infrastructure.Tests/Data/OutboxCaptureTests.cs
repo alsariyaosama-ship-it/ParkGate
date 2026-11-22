@@ -84,6 +84,28 @@ public sealed class OutboxCaptureTests
     }
 
     [Fact]
+    public void SerializePayload_OnBeneficiary_OmitsCityIdUntilTheCloudHasIt()
+    {
+        // F9, T9.4: the cloud schema has no city yet, so the field must not be pushed.
+        using var context = CreateContext();
+        var beneficiary = new Beneficiary(
+            id: Guid.NewGuid(),
+            organizationId: 1,
+            cardNumber: CardNumber.Create("CARD-998"),
+            fullName: "name",
+            phone: null,
+            cityId: 4);
+
+        var entry = context.Beneficiaries.Add(beneficiary);
+
+        var json = OutboxEntityExtractor.SerializePayload(entry);
+
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        doc.RootElement.TryGetProperty("CityId", out _).ShouldBeFalse();
+        doc.RootElement.TryGetProperty("Phone", out _).ShouldBeFalse();
+    }
+
+    [Fact]
     public void SerializePayload_OnBeneficiary_OmitsPhoneAndNationalId()
     {
         using var context = CreateContext();

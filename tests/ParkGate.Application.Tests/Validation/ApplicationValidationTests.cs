@@ -40,6 +40,49 @@ public sealed class ApplicationValidationTests
         result.IsValid.ShouldBeFalse();
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void RegisterBeneficiaryRequestValidator_WhenPhoneMissing_ShouldPass(string? phone)
+    {
+        var validator = new RegisterBeneficiaryRequestValidator();
+        var request = new RegisterBeneficiaryRequest(OrganizationId: 1, CardNumber: "CARD1", FullName: "Ali Omar", Phone: phone);
+
+        validator.Validate(request).IsValid.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-3)]
+    public void RegisterBeneficiaryRequestValidator_WhenCityIdNotPositive_ShouldFailWithInvalidCity(int cityId)
+    {
+        var validator = new RegisterBeneficiaryRequestValidator();
+        var request = new RegisterBeneficiaryRequest(OrganizationId: 1, CardNumber: "CARD1", FullName: "Ali Omar", Phone: null, CityId: cityId);
+
+        var result = validator.Validate(request);
+
+        result.Errors.ShouldContain(e => e.ErrorCode == "InvalidCity");
+    }
+
+    [Fact]
+    public void UpdateBeneficiaryRequestValidator_WhenPhoneMissingAndCityGiven_ShouldPass()
+    {
+        var validator = new UpdateBeneficiaryRequestValidator();
+        var request = new UpdateBeneficiaryRequest(Guid.NewGuid(), 1, "CARD1", "Ali Omar", Phone: null, CityId: 4);
+
+        validator.Validate(request).IsValid.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void UpdateBeneficiaryRequestValidator_WhenPhoneInvalid_ShouldFailWithInvalidPhone()
+    {
+        var validator = new UpdateBeneficiaryRequestValidator();
+        var request = new UpdateBeneficiaryRequest(Guid.NewGuid(), 1, "CARD1", "Ali Omar", Phone: "12345");
+
+        validator.Validate(request).Errors.ShouldContain(e => e.ErrorCode == "InvalidPhone");
+    }
+
     [Fact]
     public void RegisterBeneficiaryRequestValidator_WhenNationalIdInvalid_ShouldFail()
     {

@@ -20,9 +20,14 @@ public sealed class RegisterBeneficiaryRequestValidator : AbstractValidator<Regi
             .NotEmpty().WithErrorCode("FullNameRequired")
             .MaximumLength(Beneficiary.MaxFullNameLength).WithErrorCode("FullNameTooLong");
 
+        // BR-15: the phone is optional; when given it is validated like before.
         RuleFor(x => x.Phone)
-            .NotEmpty().WithErrorCode("PhoneRequired")
-            .Must(p => PhoneNumber.TryCreate(p, out _)).WithErrorCode("InvalidPhone");
+            .Must(p => string.IsNullOrWhiteSpace(p) || PhoneNumber.TryCreate(p, out _))
+            .WithErrorCode("InvalidPhone");
+
+        RuleFor(x => x.CityId)
+            .GreaterThan(0).When(x => x.CityId is not null)
+            .WithErrorCode("InvalidCity");
 
         RuleFor(x => x.NationalId)
             .Must(n => string.IsNullOrWhiteSpace(n) || NationalId.TryCreate(n, out _))

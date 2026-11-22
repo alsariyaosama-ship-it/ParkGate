@@ -107,6 +107,11 @@ public static class Errors
         public static readonly Error NameAlreadyExistsInactive = new("AgeCategory.NameAlreadyExistsInactive", "Age category name already exists for an inactive category.");
     }
 
+    public static class City
+    {
+        public static readonly Error NotFound = new("City.NotFound", "City not found or inactive.");
+    }
+
     public static class User
     {
         public static readonly Error NotFound = new("User.NotFound", "User not found.");

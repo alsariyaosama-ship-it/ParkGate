@@ -502,7 +502,7 @@ public sealed class BeneficiariesManagementTests
             var matches = _beneficiaries.Where(b =>
                 b.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 b.CardNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                b.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (b.Phone != null && b.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                 (b.NationalId != null && b.NationalId.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))).ToList();
 
             return Task.FromResult(Result<IReadOnlyList<BeneficiaryDto>>.Success(matches));

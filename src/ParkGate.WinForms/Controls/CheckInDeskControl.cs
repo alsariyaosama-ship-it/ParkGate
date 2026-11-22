@@ -643,7 +643,7 @@ public partial class CheckInDeskControl : UserControl
         HideInlineRegistration();
 
         _lblHolderName.Text = holder.FullName;
-        _lblHolderPhone.Text = holder.Phone;
+        _lblHolderPhone.Text = holder.Phone ?? "-";
         ShowCardAlert(holder.HasOpenCardAlert);
         _lblHolderOrg.Text = holder.OrganizationName;
 

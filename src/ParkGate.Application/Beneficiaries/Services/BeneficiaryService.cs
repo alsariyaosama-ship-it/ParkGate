@@ -66,6 +66,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var localToday = TimeZoneHelper.GetLocalBusinessDate(nowUtc, timeZoneId);
 
         var alerted = await uow.CardPatternAlerts.GetBeneficiariesWithOpenAlertsAsync(beneficiaries.Select(b => b.Id).ToList(), cancellationToken);
+        var cityNames = await LoadCityNamesAsync(uow, cancellationToken);
         var matches = new List<BeneficiaryLookupResultDto>();
         var registeredElsewhere = new List<OrganizationRefDto>();
         foreach (var beneficiary in beneficiaries)
@@ -82,7 +83,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
             var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
 
-            matches.Add(new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName, alerted.Contains(beneficiary.Id)), preview, lastCompanions));
+            matches.Add(new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName, CityNameOf(cityNames, beneficiary.CityId), alerted.Contains(beneficiary.Id)), preview, lastCompanions));
         }
 
         return new CardLookupDto(matches, registeredElsewhere);
@@ -114,8 +115,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var preview = BuildEligibilityPreview(org, beneficiary, defaultCooldown, nowUtc, localToday);
         var lastCompanions = await GetLastCompanionsAsync(uow, beneficiary.Id, cancellationToken);
         var alerted = await uow.CardPatternAlerts.GetBeneficiariesWithOpenAlertsAsync([beneficiary.Id], cancellationToken);
+        var cityNames = await LoadCityNamesAsync(uow, cancellationToken);
 
-        return new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName, alerted.Contains(beneficiary.Id)), preview, lastCompanions);
+        return new BeneficiaryLookupResultDto(ToViewerDto(beneficiary, orgName, CityNameOf(cityNames, beneficiary.CityId), alerted.Contains(beneficiary.Id)), preview, lastCompanions);
     }
 
     public async Task<Result<BeneficiaryDto>> RegisterAsync(
@@ -134,7 +136,12 @@ public sealed class BeneficiaryService : IBeneficiaryService
         }
 
         CardNumber.TryCreate(request.CardNumber, out var cardVo);
-        PhoneNumber.TryCreate(request.Phone, out var phoneVo);
+        PhoneNumber? phoneVo = null;
+        if (!string.IsNullOrWhiteSpace(request.Phone) && PhoneNumber.TryCreate(request.Phone, out var parsedPhone))
+        {
+            phoneVo = parsedPhone;
+        }
+
         NationalId? natIdVo = null;
         if (!string.IsNullOrWhiteSpace(request.NationalId) && NationalId.TryCreate(request.NationalId, out var parsedNatId))
         {
@@ -153,6 +160,12 @@ public sealed class BeneficiaryService : IBeneficiaryService
             return Errors.CheckIn.OrganizationInactive;
         }
 
+        var city = await ResolveCityAsync(uow, request.CityId, currentCityId: null, cancellationToken);
+        if (request.CityId is not null && city is null)
+        {
+            return Errors.City.NotFound;
+        }
+
         var existingCard = await uow.Beneficiaries.GetByOrgAndCardAsync(request.OrganizationId, cardVo!, cancellationToken);
         if (existingCard is not null)
         {
@@ -169,10 +182,11 @@ public sealed class BeneficiaryService : IBeneficiaryService
             request.OrganizationId,
             cardVo!,
             request.FullName,
-            phoneVo!,
+            phoneVo,
             natIdVo,
             request.CardExpiryDate,
-            request.Notes);
+            request.Notes,
+            request.CityId);
 
         uow.Beneficiaries.Add(beneficiary);
         await uow.AddAuditAsync(
@@ -188,7 +202,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
 
         await uow.SaveChangesAsync(cancellationToken);
 
-        return ToViewerDto(beneficiary, org.NameAr, alerted);
+        return ToViewerDto(beneficiary, org.NameAr, city?.NameAr, alerted);
     }
 
     public async Task<Result<BeneficiaryDto>> UpdateAsync(
@@ -207,7 +221,12 @@ public sealed class BeneficiaryService : IBeneficiaryService
         }
 
         CardNumber.TryCreate(request.CardNumber, out var cardVo);
-        PhoneNumber.TryCreate(request.Phone, out var phoneVo);
+        PhoneNumber? phoneVo = null;
+        if (!string.IsNullOrWhiteSpace(request.Phone) && PhoneNumber.TryCreate(request.Phone, out var parsedPhone))
+        {
+            phoneVo = parsedPhone;
+        }
+
         NationalId? natIdVo = null;
         if (!string.IsNullOrWhiteSpace(request.NationalId) && NationalId.TryCreate(request.NationalId, out var parsedNatId))
         {
@@ -225,6 +244,13 @@ public sealed class BeneficiaryService : IBeneficiaryService
         if (org is null)
         {
             return Errors.Organization.NotFound;
+        }
+
+        // An inactive city is kept as is, but cannot be newly chosen.
+        var city = await ResolveCityAsync(uow, request.CityId, beneficiary.CityId, cancellationToken);
+        if (request.CityId is not null && city is null)
+        {
+            return Errors.City.NotFound;
         }
 
         string? cardChange = null;
@@ -247,10 +273,11 @@ public sealed class BeneficiaryService : IBeneficiaryService
 
         beneficiary.UpdateDetails(
             request.FullName,
-            phoneVo!,
+            phoneVo,
             natIdVo,
             request.CardExpiryDate,
-            request.Notes);
+            request.Notes,
+            request.CityId);
 
         await uow.AddAuditAsync(
             action: "BeneficiaryUpdated",
@@ -268,7 +295,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
 
         await uow.SaveChangesAsync(cancellationToken);
 
-        return ToViewerDto(beneficiary, org.NameAr, alerted);
+        return ToViewerDto(beneficiary, org.NameAr, city?.NameAr, alerted);
     }
 
     public async Task<Result<BeneficiaryDto>> ChangeStatusAsync(
@@ -309,6 +336,9 @@ public sealed class BeneficiaryService : IBeneficiaryService
         }
 
         var org = await uow.Organizations.GetByIdAsync(beneficiary.OrganizationId, cancellationToken);
+        var cityName = beneficiary.CityId is { } cityId
+            ? (await uow.Cities.GetByIdAsync(cityId, cancellationToken))?.NameAr
+            : null;
 
         await uow.AddAuditAsync(
             action: "BeneficiaryStatusChanged",
@@ -320,7 +350,7 @@ public sealed class BeneficiaryService : IBeneficiaryService
             cancellationToken: cancellationToken);
         await uow.SaveChangesAsync(cancellationToken);
 
-        return ToViewerDto(beneficiary, org?.NameAr ?? string.Empty);
+        return ToViewerDto(beneficiary, org?.NameAr ?? string.Empty, cityName);
     }
 
     public async Task<Result<IReadOnlyList<BeneficiaryDto>>> SearchAsync(
@@ -337,11 +367,12 @@ public sealed class BeneficiaryService : IBeneficiaryService
         var matches = await uow.Beneficiaries.SearchAsync(searchTerm, maxResults, cancellationToken);
         var orgs = await uow.Organizations.GetAllAsync(activeOnly: false, cancellationToken);
         var orgLookup = orgs.ToDictionary(o => o.Id, o => o.NameAr);
+        var cityNames = await LoadCityNamesAsync(uow, cancellationToken);
 
         var dtos = matches.Select(b =>
         {
             var orgName = orgLookup.TryGetValue(b.OrganizationId, out var name) ? name : string.Empty;
-            return ToViewerDto(b, orgName);
+            return ToViewerDto(b, orgName, CityNameOf(cityNames, b.CityId));
         }).ToList();
 
         return dtos;
@@ -383,13 +414,43 @@ public sealed class BeneficiaryService : IBeneficiaryService
     }
 
     /// <summary>SPEC §8, R6.16: operators get the national ID masked, so the full number never reaches their screen.</summary>
-    private BeneficiaryDto ToViewerDto(Beneficiary beneficiary, string organizationName, bool hasOpenCardAlert = false)
+    private BeneficiaryDto ToViewerDto(Beneficiary beneficiary, string organizationName, string? cityName, bool hasOpenCardAlert = false)
     {
-        var dto = beneficiary.ToDto(organizationName) with { HasOpenCardAlert = hasOpenCardAlert };
+        var dto = beneficiary.ToDto(organizationName, cityName) with { HasOpenCardAlert = hasOpenCardAlert };
         return _currentUser.Has(Permission.ViewFullNationalId)
             ? dto
             : dto with { NationalId = NationalIdMask.Mask(dto.NationalId) };
     }
+
+    /// <summary>
+    /// Finds the chosen city. An inactive city is accepted only when it is the one the holder already has, so an old
+    /// choice is never lost by an unrelated edit (BR-32).
+    /// </summary>
+    private static async Task<City?> ResolveCityAsync(
+        IUnitOfWork uow,
+        int? cityId,
+        int? currentCityId,
+        CancellationToken cancellationToken)
+    {
+        if (cityId is not { } id)
+        {
+            return null;
+        }
+
+        var city = await uow.Cities.GetByIdAsync(id, cancellationToken);
+        return city is not null && (city.IsActive || id == currentCityId) ? city : null;
+    }
+
+    private static async Task<IReadOnlyDictionary<int, string>> LoadCityNamesAsync(
+        IUnitOfWork uow,
+        CancellationToken cancellationToken)
+    {
+        var cities = await uow.Cities.GetAllAsync(cancellationToken);
+        return cities.ToDictionary(c => c.Id, c => c.NameAr);
+    }
+
+    private static string? CityNameOf(IReadOnlyDictionary<int, string> cityNames, int? cityId) =>
+        cityId is { } id && cityNames.TryGetValue(id, out var name) ? name : null;
 
     private EligibilityPreviewDto BuildEligibilityPreview(
         Organization? organization,

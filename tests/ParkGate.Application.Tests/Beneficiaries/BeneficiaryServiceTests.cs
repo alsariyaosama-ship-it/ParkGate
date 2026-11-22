@@ -383,4 +383,156 @@ public sealed class BeneficiaryServiceTests
         eligibility.CanBeOverridden.ShouldBeTrue();
         eligibility.AllowedEntryDays.ShouldBe(WeekDays.Saturday | WeekDays.Thursday);
     }
+
+    // ── F9, BR-15 and BR-32: optional phone and city ──
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task RegisterAsync_WithoutPhone_ShouldSucceedWithNoPhone(string? phone)
+    {
+        var result = await _sut.RegisterAsync(new RegisterBeneficiaryRequest(_org.Id, "CARD-NOPHONE", "Salem Ali", phone));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Phone.ShouldBeNull();
+        _beneficiaries.Single().Phone.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WithInvalidPhone_ShouldReturnInvalidPhoneValidationError()
+    {
+        var result = await _sut.RegisterAsync(new RegisterBeneficiaryRequest(_org.Id, "CARD-BADPHONE", "Salem Ali", "12345"));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.General.ValidationFailed([]).Code);
+        result.Error.ValidationErrors!.ShouldContain(e => e.Code == "InvalidPhone");
+        _beneficiaries.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WithPhone_ShouldStillNormalizeIt()
+    {
+        var result = await _sut.RegisterAsync(new RegisterBeneficiaryRequest(_org.Id, "CARD-PHONE", "Salem Ali", "+218912345678"));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Phone.ShouldBe("0912345678");
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WithUnknownCity_ShouldReturnCityNotFound()
+    {
+        var result = await _sut.RegisterAsync(new RegisterBeneficiaryRequest(_org.Id, "CARD-CITY", "Salem Ali", null, CityId: 99));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.City.NotFound.Code);
+        _beneficiaries.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WithInactiveCity_ShouldReturnCityNotFound()
+    {
+        var inactive = _uowFactory.CurrentUow.CitiesFake.Add("زليتن", 2, isActive: false);
+
+        var result = await _sut.RegisterAsync(new RegisterBeneficiaryRequest(_org.Id, "CARD-CITY", "Salem Ali", null, CityId: inactive.Id));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.City.NotFound.Code);
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WithNonPositiveCity_ShouldReturnInvalidCityValidationError()
+    {
+        var result = await _sut.RegisterAsync(new RegisterBeneficiaryRequest(_org.Id, "CARD-CITY", "Salem Ali", null, CityId: 0));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ValidationErrors!.ShouldContain(e => e.Code == "InvalidCity");
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WithValidCity_ShouldReturnCityIdAndName()
+    {
+        var city = _uowFactory.CurrentUow.CitiesFake.Add("الخمس", 1);
+
+        var result = await _sut.RegisterAsync(new RegisterBeneficiaryRequest(_org.Id, "CARD-CITY", "Salem Ali", null, CityId: city.Id));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.CityId.ShouldBe(city.Id);
+        result.Value.CityName.ShouldBe("الخمس");
+        _beneficiaries.Single().CityId.ShouldBe(city.Id);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WithNoPhoneAndNoCity_ShouldClearBoth()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Supervisor", UserRole.Supervisor);
+        var city = _uowFactory.CurrentUow.CitiesFake.Add("الخمس", 1);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-CLR"), "Name", PhoneNumber.Create("0912345678"), cityId: city.Id);
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.UpdateAsync(new UpdateBeneficiaryRequest(holder.Id, _org.Id, "CARD-CLR", "Name", null));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Phone.ShouldBeNull();
+        result.Value.CityId.ShouldBeNull();
+        result.Value.CityName.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task UpdateAsync_KeepingAnInactiveCurrentCity_ShouldSucceed()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Supervisor", UserRole.Supervisor);
+        var inactive = _uowFactory.CurrentUow.CitiesFake.Add("زليتن", 2, isActive: false);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-KEEP"), "Name", null, cityId: inactive.Id);
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.UpdateAsync(new UpdateBeneficiaryRequest(holder.Id, _org.Id, "CARD-KEEP", "New Name", null, CityId: inactive.Id));
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.CityId.ShouldBe(inactive.Id);
+        result.Value.CityName.ShouldBe("زليتن");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_SwitchingToAnInactiveCity_ShouldReturnCityNotFound()
+    {
+        _currentUser.SetUser(2, "supervisor1", "Supervisor", UserRole.Supervisor);
+        var active = _uowFactory.CurrentUow.CitiesFake.Add("الخمس", 1);
+        var inactive = _uowFactory.CurrentUow.CitiesFake.Add("زليتن", 2, isActive: false);
+        var holder = new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-SW"), "Name", null, cityId: active.Id);
+        _beneficiaries.Add(holder);
+
+        var result = await _sut.UpdateAsync(new UpdateBeneficiaryRequest(holder.Id, _org.Id, "CARD-SW", "Name", null, CityId: inactive.Id));
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe(Errors.City.NotFound.Code);
+        holder.CityId.ShouldBe(active.Id);
+    }
+
+    [Fact]
+    public async Task SearchAsync_HolderWithCity_ShouldCarryTheCityName()
+    {
+        var city = _uowFactory.CurrentUow.CitiesFake.Add("مصراتة", 3);
+        _beneficiaries.Add(new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-S1"), "Mohamed Salem", null, cityId: city.Id));
+        _beneficiaries.Add(new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-S2"), "Mohamed Omar", null));
+
+        var result = await _sut.SearchAsync("Mohamed");
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Single(b => b.CardNumber == "CARD-S1").CityName.ShouldBe("مصراتة");
+        result.Value.Single(b => b.CardNumber == "CARD-S2").CityName.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task LookupByCardNumberAsync_HolderWithCity_ShouldCarryTheCityName()
+    {
+        var city = _uowFactory.CurrentUow.CitiesFake.Add("مصراتة", 3);
+        _beneficiaries.Add(new Beneficiary(Guid.NewGuid(), _org.Id, CardNumber.Create("CARD-L1"), "Mohamed Salem", null, cityId: city.Id));
+
+        var result = await _sut.LookupByCardNumberAsync("CARD-L1");
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Matches.Single().Beneficiary.CityName.ShouldBe("مصراتة");
+        result.Value.Matches.Single().Beneficiary.Phone.ShouldBeNull();
+    }
 }

@@ -375,6 +375,31 @@ public sealed class FakeAgeCategoryRepository : IAgeCategoryRepository
     public void Update(AgeCategory category) { }
 }
 
+public sealed class FakeCityRepository : ICityRepository
+{
+    private readonly List<City> _cities = [];
+
+    public IReadOnlyList<City> Cities => _cities;
+
+    /// <summary>Adds a city with the next id, the way the database seed gives them.</summary>
+    public City Add(string nameAr, int sortOrder, bool isActive = true)
+    {
+        var city = new City(nameAr, sortOrder, isActive);
+        typeof(City).GetProperty(nameof(City.Id))!.SetValue(city, _cities.Count + 1);
+        _cities.Add(city);
+        return city;
+    }
+
+    public Task<IReadOnlyList<City>> GetAllActiveAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<City>>(_cities.Where(c => c.IsActive).OrderBy(c => c.SortOrder).ThenBy(c => c.Id).ToList());
+
+    public Task<IReadOnlyList<City>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<City>>(_cities.OrderBy(c => c.SortOrder).ThenBy(c => c.Id).ToList());
+
+    public Task<City?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_cities.FirstOrDefault(c => c.Id == id));
+}
+
 public sealed class FakeGiftVoucherRepository : IGiftVoucherRepository
 {
     private readonly List<GiftVoucher> _vouchers = [];
@@ -563,6 +588,8 @@ public sealed class FakeUnitOfWork : IUnitOfWork
     public IOrganizationRepository Organizations { get; }
     public IEntryAttemptRepository EntryAttempts { get; }
     public IAgeCategoryRepository AgeCategories { get; }
+    public ICityRepository Cities => CitiesFake;
+    public FakeCityRepository CitiesFake { get; } = new();
     public IAuditLogRepository AuditLogs { get; }
     public ISyncOutboxRepository SyncOutboxes { get; }
     public IGiftVoucherRepository GiftVouchers { get; }

@@ -9,7 +9,7 @@ public sealed record BeneficiaryDto(
     string OrganizationName,
     string CardNumber,
     string FullName,
-    string Phone,
+    string? Phone,
     string? NationalId,
     DateOnly? CardExpiryDate,
     BeneficiaryStatus Status,
@@ -17,7 +17,9 @@ public sealed record BeneficiaryDto(
     DateTime? LastGrantedEntryUtc,
     string? Notes,
     DateTime CreatedAtUtc,
-    bool HasOpenCardAlert = false); // F8, BR-29: the number does not look like the organization's usual numbers
+    bool HasOpenCardAlert = false, // F8, BR-29: the number does not look like the organization's usual numbers
+    int? CityId = null,
+    string? CityName = null); // F9, BR-32
 
 public sealed record CompanionCountDto(
     int AgeCategoryId,
@@ -56,20 +58,22 @@ public sealed record RegisterBeneficiaryRequest(
     int OrganizationId,
     string CardNumber,
     string FullName,
-    string Phone,
+    string? Phone,
     string? NationalId = null,
     DateOnly? CardExpiryDate = null,
-    string? Notes = null);
+    string? Notes = null,
+    int? CityId = null);
 
 public sealed record UpdateBeneficiaryRequest(
     Guid Id,
     int OrganizationId,
     string CardNumber,
     string FullName,
-    string Phone,
+    string? Phone,
     string? NationalId = null,
     DateOnly? CardExpiryDate = null,
-    string? Notes = null);
+    string? Notes = null,
+    int? CityId = null);
 
 public sealed record ChangeBeneficiaryStatusRequest(
     Guid Id,
@@ -96,19 +100,21 @@ public sealed record EntryAttemptDto(
 
 public static class BeneficiaryMappingExtensions
 {
-    public static BeneficiaryDto ToDto(this Beneficiary b, string organizationName) =>
+    public static BeneficiaryDto ToDto(this Beneficiary b, string organizationName, string? cityName = null) =>
         new(
             b.Id,
             b.OrganizationId,
             organizationName,
             b.CardNumber.Value,
             b.FullName,
-            b.Phone.Value,
+            b.Phone?.Value,
             b.NationalId?.Value,
             b.CardExpiryDate,
             b.Status,
             b.StatusReason,
             b.LastGrantedEntryUtc,
             b.Notes,
-            b.CreatedAtUtc);
+            b.CreatedAtUtc,
+            CityId: b.CityId,
+            CityName: cityName);
 }

@@ -105,7 +105,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
 
         _txtFullName.Text = beneficiary.FullName;
         _txtCardNumber.Text = beneficiary.CardNumber;
-        _txtPhone.Text = beneficiary.Phone;
+        _txtPhone.Text = beneficiary.Phone ?? string.Empty;
         _txtNationalId.Text = beneficiary.NationalId ?? string.Empty;
         _txtNotes.Text = beneficiary.Notes ?? string.Empty;
 

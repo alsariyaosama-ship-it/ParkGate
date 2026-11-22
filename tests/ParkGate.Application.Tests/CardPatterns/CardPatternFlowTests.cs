@@ -228,7 +228,7 @@ public sealed class CardPatternFlowTests
         _currentUser.SetUser(_admin);
 
         var result = await _beneficiaries_.UpdateAsync(new UpdateBeneficiaryRequest(
-            holder.Id, holder.OrganizationId, "XY-9999", holder.FullName, holder.Phone.Value));
+            holder.Id, holder.OrganizationId, "XY-9999", holder.FullName, holder.Phone!.Value));
 
         result.Value.HasOpenCardAlert.ShouldBeTrue();
         Alerts.ShouldHaveSingleItem().CardNumber.ShouldBe("XY-9999");
