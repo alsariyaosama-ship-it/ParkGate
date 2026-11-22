@@ -10,15 +10,15 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-11-22 |
-| Last session | S44 — R9.3, R9.5 (PR #26); F9 visitor city and optional phone on `phase/f9-visitor-city` |
-| Current phase | F9 done except T9.4 (cloud sync, paused with the web). Next: production rollout of the desktop app. Web work is paused (Osama, 2026-11-20) |
-| Working branch | `phase/f9-visitor-city`, based on `phase/r9-docs` (PR #26 must be merged first); pushed, PR open |
+| Last session | S44 — R9.3, R9.5 (PR #26); F9 city and optional phone (PR #27); F10 entry receipt on `phase/f10-entry-receipt` |
+| Current phase | F9 and F10 done (T9.4 cloud sync paused with the web). Next: production rollout of the desktop app. Web work is paused (Osama, 2026-11-20) |
+| Working branch | `phase/f10-entry-receipt` on `phase/f9-visitor-city` on `phase/r9-docs`: merge PR #26, then #27, then the F10 PR |
 | Build | `dotnet build ParkGate.sln -c Debug`: 0 errors, 0 warnings (the Pkcs advisories are gone, R8.2) |
-| .NET Unit tests | 1265 passed (non-integration): 279 domain + 306 application + 111 infrastructure + 569 architecture |
+| .NET Unit tests | 1299 passed (non-integration): 279 domain + 318 application + 111 infrastructure + 591 architecture; Infrastructure with integration 188 |
 | .NET Integration tests | Infrastructure project 178 passed on LocalDB (integration and non-integration together) |
 | Web tests | `php artisan test`: 101 passed. Needs PHP >= 8.4.1 now (R8.7); the herd-lite `php` 8.4.0 on PATH is too old, PHP 8.4.27 from WinGet works |
 | Total tests | 1244 .NET (incl. integration) + 101 web |
-| Latest migration | `AddCitiesAndOptionalPhone` (S44, F9: `Cities` seeded with 57 rows, `Beneficiaries.Phone` nullable, `Beneficiaries.CityId`). **Not applied** on any database; `AddCardPatterns` is also still pending on the dev databases |
+| Latest migration | `AddEntryReceiptNo` (S44, F10: identity `EntryAttempts.ReceiptNo`, existing rows are numbered), after `AddCitiesAndOptionalPhone` (F9). **Neither applied** on any database; `AddCardPatterns` is also still pending on the dev databases |
 
 ## State of the work
 
@@ -125,13 +125,15 @@ Run sessions on the dev machine (`claude` in `C:\dev\ParkGate`), not from the cl
 **S44 (2026-11-20):** R9.3 `AGENTS.md` (five production projects with `ParkGate.SyncAgent`; UI tests live in `ParkGate.ArchitectureTests`; the web test command was left out on Osama's request). R9.5 this handoff. R9 PR opened (`phase/r9-docs` → `main`, docs only).
 
 **Next, in order:**
-1. Osama reviews and merges PR #26 (R9 docs), then the F9 PR (visitor city, optional phone). Apply `AddCitiesAndOptionalPhone` and run TC-40.
+1. Osama reviews and merges PR #26 (R9 docs), then PR #27 (F9 city, optional phone), then the F10 PR (entry receipt). Apply both migrations and run TC-40 and TC-41 (TC-41 on the real 80 mm printer).
 2. **Rebuild the installer from `main`** (`scripts\build-installer.ps1`). The S40 build of 1.1.0 lacks T8.7 (tab-control crash at 125 %), F8 card patterns and R6.5; do not ship it.
 3. **Production rollout**, following `docs/DEPLOYMENT.md`: server mode on the real server (SQL Server Express, `Setup-ProductionDatabase.ps1` for migrations and `parkgate_app`, §3–§4), then one desk (§5, network must be Private), first-run admin (§6), readiness check (§7). Upgrading an existing 1.0.0 install: §10. Backups: `scripts\backup.ps1` as Administrator (§9).
 4. **Before opening to visitors:** set each organization's entry days in «الجهات» (all days allowed by default), enable gifts per organization where needed, and run the manual tests on the real machines: TC-36..TC-39, TC-32 (1366×768), TC-38 (125 %), TC-20 (Cairo missing), the R7.12 slips on the 80 mm printer.
 5. Collect trial feedback; each problem becomes a `fix/<name>` branch with a failing test first.
 
 **F9 (S44, Osama 2026-11-22):** phone optional (BR-15), optional city from a seeded `Cities` table (BR-32, 57 cities: his 16 first in his order, then the rest of the centre and west plus Sabha alphabetically; the 41 after Janzour were chosen by the agent, ask Osama to check). City box: `SearchableComboBox` (contains match, `ArabicSearchText` ignores hamza / ta marbuta / alef maqsura). `CityId` is excluded from the cloud outbox until the web has it (T9.4). Verified in a real window with typed keys (scratch probe), not yet at 125 % or by Osama.
+
+**F10 (S44, Osama 2026-11-22):** entry receipt printed silently on every granted desk entry and override (BR-33): total persons in 26 pt (infants = companion-limit-exempt categories are not counted), «صاحب البطاقة + …», breakdown, time, desk, `ReceiptNo` (identity, denied attempts also take numbers, so printed numbers have gaps). Setting `Entry.PrintEntryReceipt` (default on, not seeded). Print failure only adds «تعذّرت طباعة الواصل» to the banner. Printing is synchronous on the UI thread; a hung spooler could stall the desk briefly. Rendered through `PreviewPrintController` and checked by eye; not yet printed on paper.
 
 ## Known issues (as of 1.1.0)
 

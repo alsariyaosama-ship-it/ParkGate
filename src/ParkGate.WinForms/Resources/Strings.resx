@@ -2059,6 +2059,36 @@
   <data name="Slip_GiftNumber" xml:space="preserve">
     <value>رقم القسيمة: {0}</value>
   </data>
+  <data name="Slip_EntryPersons" xml:space="preserve">
+    <value>عدد الأشخاص: {0}</value>
+  </data>
+  <data name="Slip_EntryHolderOnly" xml:space="preserve">
+    <value>صاحب البطاقة فقط</value>
+  </data>
+  <data name="Slip_EntryWith_One" xml:space="preserve">
+    <value>صاحب البطاقة + مرافق</value>
+  </data>
+  <data name="Slip_EntryWith_Two" xml:space="preserve">
+    <value>صاحب البطاقة + مرافقان</value>
+  </data>
+  <data name="Slip_EntryWith_Few" xml:space="preserve">
+    <value>صاحب البطاقة + {0} مرافقين</value>
+  </data>
+  <data name="Slip_EntryWith_Many" xml:space="preserve">
+    <value>صاحب البطاقة + {0} مرافقًا</value>
+  </data>
+  <data name="Slip_EntryBreakdown" xml:space="preserve">
+    <value>المرافقون: {0}</value>
+  </data>
+  <data name="Slip_EntryDeskAndNumber" xml:space="preserve">
+    <value>{0}   واصل رقم {1}</value>
+  </data>
+  <data name="Banner_ReceiptPrintFailed" xml:space="preserve">
+    <value>تعذّرت طباعة الواصل</value>
+  </data>
+  <data name="Label_PrintEntryReceipt" xml:space="preserve">
+    <value>طباعة واصل الدخول تلقائيًا</value>
+  </data>
   <data name="Error_Gift_NoEntryToday" xml:space="preserve">
     <value>لم يسجّل الزائر دخولاً اليوم</value>
   </data>

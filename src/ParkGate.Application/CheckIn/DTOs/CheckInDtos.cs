@@ -34,7 +34,9 @@ public sealed record CheckInResultDto(
     int EffectiveCooldownMinutes,
     DateTime? NextEligibleAtUtc,
     bool CanBeOverridden,
-    IReadOnlyList<CompanionCountDto> Companions);
+    IReadOnlyList<CompanionCountDto> Companions,
+    int ReceiptNo = 0, // T10.1: number printed on the entry receipt
+    int CountedPersons = 0); // BR-33: holder + companions of categories that are not companion-limit-exempt
 
 public sealed record TodayDeskAttemptDto(
     Guid Id,

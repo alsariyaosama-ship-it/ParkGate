@@ -171,6 +171,16 @@ Design: SPEC BR-15 (phone optional) and BR-32 (city), DATABASE §3.2 and §3.18.
 
 ---
 
+## Phase F10 — entry receipt (Osama, 2026-11-22) · branch `phase/f10-entry-receipt`
+Design: SPEC BR-33, DATABASE §3.4 (`ReceiptNo`) and §5 (`Entry.PrintEntryReceipt`).
+- [x] T10.1 Receipt number: `EntryAttempts.ReceiptNo` (identity, unique index), migration `AddEntryReceiptNo`, excluded from the outbox payload; `CheckInResultDto.ReceiptNo` and `CountedPersons` (infants not counted, one rule in `EntryPersonCounting`), `CompanionCountDto.CategoryName` filled (unit and integration tests)
+- [x] T10.2 Slip and silent printing: `ReceiptSlips.EntryReceipt`, `SlipTextStyle.Total`, `ReceiptPrinter.CreateDocument` without QR, `IEntryReceiptPrinter` / `EntryReceiptPrinter` (default printer, no dialog, failure is a return value), desk prints after record and override, banner note on failure (tests)
+- [x] T10.3 Setting `Entry.PrintEntryReceipt` (default on, not seeded): `AppSettingsModel`, `SettingsService`, checkbox in the Settings screen (tests)
+
+**Done when:** a granted desk entry, including an override, prints a receipt with the person total (infants excluded), time, desk and receipt number; the setting turns it off; a printer problem never blocks the entry.
+
+---
+
 ## Phase R — Remediation · see `docs/REMEDIATION_PLAN.md`
 
 Source: full code review 2026-11-12. Work R0 → R9 in order, one phase per branch and PR.
