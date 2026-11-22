@@ -397,6 +397,9 @@
   <data name="Error_AgeCategory_NotFound" xml:space="preserve">
     <value>لم يتم العثور على الفئة العمرية المطلوبة.</value>
   </data>
+  <data name="Error_City_NotFound" xml:space="preserve">
+    <value>المدينة المختارة غير موجودة أو موقوفة.</value>
+  </data>
   <data name="Error_AgeCategory_NameAlreadyExists" xml:space="preserve">
     <value>اسم الفئة العمرية مسجل مسبقاً.</value>
   </data>
@@ -607,6 +610,9 @@
   <data name="Label_RegPhone" xml:space="preserve">
     <value>الهاتف (09xxxxxxxx):</value>
   </data>
+  <data name="Label_RegCity" xml:space="preserve">
+    <value>المدينة:</value>
+  </data>
   <data name="Label_RegNationalId" xml:space="preserve">
     <value>الرقم الوطني (12 رقماً):</value>
   </data>
@@ -726,6 +732,9 @@
   </data>
   <data name="Col_Ben_Phone" xml:space="preserve">
     <value>رقم الهاتف</value>
+  </data>
+  <data name="Col_Ben_City" xml:space="preserve">
+    <value>المدينة</value>
   </data>
   <data name="Col_Ben_NationalId" xml:space="preserve">
     <value>الرقم الوطني</value>
@@ -1663,6 +1672,12 @@
   <data name="Val_RegOrganizationRequired" xml:space="preserve">
     <value>يرجى اختيار الجهة التي يتبع لها الزائر.</value>
   </data>
+  <data name="Val_InvalidCity" xml:space="preserve">
+    <value>المدينة المختارة غير صحيحة.</value>
+  </data>
+  <data name="Val_InvalidPhone" xml:space="preserve">
+    <value>رقم الهاتف غير صحيح؛ أدخل رقماً ليبياً من الشكل 09xxxxxxxx أو اتركه فارغاً.</value>
+  </data>
   <data name="Banner_CardRegisteredElsewhere" xml:space="preserve">
     <value>البطاقة مسجلة لدى جهة: {0}</value>
   </data>
@@ -1764,9 +1779,6 @@
   </data>
   <data name="Ui_CheckInDesk_08" xml:space="preserve">
     <value>الاسم الرباعي مطلوب.</value>
-  </data>
-  <data name="Ui_CheckInDesk_09" xml:space="preserve">
-    <value>رقم الهاتف مطلوب.</value>
   </data>
   <data name="Ui_CheckInDesk_10" xml:space="preserve">
     <value>تم تسجيل الزائر بنجاح.</value>

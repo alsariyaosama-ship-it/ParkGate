@@ -291,6 +291,7 @@ internal class Strings
     internal static string Title_InlineRegistration => GetString(nameof(Title_InlineRegistration));
     internal static string Label_RegFullName => GetString(nameof(Label_RegFullName));
     internal static string Label_RegPhone => GetString(nameof(Label_RegPhone));
+    internal static string Label_RegCity => GetString(nameof(Label_RegCity));
     internal static string Label_RegNationalId => GetString(nameof(Label_RegNationalId));
     internal static string Label_RegExpiry => GetString(nameof(Label_RegExpiry));
     internal static string Label_RegNotes => GetString(nameof(Label_RegNotes));
@@ -338,6 +339,7 @@ internal class Strings
     internal static string Col_Ben_Organization => GetString(nameof(Col_Ben_Organization));
     internal static string Col_Ben_FullName => GetString(nameof(Col_Ben_FullName));
     internal static string Col_Ben_Phone => GetString(nameof(Col_Ben_Phone));
+    internal static string Col_Ben_City => GetString(nameof(Col_Ben_City));
     internal static string Col_Ben_NationalId => GetString(nameof(Col_Ben_NationalId));
     internal static string Col_Ben_ExpiryDate => GetString(nameof(Col_Ben_ExpiryDate));
     internal static string Col_Ben_Status => GetString(nameof(Col_Ben_Status));
@@ -771,6 +773,8 @@ internal class Strings
     internal static string Msg_NoGiftReceiptsFound => GetString(nameof(Msg_NoGiftReceiptsFound));
     internal static string Label_RegOrganization => GetString(nameof(Label_RegOrganization));
     internal static string Val_RegOrganizationRequired => GetString(nameof(Val_RegOrganizationRequired));
+    internal static string Val_InvalidCity => GetString(nameof(Val_InvalidCity));
+    internal static string Val_InvalidPhone => GetString(nameof(Val_InvalidPhone));
     internal static string Banner_CardRegisteredElsewhere => GetString(nameof(Banner_CardRegisteredElsewhere));
     internal static string Banner_CardRegisteredElsewhereHint => GetString(nameof(Banner_CardRegisteredElsewhereHint));
     internal static string Text_ListSeparator => GetString(nameof(Text_ListSeparator));
@@ -805,7 +809,6 @@ internal class Strings
     internal static string Ui_CheckInDesk_06 => GetString(nameof(Ui_CheckInDesk_06));
     internal static string Ui_CheckInDesk_07 => GetString(nameof(Ui_CheckInDesk_07));
     internal static string Ui_CheckInDesk_08 => GetString(nameof(Ui_CheckInDesk_08));
-    internal static string Ui_CheckInDesk_09 => GetString(nameof(Ui_CheckInDesk_09));
     internal static string Ui_CheckInDesk_10 => GetString(nameof(Ui_CheckInDesk_10));
     internal static string Ui_CheckInDesk_12 => GetString(nameof(Ui_CheckInDesk_12));
     internal static string Ui_CheckInDesk_13 => GetString(nameof(Ui_CheckInDesk_13));

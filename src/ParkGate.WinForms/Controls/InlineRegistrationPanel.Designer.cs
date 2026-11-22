@@ -28,6 +28,8 @@ partial class InlineRegistrationPanel
         this._txtRegFullName = new System.Windows.Forms.TextBox();
         this._lblRegPhone = new System.Windows.Forms.Label();
         this._txtRegPhone = new System.Windows.Forms.TextBox();
+        this._lblRegCity = new System.Windows.Forms.Label();
+        this._cmbRegCity = new ParkGate.WinForms.Controls.SearchableComboBox();
         this._lblRegNationalId = new System.Windows.Forms.Label();
         this._txtRegNationalId = new System.Windows.Forms.TextBox();
         this._lblRegExpiry = new System.Windows.Forms.Label();
@@ -52,7 +54,7 @@ partial class InlineRegistrationPanel
         this._grpRegistration.Location = new System.Drawing.Point(0, 0);
         this._grpRegistration.Name = "_grpRegistration";
         this._grpRegistration.Padding = new System.Windows.Forms.Padding(8);
-        this._grpRegistration.Size = new System.Drawing.Size(500, 289);
+        this._grpRegistration.Size = new System.Drawing.Size(500, 324);
         this._grpRegistration.TabIndex = 1;
         this._grpRegistration.TabStop = false;
         this._grpRegistration.Text = "تسجيل زائر جديد (فوري)";
@@ -68,19 +70,22 @@ partial class InlineRegistrationPanel
         this._tblRegistration.Controls.Add(this._txtRegFullName, 1, 1);
         this._tblRegistration.Controls.Add(this._lblRegPhone, 0, 2);
         this._tblRegistration.Controls.Add(this._txtRegPhone, 1, 2);
-        this._tblRegistration.Controls.Add(this._lblRegNationalId, 0, 3);
-        this._tblRegistration.Controls.Add(this._txtRegNationalId, 1, 3);
-        this._tblRegistration.Controls.Add(this._lblRegExpiry, 0, 4);
-        this._tblRegistration.Controls.Add(this._dtpRegExpiry, 1, 4);
-        this._tblRegistration.Controls.Add(this._lblRegNotes, 0, 5);
-        this._tblRegistration.Controls.Add(this._txtRegNotes, 1, 5);
-        this._tblRegistration.Controls.Add(this._pnlRegActions, 1, 6);
+        this._tblRegistration.Controls.Add(this._lblRegCity, 0, 3);
+        this._tblRegistration.Controls.Add(this._cmbRegCity, 1, 3);
+        this._tblRegistration.Controls.Add(this._lblRegNationalId, 0, 4);
+        this._tblRegistration.Controls.Add(this._txtRegNationalId, 1, 4);
+        this._tblRegistration.Controls.Add(this._lblRegExpiry, 0, 5);
+        this._tblRegistration.Controls.Add(this._dtpRegExpiry, 1, 5);
+        this._tblRegistration.Controls.Add(this._lblRegNotes, 0, 6);
+        this._tblRegistration.Controls.Add(this._txtRegNotes, 1, 6);
+        this._tblRegistration.Controls.Add(this._pnlRegActions, 1, 7);
         this._tblRegistration.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblRegistration.Font = new System.Drawing.Font("Cairo", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblRegistration.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
         this._tblRegistration.Location = new System.Drawing.Point(8, 26);
         this._tblRegistration.Name = "_tblRegistration";
-        this._tblRegistration.RowCount = 7;
+        this._tblRegistration.RowCount = 8;
+        this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
@@ -88,7 +93,7 @@ partial class InlineRegistrationPanel
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
         this._tblRegistration.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
-        this._tblRegistration.Size = new System.Drawing.Size(484, 255);
+        this._tblRegistration.Size = new System.Drawing.Size(484, 290);
         this._tblRegistration.TabIndex = 0;
         // 
         // _lblRegOrganization
@@ -155,34 +160,54 @@ partial class InlineRegistrationPanel
         this._txtRegPhone.Size = new System.Drawing.Size(348, 24);
         this._txtRegPhone.TabIndex = 5;
         // 
+        // _lblRegCity
+        // 
+        this._lblRegCity.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this._lblRegCity.AutoSize = true;
+        this._lblRegCity.Location = new System.Drawing.Point(437, 71);
+        this._lblRegCity.Name = "_lblRegCity";
+        this._lblRegCity.Size = new System.Drawing.Size(44, 17);
+        this._lblRegCity.TabIndex = 6;
+        this._lblRegCity.Text = "المدينة:";
+        // 
+        // _cmbRegCity
+        // 
+        this._cmbRegCity.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._cmbRegCity.FormattingEnabled = true;
+        this._cmbRegCity.Location = new System.Drawing.Point(3, 68);
+        this._cmbRegCity.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+        this._cmbRegCity.Name = "_cmbRegCity";
+        this._cmbRegCity.Size = new System.Drawing.Size(348, 24);
+        this._cmbRegCity.TabIndex = 7;
+        // 
         // _lblRegNationalId
         // 
         this._lblRegNationalId.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblRegNationalId.AutoSize = true;
-        this._lblRegNationalId.Location = new System.Drawing.Point(365, 71);
+        this._lblRegNationalId.Location = new System.Drawing.Point(365, 106);
         this._lblRegNationalId.Name = "_lblRegNationalId";
         this._lblRegNationalId.Size = new System.Drawing.Size(116, 17);
-        this._lblRegNationalId.TabIndex = 6;
+        this._lblRegNationalId.TabIndex = 8;
         this._lblRegNationalId.Text = "الرقم الوطني (اختياري):";
         // 
         // _txtRegNationalId
         // 
         this._txtRegNationalId.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtRegNationalId.Location = new System.Drawing.Point(3, 68);
+        this._txtRegNationalId.Location = new System.Drawing.Point(3, 103);
         this._txtRegNationalId.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
         this._txtRegNationalId.MaxLength = 12;
         this._txtRegNationalId.Name = "_txtRegNationalId";
         this._txtRegNationalId.Size = new System.Drawing.Size(348, 24);
-        this._txtRegNationalId.TabIndex = 7;
+        this._txtRegNationalId.TabIndex = 9;
         // 
         // _lblRegExpiry
         // 
         this._lblRegExpiry.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblRegExpiry.AutoSize = true;
-        this._lblRegExpiry.Location = new System.Drawing.Point(367, 103);
+        this._lblRegExpiry.Location = new System.Drawing.Point(367, 138);
         this._lblRegExpiry.Name = "_lblRegExpiry";
         this._lblRegExpiry.Size = new System.Drawing.Size(114, 17);
-        this._lblRegExpiry.TabIndex = 8;
+        this._lblRegExpiry.TabIndex = 10;
         this._lblRegExpiry.Text = "صلاحية البطاقة (اختياري):";
         // 
         // _dtpRegExpiry
@@ -191,42 +216,42 @@ partial class InlineRegistrationPanel
         this._dtpRegExpiry.CustomFormat = "dd/MM/yyyy";
         this._dtpRegExpiry.Dock = System.Windows.Forms.DockStyle.Fill;
         this._dtpRegExpiry.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-        this._dtpRegExpiry.Location = new System.Drawing.Point(3, 100);
+        this._dtpRegExpiry.Location = new System.Drawing.Point(3, 135);
         this._dtpRegExpiry.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
         this._dtpRegExpiry.Name = "_dtpRegExpiry";
         this._dtpRegExpiry.ShowCheckBox = true;
         this._dtpRegExpiry.Size = new System.Drawing.Size(348, 24);
-        this._dtpRegExpiry.TabIndex = 9;
+        this._dtpRegExpiry.TabIndex = 11;
         // 
         // _lblRegNotes
         // 
         this._lblRegNotes.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblRegNotes.AutoSize = true;
-        this._lblRegNotes.Location = new System.Drawing.Point(427, 137);
+        this._lblRegNotes.Location = new System.Drawing.Point(427, 172);
         this._lblRegNotes.Name = "_lblRegNotes";
         this._lblRegNotes.Size = new System.Drawing.Size(54, 17);
-        this._lblRegNotes.TabIndex = 10;
+        this._lblRegNotes.TabIndex = 12;
         this._lblRegNotes.Text = "ملاحظات:";
         // 
         // _txtRegNotes
         // 
         this._txtRegNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtRegNotes.Location = new System.Drawing.Point(3, 132);
+        this._txtRegNotes.Location = new System.Drawing.Point(3, 167);
         this._txtRegNotes.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
         this._txtRegNotes.MaxLength = 500;
         this._txtRegNotes.Name = "_txtRegNotes";
         this._txtRegNotes.Size = new System.Drawing.Size(348, 24);
-        this._txtRegNotes.TabIndex = 11;
+        this._txtRegNotes.TabIndex = 13;
         // 
         // _pnlRegActions
         // 
         this._pnlRegActions.Controls.Add(this._btnSaveReg);
         this._pnlRegActions.Controls.Add(this._btnCancelReg);
         this._pnlRegActions.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._pnlRegActions.Location = new System.Drawing.Point(3, 163);
+        this._pnlRegActions.Location = new System.Drawing.Point(3, 198);
         this._pnlRegActions.Name = "_pnlRegActions";
         this._pnlRegActions.Size = new System.Drawing.Size(348, 54);
-        this._pnlRegActions.TabIndex = 12;
+        this._pnlRegActions.TabIndex = 14;
         // 
         // _btnSaveReg
         // 
@@ -265,7 +290,7 @@ partial class InlineRegistrationPanel
         this.Margin = new System.Windows.Forms.Padding(0);
         this.Name = "InlineRegistrationPanel";
         this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-        this.Size = new System.Drawing.Size(500, 289);
+        this.Size = new System.Drawing.Size(500, 324);
         this._grpRegistration.ResumeLayout(false);
         this._tblRegistration.ResumeLayout(false);
         this._tblRegistration.PerformLayout();
@@ -281,6 +306,8 @@ partial class InlineRegistrationPanel
     private System.Windows.Forms.TextBox _txtRegFullName;
     private System.Windows.Forms.Label _lblRegPhone;
     private System.Windows.Forms.TextBox _txtRegPhone;
+    private System.Windows.Forms.Label _lblRegCity;
+    private ParkGate.WinForms.Controls.SearchableComboBox _cmbRegCity;
     private System.Windows.Forms.Label _lblRegNationalId;
     private System.Windows.Forms.TextBox _txtRegNationalId;
     private System.Windows.Forms.Label _lblRegExpiry;

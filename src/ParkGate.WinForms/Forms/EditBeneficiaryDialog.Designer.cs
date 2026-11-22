@@ -28,6 +28,8 @@ partial class EditBeneficiaryDialog
         this._txtCardNumber = new System.Windows.Forms.TextBox();
         this._lblPhone = new System.Windows.Forms.Label();
         this._txtPhone = new System.Windows.Forms.TextBox();
+        this._lblCity = new System.Windows.Forms.Label();
+        this._cboCity = new ParkGate.WinForms.Controls.SearchableComboBox();
         this._lblNationalId = new System.Windows.Forms.Label();
         this._txtNationalId = new System.Windows.Forms.TextBox();
         this._lblExpiryDate = new System.Windows.Forms.Label();
@@ -81,17 +83,20 @@ partial class EditBeneficiaryDialog
         this._tblLayout.Controls.Add(this._txtCardNumber, 1, 2);
         this._tblLayout.Controls.Add(this._lblPhone, 0, 3);
         this._tblLayout.Controls.Add(this._txtPhone, 1, 3);
-        this._tblLayout.Controls.Add(this._lblNationalId, 0, 4);
-        this._tblLayout.Controls.Add(this._txtNationalId, 1, 4);
-        this._tblLayout.Controls.Add(this._lblExpiryDate, 0, 5);
-        this._tblLayout.Controls.Add(this._pnlExpiry, 1, 5);
-        this._tblLayout.Controls.Add(this._lblNotes, 0, 6);
-        this._tblLayout.Controls.Add(this._txtNotes, 1, 6);
+        this._tblLayout.Controls.Add(this._lblCity, 0, 4);
+        this._tblLayout.Controls.Add(this._cboCity, 1, 4);
+        this._tblLayout.Controls.Add(this._lblNationalId, 0, 5);
+        this._tblLayout.Controls.Add(this._txtNationalId, 1, 5);
+        this._tblLayout.Controls.Add(this._lblExpiryDate, 0, 6);
+        this._tblLayout.Controls.Add(this._pnlExpiry, 1, 6);
+        this._tblLayout.Controls.Add(this._lblNotes, 0, 7);
+        this._tblLayout.Controls.Add(this._txtNotes, 1, 7);
         this._tblLayout.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblLayout.Location = new System.Drawing.Point(0, 50);
         this._tblLayout.Name = "_tblLayout";
         this._tblLayout.Padding = new System.Windows.Forms.Padding(16, 16, 16, 8);
-        this._tblLayout.RowCount = 7;
+        this._tblLayout.RowCount = 8;
+        this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
@@ -99,7 +104,7 @@ partial class EditBeneficiaryDialog
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
         this._tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-        this._tblLayout.Size = new System.Drawing.Size(520, 340);
+        this._tblLayout.Size = new System.Drawing.Size(520, 380);
         this._tblLayout.TabIndex = 1;
         // 
         // _lblFullName
@@ -178,34 +183,53 @@ partial class EditBeneficiaryDialog
         this._txtPhone.Name = "_txtPhone";
         this._txtPhone.Size = new System.Drawing.Size(352, 25);
         this._txtPhone.TabIndex = 7;
+        //
+        // _lblCity
+        //
+        this._lblCity.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this._lblCity.AutoSize = true;
+        this._lblCity.Location = new System.Drawing.Point(433, 168);
+        this._lblCity.Name = "_lblCity";
+        this._lblCity.Size = new System.Drawing.Size(41, 19);
+        this._lblCity.TabIndex = 8;
+        this._lblCity.Text = "المدينة:";
+        //
+        // _cboCity
+        //
+        this._cboCity.Dock = System.Windows.Forms.DockStyle.Fill;
+        this._cboCity.FormattingEnabled = true;
+        this._cboCity.Location = new System.Drawing.Point(19, 163);
+        this._cboCity.Name = "_cboCity";
+        this._cboCity.Size = new System.Drawing.Size(352, 25);
+        this._cboCity.TabIndex = 9;
         // 
         // _lblNationalId
         // 
         this._lblNationalId.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblNationalId.AutoSize = true;
-        this._lblNationalId.Location = new System.Drawing.Point(391, 168);
+        this._lblNationalId.Location = new System.Drawing.Point(391, 204);
         this._lblNationalId.Name = "_lblNationalId";
         this._lblNationalId.Size = new System.Drawing.Size(83, 19);
-        this._lblNationalId.TabIndex = 8;
+        this._lblNationalId.TabIndex = 10;
         this._lblNationalId.Text = "الرقم الوطني:";
         // 
         // _txtNationalId
         // 
         this._txtNationalId.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtNationalId.Location = new System.Drawing.Point(19, 163);
+        this._txtNationalId.Location = new System.Drawing.Point(19, 199);
         this._txtNationalId.MaxLength = 12;
         this._txtNationalId.Name = "_txtNationalId";
         this._txtNationalId.Size = new System.Drawing.Size(352, 25);
-        this._txtNationalId.TabIndex = 9;
+        this._txtNationalId.TabIndex = 11;
         // 
         // _lblExpiryDate
         // 
         this._lblExpiryDate.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this._lblExpiryDate.AutoSize = true;
-        this._lblExpiryDate.Location = new System.Drawing.Point(389, 204);
+        this._lblExpiryDate.Location = new System.Drawing.Point(389, 240);
         this._lblExpiryDate.Name = "_lblExpiryDate";
         this._lblExpiryDate.Size = new System.Drawing.Size(85, 19);
-        this._lblExpiryDate.TabIndex = 10;
+        this._lblExpiryDate.TabIndex = 12;
         this._lblExpiryDate.Text = "انتهاء البطاقة:";
         // 
         // _pnlExpiry
@@ -213,10 +237,10 @@ partial class EditBeneficiaryDialog
         this._pnlExpiry.Controls.Add(this._chkHasExpiry);
         this._pnlExpiry.Controls.Add(this._dtpExpiryDate);
         this._pnlExpiry.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._pnlExpiry.Location = new System.Drawing.Point(19, 199);
+        this._pnlExpiry.Location = new System.Drawing.Point(19, 235);
         this._pnlExpiry.Name = "_pnlExpiry";
         this._pnlExpiry.Size = new System.Drawing.Size(352, 30);
-        this._pnlExpiry.TabIndex = 11;
+        this._pnlExpiry.TabIndex = 13;
         // 
         // _chkHasExpiry
         // 
@@ -242,23 +266,23 @@ partial class EditBeneficiaryDialog
         // 
         this._lblNotes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
         this._lblNotes.AutoSize = true;
-        this._lblNotes.Location = new System.Drawing.Point(409, 232);
+        this._lblNotes.Location = new System.Drawing.Point(409, 268);
         this._lblNotes.Margin = new System.Windows.Forms.Padding(3, 8, 3, 0);
         this._lblNotes.Name = "_lblNotes";
         this._lblNotes.Size = new System.Drawing.Size(65, 19);
-        this._lblNotes.TabIndex = 12;
+        this._lblNotes.TabIndex = 14;
         this._lblNotes.Text = "ملاحظات:";
         // 
         // _txtNotes
         // 
         this._txtNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-        this._txtNotes.Location = new System.Drawing.Point(19, 235);
+        this._txtNotes.Location = new System.Drawing.Point(19, 271);
         this._txtNotes.MaxLength = 500;
         this._txtNotes.Multiline = true;
         this._txtNotes.Name = "_txtNotes";
         this._txtNotes.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
         this._txtNotes.Size = new System.Drawing.Size(352, 62);
-        this._txtNotes.TabIndex = 13;
+        this._txtNotes.TabIndex = 15;
         // 
         // _pnlButtons
         // 
@@ -266,7 +290,7 @@ partial class EditBeneficiaryDialog
         this._pnlButtons.Controls.Add(this._btnCancel);
         this._pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
         this._pnlButtons.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight;
-        this._pnlButtons.Location = new System.Drawing.Point(0, 390);
+        this._pnlButtons.Location = new System.Drawing.Point(0, 430);
         this._pnlButtons.Name = "_pnlButtons";
         this._pnlButtons.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
         this._pnlButtons.Size = new System.Drawing.Size(520, 56);
@@ -309,7 +333,7 @@ partial class EditBeneficiaryDialog
         this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
         this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(520, 446);
+        this.ClientSize = new System.Drawing.Size(520, 486);
         this.Controls.Add(this._tblLayout);
         this.Controls.Add(this._pnlButtons);
         this.Controls.Add(this._pnlHeader);
@@ -340,6 +364,8 @@ partial class EditBeneficiaryDialog
     private System.Windows.Forms.TextBox _txtCardNumber;
     private System.Windows.Forms.Label _lblPhone;
     private System.Windows.Forms.TextBox _txtPhone;
+    private System.Windows.Forms.Label _lblCity;
+    private ParkGate.WinForms.Controls.SearchableComboBox _cboCity;
     private System.Windows.Forms.Label _lblNationalId;
     private System.Windows.Forms.TextBox _txtNationalId;
     private System.Windows.Forms.Label _lblExpiryDate;

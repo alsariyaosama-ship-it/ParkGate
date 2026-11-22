@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.Beneficiaries.Services;
+using ParkGate.Application.Cities.Services;
 using ParkGate.Application.Organizations.Services;
 using ParkGate.Domain.Common;
 using ParkGate.WinForms.Common;
@@ -19,6 +20,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
 {
     private readonly IBeneficiaryService _beneficiaryService;
     private readonly IOrganizationService _orgService;
+    private readonly ICityService _cityService;
     private readonly INotifyService _notifyService;
     private readonly ILogger<EditBeneficiaryDialog> _logger;
 
@@ -29,6 +31,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
     public EditBeneficiaryDialog(
         IBeneficiaryService beneficiaryService,
         IOrganizationService orgService,
+        ICityService cityService,
         INotifyService notifyService,
         ILogger<EditBeneficiaryDialog> logger)
     {
@@ -36,6 +39,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
 
         _beneficiaryService = beneficiaryService ?? throw new ArgumentNullException(nameof(beneficiaryService));
         _orgService = orgService ?? throw new ArgumentNullException(nameof(orgService));
+        _cityService = cityService ?? throw new ArgumentNullException(nameof(cityService));
         _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -51,6 +55,7 @@ public partial class EditBeneficiaryDialog : RtlFormBase
         _lblOrganization.Text = Strings.Col_Ben_Organization + ":";
         _lblCardNumber.Text = Strings.Col_Ben_CardNumber + ":";
         _lblPhone.Text = Strings.Col_Ben_Phone + ":";
+        _lblCity.Text = Strings.Col_Ben_City + ":";
         _lblNationalId.Text = Strings.Col_Ben_NationalId + ":";
         _lblExpiryDate.Text = Strings.Col_Ben_ExpiryDate + ":";
         _lblNotes.Text = Strings.Label_Notes;
@@ -97,11 +102,42 @@ public partial class EditBeneficiaryDialog : RtlFormBase
         }
     }
 
+    private async Task LoadCitiesAsync(BeneficiaryDto beneficiary)
+    {
+        var cities = new List<CityItem>();
+        try
+        {
+            var result = await _cityService.GetActiveAsync();
+            if (result.IsSuccess)
+            {
+                cities.AddRange(result.Value.Select(c => new CityItem(c.Id, c.NameAr)));
+            }
+            else
+            {
+                _logger.LogWarning("Failed to load cities {ErrorCode}.", result.Error.Code);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load cities for edit dialog.");
+        }
+
+        // A city that was stopped after it was chosen stays on the holder, so it must stay in the list (BR-32).
+        if (beneficiary.CityId is { } cityId && beneficiary.CityName is { } cityName && cities.All(c => c.Id != cityId))
+        {
+            cities.Add(new CityItem(cityId, cityName));
+        }
+
+        _cboCity.SetItems(cities);
+        _cboCity.SelectItem(cities.FirstOrDefault(c => c.Id == beneficiary.CityId));
+    }
+
     public async Task SetBeneficiaryAsync(BeneficiaryDto beneficiary)
     {
         _originalBeneficiary = beneficiary;
 
         await LoadOrganizationsAsync(beneficiary.OrganizationId);
+        await LoadCitiesAsync(beneficiary);
 
         _txtFullName.Text = beneficiary.FullName;
         _txtCardNumber.Text = beneficiary.CardNumber;
@@ -133,7 +169,9 @@ public partial class EditBeneficiaryDialog : RtlFormBase
         var orgId = (_cboOrganization.SelectedItem as OrgItem)?.Id ?? _originalBeneficiary.OrganizationId;
         var fullName = _txtFullName.Text.Trim();
         var rawCard = DigitNormalizer.NormalizeDigits(_txtCardNumber.Text.Trim());
-        var rawPhone = DigitNormalizer.NormalizeDigits(_txtPhone.Text.Trim());
+        var rawPhone = string.IsNullOrWhiteSpace(_txtPhone.Text)
+            ? null
+            : DigitNormalizer.NormalizeDigits(_txtPhone.Text.Trim()); // BR-15: optional
         var rawNationalId = string.IsNullOrWhiteSpace(_txtNationalId.Text)
             ? null
             : DigitNormalizer.NormalizeDigits(_txtNationalId.Text.Trim());
@@ -152,7 +190,8 @@ public partial class EditBeneficiaryDialog : RtlFormBase
             Phone: rawPhone,
             NationalId: rawNationalId,
             CardExpiryDate: expiryDate,
-            Notes: notes);
+            Notes: notes,
+            CityId: SelectedCityId());
 
         using (new BusyScope(this, _btnSave, _btnCancel))
         {
@@ -189,7 +228,19 @@ public partial class EditBeneficiaryDialog : RtlFormBase
         }
     }
 
+    /// <summary>The chosen city (BR-32), or null; the typed text is resolved first so Enter without leaving the box counts.</summary>
+    private int? SelectedCityId()
+    {
+        _cboCity.CommitText();
+        return (_cboCity.SelectedItem as CityItem)?.Id;
+    }
+
     private sealed record OrgItem(int Id, string Name)
+    {
+        public override string ToString() => Name;
+    }
+
+    private sealed record CityItem(int Id, string Name)
     {
         public override string ToString() => Name;
     }

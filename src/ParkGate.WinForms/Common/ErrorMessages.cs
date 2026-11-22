@@ -108,6 +108,9 @@ public static class ErrorMessages
             "AgeCategory.NameAlreadyExists" => Strings.GetString("Error_AgeCategory_NameAlreadyExists"),
             "AgeCategory.NameAlreadyExistsInactive" => Strings.GetString("Error_AgeCategory_NameAlreadyExistsInactive"),
 
+            // City
+            "City.NotFound" => Strings.GetString("Error_City_NotFound"),
+
             // User
             "User.NotFound" => Strings.GetString("Error_User_NotFound"),
             "User.UsernameAlreadyExists" => Strings.GetString("Error_User_UsernameAlreadyExists"),

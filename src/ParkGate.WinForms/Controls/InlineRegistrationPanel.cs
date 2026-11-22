@@ -17,6 +17,7 @@ public partial class InlineRegistrationPanel : UserControl
         _lblRegOrganization.Text = Strings.Label_RegOrganization;
         _lblRegFullName.Text = Strings.Label_RegFullName;
         _lblRegPhone.Text = Strings.Label_RegPhone;
+        _lblRegCity.Text = Strings.Label_RegCity;
         _lblRegNationalId.Text = Strings.Label_RegNationalId;
         _lblRegExpiry.Text = Strings.Label_RegExpiry;
         _lblRegNotes.Text = Strings.Label_RegNotes;
@@ -45,10 +46,23 @@ public partial class InlineRegistrationPanel : UserControl
 
     public bool IsOrganizationListOpen => _cmbRegOrganization.DroppedDown;
 
+    /// <summary>The chosen city (BR-32), or null. The typed text is resolved first, so Enter without leaving the box counts.</summary>
+    public int? SelectedCityId
+    {
+        get
+        {
+            _cmbRegCity.CommitText();
+            return (_cmbRegCity.SelectedItem as CityItem)?.Id;
+        }
+    }
+
+    public bool IsCityListOpen => _cmbRegCity.IsListOpen;
+
     /// <summary>True when the operator typed or picked anything that a discard would lose.</summary>
     public bool HasInput =>
         !string.IsNullOrWhiteSpace(_txtRegFullName.Text) ||
         !string.IsNullOrWhiteSpace(_txtRegPhone.Text) ||
+        !string.IsNullOrWhiteSpace(_cmbRegCity.Text) ||
         !string.IsNullOrWhiteSpace(_txtRegNationalId.Text) ||
         !string.IsNullOrWhiteSpace(_txtRegNotes.Text) ||
         _dtpRegExpiry.Checked;
@@ -70,6 +84,11 @@ public partial class InlineRegistrationPanel : UserControl
         }
     }
 
+    public void SetCities(IEnumerable<(int Id, string Name)> cities)
+    {
+        _cmbRegCity.SetItems(cities.Select(c => new CityItem(c.Id, c.Name)));
+    }
+
     public void SelectOrganization(int? organizationId)
     {
         _cmbRegOrganization.SelectedItem = _cmbRegOrganization.Items.OfType<OrgItem>()
@@ -80,6 +99,7 @@ public partial class InlineRegistrationPanel : UserControl
     {
         _txtRegFullName.Clear();
         _txtRegPhone.Clear();
+        _cmbRegCity.SelectItem(null);
         _txtRegNationalId.Clear();
         _dtpRegExpiry.Checked = false;
         _txtRegNotes.Clear();
@@ -92,6 +112,11 @@ public partial class InlineRegistrationPanel : UserControl
     public void FocusOrganization() => _cmbRegOrganization.Focus();
 
     private sealed record OrgItem(int Id, string Name)
+    {
+        public override string ToString() => Name;
+    }
+
+    private sealed record CityItem(int Id, string Name)
     {
         public override string ToString() => Name;
     }

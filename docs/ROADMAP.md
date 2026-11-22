@@ -164,7 +164,7 @@ Owner, 2026-11-20: the entry days come first; days change rarely and by hand, pe
 Design: SPEC BR-15 (phone optional) and BR-32 (city), DATABASE §3.2 and §3.18.
 - [x] T9.1 Domain + Application: optional phone and `CityId` on `Beneficiary`, `City` entity, `ICityRepository`, `CityService`, validators, `Errors.City.NotFound`, city name in the holder DTOs (unit tests)
 - [x] T9.2 Infrastructure + migration `AddCitiesAndOptionalPhone`: `Cities` table seeded with 57 rows, `Phone` nullable, `CityId` FK and index (integration tests)
-- [ ] T9.3 Desk and management UI: optional phone, city drop-down (fixed order) in the registration panel and the edit dialog, city in the holder panel and the holders list, `Strings.resx`, tests
+- [x] T9.3 Desk and management UI: optional phone, city drop-down (fixed order) in the registration panel and the edit dialog, city in the holder panel and the holders list, `Strings.resx`, tests
 - [ ] T9.4 Sync: send the city to the cloud (paused with the web work); then remove `CityId` from the excluded set in `OutboxEntityExtractor`
 
 **Done when:** a holder can be registered and edited without a phone, and with a city chosen from the fixed list, which shows in the holder panel and the holders list.

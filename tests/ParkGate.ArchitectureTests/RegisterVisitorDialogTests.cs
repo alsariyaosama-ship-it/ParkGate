@@ -102,4 +102,72 @@ public sealed class RegisterVisitorDialogTests
 
     private static T GetField<T>(object target, string name) where T : class =>
         (target.GetType().GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(target) as T)!;
+
+    // ── F9, BR-32: the city row of the registration panel ──
+
+    private static SearchableComboBox CityBox(InlineRegistrationPanel panel) =>
+        (SearchableComboBox)typeof(InlineRegistrationPanel).GetField("_cmbRegCity", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(panel)!;
+
+    [Fact]
+    public void Panel_TabOrder_PutsTheCityRightAfterThePhone()
+    {
+        using var panel = new InlineRegistrationPanel();
+        int TabOf(string field) => ((Control)typeof(InlineRegistrationPanel).GetField(field, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(panel)!).TabIndex;
+
+        var order = new[] { "_cmbRegOrganization", "_txtRegFullName", "_txtRegPhone", "_cmbRegCity", "_txtRegNationalId", "_dtpRegExpiry", "_txtRegNotes" }
+            .Select(TabOf).ToList();
+
+        order.ShouldBe(order.Order().ToList());
+        order.Distinct().Count().ShouldBe(order.Count);
+    }
+
+    [Fact]
+    public void Panel_SelectedCityId_ResolvesTheTypedText()
+    {
+        using var panel = new InlineRegistrationPanel();
+        panel.SetCities([(1, "الخمس"), (2, "زليتن"), (3, "مصراتة")]);
+        panel.SelectedCityId.ShouldBeNull();
+
+        CityBox(panel).Text = "مصراته";
+
+        panel.SelectedCityId.ShouldBe(3);
+    }
+
+    [Fact]
+    public void Panel_SelectedCityId_UnknownText_IsNull()
+    {
+        using var panel = new InlineRegistrationPanel();
+        panel.SetCities([(1, "الخمس")]);
+        CityBox(panel).Text = "غير موجودة";
+
+        panel.SelectedCityId.ShouldBeNull();
+        CityBox(panel).Text.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Panel_HasInput_CountsTheCity_AndClearFieldsResetsIt()
+    {
+        using var panel = new InlineRegistrationPanel();
+        panel.SetCities([(1, "الخمس")]);
+        panel.HasInput.ShouldBeFalse();
+
+        CityBox(panel).Text = "خمس";
+        panel.HasInput.ShouldBeTrue();
+        panel.SelectedCityId.ShouldBe(1);
+
+        panel.ClearFields();
+
+        panel.HasInput.ShouldBeFalse();
+        panel.SelectedCityId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Dialog_ClientArea_FitsThePanelWithItsCityRow()
+    {
+        using var dialog = new RegisterVisitorDialog();
+        using var panel = new InlineRegistrationPanel();
+
+        dialog.ClientSize.Height.ShouldBeGreaterThanOrEqualTo(panel.Height + dialog.Padding.Vertical);
+        dialog.ClientSize.Width.ShouldBeGreaterThanOrEqualTo(panel.Width + dialog.Padding.Horizontal);
+    }
 }
