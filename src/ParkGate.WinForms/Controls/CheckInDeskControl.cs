@@ -18,6 +18,7 @@ using ParkGate.Domain.Common;
 using ParkGate.Domain.Enums;
 using ParkGate.WinForms.Common;
 using ParkGate.WinForms.Forms;
+using ParkGate.WinForms.Printing;
 using ParkGate.WinForms.Resources;
 using ParkGate.WinForms.Services;
 
@@ -59,7 +60,9 @@ public partial class CheckInDeskControl : UserControl
     private bool _isPrefilling;
     private bool _denialSoundEnabled;
     private bool _successSoundEnabled;
+    private bool _printEntryReceipt = true; // Entry.PrintEntryReceipt; on until the settings say otherwise (BR-33)
     private readonly IDeskSounds _deskSounds;
+    private readonly IEntryReceiptPrinter _receiptPrinter;
     private string? _timeZoneId = "Libya Standard Time";
     private bool _isSearching;
 
@@ -86,7 +89,8 @@ public partial class CheckInDeskControl : UserControl
         ParkGate.Application.EntryCards.ICardScanService cardScanService,
         IGiftVoucherService giftVoucherService,
         ILogger<GiftOfferPanel> giftPanelLogger,
-        IDeskSounds deskSounds)
+        IDeskSounds deskSounds,
+        IEntryReceiptPrinter receiptPrinter)
     {
         InitializeComponent();
         ShowRegistrationModal = dialog => dialog.ShowDialog(FindForm());
@@ -102,6 +106,7 @@ public partial class CheckInDeskControl : UserControl
         _formFactory = formFactory ?? throw new ArgumentNullException(nameof(formFactory));
         _notifyService = notifyService ?? throw new ArgumentNullException(nameof(notifyService));
         _deskSounds = deskSounds ?? throw new ArgumentNullException(nameof(deskSounds));
+        _receiptPrinter = receiptPrinter ?? throw new ArgumentNullException(nameof(receiptPrinter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _cardScanService = cardScanService ?? throw new ArgumentNullException(nameof(cardScanService));
         _giftVoucherService = giftVoucherService ?? throw new ArgumentNullException(nameof(giftVoucherService));
@@ -321,6 +326,7 @@ public partial class CheckInDeskControl : UserControl
             _prefillFromLastVisit = settings.PrefillCompanionsFromLastVisit;
             _denialSoundEnabled = settings.DenialSoundEnabled;
             _successSoundEnabled = settings.SuccessSoundEnabled;
+            _printEntryReceipt = settings.PrintEntryReceipt;
             _timeZoneId = settings.TimeZoneId;
             _giftPanel.SetTimeZone(_timeZoneId);
         }
@@ -1199,6 +1205,58 @@ public partial class CheckInDeskControl : UserControl
         }
     }
 
+    private sealed record SupervisorApproval(string Token, string FullName, string Reason);
+
+    /// <summary>Test seam: replaces the supervisor sign-in dialog. Returns null for "cancelled".</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    internal Func<(string Token, string FullName, string Reason)?>? AskSupervisorOverride { get; set; }
+
+    private SupervisorApproval? AskSupervisor()
+    {
+        if (AskSupervisorOverride != null)
+        {
+            return AskSupervisorOverride() is { } given ? new SupervisorApproval(given.Token, given.FullName, given.Reason) : null;
+        }
+
+        using var dialog = _formFactory.Create<SupervisorAuthDialog>();
+        dialog.SetContext(defaultReason: Strings.Ui_CheckInDesk_17);
+        return dialog.ShowDialog(this) == DialogResult.OK
+            ? new SupervisorApproval(dialog.ApprovalToken, dialog.SupervisorFullName, dialog.Reason)
+            : null;
+    }
+
+    /// <summary>
+    /// BR-33: prints the entry receipt silently for a granted entry. Returns false only when printing was wanted and
+    /// failed; the entry is already recorded, so the desk shows a note in the banner and carries on.
+    /// </summary>
+    private bool PrintEntryReceipt(BeneficiaryDto holder, CheckInResultDto result)
+    {
+        if (!_printEntryReceipt)
+        {
+            return true;
+        }
+
+        try
+        {
+            var slip = ReceiptSlips.EntryReceipt(
+                holder.OrganizationName,
+                result.CountedPersons,
+                result.Companions,
+                DateTimeDisplayHelper.ToParkLocalTime(result.AttemptedAtUtc, _timeZoneId),
+                _currentWorkstation.DisplayName ?? _currentWorkstation.MachineName,
+                result.ReceiptNo);
+            return _receiptPrinter.TryPrint(slip);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not build the entry receipt.");
+            return false;
+        }
+    }
+
+    private static string WithReceiptFailure(string details, bool printed) =>
+        printed ? details : $"{details} · {Strings.Banner_ReceiptPrintFailed}";
+
     public async Task RecordEntryAsync()
     {
         if (_activeHolder == null)
@@ -1225,7 +1283,9 @@ public partial class CheckInDeskControl : UserControl
                 var result = await _checkInService.RecordEntryAsync(request);
                 if (result.IsSuccess)
                 {
-                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_13, string.Format(Strings.Ui_CheckInDesk_14, companions.Sum(c => c.Count), result.Value.TotalPersons));
+                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_13, WithReceiptFailure(
+                        string.Format(Strings.Ui_CheckInDesk_14, companions.Sum(c => c.Count), result.Value.TotalPersons),
+                        PrintEntryReceipt(entered, result.Value)));
                     await RefreshTodayDeskSummaryAsync();
 
                     PlayGrantedSound();
@@ -1256,11 +1316,8 @@ public partial class CheckInDeskControl : UserControl
 
         var entered = _activeHolder;
 
-        var supervisorDialog = _formFactory.Create<SupervisorAuthDialog>();
-
-        supervisorDialog.SetContext(defaultReason: Strings.Ui_CheckInDesk_17);
-
-        if (supervisorDialog.ShowDialog(this) != DialogResult.OK)
+        var approval = AskSupervisor();
+        if (approval is null)
         {
             return;
         }
@@ -1276,15 +1333,17 @@ public partial class CheckInDeskControl : UserControl
             {
                 var request = new OverrideEntryRequest(
                     BeneficiaryId: _activeHolder.Id,
-                    Reason: supervisorDialog.Reason,
-                    SupervisorApprovalToken: supervisorDialog.ApprovalToken,
+                    Reason: approval.Reason,
+                    SupervisorApprovalToken: approval.Token,
                     Companions: companions,
                     Channel: EntryChannel.Desk);
 
                 var result = await _checkInService.OverrideEntryAsync(request);
                 if (result.IsSuccess)
                 {
-                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_18, string.Format(Strings.Ui_CheckInDesk_19, supervisorDialog.SupervisorFullName, supervisorDialog.Reason));
+                    _statusBanner.SetGranted(Strings.Ui_CheckInDesk_18, WithReceiptFailure(
+                        string.Format(Strings.Ui_CheckInDesk_19, approval.FullName, approval.Reason),
+                        PrintEntryReceipt(entered, result.Value)));
                     await RefreshTodayDeskSummaryAsync();
 
                     PlayGrantedSound();

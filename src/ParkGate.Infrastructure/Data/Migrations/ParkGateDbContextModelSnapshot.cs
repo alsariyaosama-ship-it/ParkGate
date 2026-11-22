@@ -905,6 +905,12 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<int>("ReceiptNo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptNo"));
+
                     b.Property<byte>("Result")
                         .HasColumnType("tinyint");
 
@@ -944,6 +950,10 @@ namespace ParkGate.Infrastructure.Data.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.HasIndex("OverrideByUserId");
+
+                    b.HasIndex("ReceiptNo")
+                        .IsUnique()
+                        .HasDatabaseName("UX_EntryAttempts_ReceiptNo");
 
                     b.HasIndex("UserId");
 

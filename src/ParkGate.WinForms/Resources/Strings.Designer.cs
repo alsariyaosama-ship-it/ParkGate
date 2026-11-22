@@ -716,6 +716,16 @@ internal class Strings
     internal static string Slip_GiftValidToday => GetString(nameof(Slip_GiftValidToday));
     internal static string Slip_GiftPickup => GetString(nameof(Slip_GiftPickup));
     internal static string Slip_GiftNumber => GetString(nameof(Slip_GiftNumber));
+    internal static string Slip_EntryPersons => GetString(nameof(Slip_EntryPersons));
+    internal static string Slip_EntryHolderOnly => GetString(nameof(Slip_EntryHolderOnly));
+    internal static string Slip_EntryWith_One => GetString(nameof(Slip_EntryWith_One));
+    internal static string Slip_EntryWith_Two => GetString(nameof(Slip_EntryWith_Two));
+    internal static string Slip_EntryWith_Few => GetString(nameof(Slip_EntryWith_Few));
+    internal static string Slip_EntryWith_Many => GetString(nameof(Slip_EntryWith_Many));
+    internal static string Slip_EntryBreakdown => GetString(nameof(Slip_EntryBreakdown));
+    internal static string Slip_EntryDeskAndNumber => GetString(nameof(Slip_EntryDeskAndNumber));
+    internal static string Banner_ReceiptPrintFailed => GetString(nameof(Banner_ReceiptPrintFailed));
+    internal static string Label_PrintEntryReceipt => GetString(nameof(Label_PrintEntryReceipt));
     internal static string Menu_GiftRedemption => GetString(nameof(Menu_GiftRedemption));
     internal static string Title_GiftRedeem => GetString(nameof(Title_GiftRedeem));
     internal static string Label_ScanGiftQr => GetString(nameof(Label_ScanGiftQr));

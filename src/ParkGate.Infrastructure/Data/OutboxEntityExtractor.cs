@@ -34,6 +34,11 @@ public static class OutboxEntityExtractor
             // it (T9.4), otherwise the cloud would reject the unknown field.
             nameof(Beneficiary.CityId)
         },
+        [nameof(EntryAttempt)] = new(StringComparer.Ordinal)
+        {
+            // The cloud schema has no receipt number (web work paused, 2026-11-22).
+            nameof(EntryAttempt.ReceiptNo)
+        },
         // The token is the bearer credential printed on the QR card (ADR-020). The cloud only
         // reports on vouchers, so it never needs the secret or the signing key id (R2.7).
         [nameof(GiftVoucher)] = new(StringComparer.Ordinal)

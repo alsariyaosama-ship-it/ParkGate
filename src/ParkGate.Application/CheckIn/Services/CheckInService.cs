@@ -173,6 +173,7 @@ public sealed class CheckInService : ICheckInService
         uow.EntryAttempts.Add(attempt);
 
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        var categories = await uow.AgeCategories.GetAllAsync(cancellationToken);
         uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryGranted", userId, workstationId, nameof(EntryAttempt), attemptId.ToString(), AuditDetails.ToJson(
             AuditTrail.For(holder, businessDate, userId)
                 .With("TotalPersons", attempt.TotalPersons)
@@ -192,7 +193,9 @@ public sealed class CheckInService : ICheckInService
             EffectiveCooldownMinutes: attempt.CooldownMinutesApplied,
             NextEligibleAtUtc: attempt.NextEligibleAtUtc,
             CanBeOverridden: false,
-            Companions: companionList.Select(c => new CompanionCountDto(c.AgeCategoryId, string.Empty, c.Count)).ToList());
+            Companions: EntryPersonCounting.ToCompanionDtos(companionList, categories),
+            ReceiptNo: attempt.ReceiptNo, // filled by the database during SaveChanges
+            CountedPersons: EntryPersonCounting.CountedPersons(companionList, categories));
     }
 
     public async Task<Result<CheckInResultDto>> OverrideEntryAsync(
@@ -313,6 +316,7 @@ public sealed class CheckInService : ICheckInService
         uow.EntryAttempts.Add(attempt);
 
         // Same transaction as the change it records: a crash cannot keep one without the other (R3.5).
+        var categories = await uow.AgeCategories.GetAllAsync(cancellationToken);
         uow.AuditLogs.Add(new AuditLog(nowUtc, "EntryOverridden", approverUserId, workstationId, nameof(EntryAttempt), attemptId.ToString(), AuditDetails.ToJson(
             AuditTrail.For(holder, businessDate, userId, approverUserId)
                 .With("Reason", request.Reason)
@@ -333,7 +337,9 @@ public sealed class CheckInService : ICheckInService
             EffectiveCooldownMinutes: attempt.CooldownMinutesApplied,
             NextEligibleAtUtc: attempt.NextEligibleAtUtc,
             CanBeOverridden: false,
-            Companions: companionList.Select(c => new CompanionCountDto(c.AgeCategoryId, string.Empty, c.Count)).ToList());
+            Companions: EntryPersonCounting.ToCompanionDtos(companionList, categories),
+            ReceiptNo: attempt.ReceiptNo, // filled by the database during SaveChanges
+            CountedPersons: EntryPersonCounting.CountedPersons(companionList, categories));
     }
 
     public async Task<Result> VoidEntryAsync(

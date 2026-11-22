@@ -77,6 +77,7 @@ public sealed class ManagementServicesTests
         initial.MaxGroupSize.ShouldBe(10);
         initial.ParkName.ShouldBe("صندوق التضامن الاجتماعي — متنزه العائلة");
         initial.SuccessSoundEnabled.ShouldBeTrue(); // R5.7: default when the key was never saved
+        initial.PrintEntryReceipt.ShouldBeTrue(); // T10.3: default when the key was never saved
 
         var updateReq = new UpdateSettingsRequest(
             DefaultCooldownMinutes: 480,
@@ -89,7 +90,8 @@ public sealed class ManagementServicesTests
             AutoLockMinutes: 5,
             ParkName: "New Park Name",
             TimeZoneId: "Libya Standard Time",
-            SuccessSoundEnabled: false);
+            SuccessSoundEnabled: false,
+            PrintEntryReceipt: false);
 
         var result = await sut.UpdateSettingsAsync(updateReq);
         result.IsSuccess.ShouldBeTrue();
@@ -99,6 +101,7 @@ public sealed class ManagementServicesTests
         updated.MaxGroupSize.ShouldBe(15);
         updated.ParkName.ShouldBe("New Park Name");
         updated.SuccessSoundEnabled.ShouldBeFalse();
+        updated.PrintEntryReceipt.ShouldBeFalse();
         updated.DenialSoundEnabled.ShouldBeTrue();
 
         _uowFactory.CurrentUow.AuditRowsAtLastSave.ShouldContain(w => w.Action == "SettingsUpdated");

@@ -41,9 +41,17 @@ public static class ReceiptPrinter
         return new SlipLayout(placed, last.Top + last.Height + CutterFeed);
     }
 
-    /// <summary>A document sized to the slip; the caller shows the print dialog and disposes it.</summary>
-    public static PrintDocument CreateDocument(ReceiptSlip slip, Image qr)
+    /// <summary>
+    /// A document sized to the slip; the caller shows the print dialog (or prints silently) and disposes it.
+    /// <paramref name="qr"/> may be null only for a slip without a <see cref="SlipQr"/> (the entry receipt).
+    /// </summary>
+    public static PrintDocument CreateDocument(ReceiptSlip slip, Image? qr)
     {
+        if (qr is null && slip.Items.Any(i => i is SlipQr))
+        {
+            throw new ArgumentException("The slip has a QR code but no image was given.", nameof(qr));
+        }
+
         var layout = Layout(slip, MeasureOnScreen);
         var document = new PrintDocument { DocumentName = PaperName, OriginAtMargins = false };
         document.DefaultPageSettings.PaperSize = new PaperSize(PaperName, PaperWidth, layout.PageHeight);
@@ -58,7 +66,7 @@ public static class ReceiptPrinter
         return document;
     }
 
-    private static void Draw(Graphics g, SlipLayout layout, Image qr)
+    private static void Draw(Graphics g, SlipLayout layout, Image? qr)
     {
         g.InterpolationMode = InterpolationMode.NearestNeighbor; // crisp QR modules
         g.PixelOffsetMode = PixelOffsetMode.Half;
@@ -71,7 +79,7 @@ public static class ReceiptPrinter
                 var area = new RectangleF(SideMargin, placed.Top, PrintableWidth, placed.Height);
                 g.DrawString(text.Text, font, Brushes.Black, area, format);
             }
-            else
+            else if (qr is not null)
             {
                 g.DrawImage(qr, (PaperWidth - QrSize) / 2, placed.Top, QrSize, QrSize);
             }
@@ -101,6 +109,7 @@ public static class ReceiptPrinter
         SlipTextStyle.Company => AppFont.CreateFont(10F, FontStyle.Bold),
         SlipTextStyle.Park => AppFont.CreateFont(12F, FontStyle.Bold),
         SlipTextStyle.Emphasis => AppFont.CreateFont(10F, FontStyle.Bold),
+        SlipTextStyle.Total => AppFont.CreateFont(26F, FontStyle.Bold),
         SlipTextStyle.Small => AppFont.CreateFont(9F, FontStyle.Regular),
         _ => AppFont.CreateFont(10F, FontStyle.Regular),
     };

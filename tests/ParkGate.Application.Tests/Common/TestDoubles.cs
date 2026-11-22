@@ -335,7 +335,16 @@ public sealed class FakeEntryAttemptRepository : IEntryAttemptRepository
                 .ToDictionary(g => g.Key, g => g.Sum(c => c.Count))));
     }
 
-    public void Add(EntryAttempt attempt) => _attempts.Add(attempt);
+    public void Add(EntryAttempt attempt)
+    {
+        // The database numbers receipts (identity, T10.1); the fake does the same so the use case can read the number back.
+        if (attempt.ReceiptNo == 0)
+        {
+            typeof(EntryAttempt).GetProperty(nameof(EntryAttempt.ReceiptNo))!.SetValue(attempt, _attempts.Count == 0 ? 1 : _attempts.Max(a => a.ReceiptNo) + 1);
+        }
+
+        _attempts.Add(attempt);
+    }
 
     public void Update(EntryAttempt attempt) { }
 }

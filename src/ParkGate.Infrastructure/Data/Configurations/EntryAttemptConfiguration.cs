@@ -20,6 +20,11 @@ public sealed class EntryAttemptConfiguration : IEntityTypeConfiguration<EntryAt
             .ValueGeneratedOnAdd()
             .HasDefaultValueSql("NEWSEQUENTIALID()");
 
+        // Receipt number for the entry slip (T10.1): identity, so concurrent desks never share a number.
+        builder.Property(x => x.ReceiptNo)
+            .UseIdentityColumn()
+            .ValueGeneratedOnAdd();
+
         builder.Property(x => x.BeneficiaryId)
             .IsRequired();
 
@@ -121,6 +126,10 @@ public sealed class EntryAttemptConfiguration : IEntityTypeConfiguration<EntryAt
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         // Indexes per DATABASE.md §3.4
+        builder.HasIndex(x => x.ReceiptNo)
+            .IsUnique()
+            .HasDatabaseName("UX_EntryAttempts_ReceiptNo");
+
         builder.HasIndex(x => new { x.BeneficiaryId, x.AttemptedAtUtc })
             .IsDescending(false, true)
             .HasDatabaseName("IX_EntryAttempts_Beneficiary_Time");

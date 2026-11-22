@@ -5,6 +5,7 @@ using NSubstitute;
 using ParkGate.Application.Cities.DTOs;
 using ParkGate.Application.Cities.Services;
 using ParkGate.Application.Common;
+using ParkGate.WinForms.Printing;
 
 namespace ParkGate.ArchitectureTests;
 
@@ -66,6 +67,11 @@ internal static class TestUi
             return new FakeCityService();
         }
 
+        if (type == typeof(IEntryReceiptPrinter))
+        {
+            return new FakeEntryReceiptPrinter();
+        }
+
         return Substitute.For([type], []);
     }
 }
@@ -90,4 +96,18 @@ internal sealed class FakeCityService : ICityService
 
     public Task<Result<IReadOnlyList<CityDto>>> GetActiveAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(Result<IReadOnlyList<CityDto>>.Success(_cities));
+}
+
+/// <summary>BR-33 default for <see cref="IEntryReceiptPrinter"/>: records the slips, answers synchronously, prints nothing.</summary>
+internal sealed class FakeEntryReceiptPrinter : IEntryReceiptPrinter
+{
+    public List<ReceiptSlip> Slips { get; } = [];
+
+    public bool Succeeds { get; set; } = true;
+
+    public bool TryPrint(ReceiptSlip slip)
+    {
+        Slips.Add(slip);
+        return Succeeds;
+    }
 }

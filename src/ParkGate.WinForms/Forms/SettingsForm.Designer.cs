@@ -37,6 +37,7 @@ partial class SettingsForm
         _chkPrefillCompanions = new ParkGate.WinForms.Controls.RtlCheckBox();
         _chkDenialSound = new ParkGate.WinForms.Controls.RtlCheckBox();
         _chkSuccessSound = new ParkGate.WinForms.Controls.RtlCheckBox();
+        _chkPrintEntryReceipt = new ParkGate.WinForms.Controls.RtlCheckBox();
         _tabSecurity = new TabPage();
         _tblSecurity = new TableLayoutPanel();
         _lblMaxFailedLogins = new Label();
@@ -98,7 +99,7 @@ partial class SettingsForm
         _tabSettings.Location = new Point(0, 50);
         _tabSettings.Name = "_tabSettings";
         _tabSettings.SelectedIndex = 0;
-        _tabSettings.Size = new Size(650, 310);
+        _tabSettings.Size = new Size(650, 350);
         _tabSettings.TabIndex = 1;
         // 
         // _tabGeneral
@@ -193,17 +194,19 @@ partial class SettingsForm
         _tblEntry.Controls.Add(_chkPrefillCompanions, 0, 3);
         _tblEntry.Controls.Add(_chkDenialSound, 0, 4);
         _tblEntry.Controls.Add(_chkSuccessSound, 0, 5);
+        _tblEntry.Controls.Add(_chkPrintEntryReceipt, 0, 6);
         _tblEntry.Dock = DockStyle.Top;
         _tblEntry.Location = new Point(12, 12);
         _tblEntry.Name = "_tblEntry";
-        _tblEntry.RowCount = 6;
+        _tblEntry.RowCount = 7;
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
         _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
-        _tblEntry.Size = new Size(618, 228);
+        _tblEntry.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
+        _tblEntry.Size = new Size(618, 266);
         _tblEntry.TabIndex = 0;
         // 
         // _lblCooldownHours
@@ -304,6 +307,18 @@ partial class SettingsForm
         _chkSuccessSound.TabIndex = 8;
         _chkSuccessSound.Text = "تشغيل تنبيه صوتي عند قبول الدخول";
         _chkSuccessSound.UseVisualStyleBackColor = true;
+        // 
+        // _chkPrintEntryReceipt
+        // 
+        _chkPrintEntryReceipt.Anchor = AnchorStyles.Left;
+        _chkPrintEntryReceipt.AutoSize = true;
+        _tblEntry.SetColumnSpan(_chkPrintEntryReceipt, 2);
+        _chkPrintEntryReceipt.Location = new Point(329, 231);
+        _chkPrintEntryReceipt.Name = "_chkPrintEntryReceipt";
+        _chkPrintEntryReceipt.Size = new Size(286, 32);
+        _chkPrintEntryReceipt.TabIndex = 9;
+        _chkPrintEntryReceipt.Text = "طباعة واصل الدخول تلقائيًا";
+        _chkPrintEntryReceipt.UseVisualStyleBackColor = true;
         // 
         // _tabSecurity
         // 
@@ -463,7 +478,7 @@ partial class SettingsForm
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
         CancelButton = _btnClose;
-        ClientSize = new Size(650, 416);
+        ClientSize = new Size(650, 456);
         Controls.Add(_tabSettings);
         Controls.Add(_pnlButtons);
         Controls.Add(_pnlHeader);
@@ -515,6 +530,7 @@ partial class SettingsForm
     private ParkGate.WinForms.Controls.RtlCheckBox _chkPrefillCompanions;
     private ParkGate.WinForms.Controls.RtlCheckBox _chkDenialSound;
     private ParkGate.WinForms.Controls.RtlCheckBox _chkSuccessSound;
+    private ParkGate.WinForms.Controls.RtlCheckBox _chkPrintEntryReceipt;
     private System.Windows.Forms.TabPage _tabSecurity;
     private System.Windows.Forms.TableLayoutPanel _tblSecurity;
     private System.Windows.Forms.Label _lblMaxFailedLogins;
