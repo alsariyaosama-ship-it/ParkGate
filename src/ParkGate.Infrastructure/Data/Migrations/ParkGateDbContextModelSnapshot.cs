@@ -225,6 +225,9 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .ValueGeneratedOnAdd()
                         .HasPrecision(3)
@@ -259,7 +262,6 @@ namespace ParkGate.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
@@ -289,6 +291,9 @@ namespace ParkGate.Infrastructure.Data.Migrations
 
                     b.HasIndex("CardNumber")
                         .HasDatabaseName("IX_Beneficiaries_CardNumber");
+
+                    b.HasIndex("CityId")
+                        .HasDatabaseName("IX_Beneficiaries_CityId");
 
                     b.HasIndex("FullName")
                         .HasDatabaseName("IX_Beneficiaries_FullName");
@@ -420,6 +425,437 @@ namespace ParkGate.Infrastructure.Data.Migrations
                     b.HasIndex("WorkstationId");
 
                     b.ToTable("CardScanLog", (string)null);
+                });
+
+            modelBuilder.Entity("ParkGate.Domain.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NameAr")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Cities_NameAr");
+
+                    b.ToTable("Cities", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsActive = true,
+                            NameAr = "الخمس",
+                            SortOrder = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsActive = true,
+                            NameAr = "زليتن",
+                            SortOrder = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsActive = true,
+                            NameAr = "مصراتة",
+                            SortOrder = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsActive = true,
+                            NameAr = "طرابلس",
+                            SortOrder = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsActive = true,
+                            NameAr = "مسلاتة",
+                            SortOrder = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsActive = true,
+                            NameAr = "ترهونة",
+                            SortOrder = 6
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IsActive = true,
+                            NameAr = "القره بوللي",
+                            SortOrder = 7
+                        },
+                        new
+                        {
+                            Id = 8,
+                            IsActive = true,
+                            NameAr = "قصر الأخيار",
+                            SortOrder = 8
+                        },
+                        new
+                        {
+                            Id = 9,
+                            IsActive = true,
+                            NameAr = "العلوص",
+                            SortOrder = 9
+                        },
+                        new
+                        {
+                            Id = 10,
+                            IsActive = true,
+                            NameAr = "الثمانين",
+                            SortOrder = 10
+                        },
+                        new
+                        {
+                            Id = 11,
+                            IsActive = true,
+                            NameAr = "قماطة",
+                            SortOrder = 11
+                        },
+                        new
+                        {
+                            Id = 12,
+                            IsActive = true,
+                            NameAr = "بني وليد",
+                            SortOrder = 12
+                        },
+                        new
+                        {
+                            Id = 13,
+                            IsActive = true,
+                            NameAr = "سرت",
+                            SortOrder = 13
+                        },
+                        new
+                        {
+                            Id = 14,
+                            IsActive = true,
+                            NameAr = "العجيلات",
+                            SortOrder = 14
+                        },
+                        new
+                        {
+                            Id = 15,
+                            IsActive = true,
+                            NameAr = "صبراتة",
+                            SortOrder = 15
+                        },
+                        new
+                        {
+                            Id = 16,
+                            IsActive = true,
+                            NameAr = "جنزور",
+                            SortOrder = 16
+                        },
+                        new
+                        {
+                            Id = 17,
+                            IsActive = true,
+                            NameAr = "أبو سليم",
+                            SortOrder = 17
+                        },
+                        new
+                        {
+                            Id = 18,
+                            IsActive = true,
+                            NameAr = "أبو كماش",
+                            SortOrder = 18
+                        },
+                        new
+                        {
+                            Id = 19,
+                            IsActive = true,
+                            NameAr = "الأصابعة",
+                            SortOrder = 19
+                        },
+                        new
+                        {
+                            Id = 20,
+                            IsActive = true,
+                            NameAr = "الجميل",
+                            SortOrder = 20
+                        },
+                        new
+                        {
+                            Id = 21,
+                            IsActive = true,
+                            NameAr = "الرجبان",
+                            SortOrder = 21
+                        },
+                        new
+                        {
+                            Id = 22,
+                            IsActive = true,
+                            NameAr = "الرحيبات",
+                            SortOrder = 22
+                        },
+                        new
+                        {
+                            Id = 23,
+                            IsActive = true,
+                            NameAr = "الزاوية",
+                            SortOrder = 23
+                        },
+                        new
+                        {
+                            Id = 24,
+                            IsActive = true,
+                            NameAr = "الزنتان",
+                            SortOrder = 24
+                        },
+                        new
+                        {
+                            Id = 25,
+                            IsActive = true,
+                            NameAr = "الزهراء",
+                            SortOrder = 25
+                        },
+                        new
+                        {
+                            Id = 26,
+                            IsActive = true,
+                            NameAr = "السبيعة",
+                            SortOrder = 26
+                        },
+                        new
+                        {
+                            Id = 27,
+                            IsActive = true,
+                            NameAr = "السواني",
+                            SortOrder = 27
+                        },
+                        new
+                        {
+                            Id = 28,
+                            IsActive = true,
+                            NameAr = "العزيزية",
+                            SortOrder = 28
+                        },
+                        new
+                        {
+                            Id = 29,
+                            IsActive = true,
+                            NameAr = "القلعة",
+                            SortOrder = 29
+                        },
+                        new
+                        {
+                            Id = 30,
+                            IsActive = true,
+                            NameAr = "الماية",
+                            SortOrder = 30
+                        },
+                        new
+                        {
+                            Id = 31,
+                            IsActive = true,
+                            NameAr = "بئر الغنم",
+                            SortOrder = 31
+                        },
+                        new
+                        {
+                            Id = 32,
+                            IsActive = true,
+                            NameAr = "تاجوراء",
+                            SortOrder = 32
+                        },
+                        new
+                        {
+                            Id = 33,
+                            IsActive = true,
+                            NameAr = "تاورغاء",
+                            SortOrder = 33
+                        },
+                        new
+                        {
+                            Id = 34,
+                            IsActive = true,
+                            NameAr = "جادو",
+                            SortOrder = 34
+                        },
+                        new
+                        {
+                            Id = 35,
+                            IsActive = true,
+                            NameAr = "حي الأندلس",
+                            SortOrder = 35
+                        },
+                        new
+                        {
+                            Id = 36,
+                            IsActive = true,
+                            NameAr = "درج",
+                            SortOrder = 36
+                        },
+                        new
+                        {
+                            Id = 37,
+                            IsActive = true,
+                            NameAr = "رقدالين",
+                            SortOrder = 37
+                        },
+                        new
+                        {
+                            Id = 38,
+                            IsActive = true,
+                            NameAr = "زلطن",
+                            SortOrder = 38
+                        },
+                        new
+                        {
+                            Id = 39,
+                            IsActive = true,
+                            NameAr = "زوارة",
+                            SortOrder = 39
+                        },
+                        new
+                        {
+                            Id = 40,
+                            IsActive = true,
+                            NameAr = "سبها",
+                            SortOrder = 40
+                        },
+                        new
+                        {
+                            Id = 41,
+                            IsActive = true,
+                            NameAr = "سوق الجمعة",
+                            SortOrder = 41
+                        },
+                        new
+                        {
+                            Id = 42,
+                            IsActive = true,
+                            NameAr = "سوق الخميس امسيحل",
+                            SortOrder = 42
+                        },
+                        new
+                        {
+                            Id = 43,
+                            IsActive = true,
+                            NameAr = "سوكنة",
+                            SortOrder = 43
+                        },
+                        new
+                        {
+                            Id = 44,
+                            IsActive = true,
+                            NameAr = "صرمان",
+                            SortOrder = 44
+                        },
+                        new
+                        {
+                            Id = 45,
+                            IsActive = true,
+                            NameAr = "عين زارة",
+                            SortOrder = 45
+                        },
+                        new
+                        {
+                            Id = 46,
+                            IsActive = true,
+                            NameAr = "غدامس",
+                            SortOrder = 46
+                        },
+                        new
+                        {
+                            Id = 47,
+                            IsActive = true,
+                            NameAr = "غريان",
+                            SortOrder = 47
+                        },
+                        new
+                        {
+                            Id = 48,
+                            IsActive = true,
+                            NameAr = "قصر بن غشير",
+                            SortOrder = 48
+                        },
+                        new
+                        {
+                            Id = 49,
+                            IsActive = true,
+                            NameAr = "كاباو",
+                            SortOrder = 49
+                        },
+                        new
+                        {
+                            Id = 50,
+                            IsActive = true,
+                            NameAr = "كعام",
+                            SortOrder = 50
+                        },
+                        new
+                        {
+                            Id = 51,
+                            IsActive = true,
+                            NameAr = "ككلة",
+                            SortOrder = 51
+                        },
+                        new
+                        {
+                            Id = 52,
+                            IsActive = true,
+                            NameAr = "ماجر",
+                            SortOrder = 52
+                        },
+                        new
+                        {
+                            Id = 53,
+                            IsActive = true,
+                            NameAr = "مزدة",
+                            SortOrder = 53
+                        },
+                        new
+                        {
+                            Id = 54,
+                            IsActive = true,
+                            NameAr = "نالوت",
+                            SortOrder = 54
+                        },
+                        new
+                        {
+                            Id = 55,
+                            IsActive = true,
+                            NameAr = "هون",
+                            SortOrder = 55
+                        },
+                        new
+                        {
+                            Id = 56,
+                            IsActive = true,
+                            NameAr = "ودان",
+                            SortOrder = 56
+                        },
+                        new
+                        {
+                            Id = 57,
+                            IsActive = true,
+                            NameAr = "يفرن",
+                            SortOrder = 57
+                        });
                 });
 
             modelBuilder.Entity("ParkGate.Domain.Entities.EntryAttempt", b =>
@@ -1162,6 +1598,11 @@ namespace ParkGate.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("ParkGate.Domain.Entities.Beneficiary", b =>
                 {
+                    b.HasOne("ParkGate.Domain.Entities.City", null)
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ParkGate.Domain.Entities.Organization", null)
                         .WithMany()
                         .HasForeignKey("OrganizationId")

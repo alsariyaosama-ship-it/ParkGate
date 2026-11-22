@@ -77,7 +77,13 @@ public sealed class ModelMetadataTests
 
             var phoneProp = entity.FindProperty(nameof(Beneficiary.Phone))!;
             phoneProp.GetMaxLength().ShouldBe(15);
-            phoneProp.IsNullable.ShouldBeFalse();
+            phoneProp.IsNullable.ShouldBeTrue(); // F9: the phone is optional (BR-15)
+
+            var cityProp = entity.FindProperty(nameof(Beneficiary.CityId))!;
+            cityProp.IsNullable.ShouldBeTrue();
+            var cityKey = entity.GetForeignKeys().Single(k => k.Properties.Any(p => p.Name == nameof(Beneficiary.CityId)));
+            cityKey.PrincipalEntityType.ClrType.ShouldBe(typeof(City));
+            cityKey.DeleteBehavior.ShouldBe(DeleteBehavior.Restrict);
 
             var nationalIdProp = entity.FindProperty(nameof(Beneficiary.NationalId))!;
             nationalIdProp.GetMaxLength().ShouldBe(NationalId.RequiredLength);
@@ -97,12 +103,39 @@ public sealed class ModelMetadataTests
             entity.GetIndexes().ShouldContain(i => i.GetDatabaseName() == "IX_Beneficiaries_CardNumber");
             entity.GetIndexes().ShouldContain(i => i.GetDatabaseName() == "IX_Beneficiaries_Phone");
             entity.GetIndexes().ShouldContain(i => i.GetDatabaseName() == "IX_Beneficiaries_FullName");
+            entity.GetIndexes().ShouldContain(i => i.GetDatabaseName() == "IX_Beneficiaries_CityId");
 
             var statusReasonConstraint = entity.GetCheckConstraints().SingleOrDefault(c => c.Name == "CK_Beneficiaries_StatusReason");
             statusReasonConstraint.ShouldNotBeNull();
 
             var rowVersion = entity.FindProperty(nameof(Beneficiary.RowVersion))!;
             rowVersion.IsConcurrencyToken.ShouldBeTrue();
+        }
+    }
+
+    [Fact]
+    public void Cities_Metadata_ShouldMatchDatabaseDesign()
+    {
+        var model = GetDesignModel(out var context);
+        using (context)
+        {
+            var entity = model.FindEntityType(typeof(City));
+            entity.ShouldNotBeNull();
+
+            entity.GetTableName().ShouldBe("Cities");
+            entity.FindPrimaryKey()!.Properties.Single().Name.ShouldBe(nameof(City.Id));
+
+            var nameProp = entity.FindProperty(nameof(City.NameAr))!;
+            nameProp.GetMaxLength().ShouldBe(City.MaxNameLength);
+            nameProp.IsNullable.ShouldBeFalse();
+
+            var nameIndex = entity.GetIndexes().SingleOrDefault(i => i.GetDatabaseName() == "UX_Cities_NameAr");
+            nameIndex.ShouldNotBeNull();
+            nameIndex.IsUnique.ShouldBeTrue();
+
+            entity.FindProperty(nameof(City.SortOrder))!.IsNullable.ShouldBeFalse();
+            entity.FindProperty(nameof(City.IsActive))!.IsNullable.ShouldBeFalse();
+            entity.GetSeedData().Count().ShouldBe(57);
         }
     }
 

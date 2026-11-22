@@ -124,7 +124,7 @@ public sealed class BeneficiariesManagementTests
         gridBen.Rows[0].Cells[2].Value.ShouldBe("محمد عبد الله سالم");
 
         // Supervisor sees unmasked national ID
-        gridBen.Rows[0].Cells[4].Value.ShouldBe("119850123456");
+        gridBen.Rows[0].Cells[5].Value.ShouldBe("119850123456");
         lblNid.Text.ShouldBe("119850123456");
 
         lblName.Text.ShouldBe("محمد عبد الله سالم");
@@ -221,7 +221,7 @@ public sealed class BeneficiariesManagementTests
 
         gridBen.Rows.Count.ShouldBe(1);
         // Shown as the service returned it.
-        gridBen.Rows[0].Cells[4].Value.ShouldBe("********3456");
+        gridBen.Rows[0].Cells[5].Value.ShouldBe("********3456");
         lblNid.Text.ShouldBe("********3456");
 
         // Operator does not have Edit/ChangeStatus permissions
@@ -466,6 +466,7 @@ public sealed class BeneficiariesManagementTests
                 CardNumber = request.CardNumber,
                 FullName = request.FullName,
                 Phone = request.Phone,
+                CityId = request.CityId,
                 NationalId = request.NationalId,
                 CardExpiryDate = request.CardExpiryDate,
                 Notes = request.Notes
@@ -502,7 +503,7 @@ public sealed class BeneficiariesManagementTests
             var matches = _beneficiaries.Where(b =>
                 b.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 b.CardNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                b.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (b.Phone != null && b.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                 (b.NationalId != null && b.NationalId.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))).ToList();
 
             return Task.FromResult(Result<IReadOnlyList<BeneficiaryDto>>.Success(matches));
@@ -567,5 +568,120 @@ public sealed class BeneficiariesManagementTests
         public void Warning(string message, string? title = null) => Warnings.Add(message);
         public void Error(string message, string? title = null) => Errors.Add(message);
         public bool Confirm(string message, string? title = null) => NextConfirmResult;
+    }
+
+    // ── F9, BR-15 and BR-32: city and optional phone in the management screens ──
+
+    private static BeneficiaryDto HolderWithCity(int? cityId, string? cityName, string? phone) => new(
+        Id: Guid.NewGuid(),
+        OrganizationId: 1,
+        OrganizationName: "صندوق التضامن",
+        CardNumber: "CITY-1",
+        FullName: "سالم علي",
+        Phone: phone,
+        NationalId: null,
+        CardExpiryDate: null,
+        Status: BeneficiaryStatus.Active,
+        StatusReason: null,
+        LastGrantedEntryUtc: null,
+        Notes: null,
+        CreatedAtUtc: DateTime.UtcNow,
+        CityId: cityId,
+        CityName: cityName);
+
+    [Fact]
+    public async Task BeneficiariesControl_Search_ShowsTheCityInTheGridAndTheDetails_AndADashWhenNone()
+    {
+        var withCity = HolderWithCity(3, "مصراتة", null);
+        var withoutCity = withCity with { Id = Guid.NewGuid(), CardNumber = "CITY-2", FullName = "سالم عمر", CityId = null, CityName = null };
+        var currentUser = new FakeCurrentUser(1, "supervisor1", "Park Supervisor", UserRole.Supervisor);
+        using var control = TestUi.Create<BeneficiariesControl>(new FakeBeneficiaryService([withCity, withoutCity], []), currentUser);
+        var grid = GetField<DataGridView>(control, "_gridBeneficiaries");
+        var colCity = GetField<DataGridViewColumn>(control, "_colCity");
+        var colPhone = GetField<DataGridViewColumn>(control, "_colPhone");
+
+        GetField<TextBox>(control, "_txtSearch").Text = "سالم";
+        await control.PerformSearchAsync();
+
+        colCity.HeaderText.ShouldBe(Strings.Col_Ben_City);
+        colCity.ReadOnly.ShouldBeTrue();
+        colCity.Index.ShouldBe(colPhone.Index + 1);
+        grid.Rows.Count.ShouldBe(2);
+        grid.Rows[0].Cells[colCity.Index].Value.ShouldBe("مصراتة");
+        grid.Rows[0].Cells[colPhone.Index].Value.ShouldBe("-");
+        grid.Rows[1].Cells[colCity.Index].Value.ShouldBe("-");
+        GetField<Label>(control, "_lblDetailCityTitle").Text.ShouldBe(Strings.Col_Ben_City + ":");
+        GetField<Label>(control, "_lblDetailCity").Text.ShouldBe("مصراتة");
+    }
+
+    [Fact]
+    public async Task EditBeneficiaryDialog_Set_SelectsTheHoldersCity()
+    {
+        var holder = HolderWithCity(3, "مصراتة", "0911112233");
+        using var dialog = TestUi.Create<EditBeneficiaryDialog>(new FakeBeneficiaryService([holder], []), new FakeNotifyService());
+
+        await dialog.SetBeneficiaryAsync(holder);
+
+        var city = GetField<SearchableComboBox>(dialog, "_cboCity");
+        city.Items.Count.ShouldBe(FakeCityService.DefaultCities.Length);
+        city.SelectedItem!.ToString().ShouldBe("مصراتة");
+        GetField<Label>(dialog, "_lblCity").Text.ShouldBe(Strings.Col_Ben_City + ":");
+    }
+
+    [Fact]
+    public async Task EditBeneficiaryDialog_HolderWithoutCity_StartsEmpty()
+    {
+        var holder = HolderWithCity(null, null, "0911112233");
+        using var dialog = TestUi.Create<EditBeneficiaryDialog>(new FakeBeneficiaryService([holder], []), new FakeNotifyService());
+
+        await dialog.SetBeneficiaryAsync(holder);
+
+        GetField<SearchableComboBox>(dialog, "_cboCity").SelectedItem.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task EditBeneficiaryDialog_CityNoLongerActive_IsKeptInTheListAndSelected()
+    {
+        var holder = HolderWithCity(9, "زلطن", null);
+        var notify = new FakeNotifyService();
+        using var dialog = TestUi.Create<EditBeneficiaryDialog>(new FakeBeneficiaryService([holder], []), notify);
+        await dialog.SetBeneficiaryAsync(holder);
+
+        var city = GetField<SearchableComboBox>(dialog, "_cboCity");
+        city.Items.Count.ShouldBe(FakeCityService.DefaultCities.Length + 1);
+        city.SelectedItem!.ToString().ShouldBe("زلطن");
+
+        await dialog.SaveAsync();
+
+        dialog.UpdatedBeneficiary!.CityId.ShouldBe(9);
+    }
+
+    [Fact]
+    public async Task EditBeneficiaryDialog_Save_WithBlankPhoneAndAChosenCity_SendsNoPhoneAndTheCity()
+    {
+        var holder = HolderWithCity(null, null, "0911112233");
+        using var dialog = TestUi.Create<EditBeneficiaryDialog>(new FakeBeneficiaryService([holder], []), new FakeNotifyService());
+        await dialog.SetBeneficiaryAsync(holder);
+        GetField<TextBox>(dialog, "_txtPhone").Text = "  ";
+        GetField<SearchableComboBox>(dialog, "_cboCity").Text = "زليتن";
+
+        await dialog.SaveAsync();
+
+        dialog.UpdatedBeneficiary.ShouldNotBeNull();
+        dialog.UpdatedBeneficiary.Phone.ShouldBeNull();
+        dialog.UpdatedBeneficiary.CityId.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task EditBeneficiaryDialog_Save_WithTheCityBoxCleared_SendsNoCity()
+    {
+        var holder = HolderWithCity(3, "مصراتة", "0911112233");
+        using var dialog = TestUi.Create<EditBeneficiaryDialog>(new FakeBeneficiaryService([holder], []), new FakeNotifyService());
+        await dialog.SetBeneficiaryAsync(holder);
+        GetField<SearchableComboBox>(dialog, "_cboCity").Text = string.Empty;
+
+        await dialog.SaveAsync();
+
+        dialog.UpdatedBeneficiary!.CityId.ShouldBeNull();
     }
 }

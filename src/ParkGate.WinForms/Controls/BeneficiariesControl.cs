@@ -92,6 +92,7 @@ public partial class BeneficiariesControl : UserControl
         _colOrganization.HeaderText = Strings.Col_Ben_Organization;
         _colFullName.HeaderText = Strings.Col_Ben_FullName;
         _colPhone.HeaderText = Strings.Col_Ben_Phone;
+        _colCity.HeaderText = Strings.Col_Ben_City;
         _colNationalId.HeaderText = Strings.Col_Ben_NationalId;
         _colStatus.HeaderText = Strings.Col_Ben_Status;
         _colLastEntry.HeaderText = Strings.Col_Ben_LastEntry;
@@ -102,6 +103,7 @@ public partial class BeneficiariesControl : UserControl
         _lblDetailCardTitle.Text = Strings.Col_Ben_CardNumber + ":";
         _lblDetailOrgTitle.Text = Strings.Col_Ben_Organization + ":";
         _lblDetailPhoneTitle.Text = Strings.Col_Ben_Phone + ":";
+        _lblDetailCityTitle.Text = Strings.Col_Ben_City + ":";
         _lblDetailNidTitle.Text = Strings.Col_Ben_NationalId + ":";
         _lblDetailExpiryTitle.Text = Strings.Col_Ben_ExpiryDate + ":";
         _lblDetailStatusTitle.Text = Strings.Col_Ben_Status + ":";
@@ -284,7 +286,8 @@ public partial class BeneficiariesControl : UserControl
                     b.CardNumber,
                     b.OrganizationName,
                     b.FullName,
-                    b.Phone,
+                    b.Phone ?? "-",
+                    b.CityName ?? "-",
                     displayNid,
                     statusText,
                     lastEntryText,
@@ -368,7 +371,8 @@ public partial class BeneficiariesControl : UserControl
         _lblDetailName.Text = b.FullName;
         _lblDetailCard.Text = b.CardNumber;
         _lblDetailOrg.Text = b.OrganizationName;
-        _lblDetailPhone.Text = b.Phone;
+        _lblDetailPhone.Text = b.Phone ?? "-";
+        _lblDetailCity.Text = b.CityName ?? "-";
         _lblDetailNid.Text = FormatNationalId(b.NationalId);
         _lblDetailExpiry.Text = b.CardExpiryDate?.ToString("dd/MM/yyyy") ?? Strings.Ui_Beneficiaries_04;
 
@@ -397,6 +401,7 @@ public partial class BeneficiariesControl : UserControl
         _lblDetailCard.Text = "-";
         _lblDetailOrg.Text = "-";
         _lblDetailPhone.Text = "-";
+        _lblDetailCity.Text = "-";
         _lblDetailNid.Text = "-";
         _lblDetailExpiry.Text = "-";
         _lblDetailStatus.Text = "-";
@@ -557,7 +562,8 @@ public partial class BeneficiariesControl : UserControl
                 row.Cells[_colCardNumber.Index].Value = updated.CardNumber;
                 row.Cells[_colOrganization.Index].Value = updated.OrganizationName;
                 row.Cells[_colFullName.Index].Value = updated.FullName;
-                row.Cells[_colPhone.Index].Value = updated.Phone;
+                row.Cells[_colPhone.Index].Value = updated.Phone ?? "-";
+                row.Cells[_colCity.Index].Value = updated.CityName ?? "-";
                 row.Cells[_colNationalId.Index].Value = FormatNationalId(updated.NationalId);
                 row.Cells[_colExpiryDate.Index].Value = updated.CardExpiryDate?.ToString("dd/MM/yyyy") ?? "-";
             }

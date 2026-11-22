@@ -22,6 +22,7 @@ public sealed class UnitOfWork : IUnitOfWork
         Organizations = new OrganizationRepository(context);
         EntryAttempts = new EntryAttemptRepository(context);
         AgeCategories = new AgeCategoryRepository(context);
+        Cities = new CityRepository(context);
         Users = new UserRepository(context);
         Workstations = new WorkstationRepository(context);
         AppSettings = new AppSettingRepository(context);
@@ -36,6 +37,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public IOrganizationRepository Organizations { get; }
     public IEntryAttemptRepository EntryAttempts { get; }
     public IAgeCategoryRepository AgeCategories { get; }
+    public ICityRepository Cities { get; }
     public IUserRepository Users { get; }
     public IWorkstationRepository Workstations { get; }
     public IAppSettingRepository AppSettings { get; }

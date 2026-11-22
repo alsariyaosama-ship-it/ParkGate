@@ -13,6 +13,7 @@ public class ParkGateDbContext : DbContext
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<Beneficiary> Beneficiaries => Set<Beneficiary>();
     public DbSet<AgeCategory> AgeCategories => Set<AgeCategory>();
+    public DbSet<City> Cities => Set<City>();
     public DbSet<EntryAttempt> EntryAttempts => Set<EntryAttempt>();
     public DbSet<EntryAttemptCompanion> EntryAttemptCompanions => Set<EntryAttemptCompanion>();
     public DbSet<User> Users => Set<User>();

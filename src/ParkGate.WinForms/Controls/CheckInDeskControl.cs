@@ -6,6 +6,7 @@ using ParkGate.Application.AgeCategories.DTOs;
 using ParkGate.Application.AgeCategories.Services;
 using ParkGate.Application.Beneficiaries.DTOs;
 using ParkGate.Application.Beneficiaries.Services;
+using ParkGate.Application.Cities.Services;
 using ParkGate.Application.GiftVouchers.Services;
 using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Application.CheckIn.Services;
@@ -31,6 +32,7 @@ public partial class CheckInDeskControl : UserControl
     private readonly ICheckInService _checkInService;
     private readonly IOrganizationService _orgService;
     private readonly IAgeCategoryService _ageCategoryService;
+    private readonly ICityService _cityService;
     private readonly ISettingsService _settingsService;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentWorkstation _currentWorkstation;
@@ -74,6 +76,7 @@ public partial class CheckInDeskControl : UserControl
         ICheckInService checkInService,
         IOrganizationService orgService,
         IAgeCategoryService ageCategoryService,
+        ICityService cityService,
         ISettingsService settingsService,
         ICurrentUser currentUser,
         ICurrentWorkstation currentWorkstation,
@@ -92,6 +95,7 @@ public partial class CheckInDeskControl : UserControl
         _checkInService = checkInService ?? throw new ArgumentNullException(nameof(checkInService));
         _orgService = orgService ?? throw new ArgumentNullException(nameof(orgService));
         _ageCategoryService = ageCategoryService ?? throw new ArgumentNullException(nameof(ageCategoryService));
+        _cityService = cityService ?? throw new ArgumentNullException(nameof(cityService));
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
         _currentWorkstation = currentWorkstation ?? throw new ArgumentNullException(nameof(currentWorkstation));
@@ -262,7 +266,7 @@ public partial class CheckInDeskControl : UserControl
                 break;
 
             case Keys.Escape:
-                if (_cmbOrganization.DroppedDown || _registrationPanel.IsOrganizationListOpen)
+                if (_cmbOrganization.DroppedDown || _registrationPanel.IsOrganizationListOpen || _registrationPanel.IsCityListOpen)
                 {
                     // Esc closes the open list; it must not also reset the desk (R4.5).
                     break;
@@ -295,6 +299,7 @@ public partial class CheckInDeskControl : UserControl
     {
         await LoadSettingsAsync();
         await LoadOrganizationsAsync();
+        await LoadCitiesAsync();
         await LoadAgeCategoriesAsync();
         await RefreshTodayDeskSummaryAsync();
 
@@ -349,6 +354,28 @@ public partial class CheckInDeskControl : UserControl
         {
             _logger.LogWarning(ex, "Failed to load organizations for filter.");
         }
+    }
+
+    private async Task LoadCitiesAsync()
+    {
+        try
+        {
+            var result = await _cityService.GetActiveAsync();
+            if (result.IsSuccess)
+            {
+                _registrationPanel.SetCities(result.Value.Select(c => (c.Id, c.NameAr)));
+                return;
+            }
+
+            _logger.LogWarning("Failed to load cities {ErrorCode}.", result.Error.Code);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load cities for registration.");
+        }
+
+        // The city is optional (BR-32): registration still works with an empty list.
+        _registrationPanel.SetCities([]);
     }
 
     public async Task LoadAgeCategoriesAsync()
@@ -643,7 +670,7 @@ public partial class CheckInDeskControl : UserControl
         HideInlineRegistration();
 
         _lblHolderName.Text = holder.FullName;
-        _lblHolderPhone.Text = holder.Phone;
+        _lblHolderPhone.Text = holder.Phone ?? "-";
         ShowCardAlert(holder.HasOpenCardAlert);
         _lblHolderOrg.Text = holder.OrganizationName;
 
@@ -1124,13 +1151,6 @@ public partial class CheckInDeskControl : UserControl
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(phone))
-        {
-            _notifyService.Warning(Strings.Ui_CheckInDesk_09, Strings.Title_Warning);
-            _registrationPanel.FocusPhone();
-            return;
-        }
-
         using (new BusyScope(this, _registrationPanel.ActionButtons))
         {
             try
@@ -1145,10 +1165,11 @@ public partial class CheckInDeskControl : UserControl
                     OrganizationId: orgId,
                     CardNumber: card,
                     FullName: fullName,
-                    Phone: phone,
+                    Phone: string.IsNullOrWhiteSpace(phone) ? null : phone, // BR-15: optional
                     NationalId: natId,
                     CardExpiryDate: expiry,
-                    Notes: notes);
+                    Notes: notes,
+                    CityId: _registrationPanel.SelectedCityId); // BR-32: optional
 
                 var regResult = await _beneficiaryService.RegisterAsync(regRequest);
                 if (regResult.IsSuccess)

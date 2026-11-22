@@ -2,6 +2,9 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using ParkGate.Application.Cities.DTOs;
+using ParkGate.Application.Cities.Services;
+using ParkGate.Application.Common;
 
 namespace ParkGate.ArchitectureTests;
 
@@ -58,6 +61,33 @@ internal static class TestUi
             return Activator.CreateInstance(typeof(NullLogger<>).MakeGenericType(type.GetGenericArguments()))!;
         }
 
+        if (type == typeof(ICityService))
+        {
+            return new FakeCityService();
+        }
+
         return Substitute.For([type], []);
     }
+}
+
+/// <summary>R7.9 default for <see cref="ICityService"/>: a few cities in the fixed seed order, answered synchronously.</summary>
+internal sealed class FakeCityService : ICityService
+{
+    public static readonly CityDto[] DefaultCities =
+    [
+        new(1, "الخمس"),
+        new(2, "زليتن"),
+        new(3, "مصراتة"),
+        new(4, "طرابلس")
+    ];
+
+    private readonly IReadOnlyList<CityDto> _cities;
+
+    public FakeCityService(params CityDto[] cities)
+    {
+        _cities = cities.Length == 0 ? DefaultCities : cities;
+    }
+
+    public Task<Result<IReadOnlyList<CityDto>>> GetActiveAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(Result<IReadOnlyList<CityDto>>.Success(_cities));
 }

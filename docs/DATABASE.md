@@ -62,8 +62,9 @@ CardPatternSource      : 1 Dominant, 2 NewSeries                (F8)
 | OrganizationId | int FK → Organizations | |
 | CardNumber | nvarchar(50) NOT NULL | Normalized (BR-01) |
 | FullName | nvarchar(150) NOT NULL | |
-| Phone | nvarchar(15) NOT NULL | Normalized `09XXXXXXXX` (BR-15) |
+| Phone | nvarchar(15) NULL | Optional (F9); normalized `09XXXXXXXX` when given (BR-15) |
 | NationalId | nvarchar(12) NULL | 12 digits (BR-16) |
+| CityId | int NULL FK → Cities | F9, BR-32. The city the visitor comes from; `DeleteBehavior.Restrict`. Not synced to the cloud yet (excluded in `OutboxEntityExtractor`) |
 | CardExpiryDate | date NULL | |
 | Status | tinyint NOT NULL | `BeneficiaryStatus`, default 1 |
 | StatusReason | nvarchar(250) NULL | Required when status ≠ Active (`CK_Beneficiaries_StatusReason`) |
@@ -72,7 +73,7 @@ CardPatternSource      : 1 Dominant, 2 NewSeries                (F8)
 | LastGiftIssuedUtc | datetime2(3) NULL | R6.13. Latest non-voided gift issue; written on every issue and recalculated on void so that two gift issues for one holder conflict (ADR-026). Not backfilled (no SQL in migrations, ADR-025): NULL until the holder's next gift. Eligibility still reads `GiftVouchers` |
 | audit columns, RowVersion | | |
 
-Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_Beneficiaries_CardNumber (CardNumber)` (cross-org lookup) · `IX_Beneficiaries_Phone` · `UX_Beneficiaries_NationalId` unique filtered `WHERE NationalId IS NOT NULL` · `IX_Beneficiaries_FullName`.
+Indexes: `UX_Beneficiaries_Org_Card (OrganizationId, CardNumber)` unique · `IX_Beneficiaries_CardNumber (CardNumber)` (cross-org lookup) · `IX_Beneficiaries_Phone` · `UX_Beneficiaries_NationalId` unique filtered `WHERE NationalId IS NOT NULL` · `IX_Beneficiaries_FullName` · `IX_Beneficiaries_CityId`.
 
 Name search uses `LIKE '%term%'`, so it scans `IX_Beneficiaries_FullName` instead of seeking it. Measured on LocalDB with 100 000 holders (R6.6, 2026-11-18): about 350 ms for a term matched by one row and for no match, under the 1 s target; `PerformanceBenchmarkTests` keeps the check. Revisit (prefix search on name tokens or full-text) if the holder count grows well past that.
 
@@ -303,6 +304,16 @@ Unique `UX_OrganizationCardPatterns_Org_Shape_Prefix` on (`OrganizationId`, `Sha
 
 Index `IX_CardPatternAlerts_Org_Status_Shape` on (`OrganizationId`, `Status`, `Shape`).
 
+### 3.18 `Cities` — المدن
+| Column | Type | Notes |
+|---|---|---|
+| Id | int IDENTITY PK | |
+| NameAr | nvarchar(50) NOT NULL | Unique (`UX_Cities_NameAr`) |
+| SortOrder | int NOT NULL | Fixed display order (the seed order); the list is not sorted alphabetically |
+| IsActive | bit NOT NULL | Default 1. An inactive city cannot be newly chosen, but a holder that already has it keeps it |
+
+Seeded (57 rows, central and western Libya plus Sabha), no management screen; changes by migration (BR-32). `Cities` is **not** synced to the cloud (not in `OutboxEntityExtractor.SyncableTypes`).
+
 ## 4. Atomic check-in (BR-12, ADR-026)
 
 Optimistic concurrency on `Beneficiaries.RowVersion` (ADR-026, since R6.13). Each attempt runs in **one transaction** inside a fresh unit of work:
@@ -354,6 +365,7 @@ Settings are read through a typed `ISettingsService` in Application (no raw key 
 
 - Organization: `SSF` — «صندوق التضامن الاجتماعي», `IsDefault = 1`, `IsActive = 1`, `CooldownMinutes = NULL`.
 - Age categories: «بالغ» («13 سنة فأكثر», 1) · «طفل» («من 3 إلى 12 سنة», 2) · «رضيع» («أقل من 3 سنوات», 3). Age ranges are display text only (editable). «رضيع» is seeded with `IsCompanionLimitExempt = 1` (BR-26); the `AddGiftVouchersAndCompanionLimit` migration also applies that flag by name to databases created earlier.
+- Cities (F9, `AddCitiesAndOptionalPhone` migration): 57 rows, `Id = SortOrder = 1..57`, from «الخمس» (1) to «يفرن» (57), all active. The list is fixed; see §3.18.
 - All settings in §5.
 - **No users** — first-run wizard creates the Admin (ADR-012).
 

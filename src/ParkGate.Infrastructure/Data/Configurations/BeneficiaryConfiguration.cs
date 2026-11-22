@@ -38,9 +38,13 @@ public sealed class BeneficiaryConfiguration : IEntityTypeConfiguration<Benefici
             .IsRequired();
 
         builder.Property(x => x.Phone)
-            .HasConversion(p => p.Value, v => PhoneNumber.Create(v))
-            .HasMaxLength(15)
-            .IsRequired();
+            .HasConversion(p => p != null ? p.Value : null, v => v != null ? PhoneNumber.Create(v) : null)
+            .HasMaxLength(15);
+
+        builder.HasOne<City>()
+            .WithMany()
+            .HasForeignKey(x => x.CityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(x => x.NationalId)
             .HasConversion(n => n != null ? n.Value : null, v => v != null ? NationalId.Create(v) : null)
@@ -96,5 +100,8 @@ public sealed class BeneficiaryConfiguration : IEntityTypeConfiguration<Benefici
 
         builder.HasIndex(x => x.FullName)
             .HasDatabaseName("IX_Beneficiaries_FullName");
+
+        builder.HasIndex(x => x.CityId)
+            .HasDatabaseName("IX_Beneficiaries_CityId");
     }
 }

@@ -136,4 +136,64 @@ public sealed class BeneficiaryTests
         b.RecalculateLastGrantedEntry(null);
         b.LastGrantedEntryUtc.ShouldBeNull();
     }
+
+    // ── F9: optional phone and city ──
+
+    [Fact]
+    public void Constructor_NullPhone_Succeeds()
+    {
+        var b = new Beneficiary(Guid.NewGuid(), 1, CardNumber.Create("SSF-002"), "علي بن سالم", phone: null);
+
+        b.Phone.ShouldBeNull();
+        b.CityId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Constructor_WithCityId_StoresCity()
+    {
+        var b = new Beneficiary(Guid.NewGuid(), 1, CardNumber.Create("SSF-002"), "علي بن سالم", null, cityId: 4);
+
+        b.CityId.ShouldBe(4);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Constructor_NonPositiveCityId_ThrowsArgumentOutOfRangeException(int cityId)
+    {
+        Should.Throw<ArgumentOutOfRangeException>(() =>
+            new Beneficiary(Guid.NewGuid(), 1, CardNumber.Create("SSF-002"), "علي بن سالم", null, cityId: cityId));
+    }
+
+    [Fact]
+    public void UpdateDetails_NullPhoneAndNoCity_ClearsBoth()
+    {
+        var b = new Beneficiary(Guid.NewGuid(), 1, CardNumber.Create("SSF-002"), "علي بن سالم", PhoneNumber.Create("0912345678"), cityId: 4);
+
+        b.UpdateDetails("علي بن سالم", null, null, null, null, null);
+
+        b.Phone.ShouldBeNull();
+        b.CityId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void UpdateDetails_WithCityId_ChangesCity()
+    {
+        var b = CreateSampleBeneficiary();
+
+        b.UpdateDetails("علي بن سالم", PhoneNumber.Create("0912345678"), null, null, null, 7);
+
+        b.CityId.ShouldBe(7);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void UpdateDetails_NonPositiveCityId_ThrowsArgumentOutOfRangeException(int cityId)
+    {
+        var b = CreateSampleBeneficiary();
+
+        Should.Throw<ArgumentOutOfRangeException>(() =>
+            b.UpdateDetails("علي بن سالم", PhoneNumber.Create("0912345678"), null, null, null, cityId));
+    }
 }

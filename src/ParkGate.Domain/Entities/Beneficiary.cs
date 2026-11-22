@@ -17,8 +17,9 @@ public sealed class Beneficiary : IAuditableEntity
     public int OrganizationId { get; private set; }
     public CardNumber CardNumber { get; private set; } = null!;
     public string FullName { get; private set; } = null!;
-    public PhoneNumber Phone { get; private set; } = null!;
+    public PhoneNumber? Phone { get; private set; }
     public NationalId? NationalId { get; private set; }
+    public int? CityId { get; private set; }
     public DateOnly? CardExpiryDate { get; private set; }
     public BeneficiaryStatus Status { get; private set; }
     public string? StatusReason { get; private set; }
@@ -44,10 +45,11 @@ public sealed class Beneficiary : IAuditableEntity
         int organizationId,
         CardNumber cardNumber,
         string fullName,
-        PhoneNumber phone,
+        PhoneNumber? phone,
         NationalId? nationalId = null,
         DateOnly? cardExpiryDate = null,
-        string? notes = null)
+        string? notes = null,
+        int? cityId = null)
     {
         if (id == Guid.Empty)
         {
@@ -60,9 +62,9 @@ public sealed class Beneficiary : IAuditableEntity
         }
 
         ArgumentNullException.ThrowIfNull(cardNumber);
-        ArgumentNullException.ThrowIfNull(phone);
         ValidateFullName(fullName);
         ValidateNotes(notes);
+        ValidateCityId(cityId);
 
         Id = id;
         OrganizationId = organizationId;
@@ -70,6 +72,7 @@ public sealed class Beneficiary : IAuditableEntity
         FullName = fullName.Trim();
         Phone = phone;
         NationalId = nationalId;
+        CityId = cityId;
         CardExpiryDate = cardExpiryDate;
         Notes = string.IsNullOrWhiteSpace(notes) ? null : notes.Trim();
         Status = BeneficiaryStatus.Active;
@@ -78,18 +81,20 @@ public sealed class Beneficiary : IAuditableEntity
 
     public void UpdateDetails(
         string fullName,
-        PhoneNumber phone,
+        PhoneNumber? phone,
         NationalId? nationalId,
         DateOnly? cardExpiryDate,
-        string? notes)
+        string? notes,
+        int? cityId)
     {
-        ArgumentNullException.ThrowIfNull(phone);
         ValidateFullName(fullName);
         ValidateNotes(notes);
+        ValidateCityId(cityId);
 
         FullName = fullName.Trim();
         Phone = phone;
         NationalId = nationalId;
+        CityId = cityId;
         CardExpiryDate = cardExpiryDate;
         Notes = string.IsNullOrWhiteSpace(notes) ? null : notes.Trim();
     }
@@ -173,6 +178,14 @@ public sealed class Beneficiary : IAuditableEntity
         if (string.IsNullOrWhiteSpace(reason) || reason.Trim().Length > MaxStatusReasonLength)
         {
             throw new ArgumentException($"A reason for {action} is required and cannot exceed {MaxStatusReasonLength} characters.", nameof(reason));
+        }
+    }
+
+    private static void ValidateCityId(int? cityId)
+    {
+        if (cityId is <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(cityId), "City Id must be positive.");
         }
     }
 

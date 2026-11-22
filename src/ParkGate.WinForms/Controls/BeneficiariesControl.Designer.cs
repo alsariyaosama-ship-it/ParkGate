@@ -30,6 +30,7 @@ partial class BeneficiariesControl
         this._colOrganization = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colFullName = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colPhone = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        this._colCity = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colNationalId = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this._colLastEntry = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -45,6 +46,8 @@ partial class BeneficiariesControl
         this._lblDetailOrg = new System.Windows.Forms.Label();
         this._lblDetailPhoneTitle = new System.Windows.Forms.Label();
         this._lblDetailPhone = new System.Windows.Forms.Label();
+        this._lblDetailCityTitle = new System.Windows.Forms.Label();
+        this._lblDetailCity = new System.Windows.Forms.Label();
         this._lblDetailNidTitle = new System.Windows.Forms.Label();
         this._lblDetailNid = new System.Windows.Forms.Label();
         this._lblDetailExpiryTitle = new System.Windows.Forms.Label();
@@ -219,6 +222,7 @@ partial class BeneficiariesControl
             this._colOrganization,
             this._colFullName,
             this._colPhone,
+            this._colCity,
             this._colNationalId,
             this._colStatus,
             this._colLastEntry,
@@ -261,6 +265,13 @@ partial class BeneficiariesControl
         this._colPhone.Name = "_colPhone";
         this._colPhone.ReadOnly = true;
         this._colPhone.Width = 110;
+        //
+        // _colCity
+        //
+        this._colCity.HeaderText = "المدينة";
+        this._colCity.Name = "_colCity";
+        this._colCity.ReadOnly = true;
+        this._colCity.Width = 100;
         // 
         // _colNationalId
         // 
@@ -336,31 +347,34 @@ partial class BeneficiariesControl
         this._tblDetails.Controls.Add(this._lblDetailOrg, 1, 2);
         this._tblDetails.Controls.Add(this._lblDetailPhoneTitle, 0, 3);
         this._tblDetails.Controls.Add(this._lblDetailPhone, 1, 3);
-        this._tblDetails.Controls.Add(this._lblDetailNidTitle, 0, 4);
-        this._tblDetails.Controls.Add(this._lblDetailNid, 1, 4);
-        this._tblDetails.Controls.Add(this._lblDetailExpiryTitle, 0, 5);
-        this._tblDetails.Controls.Add(this._lblDetailExpiry, 1, 5);
-        this._tblDetails.Controls.Add(this._lblDetailStatusTitle, 0, 6);
-        this._tblDetails.Controls.Add(this._lblDetailStatus, 1, 6);
-        this._tblDetails.Controls.Add(this._lblDetailReasonTitle, 0, 7);
-        this._tblDetails.Controls.Add(this._lblDetailReason, 1, 7);
-        this._tblDetails.Controls.Add(this._lblDetailNotesTitle, 0, 8);
-        this._tblDetails.Controls.Add(this._lblDetailNotes, 1, 8);
+        this._tblDetails.Controls.Add(this._lblDetailCityTitle, 0, 4);
+        this._tblDetails.Controls.Add(this._lblDetailCity, 1, 4);
+        this._tblDetails.Controls.Add(this._lblDetailNidTitle, 0, 5);
+        this._tblDetails.Controls.Add(this._lblDetailNid, 1, 5);
+        this._tblDetails.Controls.Add(this._lblDetailExpiryTitle, 0, 6);
+        this._tblDetails.Controls.Add(this._lblDetailExpiry, 1, 6);
+        this._tblDetails.Controls.Add(this._lblDetailStatusTitle, 0, 7);
+        this._tblDetails.Controls.Add(this._lblDetailStatus, 1, 7);
+        this._tblDetails.Controls.Add(this._lblDetailReasonTitle, 0, 8);
+        this._tblDetails.Controls.Add(this._lblDetailReason, 1, 8);
+        this._tblDetails.Controls.Add(this._lblDetailNotesTitle, 0, 9);
+        this._tblDetails.Controls.Add(this._lblDetailNotes, 1, 9);
         this._tblDetails.AutoScroll = true;
         this._tblDetails.Dock = System.Windows.Forms.DockStyle.Fill;
         this._tblDetails.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this._tblDetails.Location = new System.Drawing.Point(6, 23);
         this._tblDetails.Name = "_tblDetails";
-        this._tblDetails.RowCount = 9;
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+        this._tblDetails.RowCount = 10;
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+        this._tblDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
         this._tblDetails.Size = new System.Drawing.Size(364, 258);
         this._tblDetails.TabIndex = 0;
         // 
@@ -440,6 +454,25 @@ partial class BeneficiariesControl
         this._lblDetailPhone.Size = new System.Drawing.Size(10, 15);
         this._lblDetailPhone.TabIndex = 7;
         this._lblDetailPhone.Text = "-";
+        //
+        // _lblDetailCityTitle
+        //
+        this._lblDetailCityTitle.AutoSize = true;
+        this._lblDetailCityTitle.Font = new System.Drawing.Font("Cairo", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this._lblDetailCityTitle.Location = new System.Drawing.Point(317, 98);
+        this._lblDetailCityTitle.Name = "_lblDetailCityTitle";
+        this._lblDetailCityTitle.Size = new System.Drawing.Size(44, 15);
+        this._lblDetailCityTitle.TabIndex = 8;
+        this._lblDetailCityTitle.Text = "المدينة:";
+        //
+        // _lblDetailCity
+        //
+        this._lblDetailCity.AutoSize = true;
+        this._lblDetailCity.Location = new System.Drawing.Point(256, 98);
+        this._lblDetailCity.Name = "_lblDetailCity";
+        this._lblDetailCity.Size = new System.Drawing.Size(10, 15);
+        this._lblDetailCity.TabIndex = 9;
+        this._lblDetailCity.Text = "-";
         // 
         // _lblDetailNidTitle
         // 
@@ -448,7 +481,7 @@ partial class BeneficiariesControl
         this._lblDetailNidTitle.Location = new System.Drawing.Point(286, 104);
         this._lblDetailNidTitle.Name = "_lblDetailNidTitle";
         this._lblDetailNidTitle.Size = new System.Drawing.Size(75, 15);
-        this._lblDetailNidTitle.TabIndex = 8;
+        this._lblDetailNidTitle.TabIndex = 10;
         this._lblDetailNidTitle.Text = "الرقم الوطني:";
         // 
         // _lblDetailNid
@@ -457,7 +490,7 @@ partial class BeneficiariesControl
         this._lblDetailNid.Location = new System.Drawing.Point(256, 104);
         this._lblDetailNid.Name = "_lblDetailNid";
         this._lblDetailNid.Size = new System.Drawing.Size(10, 15);
-        this._lblDetailNid.TabIndex = 9;
+        this._lblDetailNid.TabIndex = 11;
         this._lblDetailNid.Text = "-";
         // 
         // _lblDetailExpiryTitle
@@ -467,7 +500,7 @@ partial class BeneficiariesControl
         this._lblDetailExpiryTitle.Location = new System.Drawing.Point(285, 130);
         this._lblDetailExpiryTitle.Name = "_lblDetailExpiryTitle";
         this._lblDetailExpiryTitle.Size = new System.Drawing.Size(76, 15);
-        this._lblDetailExpiryTitle.TabIndex = 10;
+        this._lblDetailExpiryTitle.TabIndex = 12;
         this._lblDetailExpiryTitle.Text = "تاريخ الانتهاء:";
         // 
         // _lblDetailExpiry
@@ -476,7 +509,7 @@ partial class BeneficiariesControl
         this._lblDetailExpiry.Location = new System.Drawing.Point(256, 130);
         this._lblDetailExpiry.Name = "_lblDetailExpiry";
         this._lblDetailExpiry.Size = new System.Drawing.Size(10, 15);
-        this._lblDetailExpiry.TabIndex = 11;
+        this._lblDetailExpiry.TabIndex = 13;
         this._lblDetailExpiry.Text = "-";
         // 
         // _lblDetailStatusTitle
@@ -486,7 +519,7 @@ partial class BeneficiariesControl
         this._lblDetailStatusTitle.Location = new System.Drawing.Point(322, 156);
         this._lblDetailStatusTitle.Name = "_lblDetailStatusTitle";
         this._lblDetailStatusTitle.Size = new System.Drawing.Size(39, 15);
-        this._lblDetailStatusTitle.TabIndex = 12;
+        this._lblDetailStatusTitle.TabIndex = 14;
         this._lblDetailStatusTitle.Text = "الحالة:";
         // 
         // _lblDetailStatus
@@ -496,7 +529,7 @@ partial class BeneficiariesControl
         this._lblDetailStatus.Location = new System.Drawing.Point(256, 156);
         this._lblDetailStatus.Name = "_lblDetailStatus";
         this._lblDetailStatus.Size = new System.Drawing.Size(10, 15);
-        this._lblDetailStatus.TabIndex = 13;
+        this._lblDetailStatus.TabIndex = 15;
         this._lblDetailStatus.Text = "-";
         // 
         // _lblDetailReasonTitle
@@ -506,7 +539,7 @@ partial class BeneficiariesControl
         this._lblDetailReasonTitle.Location = new System.Drawing.Point(295, 182);
         this._lblDetailReasonTitle.Name = "_lblDetailReasonTitle";
         this._lblDetailReasonTitle.Size = new System.Drawing.Size(66, 15);
-        this._lblDetailReasonTitle.TabIndex = 14;
+        this._lblDetailReasonTitle.TabIndex = 16;
         this._lblDetailReasonTitle.Text = "سبب الحالة:";
         // 
         // _lblDetailReason
@@ -515,7 +548,7 @@ partial class BeneficiariesControl
         this._lblDetailReason.Location = new System.Drawing.Point(256, 182);
         this._lblDetailReason.Name = "_lblDetailReason";
         this._lblDetailReason.Size = new System.Drawing.Size(10, 15);
-        this._lblDetailReason.TabIndex = 15;
+        this._lblDetailReason.TabIndex = 17;
         this._lblDetailReason.Text = "-";
         // 
         // _lblDetailNotesTitle
@@ -525,7 +558,7 @@ partial class BeneficiariesControl
         this._lblDetailNotesTitle.Location = new System.Drawing.Point(308, 208);
         this._lblDetailNotesTitle.Name = "_lblDetailNotesTitle";
         this._lblDetailNotesTitle.Size = new System.Drawing.Size(53, 15);
-        this._lblDetailNotesTitle.TabIndex = 16;
+        this._lblDetailNotesTitle.TabIndex = 18;
         this._lblDetailNotesTitle.Text = "ملاحظات:";
         // 
         // _lblDetailNotes
@@ -534,7 +567,7 @@ partial class BeneficiariesControl
         this._lblDetailNotes.Location = new System.Drawing.Point(256, 208);
         this._lblDetailNotes.Name = "_lblDetailNotes";
         this._lblDetailNotes.Size = new System.Drawing.Size(10, 15);
-        this._lblDetailNotes.TabIndex = 17;
+        this._lblDetailNotes.TabIndex = 19;
         this._lblDetailNotes.Text = "-";
         // 
         // _pnlDetailsActions
@@ -771,6 +804,7 @@ partial class BeneficiariesControl
     private System.Windows.Forms.DataGridViewTextBoxColumn _colOrganization;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colFullName;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colPhone;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _colCity;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colNationalId;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colStatus;
     private System.Windows.Forms.DataGridViewTextBoxColumn _colLastEntry;
@@ -786,6 +820,8 @@ partial class BeneficiariesControl
     private System.Windows.Forms.Label _lblDetailOrg;
     private System.Windows.Forms.Label _lblDetailPhoneTitle;
     private System.Windows.Forms.Label _lblDetailPhone;
+    private System.Windows.Forms.Label _lblDetailCityTitle;
+    private System.Windows.Forms.Label _lblDetailCity;
     private System.Windows.Forms.Label _lblDetailNidTitle;
     private System.Windows.Forms.Label _lblDetailNid;
     private System.Windows.Forms.Label _lblDetailExpiryTitle;

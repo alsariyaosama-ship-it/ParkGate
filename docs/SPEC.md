@@ -79,7 +79,7 @@ Permissions are enforced in the **Application layer**. Hiding UI elements is a c
 
 | ID | Condition | Behavior |
 |---|---|---|
-| A1 | Card not found | Inline registration panel opens with card number prefilled and organization defaulted to the default organization. Required: full name, phone. Optional: national ID, card expiry date, notes. On save, flow continues at step 5 (a new holder is eligible). |
+| A1 | Card not found | Inline registration panel opens with card number prefilled and organization defaulted to the default organization. Required: full name. Optional: phone, city, national ID, card expiry date, notes. On save, flow continues at step 5 (a new holder is eligible). |
 | A2 | Card found in more than one organization | Operator chooses the organization from a short list, then continue. |
 | A3 | Within cooldown | **Red banner** «مرفوض — دخل قبل أقل من {N} ساعة», showing last granted entry time, the time entry becomes allowed, and remaining time (ساعات:دقائق). Warning sound if enabled. Register button disabled. A denied attempt is logged (BR-10). |
 | A4 | Holder suspended / blocked, card expired, or organization inactive | Red banner with the specific reason (BR-06 order). Denied attempt logged. |
@@ -120,7 +120,7 @@ Keyboard-first: the whole flow must be possible without a mouse.
 | BR-12 | **Concurrency:** optimistic (ADR-026). Every grant updates the holder row, whose `RowVersion` makes a concurrent grant fail at save; the use case retries from the start (at most 3 times) and the retry is judged by the normal rules. Two desks can never both grant the same window. See DATABASE.md §4. |
 | BR-13 | **Void:** entry records are immutable. A Supervisor can void a granted entry with a reason. Voiding recalculates `LastGrantedEntryUtc` from the latest remaining non-voided granted entry. Denied attempts cannot be voided. |
 | BR-14 | Holders, organizations, users and age categories are **never hard-deleted**; they are deactivated/suspended. |
-| BR-15 | **Phone (required):** Libyan mobile normalized to `09XXXXXXXX`. Accept `+2189…`, `002189…`, `2189…` and Arabic-Indic digits as input. |
+| BR-15 | **Phone (optional, F9):** when given, a Libyan mobile normalized to `09XXXXXXXX`. Accept `+2189…`, `002189…`, `2189…` and Arabic-Indic digits as input. |
 | BR-16 | **National ID (optional):** digits only after normalization, exactly 12 digits when present. Unique when present (filtered unique index). |
 | BR-17 | **Audit:** create/update of holders, status changes, overrides, voids, settings changes, user management and logins are written to the audit log with user, workstation and DB time. |
 | BR-18 | **Account lockout:** after `Security.MaxFailedLogins` (default 5) failures, the account is locked for `Security.LockoutMinutes` (default 15). |
@@ -137,6 +137,7 @@ Keyboard-first: the whole flow must be possible without a mouse.
 | BR-29 | **Card-number pattern alert (F8):** when a holder is registered or their card number changes, the number's shape (length, character class per position, and a prefix shared by most numbers) is compared with the organization's patterns. A mismatch shows a non-blocking amber note to the operator and writes an alert for the Admin. After `CardPattern.MinSample` (default 10) cards, the dominant shape is proposed and used provisionally until the Admin decides. A shape that reaches `CardPattern.NewSeriesThreshold` (default 5) alerts is proposed as a new series. **Only an Admin approves a pattern**; it is never approved automatically. A rejected pattern keeps alerting, and its holders stay on the review list. **Built rules (S41):** the shape is one class per character (`D` digit, `L` letter, `-` dash, `O` other). The first pattern is proposed when the organization has `MinSample` cards and one shape holds more than half of them; its prefix is the first `PrefixLength` characters when `PrefixSharePercent` of those numbers share them. This first (dominant) proposal is used provisionally until the Admin decides; a new-series proposal stops no alert until approved. Approving a pattern closes the open alerts it matches. The check runs in the same save as the registration or card change, and the desk shows «رقم غير معتاد» beside the name of a holder with an open alert. Only Admins see «الإدارة ← أنماط أرقام البطاقات» (`ManageCardPatterns`); every proposal, decision, alert and review is in the audit trail. |
 | BR-30 | **Gift only after today's entry (owner, 2026-11-18):** a gift voucher is issued only when the organization has gifts enabled (`GiftEnabled`) **and** the holder has a granted or overridden, non-voided entry on today's park business date (BR-05). Otherwise the gift is denied with `NoEntryToday`, checked right after the holder status in the BR-20 order. It is **not overridable**, not even by the supervisor gift override (BR-21). |
 | BR-31 | **Voiding an entry and its gift (owner, 2026-11-19):** a gift rests on the day's entry (BR-30). When the voided entry is the holder's only granted or overridden, non-voided entry of that business date, that day's unredeemed gift vouchers are voided with it, in the same transaction and with the same reason and approver, and the gift interval is recalculated (BR-21). If a gift of that day was **already redeemed**, the entry **cannot be voided** (`CheckIn.GiftAlreadyRedeemed`), with no exception. When another valid entry of that day remains, the gifts are not touched. |
+| BR-32 | **City (optional, F9, Osama 2026-11-22):** a holder may have a city, chosen from the seeded `Cities` list (DATABASE.md §3.18) in its fixed display order, not alphabetical. There is no management screen; the list changes by migration. An inactive city cannot be newly chosen, but a holder that already has it keeps it. The city is not synced to the cloud yet (T9.4). |
 
 ## 7. Functional requirements
 
@@ -163,6 +164,7 @@ Priority: **M** = MVP, **L** = later in MVP roadmap (Phase 6–8).
 
 ### 7.3 Holders (FR-BEN)
 - FR-BEN-01 (M) Search by card number, name (contains), phone, national ID.
+- FR-BEN-05 (S) Optional city on the holder (BR-32), chosen from a fixed list, shown in the holder panel and the holders list.
 - FR-BEN-02 (M) View holder details and full entry history.
 - FR-BEN-03 (M) Edit holder (Supervisor), including card number change (audited).
 - FR-BEN-04 (M) Suspend / reactivate / block with reason.
@@ -259,7 +261,7 @@ Defaults below are applied until the user answers. An agent must not change a de
 | Q2 | Is the holder counted inside the adult count or separately? | **Answered 2026-10-04:** separately (BR-08) | — |
 | Q3 | Rolling 12 h window, or "once per calendar day / per opening day"? | **Answered 2026-10-04:** rolling window in hours (BR-02/BR-03), chosen for finer control | — |
 | Q4 | Maximum group size? Limits per category? | Max 10 total, no per-category limit | — |
-| Q5 | Which holder fields are required by the client (national ID, card expiry)? | Name + phone required; others optional | — |
+| Q5 | Which holder fields are required by the client (national ID, card expiry)? | Name required; others optional (phone became optional in F9, Osama, 2026-11-22) | — |
 | Q6 | How many desks? Is an offline fallback needed if the server PC fails? | **Answered 2026-11-20 (Q-R6):** at most 4 desks in a workgroup; no offline mode. One SQL login for the desks (ADR-027) | — |
 | Q7 | Do other organizations get different rules (cooldown, group size)? | Per-organization cooldown only | — |
 | Q8 | Does the park invoice the fund for free entries? What report format does the fund require? | **Answered 2026-10-04:** no financial claims; per-organization statistics are important (FR-RPT-03) | — |

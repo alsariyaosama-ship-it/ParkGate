@@ -6,6 +6,7 @@ public interface IUnitOfWork : IAsyncDisposable, IDisposable
     IOrganizationRepository Organizations { get; }
     IEntryAttemptRepository EntryAttempts { get; }
     IAgeCategoryRepository AgeCategories { get; }
+    ICityRepository Cities { get; }
     IUserRepository Users { get; }
     IWorkstationRepository Workstations { get; }
     IAppSettingRepository AppSettings { get; }

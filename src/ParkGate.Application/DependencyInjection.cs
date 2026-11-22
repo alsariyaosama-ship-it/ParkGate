@@ -4,6 +4,7 @@ using ParkGate.Application.AgeCategories.Services;
 using ParkGate.Application.Auth.Services;
 using ParkGate.Application.Beneficiaries.Services;
 using ParkGate.Application.CheckIn.Services;
+using ParkGate.Application.Cities.Services;
 using ParkGate.Application.Common;
 using ParkGate.Application.EntryCards;
 using ParkGate.Application.GiftVouchers.Services;
@@ -43,6 +44,7 @@ public static class DependencyInjection
         services.AddTransient<ICheckInService, CheckInService>();
         services.AddTransient<IOrganizationService, OrganizationService>();
         services.AddTransient<IAgeCategoryService, AgeCategoryService>();
+        services.AddTransient<ICityService, CityService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IWorkstationService, WorkstationService>();
         services.AddTransient<IReportService, ReportService>();

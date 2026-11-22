@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Windows.Forms;
 using ParkGate.Application.AgeCategories.DTOs;
 using ParkGate.Application.Beneficiaries.DTOs;
+using ParkGate.Application.Cities.DTOs;
+using ParkGate.Application.Cities.Services;
 using ParkGate.Application.CheckIn.DTOs;
 using ParkGate.Domain.Enums;
 using ParkGate.WinForms.Controls;
@@ -1327,7 +1329,9 @@ public sealed class CheckInDeskControlTests
         public int InfoCalls { get; private set; }
 
         public void Info(string message, string? title = null) => InfoCalls++;
-        public void Warning(string message, string? title = null) { }
+        public int WarningCalls { get; private set; }
+
+        public void Warning(string message, string? title = null) => WarningCalls++;
         public void Error(string message, string? title = null) { }
 
         public bool Confirm(string message, string? title = null)
@@ -1380,6 +1384,85 @@ public sealed class CheckInDeskControlTests
                 RecentAttempts: []);
 
             return Task.FromResult(ParkGate.Application.Common.Result.Success(summary));
+        }
+    }
+
+    // ── F9, BR-15 and BR-32: optional phone, optional city ──────────────────
+
+    private static ParkGate.Application.Organizations.DTOs.OrganizationDto DefaultOrg() =>
+        new(2, "SSF", "صندوق التضامن", 720, IsDefault: true, IsActive: true);
+
+    [Fact]
+    public async Task CheckInDeskControl_OnDeskLoaded_OffersTheActiveCitiesInOrder()
+    {
+        using var control = TestUi.Create<CheckInDeskControl>(new FakeOrganizationService(DefaultOrg()));
+
+        await control.OnDeskLoadedAsync();
+
+        var city = GetField<SearchableComboBox>(GetField<InlineRegistrationPanel>(control, "_registrationPanel"), "_cmbRegCity");
+        city.Items.Cast<object>().Select(i => i.ToString()).ShouldBe(FakeCityService.DefaultCities.Select(c => c.NameAr));
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_OnDeskLoaded_WhenCitiesFail_RegistrationStillWorksWithAnEmptyList()
+    {
+        var cities = new ThrowingCityService();
+        using var control = TestUi.Create<CheckInDeskControl>(new FakeOrganizationService(DefaultOrg()), cities);
+
+        await control.OnDeskLoadedAsync();
+
+        cities.Calls.ShouldBe(1);
+        var city = GetField<SearchableComboBox>(GetField<InlineRegistrationPanel>(control, "_registrationPanel"), "_cmbRegCity");
+        city.Items.Count.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_WithoutPhone_SendsNoPhoneAndTheChosenCity_WithoutAWarning()
+    {
+        var beneficiaries = new FakeBeneficiaryService();
+        var notify = new FakeNotifyService(confirmAnswer: true);
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries, new FakeOrganizationService(DefaultOrg()), notify);
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "561";
+        control.ShowInlineRegistration("561", orgId: 2);
+        var panel = GetField<InlineRegistrationPanel>(control, "_registrationPanel");
+        GetField<TextBox>(panel, "_txtRegFullName").Text = "سالم محمود علي الورفلي";
+        GetField<TextBox>(panel, "_txtRegPhone").Text = "   ";
+        GetField<SearchableComboBox>(panel, "_cmbRegCity").Text = "خمس"; // typed and never left: the save resolves it
+
+        await control.SaveInlineRegistrationAsync();
+
+        var request = beneficiaries.LastRegisterRequest;
+        request.ShouldNotBeNull();
+        request.Phone.ShouldBeNull();
+        request.NationalId.ShouldBeNull();
+        request.CityId.ShouldBe(1);
+        notify.WarningCalls.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task CheckInDeskControl_InlineRegistration_WithPhoneAndNoCity_SendsThePhoneAndNoCity()
+    {
+        var beneficiaries = new FakeBeneficiaryService();
+        using var control = TestUi.Create<CheckInDeskControl>(beneficiaries, new FakeOrganizationService(DefaultOrg()));
+        await control.OnDeskLoadedAsync();
+        GetField<TextBox>(control, "_txtCardNumber").Text = "562";
+        control.ShowInlineRegistration("562", orgId: 2);
+
+        await FillAndSaveRegistrationAsync(control);
+
+        beneficiaries.LastRegisterRequest!.Phone.ShouldBe("0912345678");
+        beneficiaries.LastRegisterRequest.CityId.ShouldBeNull();
+    }
+
+    private sealed class ThrowingCityService : ICityService
+    {
+        public int Calls { get; private set; }
+
+        public Task<ParkGate.Application.Common.Result<IReadOnlyList<CityDto>>> GetActiveAsync(CancellationToken cancellationToken = default)
+        {
+            Calls++;
+            throw new InvalidOperationException("cities are down");
         }
     }
 }
